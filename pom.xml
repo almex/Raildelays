@@ -10,6 +10,7 @@
 
 	<modules>
 		<module>domain-layer</module>
+		<module>httpclient-layer</module>
 		<module>parser-layer</module>
 	</modules>
 
@@ -23,19 +24,46 @@
 
 	<dependencyManagement>
 		<dependencies>
-		
+
+			<!-- Internal dependencies -->
 			<dependency>
 				<groupId>be.raildelays</groupId>
 				<artifactId>raildelays-domain</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-			
+			<dependency>
+				<groupId>be.raildelays</groupId>
+				<artifactId>raildelays-httpclient</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>be.raildelays</groupId>
+				<artifactId>raildelays-parser</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<!-- External dependencies -->
 			<dependency>
 				<groupId>log4j</groupId>
 				<artifactId>log4j</artifactId>
 				<version>1.2.16</version>
 			</dependency>
-			
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>3.8.2</version>
+			</dependency>
+			<dependency>
+				<groupId>org.codehaus.groovy</groupId>
+				<artifactId>groovy</artifactId>
+				<version>1.8.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.codehaus.groovy</groupId>
+				<artifactId>groovy-eclipse-compiler</artifactId>
+				<version>2.5.1-1</version>
+			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 
@@ -45,9 +73,9 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<compilerVersion>1.7</compilerVersion>          
+					<compilerVersion>1.7</compilerVersion>
 					<source>1.7</source>
-         			<target>1.7</target>
+					<target>1.7</target>
 				</configuration>
 			</plugin>
 		</plugins>
