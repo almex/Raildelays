@@ -9,6 +9,7 @@
 	<packaging>pom</packaging>
 
 	<modules>
+		<module>common-layer</module>
 		<module>domain-layer</module>
 		<module>httpclient-layer</module>
 		<module>parser-layer</module>
@@ -26,6 +27,11 @@
 		<dependencies>
 
 			<!-- Internal dependencies -->
+			<dependency>
+				<groupId>be.raildelays</groupId>
+				<artifactId>raildelays-common</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>be.raildelays</groupId>
 				<artifactId>raildelays-domain</artifactId>
@@ -51,7 +57,7 @@
 			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
-				<version>3.8.2</version>
+				<version>4.10</version>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>

@@ -13,6 +13,7 @@ public class Direction implements Serializable {
 	private Integer totalDelay = null;
 	private Station from;
 	private Station to;
+	private String libelle;
 	
 	public Direction (Train train) {
 		this.setTrain(train);
@@ -64,6 +65,14 @@ public class Direction implements Serializable {
 
 	public void setTo(Station to) {
 		this.to = to;
+	}
+
+	public String getLibelle() {
+		return libelle;
+	}
+
+	public void setLibelle(String libelle) {
+		this.libelle = libelle;
 	}
 
 }

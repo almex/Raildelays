@@ -3,14 +3,14 @@ package be.raildelays.domain.railtime;
 import java.io.Serializable;
 import java.util.Date;
 
-public class Step extends Stop implements Serializable  {
+public class Step extends LineStop implements Serializable  {
 
 	private static final long serialVersionUID = -3386080893909407089L;
 
 	private Integer delay;
 	
-	public Step (String stationName, Date hour, Integer delay) {
-		super(stationName, hour);
+	public Step (String stationName, Date from, Date to, Integer delay) {
+		super(stationName, from, to);
 		this.setDelay(delay);
 	}
 

@@ -14,9 +14,29 @@
 	<dependencies>	
 		
 		<dependency>
+			<groupId>be.raildelays</groupId>
+			<artifactId>raildelays-common</artifactId>
+		</dependency>
+		
+		<dependency>
 			<groupId>org.codehaus.groovy</groupId>
 			<artifactId>groovy</artifactId>
 			<type>jar</type>
+		</dependency>		
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.codehaus.groovy.modules.http-builder</groupId>
+			<artifactId>http-builder</artifactId>
+			<version>0.5.2</version>
 		</dependency>
 		
 	</dependencies>
