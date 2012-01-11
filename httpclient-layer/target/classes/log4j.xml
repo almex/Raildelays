@@ -9,7 +9,7 @@
 		</layout>
 	</appender>
 
-	<logger name="org.proxyrailtime">
+	<logger name="be.raildelays">
 		<level value="debug" />
 	</logger>
 
