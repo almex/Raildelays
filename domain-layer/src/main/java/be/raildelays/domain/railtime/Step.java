@@ -7,18 +7,28 @@ public class Step extends LineStop implements Serializable  {
 
 	private static final long serialVersionUID = -3386080893909407089L;
 
-	private Integer delay;
+	private Long delay;
 	
-	public Step (String stationName, Date from, Date to, Integer delay) {
-		super(stationName, from, to);
+	private boolean canceled;
+	
+	public Step (String stationName, Date timestamp, Long delay, boolean canceled) {
+		super(stationName, timestamp);
 		this.setDelay(delay);
+		this.canceled = canceled;		
 	}
 
-	public Integer getDelay() {
+	public Long getDelay() {
 		return delay;
 	}
 
-	public void setDelay(Integer delay) {
+	public void setDelay(Long delay) {
 		this.delay = delay;
+	}
+
+	public boolean isCanceled() {
+		return canceled;
+	}
+	public void setCanceled(boolean canceled) {
+		this.canceled = canceled;
 	}
 }

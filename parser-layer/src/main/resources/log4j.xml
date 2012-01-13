@@ -10,7 +10,7 @@
 	</appender>
 
 	<logger name="be.raildelays">
-		<level value="debug" />
+		<level value="info" />
 	</logger>
 
 	<root>

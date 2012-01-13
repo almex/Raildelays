@@ -10,7 +10,6 @@ public class Direction implements Serializable {
 	
 	private Train train;
 	private List<Step> steps = new ArrayList<>();
-	private Integer totalDelay = null;
 	private Station from;
 	private Station to;
 	private String libelle;
@@ -19,18 +18,25 @@ public class Direction implements Serializable {
 		this.setTrain(train);
 	}
 	
-	public Integer getTotalDelay() {
-		if (totalDelay == null) {
-			totalDelay = 0;
-			
-			for(Step step : steps) {
-				this.totalDelay += step.getDelay();
-			}
-		} 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder("title="+libelle+"\n");
 		
-		return totalDelay;
+		for(Step step : steps) {
+			if(step.getDelay() > 15 || step.isCanceled()) {
+				builder.append("station="+step.getStation()+"\n");
+				if(step.isCanceled()) {
+					builder.append("Canceled!"+"\n");
+				} else {
+					builder.append("timestamp="+step.getTimestamp()+"\n")
+						   .append("delay="+step.getDelay()+"\n");
+				}
+			}
+		}
+		
+		return builder.toString();
 	}
-	
+
 	public Integer getDelayBetween(Station from, Station to) {
 		return 0;
 	}

@@ -1,15 +1,20 @@
 package be.railrelays.parser
 
+import java.io.InputStreamReader
+import java.io.Reader
+import java.util.Date
+
+import org.apache.log4j.Logger;
 import org.junit.Assert
-import be.raildelays.util.ParsingUtil
-import org.junit.Before
 import org.junit.Test
 
 import be.raildelays.domain.railtime.Direction
+import be.raildelays.domain.railtime.Step
 import be.raildelays.httpclient.RequestStreamer
 import be.raildelays.httpclient.impl.RailtimeRequestStreamer
 import be.raildelays.parser.StreamParser
 import be.raildelays.parser.impl.RailtimeStreamParser
+import be.raildelays.util.ParsingUtil
 
 /**
  * Tests for the {@link StreamParser} class.
@@ -18,84 +23,67 @@ class StreamParserTest
 {
 	
 	StreamParser parser;
-	RequestStreamer streamer;
-	Date date; 
 	
-	@Before 
-	void setUp() {
-		date = ParsingUtil.parseDate('11/01/2012');		
-		streamer = new RailtimeRequestStreamer();		
-	} 
 	
+	Logger log = Logger.getLogger(StreamParserTest.class)
+	
+	/**
+	 * Test train 466 today.
+	 */
 	@Test
-    void testParseDelayFrom466() {
-		parser = new RailtimeStreamParser(streamer.getDelays("466", date));
-		Object object = parser.parseDelayFrom("466", date);
-		Assert.assertNotNull("This method should return a result", object);
-		Assert.assertNotNull("This method should return a Direction", object instanceof Direction);
-	}
-	
-	/*@Test
-    void testParseDelayFrom467() {
-		parser = new RailtimeStreamParser(streamer.getDelays("467", date));
-		Object object = parser.parseDelayFrom("467", date);
+    void testParseDelayFrom466() {	
+		RequestStreamer streamer = new RailtimeRequestStreamer();	
+		Date date = new Date();
+		String train = "466";
+		parser = new RailtimeStreamParser(streamer.getDelays(train, date));
+		Object object = parser.parseDelay(train, date);
 		Assert.assertNotNull("This method should return a result", object);
 		Assert.assertNotNull("This method should return a Direction", object instanceof Direction);
 	}
 	
 	@Test
-    void testParseDelayFrom468() {
-		parser = new RailtimeStreamParser(streamer.getDelays("468", date));
-		Object object = parser.parseDelayFrom("468", date);
+    void testParseDelayFromSample1() {		
+		Reader reader = new InputStreamReader(this.getClass().getResourceAsStream("/Sample1.html"));
+		parser = new RailtimeStreamParser(reader);
+		Object object = parser.parseDelay("477", ParsingUtil.parseDate("13/01/2012"));
 		Assert.assertNotNull("This method should return a result", object);
 		Assert.assertNotNull("This method should return a Direction", object instanceof Direction);
+		Direction direction = (Direction)object;
+		Step[] steps = (Step[])direction.getSteps().toArray();
+		Assert.assertEquals("Step1 should from station", "Gouvy", steps[0].getStation().getName());
+		Assert.assertEquals("Step12 should have a delay of", 0, steps[0].getDelay());
+		Assert.assertEquals("Step12 should have timestamp of", ParsingUtil.parseTimestamp("13/01/201205:07"), steps[0].getTimestamp());
+		//Assert.assertEquals("Step12 should from station", "Liège-Guillemins", steps[12].getStation().getName());
+		Assert.assertEquals("Step12 should have a delay of", 0, steps[12].getDelay());
+		Assert.assertEquals("Step12 should have timestamp of", ParsingUtil.parseTimestamp("13/01/201206:34"), steps[12].getTimestamp());
+		Assert.assertTrue("Step15 should be canceled", steps[13].isCanceled());
+		Assert.assertTrue("Step15 should be canceled", steps[14].isCanceled());
+		Assert.assertTrue("Step15 should be canceled", steps[15].isCanceled());
+		Assert.assertTrue("Step15 should be canceled", steps[16].isCanceled());
+		
 	}
 	
-	@Test
-    void testParseDelayFrom514() {
-		parser = new RailtimeStreamParser(streamer.getDelays("514", date));
-		Object object = parser.parseDelayFrom("514", date);
-		Assert.assertNotNull("This method should return a result", object);
-		Assert.assertNotNull("This method should return a Direction", object instanceof Direction);
-	}
+	
 	
 	@Test
-    void testParseDelayFrom515() {
-		parser = new RailtimeStreamParser(streamer.getDelays("515", date));
-		Object object = parser.parseDelayFrom("515", date);
+	void testParseDelayFromSample2() {
+		Reader reader = new InputStreamReader(this.getClass().getResourceAsStream("/Sample2.html"));
+		parser = new RailtimeStreamParser(reader);
+		Object object = parser.parseDelay("466", ParsingUtil.parseDate("11/01/2012"));
 		Assert.assertNotNull("This method should return a result", object);
 		Assert.assertNotNull("This method should return a Direction", object instanceof Direction);
+		Direction direction = (Direction)object;
+		Step[] steps = (Step[])direction.getSteps().toArray();
+		Assert.assertEquals("Step1 should from station", "Brussels (Bruxelles)-Midi", steps[0].getStation().getName());
+		Assert.assertEquals("Step12 should have a delay of", 19, steps[0].getDelay());
+		Assert.assertEquals("Step12 should have timestamp of", ParsingUtil.parseTimestamp("11/01/201216:24"), steps[0].getTimestamp());
+		Assert.assertEquals("Step12 should from station", "Brussels (Bruxelles)-Central", steps[1].getStation().getName());
+		Assert.assertEquals("Step12 should have a delay of", 22, steps[1].getDelay());
+		Assert.assertEquals("Step12 should have timestamp of", ParsingUtil.parseTimestamp("11/01/201216:28"), steps[1].getTimestamp());
+		Assert.assertEquals("Step12 should from station", "Brussels (Bruxelles)-Nord", steps[2].getStation().getName());
+		Assert.assertEquals("Step12 should have a delay of", 22, steps[2].getDelay());
+		Assert.assertEquals("Step12 should have timestamp of", ParsingUtil.parseTimestamp("11/01/201216:33"), steps[2].getTimestamp());
+		Assert.assertTrue("Step15 should be canceled", steps[4].isCanceled());
+		Assert.assertTrue("Step15 should be canceled", steps[5].isCanceled());
 	}
-	
-	@Test
-    void testParseDelayFrom477() {
-		parser = new RailtimeStreamParser(streamer.getDelays("477", date));
-		Object object = parser.parseDelayFrom("477", date);
-		Assert.assertNotNull("This method should return a result", object);
-		Assert.assertNotNull("This method should return a Direction", object instanceof Direction);
-	}
-	
-	@Test
-    void testParseDelayFrom478() {
-		parser = new RailtimeStreamParser(streamer.getDelays("478", date));
-		Object object = parser.parseDelayFrom("478", date);
-		Assert.assertNotNull("This method should return a result", object);
-		Assert.assertNotNull("This method should return a Direction", object instanceof Direction);
-	}
-	
-	@Test
-    void testParseDelayFrom529() {
-		parser = new RailtimeStreamParser(streamer.getDelays("529", date));
-		Object object = parser.parseDelayFrom("529", date);
-		Assert.assertNotNull("This method should return a result", object);
-		Assert.assertNotNull("This method should return a Direction", object instanceof Direction);
-	}
-	
-	@Test
-    void testParseDelayFrom530() {
-		parser = new RailtimeStreamParser(streamer.getDelays("530", date));
-		Object object = parser.parseDelayFrom("530", date);
-		Assert.assertNotNull("This method should return a result", object);
-		Assert.assertNotNull("This method should return a Direction", object instanceof Direction);
-	}*/
 }

@@ -7,38 +7,28 @@ public class LineStop implements Serializable {
 
 	private static final long serialVersionUID = 3019492480070457922L;
 	
-	private Station station;
-	private Date from;
-	private Date to;
+	protected Station station;
+	protected Date timestamp;
 
-	public LineStop (String stationName, Date from, Date to) {
+	public LineStop (String stationName, Date timestamp) {
 		this.station = new Station(stationName);
-		this.setFrom(from);
-		this.setTo(to);
+		this.timestamp = timestamp;
 	}
 	
 	public Station getStation() {
 		return station;
 	}
-	
+
 	public void setStation(Station station) {
 		this.station = station;
 	}
 
-	public Date getFrom() {
-		return from;
+	public Date getTimestamp() {
+		return timestamp;
 	}
 
-	public void setFrom(Date from) {
-		this.from = from;
-	}
-
-	public Date getTo() {
-		return to;
-	}
-
-	public void setTo(Date to) {
-		this.to = to;
+	public void setTimestamp(Date timestamp) {
+		this.timestamp = timestamp;
 	}
 
 }

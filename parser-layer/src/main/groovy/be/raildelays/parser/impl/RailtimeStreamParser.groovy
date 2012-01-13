@@ -11,72 +11,66 @@ import be.raildelays.parser.StreamParser
 import be.raildelays.util.ParsingUtil
 
 class RailtimeStreamParser implements StreamParser {
-	
+
 	private Reader reader;
 	def tagsoupParser;
 	def slurper;
 	def html;
-	
+
 	public RailtimeStreamParser(reader) {
 		this.reader = reader;
 		init();
 	}
-	
+
 	private void init() {
 		tagsoupParser = new org.ccil.cowan.tagsoup.Parser()
 		slurper = new XmlSlurper(tagsoupParser)
 		html = slurper.parse(reader)
 	}
-	
+
 	Logger log = Logger.getLogger(RailtimeStreamParser.class)
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Direction parseDelayFrom(String idTrain, Date date) {
-		def steps = [] as List
-	
-		def body = html.body.'**'
-		Direction direction = new Direction(new Train(idTrain))
-		
-		def title = body.find { it.name() == 'h1' }.text()
-		log.debug("title="+title)
-		direction.setLibelle(title);
-		
-		
-		// Parse the page
-		body.findAll { it.name() == 'tr' && it.@class.text().contains('rowHeightTraject') }.each { tr ->
-			String station = tr.td[1].text()
-			String hour = tr.td[2].text()
-			String delay = tr.td[3].text()
-			
-			Step step = new Step(station, ParsingUtil.parseTimestamp(ParsingUtil.formatDate(date)+hour), null, parseDelay(delay))
-	
-			if(step.delay > 15) {
-				log.debug("station="+step.station.name)
-				log.debug("hour="+step.from)
-				log.debug("delay="+step.delay)
-			}
-			steps.add(step)
-		}
-		direction.steps = steps
-		
-		return direction;
-	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Direction parseDelayTo(String idTrain, Date date) {
-		throw new UnsupportedOperationException();
+	public Direction parseDelay(String idTrain, Date date) {
+		def steps = []as List
+
+		def body = html.body.'**'
+		Direction direction = new Direction(new Train(idTrain))
+
+		def title = body.find { it.name() == 'h1' }.text()
+		log.debug("title="+title)
+		direction.setLibelle(title);
+
+
+		// Parse the page
+		body.findAll { it.name() == 'tr' && it.@class.text().contains('rowHeightTraject') }.each { tr ->
+			String station = tr.td[1].text()
+			String hour = tr.td[2].text()
+			String delay = tr.td[3].text()
+			boolean canceled = tr.td[1].a.@class.text().contains("red")
+			
+			log.debug("station="+station)
+			log.debug("hour="+hour)
+			log.debug("delay="+delay)
+			log.debug("canceled="+canceled)
+
+			Step step = new Step(station, ParsingUtil.parseTimestamp(ParsingUtil.formatDate(date)+hour), parseDelay(delay), canceled)
+			
+
+			steps.add(step)
+		}
+		direction.steps = steps
+
+		return direction;
 	}
-	
-	def Integer stringToInteger(String value) {
+
+	def Long stringToLong(String value) {
 		String target = value.trim()
 		if (target.isInteger())
-			return Integer.parseInt(target)
+			return Long.parseLong(target)
 	}
 
 	def String extractDelay(String value) {
@@ -84,7 +78,7 @@ class RailtimeStreamParser implements StreamParser {
 	}
 
 	def parseDelay(String value) {
-		Integer delay = stringToInteger(extractDelay(value))	
+		Long delay = stringToLong(extractDelay(value))
 		return delay != null ? delay : 0
 	}
 }
