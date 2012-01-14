@@ -3,7 +3,7 @@ package be.raildelays.domain.railtime;
 import java.io.Serializable;
 import java.util.Date;
 
-public class Step extends LineStop implements Serializable  {
+public class Step extends Stop implements Serializable  {
 
 	private static final long serialVersionUID = -3386080893909407089L;
 
@@ -31,4 +31,20 @@ public class Step extends LineStop implements Serializable  {
 	public void setCanceled(boolean canceled) {
 		this.canceled = canceled;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder("station="+this.getStation()+"\n");
+		
+		if(this.isCanceled()) {
+			builder.append("Canceled!"+"\n");
+		} else {
+			builder.append("timestamp="+this.getTimestamp()+"\n")
+				   .append("delay="+this.getDelay()+"\n");
+		}
+		
+		return builder.toString();
+	}
+	
+	
 }

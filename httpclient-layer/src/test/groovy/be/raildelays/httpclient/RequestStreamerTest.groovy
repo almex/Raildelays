@@ -3,11 +3,12 @@ package be.raildelays.httpclient
 import static org.junit.Assert.assertNotNull
 
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 
 import be.raildelays.httpclient.impl.RailtimeRequestStreamer
 
-class RequestStreamerTest {
+class RailtimeRequestStreamerTest {
 
 	/**
 	 * S.U.T.
@@ -20,6 +21,7 @@ class RequestStreamerTest {
 	}
 	
 	@Test(timeout=1500L)
+	@Ignore
 	void testGetStationList() {
 		assertNotNull("The request should return a result", streamer.getStationList())
 	}

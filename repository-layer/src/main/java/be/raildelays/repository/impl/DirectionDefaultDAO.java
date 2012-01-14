@@ -1,44 +1,56 @@
 package be.raildelays.repository.impl;
 
 import java.sql.Date;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.springframework.stereotype.Repository;
 
-import be.raildelays.domain.entities.Direction;
-import be.raildelays.domain.railtime.Station;
-import be.raildelays.repository.DirectionDAO;
+import be.raildelays.domain.entities.LineStop;
+import be.raildelays.domain.entities.Station;
+import be.raildelays.repository.LineStopDAO;
 
-@Repository(value = "DirectionDAO")
-public class DirectionDefaultDAO implements DirectionDAO {
+@Repository(value = "LineStopDAO")
+public class DirectionDefaultDAO implements LineStopDAO {
 
 	@PersistenceContext
 	private EntityManager entityManager;
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public Direction createDirection(Direction direction) {
-		entityManager.persist(direction);
-		return direction;
+	public LineStop createLineStop(LineStop lineStop) {
+		entityManager.persist(lineStop);
+
+		return lineStop;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public Direction searchDirection(Station from, Station to, Date date) {
-		// TODO Auto-generated method stub
+	public List<LineStop> searchLineStop(Station departure, Station arrival,
+			Date date) {
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public void removeDirection(Long idDirection) {
-		// TODO Auto-generated method stub
+	public void removeLineStop(Long idLineStop) {
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public Direction updateDirection(Direction direction) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+	public LineStop updateLineStop(LineStop lineStop) {
+		return entityManager.merge(lineStop);
 	}
 
 }

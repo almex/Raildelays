@@ -19,24 +19,27 @@ interface RequestStreamer {
 	 * @param stationNameTo station's name using Railtime format
 	 * @param day date for which you do the search
 	 * @param hour between 00 and 24
+	 * @param language specify 'en', 'fr' or 'nl'
 	 * @return an HTML content as a stream to parse
 	 */
-	public Reader getTrainList(String stationNameFrom, String stationNameTo, Date day, Integer hour)
+	public Reader getTrainList(String stationNameFrom, String stationNameTo, Date day, Integer hour, String language)
 
 
 	/**
 	 * Request line list between two stations/stops.
 	 *
+	 * @param language specify 'en', 'fr' or 'nl'
 	 * @return an HTML content as a stream to parse
 	 */
-	//public Reader getLineList(String idStationFrom, String idStationTo, Date timeFrom, Date timeTo)
+	//public Reader getLineList(String idStationFrom, String idStationTo, Date timeFrom, Date timeTo, String language)
 
 	/**
 	 * Request station list.
 	 * 
+	 * @param language specify 'en', 'fr' or 'nl'
 	 * @return an HTML content as a stream to parse
 	 */
-	public Reader getStationList()
+	public Reader getStationList(String language)
 
 
 	/**
@@ -44,9 +47,10 @@ interface RequestStreamer {
 	 * 
 	 * @param idTrain train's id using Railtime format
 	 * @param day day for which you want to retrive
+	 * @param language specify 'en', 'fr' or 'nl'
 	 * @return an HTML content as a stream to parse
 	 */
-	public Reader getDelays(String idTrain,  Date day)
+	public Reader getDelays(String idTrain,  Date day, String language)
 
 
 	/**

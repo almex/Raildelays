@@ -3,14 +3,14 @@ package be.raildelays.domain.railtime;
 import java.io.Serializable;
 import java.util.Date;
 
-public class LineStop implements Serializable {
+public class Stop implements Serializable {
 
 	private static final long serialVersionUID = 3019492480070457922L;
 	
 	protected Station station;
 	protected Date timestamp;
 
-	public LineStop (String stationName, Date timestamp) {
+	public Stop (String stationName, Date timestamp) {
 		this.station = new Station(stationName);
 		this.timestamp = timestamp;
 	}

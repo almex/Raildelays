@@ -24,13 +24,7 @@ public class Direction implements Serializable {
 		
 		for(Step step : steps) {
 			if(step.getDelay() > 15 || step.isCanceled()) {
-				builder.append("station="+step.getStation()+"\n");
-				if(step.isCanceled()) {
-					builder.append("Canceled!"+"\n");
-				} else {
-					builder.append("timestamp="+step.getTimestamp()+"\n")
-						   .append("delay="+step.getDelay()+"\n");
-				}
+				builder.append(step.toString());
 			}
 		}
 		
