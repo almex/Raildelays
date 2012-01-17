@@ -15,18 +15,18 @@ class RailtimeRequestStreamerTest {
 	 */
 	private RequestStreamer streamer;
 		
-	@Test(timeout=3000L)
+	@Test(timeout=5000L)
 	void testGetTrainList() {
 		assertNotNull("The request should return a result", streamer.getTrainList('Bruxelles-Central','Liège-Guillemins', new Date(),0))
 	}
 	
-	@Test(timeout=1500L)
+	@Test(timeout=3000L)
 	@Ignore
 	void testGetStationList() {
 		assertNotNull("The request should return a result", streamer.getStationList())
 	}
 	
-	@Test(timeout=1500L)
+	@Test(timeout=3000L)
 	void testGetDelays() {
 		assertNotNull("The request should return a result", streamer.getDelays('466', new Date()))
 	}

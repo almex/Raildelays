@@ -14,6 +14,7 @@
 		<module>repository-layer</module>
 		<module>httpclient-layer</module>
 		<module>parser-layer</module>
+		<module>service-layer</module>
 	</modules>
 
 	<prerequisites>
@@ -43,12 +44,22 @@
 			</dependency>
 			<dependency>
 				<groupId>be.raildelays</groupId>
+				<artifactId>raildelays-repository</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>be.raildelays</groupId>
 				<artifactId>raildelays-httpclient</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>be.raildelays</groupId>
 				<artifactId>raildelays-parser</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>be.raildelays</groupId>
+				<artifactId>raildelays-service</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
