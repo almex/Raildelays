@@ -8,12 +8,12 @@
 
 	<bean id="dataSource"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource"
-		p:driverClassName="org.hsqldb.jdbcDriver" p:url="jdbc:hsqldb:file:db/test"
+		p:driverClassName="org.hsqldb.jdbcDriver" p:url="jdbc:hsqldb:mem:."
 		p:username="sa" p:password="" />
 
 	<bean id="entityManagerFactory"
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
-		p:dataSource-ref="dataSource" p:persistence-unit-name="jpa">
+		p:dataSource-ref="dataSource" p:persistence-unit-name="raildelays-repository">
 		<property name="jpaVendorAdapter">
 			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"
 				p:database="HSQL" p:databasePlatform="org.hibernate.dialect.HSQLDialect"
@@ -26,6 +26,7 @@
 
 	<context:annotation-config />
 
+	<context:component-scan base-package="be.raildelays.domain.entities" />
 	<context:component-scan base-package="be.raildelays.repository.impl" />
 
 	<tx:annotation-driven />

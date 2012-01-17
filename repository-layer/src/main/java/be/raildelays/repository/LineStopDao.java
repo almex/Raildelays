@@ -12,7 +12,7 @@ import be.raildelays.domain.railtime.Stop;
  * 
  * @author Almex
  */
-public interface LineStopDAO {
+public interface LineStopDao {
 
 	/**
 	 * Persist a new LineStop to the repository.

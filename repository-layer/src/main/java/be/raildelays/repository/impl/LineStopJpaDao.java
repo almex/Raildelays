@@ -10,10 +10,10 @@ import org.springframework.stereotype.Repository;
 
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.repository.LineStopDAO;
+import be.raildelays.repository.LineStopDao;
 
-@Repository(value = "LineStopDAO")
-public class DirectionDefaultDAO implements LineStopDAO {
+@Repository(value = "lineStopDao")
+public class LineStopJpaDao implements LineStopDao {
 
 	@PersistenceContext
 	private EntityManager entityManager;
