@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import be.raildelays.domain.entities.LineStop;
@@ -14,8 +15,9 @@ import be.raildelays.domain.entities.TimestampDelay;
 import be.raildelays.domain.entities.Train;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:spring/raildelays-dao.xml")
+@ContextConfiguration(locations = "classpath:spring/raildelays-dao-context.xml")
 @Transactional
+@TransactionConfiguration(defaultRollback=true)
 public class LineStopJpaDaoIT {
 	
 	@Resource

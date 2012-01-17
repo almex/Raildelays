@@ -36,6 +36,13 @@ public class Train implements Serializable {
 	
 	private String dutchName;
 	
+	public Train() {
+		this.id = null;
+		this.englishName = "";
+		this.dutchName = "";
+		this.frenchName = "";
+	}
+	
 	public Train(String name) {
 		this.englishName = name;
 	}

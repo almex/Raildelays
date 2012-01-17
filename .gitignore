@@ -35,3 +35,6 @@
 /domain-layer/target
 /common-layer/.settings
 /service-layer/target
+/service-layer/.settings
+/service-layer/.classpath
+/service-layer/.project

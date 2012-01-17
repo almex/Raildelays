@@ -28,6 +28,13 @@ public class Station implements Serializable {
 	
 	private String dutchName;
 	
+	public Station() {
+		this.id = null;
+		this.englishName = "";
+		this.dutchName = "";
+		this.frenchName = "";
+	}
+	
 	public Station(String name) {
 		this.englishName = name;
 	}

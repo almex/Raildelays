@@ -28,16 +28,18 @@ public class LineStop implements Serializable {
 	private static final long serialVersionUID = 7142886242889314414L;
 
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
+	@Column(name="ID")
 	private Long id;
 	
 	@ManyToOne(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
-	@JoinColumn(name="trainId", nullable = false)
+	@JoinColumn(name="TRAIN_ID", nullable = false)
 	private Train train;
 	
 	@ManyToOne(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
-	@JoinColumn(name="stationId", nullable = false)
+	@JoinColumn(name="STATION_ID", nullable = false)
 	private Station station;
 	
+	@Column(name="CANCELED")
 	private boolean canceled;
 	
 	@Embedded
@@ -54,11 +56,20 @@ public class LineStop implements Serializable {
 	})
 	private TimestampDelay departureTime;
 	
+	public LineStop() {
+		this.train = null;
+		this.station = null;
+		this.arrivalTime = null;
+		this.departureTime = null;
+		this.canceled = false;
+	}
+	
 	public LineStop(Train train, Station station, TimestampDelay arrivalTime, TimestampDelay departureTime, boolean canceled) {
 		this.train = train;
 		this.station = station;
 		this.arrivalTime = arrivalTime;
 		this.departureTime = departureTime;
+		this.canceled = canceled;
 	}
 	
 	public LineStop(Train train, Station station, TimestampDelay arrivalTime, TimestampDelay departureTime) {
