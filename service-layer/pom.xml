@@ -80,6 +80,10 @@
 			<groupId>net.sf.dozer</groupId>
 			<artifactId>dozer</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+		</dependency>
 
 		<!-- For testing -->
 		<dependency>
@@ -87,13 +91,6 @@
 			<artifactId>spring-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-tx</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<!-- Aspect programming <dependency> <groupId>cglib</groupId> <artifactId>cglib</artifactId> 
-			</dependency> -->
 
 	</dependencies>
 

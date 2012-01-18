@@ -16,6 +16,11 @@ public class RailtimeTrain extends Train {
 		this.railtimeId = railtimeId;
 	}
 
+	public RailtimeTrain(String railtimeId) {
+		super();
+		this.railtimeId = railtimeId;		
+	}
+
 	public String getRailtimeId() {
 		return railtimeId;
 	}

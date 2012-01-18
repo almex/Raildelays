@@ -14,7 +14,7 @@ Logger log = Logger.getLogger(GlobalTest.class)
 
 StreamParser parser;
 RequestStreamer streamer = new RailtimeRequestStreamer();
-Date date = ParsingUtil.parseDate('17/01/2012');
+Date date = ParsingUtil.parseDate('18/01/2012');
 Direction direction;
 parser = new RailtimeStreamParser(streamer.getDelays("466", date));
 direction = parser.parseDelay("466", date);

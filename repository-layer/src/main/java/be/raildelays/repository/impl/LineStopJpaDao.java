@@ -32,7 +32,7 @@ public class LineStopJpaDao implements LineStopDao {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<LineStop> searchLineStop(Station departure, Station arrival,
+	public List<LineStop> retrieveLineStop(Station departure, Station arrival,
 			Date date) {
 		throw new UnsupportedOperationException();
 	}
@@ -41,7 +41,7 @@ public class LineStopJpaDao implements LineStopDao {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void removeLineStop(Long idLineStop) {
+	public void deleteLineStop(Long idLineStop) {
 		throw new UnsupportedOperationException();
 	}
 

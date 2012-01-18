@@ -11,23 +11,32 @@ import org.springframework.stereotype.Service;
 
 import be.raildelays.domain.Language;
 import be.raildelays.domain.entities.LineStop;
-import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.entities.RailtimeTrain;
 import be.raildelays.domain.railtime.Direction;
 import be.raildelays.domain.railtime.Step;
 import be.raildelays.httpclient.RequestStreamer;
 import be.raildelays.parser.StreamParser;
 import be.raildelays.parser.impl.RailtimeStreamParser;
 import be.raildelays.repository.LineStopDao;
+import be.raildelays.repository.StationDao;
+import be.raildelays.repository.TrainDao;
 import be.raildelays.service.RaildelaysGrabberService;
 
 @Service(value="grabberService")
+//@Transactional
 public class RailtimeGrabberService implements RaildelaysGrabberService {
 
 	@Autowired
 	private RequestStreamer streamer;
 
 	@Autowired
-	private LineStopDao repository;
+	private LineStopDao lineStopDao;
+	
+	@Autowired
+	private TrainDao trainDao;
+	
+	@Autowired
+	private StationDao stationDao;
 	
 	@Autowired
 	Mapper mapper;
@@ -46,20 +55,23 @@ public class RailtimeGrabberService implements RaildelaysGrabberService {
 		StreamParser parser = new RailtimeStreamParser(englishStream);
 		Direction direction = parser.parseDelay(idTrain, date);
 				
+		//-- 1) We do request/mapping with arrivals
+		//-- 2) We do request/mapping for departures
+		
 		for(Step step : direction.getSteps()) {
 			//-- Map the result to an entity
 			LineStop lineStop =  mapper.map(step, LineStop.class);
 			
 			//-- Map manually translation
-			lineStop.getStation().setEnglishName(step.getStation().getName());
+			lineStop.setStation(stationDao.createOrRetrieveStation(step.getStation().getName()));
 			
-			//-- Retrieve/Create/Update a station from the repository
-			//-- Retrieve/Create/Update a train from the repository
-			lineStop.setTrain(new Train(direction.getTrain().getIdRailtime()));
+			//-- Retrieve/Create/Update a station from the lineStopDao
+			//-- Retrieve/Create/Update a train from the lineStopDao
+			
+			lineStop.setTrain(trainDao.createOrRetrieveRailtimeTrain(new RailtimeTrain(direction.getTrain().getIdRailtime())));
 			
 			//-- Persist and return the result
-			result.add(repository.createLineStop(lineStop));
-			break;
+			result.add(lineStopDao.createLineStop(lineStop));
 		}	
 		
 		return result;

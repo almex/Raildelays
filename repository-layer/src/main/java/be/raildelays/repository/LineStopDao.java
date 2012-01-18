@@ -30,14 +30,14 @@ public interface LineStopDao {
 	 * @param date day of the year for which you do the search
 	 * @return a list of line stop
 	 */
-	public List<LineStop> searchLineStop(Station departure, Station arrival, Date date);
+	public List<LineStop> retrieveLineStop(Station departure, Station arrival, Date date);
 	
 	/**
 	 * Remove a line stop.
 	 * 
 	 * @param idLineStop line stop id
 	 */
-	public void removeLineStop(Long idLineStop);
+	public void deleteLineStop(Long idLineStop);
 	
 	/**
 	 * Update a line stop.
