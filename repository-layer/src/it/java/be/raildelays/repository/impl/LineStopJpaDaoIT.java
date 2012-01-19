@@ -1,6 +1,10 @@
 package be.raildelays.repository.impl;
 
+import java.util.Date;
+
 import javax.annotation.Resource;
+
+import junit.framework.Assert;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,8 +29,16 @@ public class LineStopJpaDaoIT {
 	
 	@Test
 	public void createTest() {
-		lineStopDao.createLineStop(new LineStop(new Train("466"), new Station("Liège-Guillemins"), new TimestampDelay(), new TimestampDelay()));
+		Assert.assertNotNull("Creation should return a result", lineStopDao.createLineStop(new LineStop(new Train("466"), new Station("Liège-Guillemins"), new TimestampDelay(), new TimestampDelay())));
 	}
+	
+	@Test
+	public void retrieveTest() {
+		Assert.assertNull("No data should get back.", lineStopDao.retrieveLineStop("466", new java.sql.Date(new Date().getTime())));
+		lineStopDao.createLineStop(new LineStop(new Train("466"), new Station("Liège-Guillemins"), new TimestampDelay(), new TimestampDelay()));
+		Assert.assertEquals("You should have a certain number of results.", 0, lineStopDao.retrieveLineStop("466", new java.sql.Date(new Date().getTime())).size());
+	}
+	
 
 	
 }

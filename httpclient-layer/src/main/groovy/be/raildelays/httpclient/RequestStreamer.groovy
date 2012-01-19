@@ -48,9 +48,10 @@ interface RequestStreamer {
 	 * @param idTrain train's id using Railtime format
 	 * @param day day for which you want to retrive
 	 * @param language specify 'en', 'fr' or 'nl'
+	 * @param sens 'D' for departure or 'A' for arrival
 	 * @return an HTML content as a stream to parse
 	 */
-	public Reader getDelays(String idTrain,  Date day, String language)
+	public Reader getDelays(String idTrain,  Date day, String language, String sens)
 
 
 	/**

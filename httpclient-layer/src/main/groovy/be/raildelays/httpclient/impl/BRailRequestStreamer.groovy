@@ -35,7 +35,7 @@ class BRailRequestStreamer extends AbstractRequestStreamBuilder implements Reque
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Reader getDelays(String idTrain, Date day, String language = '1') {
+	public Reader getDelays(String idTrain, Date day, String language = '1', String sens = 'A') {
 		throw new UnsupportedOperationException();
 	}
 

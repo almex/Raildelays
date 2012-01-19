@@ -45,14 +45,14 @@ public class LineStop implements Serializable {
 	@Embedded
 	@AttributeOverrides({
 		@AttributeOverride(column=@Column(name="ARRIVAL_TIME_EXPECTED"), name = "expected"),
-		@AttributeOverride(column=@Column(name="ARRIVAL_TIME_DELAY"), name = "delay")
+		@AttributeOverride(column=@Column(name="ARRIVAL_TIME_DELAY", nullable=false), name = "delay")
 	})
 	private TimestampDelay arrivalTime;
 	
 	@Embedded
 	@AttributeOverrides({
 		@AttributeOverride(column=@Column(name="DEPARTURE_TIME_EXPECTED"), name = "expected"),
-		@AttributeOverride(column=@Column(name="DEPARTURE_TIME_DELAY"), name = "delay")
+		@AttributeOverride(column=@Column(name="DEPARTURE_TIME_DELAY", nullable=false), name = "delay")
 	})
 	private TimestampDelay departureTime;
 	

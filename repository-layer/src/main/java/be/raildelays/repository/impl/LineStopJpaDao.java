@@ -1,11 +1,14 @@
 package be.raildelays.repository.impl;
 
-import java.sql.Date;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TemporalType;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.springframework.stereotype.Repository;
 
 import be.raildelays.domain.entities.LineStop;
@@ -35,6 +38,23 @@ public class LineStopJpaDao implements LineStopDao {
 	public List<LineStop> retrieveLineStop(Station departure, Station arrival,
 			Date date) {
 		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<LineStop> retrieveLineStop(String idTrain, Date date) {
+		Date from = DateUtils.truncate(date, Calendar.DAY_OF_MONTH);
+		Date to = DateUtils.addMilliseconds(DateUtils.addDays(from, 1),-1);
+		
+		return (List<LineStop>) entityManager.createQuery("select o from LineStop o where o.train.railtimeId = :idTrain and o.departureTime.expected >= :from and o.departureTime.expected <= :to")
+				.setParameter("idTrain", idTrain)
+				.setParameter("from", from, TemporalType.TIMESTAMP)
+				.setParameter("to", to, TemporalType.TIMESTAMP)
+				.getResultList();
+		
 	}
 
 	/**

@@ -13,6 +13,11 @@
 
 	<build>
 		<testSourceDirectory>src/it/java</testSourceDirectory>
+		<testResources>
+			<testResource>
+				<directory>src/it/resources</directory>
+			</testResource>
+		</testResources>
 		<plugins>
 
 			<plugin>
@@ -67,6 +72,10 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
 		</dependency>
 
 		<!-- For testing -->
