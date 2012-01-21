@@ -9,15 +9,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import be.raildelays.service.RaildelaysGrabberService;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:spring/raildelays-dao-context.xml", "classpath:spring/raildelays-service-context.xml"})
-public class RailtimeGrabberServiceTest {
+public class RailtimeGrabberServiceIT {
 
 	/**
 	 * SUT.
 	 */
 	@Autowired
-	RailtimeGrabberService grabberService;
+	RaildelaysGrabberService grabberService;
+	
 		
 	@Test
 	public void testGrabLineStop() {

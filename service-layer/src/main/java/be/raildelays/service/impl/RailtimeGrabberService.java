@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.dozer.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import be.raildelays.domain.Language;
 import be.raildelays.domain.Sens;
@@ -34,7 +36,7 @@ import be.raildelays.service.RaildelaysGrabberService;
  * @author Almex
  */
 @Service(value = "grabberService")
-// @Transactional
+@Transactional
 public class RailtimeGrabberService implements RaildelaysGrabberService {
 
 	@Autowired
@@ -50,21 +52,27 @@ public class RailtimeGrabberService implements RaildelaysGrabberService {
 	private StationDao stationDao;
 
 	@Autowired
-	Mapper mapper;
+	private Mapper mapper;
+	
+
+	Logger log = Logger.getLogger(RailtimeStreamParser.class);
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public List<LineStop> grabTrainLine(String idTrain, Date date) {
-		List<LineStop> result = new ArrayList<>();
+		List<LineStop> result = new ArrayList<>(lineStopDao.retrieveLineStop(idTrain, date));
 		
-		lineStopDao.retrieveLineStop(idTrain, date);
+		if (result.size() == 0) {
 
-		// -- 1) We do request/mapping with arrivals
-		result.addAll(requestAndParse(idTrain, date, Sens.ARRIVAL));
-		// -- 2) We do request/mapping for departures
-		result.addAll(requestAndParse(idTrain, date, Sens.DEPARTURE));
+			// -- 1) We do request/mapping with arrivals
+			result.addAll(requestAndParse(idTrain, date, Sens.ARRIVAL));
+			// -- 2) We do request/mapping for departures
+			result.addAll(requestAndParse(idTrain, date, Sens.DEPARTURE));
+		} else {
+			log.debug("The result already exists for idTrain="+idTrain+" and date="+date);
+		}
 
 		return result;
 	}
@@ -96,7 +104,8 @@ public class RailtimeGrabberService implements RaildelaysGrabberService {
 					.getStation().getName()));
 
 			TimestampDelay timestampDelay = new TimestampDelay(
-					step.getTimestamp(), step.getDelay());
+					step.getTimestamp(), step.getDelay() == null ? 0L
+							: step.getDelay());
 
 			switch (sens) {
 			case ARRIVAL:

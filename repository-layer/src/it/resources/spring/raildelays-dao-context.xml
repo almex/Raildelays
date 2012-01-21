@@ -10,17 +10,11 @@
 
 	<bean id="entityManagerFactory"
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
-		p:dataSource-ref="dataSource" p:persistence-unit-name="raildelays-repository" >
+		p:dataSource-ref="dataSource" p:persistence-unit-name="raildelays-repository">
 		<property name="jpaVendorAdapter">
-			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
-		</property>
-		<property name="jpaProperties">
-			<props>
-<!-- 				<prop key="hibernate.hbm2ddl.auto">validate</prop> -->
-				<prop key="hibernate.show_sql">true</prop>
-				<prop key="hibernate.format_sql">true</prop>
-				<prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
-			</props>
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"
+				p:database="HSQL" p:databasePlatform="org.hibernate.dialect.HSQLDialect"
+				p:showSql="true" p:generate-ddl="true" />
 		</property>
 	</bean>
 

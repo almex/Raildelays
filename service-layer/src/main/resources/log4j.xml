@@ -12,6 +12,10 @@
 	<logger name="be.raildelays">
 		<level value="debug" />
 	</logger>
+	
+	<logger name="org.springframework">
+		<level value="warn" />
+	</logger>
 
 	<root>
 		<priority value="info" />

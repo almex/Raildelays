@@ -54,6 +54,10 @@ public class LineStopJpaDao implements LineStopDao {
 				.setParameter("from", from, TemporalType.TIMESTAMP)
 				.setParameter("to", to, TemporalType.TIMESTAMP)
 				.getResultList();
+		/*return (List<LineStop>) entityManager.createQuery("select o from LineStop o where  o.departureTime.expected >= :from and o.departureTime.expected <= :to")
+				.setParameter("from", from, TemporalType.TIMESTAMP)
+				.setParameter("to", to, TemporalType.TIMESTAMP)
+				.getResultList();*/
 		
 	}
 

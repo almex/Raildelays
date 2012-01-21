@@ -65,6 +65,10 @@
 			<groupId>org.hibernate.javax.persistence</groupId>
 			<artifactId>hibernate-jpa-2.0-api</artifactId>
 		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>org.hibernate</groupId> -->
+		<!-- <artifactId>hibernate-core</artifactId> -->
+		<!-- </dependency> -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
@@ -109,5 +113,130 @@
 		</dependency>
 
 	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>hbm-export</id>
+			<properties>
+				<version.hibernate>3.5.3-Final</version.hibernate>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>hibernate3-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>process-classes</phase>
+								<goals>
+									<goal>hbm2ddl</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<components>
+								<component>
+									<name>hbm2ddl</name>
+									<implementation>jpaconfiguration</implementation>
+								</component>
+							</components>
+							<componentProperties>
+								<persistenceunit>raildelays-repository</persistenceunit>
+								<outputfilename>schema.ddl</outputfilename>
+								<drop>false</drop>
+								<create>true</create>
+								<export>false</export>
+								<format>true</format>
+								<jdk5>true</jdk5>
+							</componentProperties>
+						</configuration>
+						<dependencies>
+							<dependency>
+								<groupId>org.hsqldb</groupId>
+								<artifactId>hsqldb</artifactId>
+								<version>${version.hsqldb}</version>
+							</dependency>
+							<dependency>
+								<groupId>org.hibernate</groupId>
+								<artifactId>hibernate-entitymanager</artifactId>
+								<version>${version.hibernate}</version>
+								<exclusions>
+									<exclusion>
+										<groupId>cglib</groupId>
+										<artifactId>cglib</artifactId>
+									</exclusion>
+									<exclusion>
+										<groupId>commons-logging</groupId>
+										<artifactId>commons-logging</artifactId>
+									</exclusion>
+								</exclusions>
+							</dependency>
+							<dependency>
+								<groupId>org.hibernate</groupId>
+								<artifactId>hibernate-core</artifactId>
+								<version>${version.hibernate}</version>
+								<exclusions>
+									<exclusion>
+										<groupId>cglib</groupId>
+										<artifactId>cglib</artifactId>
+									</exclusion>
+									<exclusion>
+										<groupId>commons-logging</groupId>
+										<artifactId>commons-logging</artifactId>
+									</exclusion>
+								</exclusions>
+							</dependency>
+							<dependency>
+								<groupId>org.hibernate</groupId>
+								<artifactId>hibernate-annotations</artifactId>
+								<version>${version.hibernate}</version>
+								<exclusions>
+									<exclusion>
+										<groupId>cglib</groupId>
+										<artifactId>cglib</artifactId>
+									</exclusion>
+									<exclusion>
+										<groupId>commons-logging</groupId>
+										<artifactId>commons-logging</artifactId>
+									</exclusion>
+								</exclusions>
+							</dependency>
+						</dependencies>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>sqlmaven</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>sql-maven-plugin</artifactId>
+						<dependencies>
+							<dependency>
+								<groupId>org.hsqldb</groupId>
+								<artifactId>hsqldb</artifactId>
+								<version>${version.hsqldb}</version>
+							</dependency>
+						</dependencies>
+						<configuration>
+							<driver>org.hsqldb.jdbcDriver</driver>
+							<url>jdbc:hsqldb:file:target/storage/database;shutdown=true</url>
+							<username>sa</username>
+							<password></password>
+							<autocommit>true</autocommit>
+							<encoding>${project.build.sourceEncoding}</encoding>
+							<srcFiles>
+								<srcFile>target/hibernate3/sql/schema.ddl</srcFile>
+							</srcFiles>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+
+	</profiles>
 
 </project>
