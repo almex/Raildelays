@@ -27,6 +27,7 @@
 		<version.spring>3.1.0.RELEASE</version.spring>
 		<version.hibernate>4.0.1.Final</version.hibernate>
 		<version.hsqldb>2.2.7</version.hsqldb>
+		<version.derby>10.8.2.2</version.derby>
 		<jdk.version>1.7</jdk.version>
 	</properties>
 
@@ -107,6 +108,16 @@
 				<groupId>org.hsqldb</groupId>
 				<artifactId>hsqldb</artifactId>
 				<version>${version.hsqldb}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.derby</groupId>
+				<artifactId>derby</artifactId>
+				<version>${version.derby}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.derby</groupId>
+				<artifactId>derbytools</artifactId>
+				<version>${version.derby}</version>
 			</dependency>
 
 

@@ -10,6 +10,10 @@ public class RailtimeStation extends Station {
 
 	@Column(unique=true)
 	private String railtimeId;
+	
+	public RailtimeStation() {
+		railtimeId = "";
+	}
 
 	public RailtimeStation(String name, String railtimeId) {
 		super(name);

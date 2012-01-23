@@ -11,6 +11,10 @@ public class RailtimeTrain extends Train {
 	@Column(unique=true)
 	private String railtimeId;
 	
+	public RailtimeTrain() {
+		railtimeId = "";
+	}
+	
 	public RailtimeTrain(String name, String railtimeId) {
 		super(name);
 		this.railtimeId = railtimeId;

@@ -122,7 +122,7 @@ public class RailtimeGrabberService implements RaildelaysGrabberService {
 							.getTrain().getIdRailtime())));
 
 			// -- Persist and return the result
-			result.add(lineStopDao.createLineStop(lineStop));
+			result.add(lineStop);
 		}
 
 		return result;

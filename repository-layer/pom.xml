@@ -102,9 +102,17 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-orm</artifactId>
 		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>org.hsqldb</groupId> -->
+		<!-- <artifactId>hsqldb</artifactId> -->
+		<!-- </dependency> -->
 		<dependency>
-			<groupId>org.hsqldb</groupId>
-			<artifactId>hsqldb</artifactId>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derby</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derbytools</artifactId>
 		</dependency>
 		<!-- Aspect programming -->
 		<dependency>
@@ -151,10 +159,20 @@
 							</componentProperties>
 						</configuration>
 						<dependencies>
+							<!-- <dependency> -->
+							<!-- <groupId>org.hsqldb</groupId> -->
+							<!-- <artifactId>hsqldb</artifactId> -->
+							<!-- <version>${version.hsqldb}</version> -->
+							<!-- </dependency> -->
 							<dependency>
-								<groupId>org.hsqldb</groupId>
-								<artifactId>hsqldb</artifactId>
-								<version>${version.hsqldb}</version>
+								<groupId>org.apache.derby</groupId>
+								<artifactId>derby</artifactId>
+								<version>${version.derby}</version>
+							</dependency>
+							<dependency>
+								<groupId>org.apache.derby</groupId>
+								<artifactId>derbytools</artifactId>
+								<version>${version.derby}</version>
 							</dependency>
 							<dependency>
 								<groupId>org.hibernate</groupId>
@@ -214,16 +232,37 @@
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>sql-maven-plugin</artifactId>
 						<dependencies>
+							<!-- <dependency> -->
+							<!-- <groupId>org.hsqldb</groupId> -->
+							<!-- <artifactId>hsqldb</artifactId> -->
+							<!-- <version>${version.hsqldb}</version> -->
+							<!-- </dependency> -->
 							<dependency>
-								<groupId>org.hsqldb</groupId>
-								<artifactId>hsqldb</artifactId>
-								<version>${version.hsqldb}</version>
+								<groupId>org.apache.derby</groupId>
+								<artifactId>derby</artifactId>
+								<version>${version.derby}</version>
+							</dependency>
+							<dependency>
+								<groupId>org.apache.derby</groupId>
+								<artifactId>derbytools</artifactId>
+								<version>${version.derby}</version>
 							</dependency>
 						</dependencies>
+						<!-- <configuration> -->
+						<!-- <driver>org.hsqldb.jdbcDriver</driver> -->
+						<!-- <url>jdbc:hsqldb:file:target/storage/database;shutdown=true</url> -->
+						<!-- <username>sa</username> -->
+						<!-- <password></password> -->
+						<!-- <autocommit>true</autocommit> -->
+						<!-- <encoding>${project.build.sourceEncoding}</encoding> -->
+						<!-- <srcFiles> -->
+						<!-- <srcFile>target/hibernate3/sql/schema.ddl</srcFile> -->
+						<!-- </srcFiles> -->
+						<!-- </configuration> -->
 						<configuration>
-							<driver>org.hsqldb.jdbcDriver</driver>
-							<url>jdbc:hsqldb:file:target/storage/database;shutdown=true</url>
-							<username>sa</username>
+							<driver>org.apache.derby.jdbc.EmbeddedDriver</driver>
+							<url>jdbc:derby:target/storage/database;create=true</url>
+							<username></username>
 							<password></password>
 							<autocommit>true</autocommit>
 							<encoding>${project.build.sourceEncoding}</encoding>

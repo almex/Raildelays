@@ -11,6 +11,10 @@ public class BRailTrain extends Train {
 	@Column(unique=true)
 	private String bRailId;
 	
+	public BRailTrain() {
+		bRailId = "";
+	}
+	
 	public BRailTrain(String name, String bRailId) {
 		super(name);
 		this.bRailId = bRailId;

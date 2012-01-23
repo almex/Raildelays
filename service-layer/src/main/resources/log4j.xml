@@ -8,18 +8,27 @@
 			<param name="ConversionPattern" value="%d{DATE} %-5p %-15c{1}: %m%n" />
 		</layout>
 	</appender>
-	
+
 	<logger name="be.raildelays">
 		<level value="debug" />
 	</logger>
-	
+
 	<logger name="org.springframework">
 		<level value="warn" />
 	</logger>
 
+	<logger name="org.hsqldb">
+		<level value="debug" />
+	</logger>
+
+	<logger name="org.hibernate">
+		<level value="debug" />
+	</logger>
+
+
 	<root>
 		<priority value="info" />
 		<appender-ref ref="console" />
-	</root>	
+	</root>
 
 </log4j:configuration>
