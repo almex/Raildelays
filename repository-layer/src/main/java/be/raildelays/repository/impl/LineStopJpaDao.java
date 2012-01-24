@@ -49,7 +49,7 @@ public class LineStopJpaDao implements LineStopDao {
 		Date from = DateUtils.truncate(date, Calendar.DAY_OF_MONTH);
 		Date to = DateUtils.addMilliseconds(DateUtils.addDays(from, 1),-1);
 		
-		return (List<LineStop>) entityManager.createQuery("select o from LineStop o where o.train.railtimeId = :idTrain and o.departureTime.expected >= :departure and o.departureTime.expected <= :arrival")
+		return (List<LineStop>) entityManager.createQuery("select o from LineStop o where o.train.railtimeId = :idTrain and o.departureTime.expected >= :departure and o.arrivalTime.expected <= :arrival")
 				.setParameter("idTrain", idTrain)
 				.setParameter("departure", from, TemporalType.TIMESTAMP)
 				.setParameter("arrival", to, TemporalType.TIMESTAMP)
