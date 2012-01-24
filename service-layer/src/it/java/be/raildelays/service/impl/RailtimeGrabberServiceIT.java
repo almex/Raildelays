@@ -12,7 +12,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import be.raildelays.service.RaildelaysGrabberService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:spring/raildelays-dao-context.xml", "classpath:spring/raildelays-service-context.xml"})
+@ContextConfiguration(locations = {"classpath:spring/service/raildelays-service-integration-context.xml"})
 public class RailtimeGrabberServiceIT {
 
 	/**

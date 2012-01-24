@@ -16,7 +16,7 @@ import be.raildelays.domain.entities.Station;
 import be.raildelays.repository.StationDao;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:spring/raildelays-dao-context.xml")
+@ContextConfiguration(locations = {"classpath:spring/repository/raildelays-repository-integration-context.xml","classpath:spring/test/raildelays-tx-context.xml"})
 @Transactional
 @TransactionConfiguration(defaultRollback=true)
 public class StationJpaDaoIT {

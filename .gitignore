@@ -54,3 +54,5 @@
 /repository-layer/database.lck
 /repository-layer/database.script
 /repository-layer/database.tmp
+/repository-layer/derby.log
+/service-layer/derby.log

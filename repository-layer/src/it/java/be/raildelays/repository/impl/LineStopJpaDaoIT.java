@@ -20,7 +20,7 @@ import be.raildelays.domain.entities.TimestampDelay;
 import be.raildelays.domain.entities.Train;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:spring/raildelays-dao-context.xml")
+@ContextConfiguration(locations = {"classpath:spring/repository/raildelays-repository-integration-context.xml","classpath:spring/test/raildelays-tx-context.xml"})
 @Transactional
 @TransactionConfiguration(defaultRollback=true)
 public class LineStopJpaDaoIT {
