@@ -56,3 +56,7 @@
 /repository-layer/database.tmp
 /repository-layer/derby.log
 /service-layer/derby.log
+/batch-layer/.settings
+/batch-layer/target
+/batch-layer/.classpath
+/batch-layer/.project
