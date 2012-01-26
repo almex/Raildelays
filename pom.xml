@@ -15,6 +15,7 @@
 		<module>httpclient-layer</module>
 		<module>parser-layer</module>
 		<module>service-layer</module>
+		<module>batch-layer</module>
 	</modules>
 
 	<prerequisites>
@@ -63,6 +64,11 @@
 			<dependency>
 				<groupId>be.raildelays</groupId>
 				<artifactId>raildelays-service</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>be.raildelays</groupId>
+				<artifactId>raildelays-batch</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
@@ -203,6 +209,11 @@
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-test</artifactId>
 				<version>${version.spring}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.batch</groupId>
+				<artifactId>spring-batch-core</artifactId>
+				<version>2.1.8.RELEASE</version>
 			</dependency>
 
 		</dependencies>
