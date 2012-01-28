@@ -1,0 +1,10 @@
+----------------------------------------------------------------
+Sat Jan 28 11:58:03 CET 2012:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.8.2.2 - (1181258): instance a816c00e-0135-23f6-f874-000000aa8200 
+on database directory D:\DEV\Raildelays\service-layer\src\main\resources\database  with class loader sun.misc.Launcher$AppClassLoader@209f4e 
+Loaded from file:/C:/Documents%20and%20Settings/pcuser/.m2/repository/org/apache/derby/derby/10.8.2.2/derby-10.8.2.2.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.7.0_02-b13
+user.dir=D:\DEV\Raildelays\batch-layer
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
