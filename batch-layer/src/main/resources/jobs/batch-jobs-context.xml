@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<job id="grabTrainFromRailtime" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step1">
+			<tasklet transaction-manager="transactionManager">
+				<chunk reader="flatFileItemReader" 
+				       processor="compositeProcessor" 
+				       writer="serviceWriter" 
+				       commit-interval="1" retry-limit="5"  />
+			</tasklet>
+		</step>
+	</job>
+	
+	<bean id="flatFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer">
+					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+						<property name="delimiter" value=","/>
+						<property name="names" value="idRailtime" />
+					</bean>
+				</property>
+				<property name="fieldSetMapper">
+					<bean class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+						<property name="targetType" value="be.raildelays.domain.railtime.Train" />	
+					</bean>
+				</property>
+			</bean>
+		</property>
+		<property name="resource" value="#{jobParameters[inputFile]}" />
+	</bean>
+
+	<bean id="serviceWriter"></bean>
+	
+	<bean id="compositeProcessor"></bean>
+
+</beans>
