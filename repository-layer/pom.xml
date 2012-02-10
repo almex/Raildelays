@@ -269,6 +269,8 @@
 							<encoding>${project.build.sourceEncoding}</encoding>
 							<srcFiles>
 								<srcFile>target/hibernate3/sql/schema.ddl</srcFile>
+								<srcFile>
+								target/classes/spring-batch-schema-derby.ddl</srcFile>
 							</srcFiles>
 						</configuration>
 					</plugin>

@@ -9,6 +9,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TemporalType;
 
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
 import be.raildelays.domain.entities.LineStop;
@@ -18,9 +19,12 @@ import be.raildelays.repository.LineStopDao;
 @Repository(value = "lineStopDao")
 public class LineStopJpaDao implements LineStopDao {
 
-	@PersistenceContext
+	@PersistenceContext(unitName="raildelays-repository")
 	private EntityManager entityManager;
 
+
+	private Logger logger = Logger.getLogger(LineStopJpaDao.class);
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -49,7 +53,9 @@ public class LineStopJpaDao implements LineStopDao {
 		Date from = DateUtils.truncate(date, Calendar.DAY_OF_MONTH);
 		Date to = DateUtils.addMilliseconds(DateUtils.addDays(from, 1),-1);
 		
-		return (List<LineStop>) entityManager.createQuery("select o from LineStop o where o.train.railtimeId = :idTrain and o.departureTime.expected >= :departure and o.arrivalTime.expected <= :arrival")
+		logger.debug("from="+from+" - to="+to);
+		
+		return (List<LineStop>) entityManager.createQuery("select o from LineStop o where o.train.railtimeId = :idTrain and o.departureTime.expected >= :departure and o.departureTime.expected <= :arrival")
 				.setParameter("idTrain", idTrain)
 				.setParameter("departure", from, TemporalType.TIMESTAMP)
 				.setParameter("arrival", to, TemporalType.TIMESTAMP)

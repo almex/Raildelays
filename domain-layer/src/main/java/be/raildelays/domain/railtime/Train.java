@@ -8,6 +8,10 @@ public class Train implements Serializable {
 	
 	private String idRailtime;
 	
+	public Train() {
+		idRailtime = "";
+	}
+	
 	public Train(String idRailtime) {
 		this.setIdRailtime(idRailtime);
 	}

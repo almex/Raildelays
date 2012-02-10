@@ -13,8 +13,10 @@ import be.raildelays.repository.StationDao;
 @Repository(value = "stationDao")
 public class StationJpaDao implements StationDao {
 
-	@PersistenceContext
+	@PersistenceContext(unitName="raildelays-repository")
 	private EntityManager entityManager;
+	
+
 
 	/**
 	 * {@inheritDoc}

@@ -4,6 +4,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
 import be.raildelays.domain.Language;
@@ -14,8 +15,11 @@ import be.raildelays.repository.TrainDao;
 @Repository(value = "trainDao")
 public class TrainJpaDao implements TrainDao {
 
-	@PersistenceContext
+	@PersistenceContext(unitName="raildelays-repository")
 	private EntityManager entityManager;
+	
+
+	private Logger logger = Logger.getLogger(TrainJpaDao.class);
 	
 	/**
 	 * {@inheritDoc}
@@ -46,6 +50,7 @@ public class TrainJpaDao implements TrainDao {
 		
 		try {
 			result = retrieveRailtimeTrain(train.getRailtimeId());
+			logger.debug("retrieveTrain: already exists "+result);
 		} catch (NoResultException e) {
 			result = createRailtimeTrain(train);
 		}
@@ -80,6 +85,8 @@ public class TrainJpaDao implements TrainDao {
 		default:
 			result = null;			
 		}
+		
+		logger.debug("retrieveTrain="+result);
 		
 		return result;
 	}

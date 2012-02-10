@@ -1,9 +1,11 @@
 package be.raildelays.service.impl;
 
 import java.io.Reader;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.dozer.Mapper;
@@ -15,6 +17,7 @@ import be.raildelays.domain.Language;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.RailtimeTrain;
+import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.TimestampDelay;
 import be.raildelays.domain.railtime.Direction;
 import be.raildelays.domain.railtime.Step;
@@ -55,29 +58,50 @@ public class RailtimeGrabberService implements RaildelaysGrabberService {
 	private Mapper mapper;
 	
 
-	Logger log = Logger.getLogger(RailtimeStreamParser.class);
+	private Logger log = Logger.getLogger(RailtimeStreamParser.class);
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<LineStop> grabTrainLine(String idTrain, Date date) {
-		List<LineStop> result = new ArrayList<>(lineStopDao.retrieveLineStop(idTrain, date));
+	public Collection<LineStop> grabTrainLine(String idTrain, Date date) {
+		Map<Station, LineStop> result = new HashMap<>();
+		List<LineStop> lineStops = lineStopDao.retrieveLineStop(idTrain, date);
 		
-		if (result.size() == 0) {
+		if (lineStops.isEmpty()) {
 
-			// -- 1) We do request/mapping with arrivals
-			result.addAll(requestAndParse(idTrain, date, Sens.ARRIVAL));
-			// -- 2) We do request/mapping for departures
-			result.addAll(requestAndParse(idTrain, date, Sens.DEPARTURE));
+			//-- 1) We do request/mapping for departures
+			result.putAll(requestAndParse(idTrain, date, Sens.DEPARTURE));
+			//-- 2) We do request/mapping with arrivals
+			result.putAll(requestAndParse(idTrain, date, Sens.ARRIVAL));
+			
+			//-- 3) Persist line stops
+			for(LineStop lineStop : result.values()) {
+				lineStopDao.createLineStop(lineStop);
+			}
+			
+			return result.values();
 		} else {
 			log.debug("The result already exists for idTrain="+idTrain+" and date="+date);
+			
+			return lineStops;
 		}
 
-		return result;
 	}
 
-	private List<LineStop> requestAndParse(String idTrain, Date date, Sens sens) {
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Collection<LineStop> grabTrainLine(String idTrain) {
+		return grabTrainLine(idTrain, new Date());
+	}
+
+	private Map<Station, LineStop> requestAndParse(String idTrain, Date date, Sens sens) {
+		return requestAndParse(new HashMap<Station, LineStop>(),idTrain, date, sens);
+	}
+	
+	private Map<Station, LineStop> requestAndParse(Map<Station, LineStop> cache, String idTrain, Date date, Sens sens) {
 		// -- Create a request to target Railtime
 		Reader englishStream = streamer.getDelays(idTrain, date,
 				Language.ENGLISH.getRailtimeParameter(),
@@ -87,11 +111,10 @@ public class RailtimeGrabberService implements RaildelaysGrabberService {
 		StreamParser parser = new RailtimeStreamParser(englishStream);
 		Direction direction = parser.parseDelay(idTrain, date);
 
-		return mapStepToLineStop(direction, sens);
+		return mapStepToLineStop(cache, direction, sens);
 	}
 
-	private List<LineStop> mapStepToLineStop(Direction direction, Sens sens) {
-		List<LineStop> result = new ArrayList<>();
+	private Map<Station, LineStop> mapStepToLineStop(Map<Station, LineStop> cache, Direction direction, Sens sens) {
 
 		for (Step step : direction.getSteps()) {
 			// -- Map the result to an entity
@@ -100,8 +123,14 @@ public class RailtimeGrabberService implements RaildelaysGrabberService {
 			// -- Map manually translation
 
 			// -- Retrieve/Create/Update a station from the lineStopDao
-			lineStop.setStation(stationDao.createOrRetrieveStation(step
-					.getStation().getName()));
+			Station station = stationDao.createOrRetrieveStation(step.getStation().getName());
+			
+			//-- Check in cache if its already exists or not
+			if(cache.containsKey(station)) {
+				lineStop = cache.get(station);
+			} else {
+				lineStop.setStation(station);
+			}
 
 			TimestampDelay timestampDelay = new TimestampDelay(
 					step.getTimestamp(), step.getDelay() == null ? 0L
@@ -117,15 +146,15 @@ public class RailtimeGrabberService implements RaildelaysGrabberService {
 			}
 
 			// -- Retrieve/Create/Update a train from the lineStopDao
-			lineStop.setTrain(trainDao
-					.createOrRetrieveRailtimeTrain(new RailtimeTrain(direction
-							.getTrain().getIdRailtime())));
+			RailtimeTrain train = new RailtimeTrain(direction.getTrain().getIdRailtime());
+			train.setEnglishName(direction.getTrain().getIdRailtime());
+			lineStop.setTrain(trainDao.createOrRetrieveRailtimeTrain(train));
 
 			// -- Persist and return the result
-			result.add(lineStop);
+			cache.put(station, lineStop);
 		}
 
-		return result;
+		return cache;
 	}
 
 }

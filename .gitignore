@@ -60,3 +60,10 @@
 /batch-layer/target
 /batch-layer/.classpath
 /batch-layer/.project
+/batch-layer/.springBeans
+/batch-layer/derby.log
+/common-layer/bin
+/domain-layer/bin
+/httpclient-layer/bin
+/parser-layer/bin
+/repository-layer/bin

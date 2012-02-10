@@ -1,8 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<batch:job-repository id="jobRepository" data-source="batchDataSource"
+		transaction-manager="batchTransactionManager" isolation-level-for-create="DEFAULT"
+		table-prefix="BATCH_" max-varchar-length="1000"  />
+		
+	<bean id="batchDataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+		p:driverClassName="org.apache.derby.jdbc.EmbeddedDriver"
+		p:url="jdbc:derby:directory:D:\DEV\Raildelays\service-layer\src\main\resources\database"
+		p:username="" p:password="" p:connectionProperties="" />
+
+	<bean id="batchTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" lazy-init="true">
+		<property name="dataSource" ref="batchDataSource" />
+	</bean>
+	
+<!-- 	<jdbc:embedded-database id="batchDataSource" /> -->
+
+<!-- 	<bean id="entityManagerFactory" -->
+<!-- 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" -->
+<!-- 		p:dataSource-ref="dataSource" p:persistence-unit-name="raildelays-repository"> -->
+<!-- 		<property name="jpaVendorAdapter"> -->
+<!-- 			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" -->
+<!-- 				p:database="HSQL" p:databasePlatform="org.hibernate.dialect.HSQLDialect" -->
+<!-- 				p:showSql="true" p:generate-ddl="true" /> -->
+<!-- 		</property> -->
+<!-- 	</bean> -->
+	
+	
 
 </beans>

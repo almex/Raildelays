@@ -1,7 +1,7 @@
 package be.raildelays.service;
 
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 import be.raildelays.domain.entities.LineStop;
 
@@ -23,5 +23,17 @@ public interface RaildelaysGrabberService {
 	 *            account).
 	 * @return the a list of {@LineStop} which has been persisted.
 	 */
-	public List<LineStop> grabTrainLine(String idTrainRailtime, Date date);
+	public Collection<LineStop> grabTrainLine(String idTrainRailtime, Date date);
+	
+
+
+	/**
+	 * Retrieve all data from Railtime to store a LineStop for today. Including
+	 * translation and arrival/departure time.
+	 * 
+	 * @param idTrainRailtime
+	 *            train's id in a Railtime format.
+	 * @return the a list of {@LineStop} which has been persisted.
+	 */
+	public Collection<LineStop> grabTrainLine(String idTrainRailtime);
 }

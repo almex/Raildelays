@@ -1,10 +1,14 @@
 package be.raildelays.batch;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameter;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -26,7 +30,11 @@ public class GrabberServiceBatchIT {
 		BatchStatus batchStatus;
 		
 		try {
-			batchStatus = jobLauncherTestUtils.launchJob().getStatus();
+			Map<String, JobParameter> parameters = new HashMap<>();
+			
+			parameters.put("inputFile", new JobParameter("file:D:\\DEV\\Raildelays\\batch-layer\\src\\it\\resources\\train-list.properties"));
+			
+			batchStatus = jobLauncherTestUtils.launchJob(new JobParameters(parameters)).getStatus();
 			
 			Assert.assertEquals(BatchStatus.COMPLETED, batchStatus);
 		} catch (Exception e) {
