@@ -307,15 +307,4 @@
 		</pluginManagement>
 	</build>
 
-	<pluginRepositories>
-		<pluginRepository>
-			<id>codehaus-snapshots</id>
-			<url>http://snapshots.repository.codehaus.org/</url>
-			<layout>default</layout>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</pluginRepository>
-	</pluginRepositories>
-
 </project>

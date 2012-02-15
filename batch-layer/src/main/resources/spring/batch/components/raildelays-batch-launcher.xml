@@ -13,7 +13,7 @@
 	<bean id="jobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
 		<property name="jobClass"
 			value="org.springframework.batch.sample.quartz.JobLauncherDetails" />
-		<property name="group" value="quartz-batch" />
+<!-- 		<property name="group" value="quartz-batch" /> -->
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="jobName" value="footballJob" />

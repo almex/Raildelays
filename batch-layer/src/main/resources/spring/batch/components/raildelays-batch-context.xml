@@ -10,28 +10,4 @@
 		transaction-manager="batchTransactionManager" isolation-level-for-create="DEFAULT"
 		table-prefix="BATCH_" max-varchar-length="1000"  />
 		
-	<bean id="batchDataSource"
-		class="org.springframework.jdbc.datasource.DriverManagerDataSource"
-		p:driverClassName="org.apache.derby.jdbc.EmbeddedDriver"
-		p:url="jdbc:derby:directory:D:\DEV\Raildelays\service-layer\src\main\resources\database"
-		p:username="" p:password="" p:connectionProperties="" />
-
-	<bean id="batchTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" lazy-init="true">
-		<property name="dataSource" ref="batchDataSource" />
-	</bean>
-	
-<!-- 	<jdbc:embedded-database id="batchDataSource" /> -->
-
-<!-- 	<bean id="entityManagerFactory" -->
-<!-- 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" -->
-<!-- 		p:dataSource-ref="dataSource" p:persistence-unit-name="raildelays-repository"> -->
-<!-- 		<property name="jpaVendorAdapter"> -->
-<!-- 			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" -->
-<!-- 				p:database="HSQL" p:databasePlatform="org.hibernate.dialect.HSQLDialect" -->
-<!-- 				p:showSql="true" p:generate-ddl="true" /> -->
-<!-- 		</property> -->
-<!-- 	</bean> -->
-	
-	
-
 </beans>
