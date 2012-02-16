@@ -17,30 +17,34 @@
 	<bean id="flatFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader"
 		scope="step">
 		<property name="lineMapper">
-			<bean class="org.springframework.batch.item.file.mapping.PassThroughLineMapper">
-<!-- 				<property name="lineTokenizer"> -->
-<!-- 					<bean -->
-<!-- 						class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer"> -->
-<!-- 						<property name="delimiter" value="," /> -->
-<!-- 						<property name="names" value="idRailtime" /> -->
-<!-- 					</bean> -->
-<!-- 				</property> -->
-<!-- 				<property name="fieldSetMapper"> -->
-<!-- 					<bean -->
-<!-- 						class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper"> -->
-<!-- 						<property name="targetType" value="be.raildelays.domain.railtime.Train" /> -->
-<!-- 					</bean> -->
-<!-- 				</property> -->
+			<bean
+				class="org.springframework.batch.item.file.mapping.PassThroughLineMapper">
+				<!-- <property name="lineTokenizer"> -->
+				<!-- <bean -->
+				<!-- class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer"> -->
+				<!-- <property name="delimiter" value="," /> -->
+				<!-- <property name="names" value="idRailtime" /> -->
+				<!-- </bean> -->
+				<!-- </property> -->
+				<!-- <property name="fieldSetMapper"> -->
+				<!-- <bean -->
+				<!-- class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper"> -->
+				<!-- <property name="targetType" value="be.raildelays.domain.railtime.Train" 
+					/> -->
+				<!-- </bean> -->
+				<!-- </property> -->
 			</bean>
 		</property>
 		<property name="resource" value="#{jobParameters[inputFile]}" />
 	</bean>
 
-	<bean id="serviceWriter"
-		class="org.springframework.batch.item.adapter.ItemWriterAdapter" scope="step">
-		<property name="targetObject" ref="grabberService" />
-		<property name="targetMethod" value="grabTrainLine" />		
-	</bean>
+	<!-- <bean id="serviceWriter" -->
+	<!-- class="org.springframework.batch.item.adapter.ItemWriterAdapter" scope="step"> -->
+	<!-- <property name="targetObject" ref="grabberService" /> -->
+	<!-- <property name="targetMethod" value="grabTrainLine" /> -->
+	<!-- </bean> -->
+
+	<bean id="serviceWriter" class="be.raildelays.batch.GrabberServiceBatch"></bean>
 
 	<!-- <bean id="compositeProcessor"></bean> -->
 

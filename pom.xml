@@ -16,6 +16,7 @@
 		<module>parser-layer</module>
 		<module>service-layer</module>
 		<module>batch-layer</module>
+		<module>java-fx-layer</module>
 	</modules>
 
 	<prerequisites>
@@ -31,6 +32,7 @@
 		<version.hsqldb>2.2.7</version.hsqldb>
 		<version.derby>10.8.2.2</version.derby>
 		<jdk.version>1.7</jdk.version>
+		<path.javafx>C:\Program Files\Oracle\JavaFX 2.0 SDK</path.javafx>
 	</properties>
 
 	<dependencyManagement>
@@ -159,6 +161,14 @@
 				<version>2.6</version>
 			</dependency>
 
+			<dependency>
+				<groupId>com.oracle</groupId>
+				<artifactId>javafx</artifactId>
+				<version>2.0</version>
+				<systemPath>${path.javafx}/rt/lib/jfxrt.jar</systemPath>
+				<scope>system</scope>
+			</dependency>
+
 
 			<!-- Spring Framework -->
 			<dependency>
@@ -211,18 +221,18 @@
 				<artifactId>spring-test</artifactId>
 				<version>${version.spring}</version>
 			</dependency>
-			
+
 			<!-- Batch -->
 			<dependency>
 				<groupId>org.springframework.batch</groupId>
 				<artifactId>spring-batch-core</artifactId>
 				<version>${version.spring.batch}</version>
-			</dependency>			
+			</dependency>
 			<dependency>
 				<groupId>org.springframework.batch</groupId>
 				<artifactId>spring-batch-infrastructure</artifactId>
 				<version>${version.spring.batch}</version>
-			</dependency>		
+			</dependency>
 			<dependency>
 				<groupId>org.springframework.batch</groupId>
 				<artifactId>spring-batch-test</artifactId>
@@ -232,14 +242,14 @@
 				<groupId>org.springframework.batch</groupId>
 				<artifactId>spring-batch-core-tests</artifactId>
 				<version>${version.spring.batch}</version>
-			</dependency>			
+			</dependency>
 			<dependency>
 				<groupId>org.springframework.batch</groupId>
 				<artifactId>spring-batch-infrastructure-tests</artifactId>
 				<version>${version.spring.batch}</version>
 			</dependency>
-			
-			<!-- SCheduling -->
+
+			<!-- Scheduling -->
 			<dependency>
 				<groupId>org.quartz-scheduler</groupId>
 				<artifactId>quartz</artifactId>

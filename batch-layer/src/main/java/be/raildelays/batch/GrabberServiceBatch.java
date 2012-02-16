@@ -10,10 +10,9 @@ import org.apache.log4j.Logger;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import be.raildelays.domain.railtime.Train;
 import be.raildelays.service.RaildelaysGrabberService;
 
-public class GrabberServiceBatch implements ItemWriter<Train> {
+public class GrabberServiceBatch implements ItemWriter<String> {
 
 	@Autowired
 	RaildelaysGrabberService grabberService;
@@ -21,7 +20,7 @@ public class GrabberServiceBatch implements ItemWriter<Train> {
 	private static Logger logger = Logger.getLogger(GrabberServiceBatch.class);
 
 	@Override
-	public void write(List<? extends Train> items) throws Exception {
+	public void write(List<? extends String> items) throws Exception {
 
 		logger.debug("Entering into batch worker...");
 		
@@ -35,10 +34,10 @@ public class GrabberServiceBatch implements ItemWriter<Train> {
 				Date date = dateRange.next().getTime();
 				logger.debug("Grabbing for date:"+date);
 				
-				for (Train train : items) {
+				for (String idTrain : items) {
 					waitRandomly();
-					logger.debug("Grabbing for train: "+train.getIdRailtime());
-					grabberService.grabTrainLine(train.getIdRailtime(), date);
+					logger.debug("Grabbing for train: "+idTrain);
+					grabberService.grabTrainLine(idTrain, date);
 				}
 			}
 			
