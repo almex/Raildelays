@@ -28,6 +28,27 @@
 				</includes>
 			</resource>
 		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>package</phase>
+						<configuration>
+							<overwritereleases>false</overwritereleases>
+							<overwritesnapshots>false</overwritesnapshots>
+							<overwriteifnewer>true</overwriteifnewer>
+						</configuration>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 	</build>
 
 	<dependencies>
