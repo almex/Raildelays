@@ -11,6 +11,12 @@
 		p:url="jdbc:derby:directory:D:\DEV\Raildelays\service-layer\src\main\resources\database"
 		p:username="" p:password="" />
 		
+<!-- 	<bean id="dataSource" -->
+<!-- 		class="org.springframework.jdbc.datasource.DriverManagerDataSource" -->
+<!-- 		p:driverClassName="org.apache.derby.jdbc.EmbeddedDriver" -->
+<!-- 		p:url="jdbc:derby:raildelays;create=true" -->
+<!-- 		p:username="" p:password="" /> -->
+		
 		
 	<bean id="entityManagerFactory"
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"

@@ -22,7 +22,12 @@ public class Station implements Serializable {
 	
 	@Override
 	public String toString() {
-		return name;
+		StringBuilder builder = new StringBuilder("station=[");
+		
+		builder.append(name);
+		
+		builder.append("]");
+		return builder.toString();
 	}
 	
 }

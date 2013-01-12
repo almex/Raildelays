@@ -7,9 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+import javax.xml.validation.Validator;
+
 import org.apache.log4j.Logger;
 import org.dozer.Mapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,8 +27,8 @@ import be.raildelays.httpclient.RequestStreamer;
 import be.raildelays.parser.StreamParser;
 import be.raildelays.parser.impl.RailtimeStreamParser;
 import be.raildelays.repository.LineStopDao;
+import be.raildelays.repository.RailtimeTrainDao;
 import be.raildelays.repository.StationDao;
-import be.raildelays.repository.TrainDao;
 import be.raildelays.service.RaildelaysGrabberService;
 
 /**
@@ -42,23 +44,26 @@ import be.raildelays.service.RaildelaysGrabberService;
 @Transactional
 public class RailtimeGrabberService implements RaildelaysGrabberService {
 
-	@Autowired
+	@Resource
 	private RequestStreamer streamer;
 
-	@Autowired
+	@Resource
 	private LineStopDao lineStopDao;
 
-	@Autowired
-	private TrainDao trainDao;
+	@Resource
+	private RailtimeTrainDao railtimeTrainDao;
 
-	@Autowired
+	@Resource
 	private StationDao stationDao;
 
-	@Autowired
+	@Resource
 	private Mapper mapper;
 	
+	@Resource
+	private Validator validator;
+	
 
-	private Logger log = Logger.getLogger(RailtimeStreamParser.class);
+	private Logger log = Logger.getLogger(RailtimeGrabberService.class);
 
 	/**
 	 * {@inheritDoc}
@@ -66,7 +71,7 @@ public class RailtimeGrabberService implements RaildelaysGrabberService {
 	@Override
 	public Collection<LineStop> grabTrainLine(String idTrain, Date date) {
 		Map<Station, LineStop> result = new HashMap<>();
-		List<LineStop> lineStops = lineStopDao.retrieveLineStop(idTrain, date);
+		List<LineStop> lineStops = lineStopDao.findByTrain(idTrain, date);
 		
 		if (lineStops.isEmpty()) {
 
@@ -77,7 +82,7 @@ public class RailtimeGrabberService implements RaildelaysGrabberService {
 			
 			//-- 3) Persist line stops
 			for(LineStop lineStop : result.values()) {
-				lineStopDao.createLineStop(lineStop);
+				lineStopDao.save(lineStop);
 			}
 			
 			return result.values();
@@ -123,7 +128,7 @@ public class RailtimeGrabberService implements RaildelaysGrabberService {
 			// -- Map manually translation
 
 			// -- Retrieve/Create/Update a station from the lineStopDao
-			Station station = stationDao.createOrRetrieveStation(step.getStation().getName());
+			Station station = createOrRetrieveStation(step.getStation().getName());
 			
 			//-- Check in cache if its already exists or not
 			if(cache.containsKey(station)) {
@@ -148,13 +153,36 @@ public class RailtimeGrabberService implements RaildelaysGrabberService {
 			// -- Retrieve/Create/Update a train from the lineStopDao
 			RailtimeTrain train = new RailtimeTrain(direction.getTrain().getIdRailtime());
 			train.setEnglishName(direction.getTrain().getIdRailtime());
-			lineStop.setTrain(trainDao.createOrRetrieveRailtimeTrain(train));
+			
+			lineStop.setTrain(createOrRetrieveRailtimeTrain(train));
 
 			// -- Persist and return the result
 			cache.put(station, lineStop);
 		}
 
 		return cache;
+	}
+	
+	private RailtimeTrain createOrRetrieveRailtimeTrain(RailtimeTrain train) {
+		RailtimeTrain persistedTrain = railtimeTrainDao.findOne(train.getRailtimeId());
+		
+		if (persistedTrain == null) {
+			persistedTrain = railtimeTrainDao.save(train);
+		}
+		
+		return persistedTrain;
+	}
+	
+	private Station createOrRetrieveStation(String stationName) {
+		Station persistedStation = stationDao.findByEnglishName(stationName);
+		
+		if (persistedStation == null) {
+			Station station = new Station(stationName);
+			
+			persistedStation = stationDao.save(station);
+		}
+		
+		return persistedStation;
 	}
 
 }

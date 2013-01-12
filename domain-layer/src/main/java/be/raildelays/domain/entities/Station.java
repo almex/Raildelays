@@ -26,29 +26,6 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 @Inheritance(strategy=InheritanceType.SINGLE_TABLE)
 public class Station implements Serializable {
 
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder().append(englishName).toHashCode();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		boolean result = false;
-		
-		if(obj == this) {
-			result = true;
-		}
-		
-		if(obj instanceof Station) {
-			Station station = (Station) obj;
-			result = new EqualsBuilder().append(englishName, station.getEnglishName()).isEquals();
-		} else {
-			result =  false;
-		}
-		
-		return result;
-	}
-
 	private static final long serialVersionUID = -3436298381031779337L;
 	
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
@@ -70,6 +47,30 @@ public class Station implements Serializable {
 	
 	public Station(String name) {
 		this.englishName = name;
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(englishName).toHashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		boolean result = false;
+		
+		if(obj == this) {			
+			result = true;
+		} else {
+			if(obj instanceof Station) {				
+				Station station = (Station) obj;
+				
+				result = new EqualsBuilder().append(englishName, station.getEnglishName()).isEquals();
+			} else {
+				result =  false;
+			}
+		}
+		
+		return result;
 	}
 
 	public Long getId() {

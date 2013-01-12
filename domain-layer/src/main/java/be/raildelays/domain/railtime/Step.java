@@ -1,6 +1,8 @@
 package be.raildelays.domain.railtime;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class Step extends Stop implements Serializable  {
@@ -34,14 +36,28 @@ public class Step extends Stop implements Serializable  {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder("station="+this.getStation()+"\n");
+		StringBuilder builder = new StringBuilder("step=[");
+		
+		builder.append(getStation());
+		builder.append(", ");
 		
 		if(this.isCanceled()) {
-			builder.append("Canceled!"+"\n");
+			builder.append("canceled=true");
 		} else {
-			builder.append("timestamp="+this.getTimestamp()+"\n")
-				   .append("delay="+this.getDelay()+"\n");
+			SimpleDateFormat formater = new SimpleDateFormat("HH:mm");
+			Calendar effectiveTime = Calendar.getInstance();
+			effectiveTime.setTime(getTimestamp());
+			effectiveTime.add(Calendar.MINUTE, delay.intValue());
+			
+			builder.append("scheduledTime=");
+			builder.append(formater.format(getTimestamp()));
+			builder.append(", ");
+			builder.append("effectiveTime=");
+			builder.append(formater.format(effectiveTime.getTime()));
 		}
+		
+
+		builder.append("]");
 		
 		return builder.toString();
 	}

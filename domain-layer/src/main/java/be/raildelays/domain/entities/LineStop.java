@@ -14,6 +14,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
@@ -23,6 +25,10 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name="LINE_STOP")
+@NamedQueries({
+//@NamedQuery(name="LineStop.findByStation", query="select o from LineStop o where o.train.railtimeId = :idTrain and o.departureTime.expected >= :departure and o.departureTime.expected <= :arrival"),
+@NamedQuery(name="LineStop.findByTrain", query="select o from LineStop o where o.train.railtimeId = ?1 and o.departureTime.expected >= ?2 and o.departureTime.expected <= ?3")
+})
 public class LineStop implements Serializable {
 
 	private static final long serialVersionUID = 7142886242889314414L;

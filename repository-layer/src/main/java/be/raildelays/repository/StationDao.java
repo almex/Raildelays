@@ -1,6 +1,7 @@
 package be.raildelays.repository;
 
-import be.raildelays.domain.Language;
+import org.springframework.data.jpa.repository.JpaRepository;
+
 import be.raildelays.domain.entities.Station;
 
 /**
@@ -8,32 +9,7 @@ import be.raildelays.domain.entities.Station;
  * 
  * @author Almex
  */
-public interface StationDao {
-	
-	/**
-	 * Persist a new Station to the repository.
-	 * 
-	 * @param station entity to persist.
-	 * @return the same entity with its id filled-in
-	 */
-	public Station createStation(Station station);
-	
-	/**
-	 * Persist a new Station to the repository, if it exists it will update it.
-	 * 
-	 * @param englishName English name for this station.
-	 * @return the same entity with its id filled-in
-	 */
-	public Station createOrRetrieveStation(String englishName);
-	
-	/**
-	 * Search for a Station by its name.
-	 * 
-	 * @param name strict name that should match to find a Station.
-	 * @param language in which you want to do the search.
-	 * @return a {@link Station}
-	 */
-	public Station retrieveStation(String name, Language language);
+public interface StationDao extends JpaRepository<Station, Long> {
 	
 	/**
 	 * Search for a Station by its English name.
@@ -42,20 +18,25 @@ public interface StationDao {
 	 * @param language in which you want to do the search.
 	 * @return a {@link Station}
 	 */
-	public Station retrieveStation(String name);
+	public Station findByEnglishName(String englishName);
+	
 	
 	/**
-	 * Remove a Station.
+	 * Search for a Station by its French name.
 	 * 
-	 * @param idStation Station id
+	 * @param name strict name that should match to find a Station.
+	 * @param language in which you want to do the search.
+	 * @return a {@link Station}
 	 */
-	public void deleteStation(Long idStation);
+	public Station findByFrenchName(String frenchName);
+	
 	
 	/**
-	 * Update a Station.
+	 * Search for a Station by its Dutch name.
 	 * 
-	 * @param station that should contain at least an id.
-	 * @return the persisted version of the Station after updating.
+	 * @param name strict name that should match to find a Station.
+	 * @param language in which you want to do the search.
+	 * @return a {@link Station}
 	 */
-	public Station updateStation(Station station);
+	public Station findByDutchName(String dutchName);
 }

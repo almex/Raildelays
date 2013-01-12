@@ -1,7 +1,7 @@
 package be.raildelays.repository;
 
-import be.raildelays.domain.Language;
-import be.raildelays.domain.entities.RailtimeTrain;
+import org.springframework.data.jpa.repository.JpaRepository;
+
 import be.raildelays.domain.entities.Train;
 
 /**
@@ -9,61 +9,35 @@ import be.raildelays.domain.entities.Train;
  * 
  * @author Almex
  */
-public interface TrainDao {
+public interface TrainDao extends JpaRepository<Train, Long> {
 	
 	/**
-	 * Persist a new {@link Train} to the repository.
+	 * Search for a Train by its English name.
 	 * 
-	 * @param train entity to persist.
-	 * @return the same entity with its id filled-in
-	 */
-	public Train createTrain(Train train);
-	
-	/**
-	 * Persist a new {@link RailtimeTrain} to the repository.
-	 * 
-	 * @param train entity to persist.
-	 * @return the same entity with its id filled-in
-	 */
-	public RailtimeTrain createRailtimeTrain(RailtimeTrain train);
-	
-	/**
-	 * Persist a new {@link RailtimeTrain} to the repository.
-	 * 
-	 * @param idRailtime entity to persist.
-	 * @return the same entity with its id filled-in
-	 */
-	public RailtimeTrain createOrRetrieveRailtimeTrain(RailtimeTrain train);
-	
-	/**
-	 * Search for a train by its name.
-	 * 
-	 * @param name strict name that should match to find a train.
+	 * @param name strict name that should match to find a Train.
 	 * @param language in which you want to do the search.
 	 * @return a {@link Train}
 	 */
-	public Train retrieveTrain(String name, Language language);
+	public Train findByEnglishName(String englishName);
+	
 	
 	/**
-	 * Search for a train by its Railtime id.
+	 * Search for a Train by its French name.
 	 * 
-	 * @param idRailtime train's id in its Railtime format.
-	 * @return a {@link RailtimeTrain}
+	 * @param name strict name that should match to find a Train.
+	 * @param language in which you want to do the search.
+	 * @return a {@link Train}
 	 */
-	public RailtimeTrain retrieveRailtimeTrain(String idRailtime);
+	public Train findByFrenchName(String frenchName);
+	
 	
 	/**
-	 * Remove a train.
+	 * Search for a Train by its Dutch name.
 	 * 
-	 * @param idTrain train id
+	 * @param name strict name that should match to find a Train.
+	 * @param language in which you want to do the search.
+	 * @return a {@link Train}
 	 */
-	public void deleteTrain(Long idTrain);
+	public Train findByDutchName(String dutchName);
 	
-	/**
-	 * Update a train.
-	 * 
-	 * @param train that should contain at least an id.
-	 * @return the persisted version of the train after updating.
-	 */
-	public Train updateTrain(Train train);
 }

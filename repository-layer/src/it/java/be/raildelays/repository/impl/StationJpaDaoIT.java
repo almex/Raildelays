@@ -11,7 +11,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import be.raildelays.domain.Language;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.repository.StationDao;
 
@@ -26,7 +25,7 @@ public class StationJpaDaoIT {
 	
 	@Test
 	public void createTest() {
-		Station station = stationDao.createStation(new Station("Liège-Guillemins"));
+		Station station = stationDao.save(new Station("Liège-Guillemins"));
 		Assert.assertNotNull("The create method should return a result", station);
 		Assert.assertNotNull("The persisted station should returned with an id", station.getId());
 	}
@@ -34,8 +33,8 @@ public class StationJpaDaoIT {
 	@Test
 	public void searchTest() {
 		String name = "Liège-Guillemins";
-		stationDao.createStation(new Station(name));
-		Station station = stationDao.retrieveStation(name, Language.ENGLISH);
+		stationDao.save(new Station(name));
+		Station station = stationDao.findByEnglishName(name);
 		Assert.assertNotNull("The create method should return a result", station);
 	}
 
