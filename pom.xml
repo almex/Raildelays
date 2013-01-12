@@ -26,7 +26,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
-		<version.spring>3.1.2.RELEASE</version.spring>
+		<version.spring>3.2.0.RELEASE</version.spring>
 		<version.spring.batch>2.1.9.RELEASE</version.spring.batch>
 		<version.spring.data>1.2.0.RELEASE</version.spring.data>
 		<version.hibernate>4.0.1.Final</version.hibernate>
@@ -34,6 +34,7 @@
 		<version.hsqldb>2.2.9</version.hsqldb>
 		<version.derby>10.8.2.2</version.derby>
 		<version.groovy>2.0.6</version.groovy>
+		<version.validator>1.0.0.GA</version.validator>
 		<groovy.version>2.0</groovy.version>
 		<jdk.version>1.7</jdk.version>
 		<path.javafx>C:\Program Files\Oracle\JavaFX 2.0 SDK</path.javafx>
@@ -118,11 +119,6 @@
 				<version>1.0.1.Final</version>
 			</dependency>
 			<dependency>
-				<groupId>org.hibernate</groupId>
-				<artifactId>hibernate-validator</artifactId>
-				<version>${version.hibernate.validator}</version>
-			</dependency>
-			<dependency>
 				<groupId>org.hsqldb</groupId>
 				<artifactId>hsqldb</artifactId>
 				<version>${version.hsqldb}</version>
@@ -138,9 +134,9 @@
 				<version>${version.derby}</version>
 			</dependency>
 			<dependency>
-			    <groupId>org.springframework.data</groupId>
-			    <artifactId>spring-data-jpa</artifactId>
-			    <version>${version.spring.data}</version>
+				<groupId>org.springframework.data</groupId>
+				<artifactId>spring-data-jpa</artifactId>
+				<version>${version.spring.data}</version>
 			</dependency>
 
 
@@ -181,6 +177,18 @@
 				<version>2.0</version>
 				<systemPath>${path.javafx}/rt/lib/jfxrt.jar</systemPath>
 				<scope>system</scope>
+			</dependency>
+			
+			<!-- Validation -->
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-validator</artifactId>
+				<version>${version.hibernate.validator}</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.validation</groupId>
+				<artifactId>validation-api</artifactId>
+				<version>${version.validator}</version>
 			</dependency>
 
 
@@ -359,33 +367,33 @@
 					<artifactId>exec-maven-plugin</artifactId>
 					<version>1.2.1</version>
 				</plugin>
-				
-<!-- 				<plugin> -->
-<!-- 			      <groupId>org.codehaus.gmaven</groupId> -->
-<!-- 			        <artifactId>gmaven-plugin</artifactId> -->
-<!-- 			        <version>1.5</version> -->
-<!-- 			        <configuration> -->
-<!-- 			          <providerSelection>${groovy.version}</providerSelection> -->
-<!-- 			          <sourceEncoding>UTF-8</sourceEncoding> -->
-<!-- 			        </configuration> -->
-<!-- 			        <executions> -->
-<!-- 			          <execution> -->
-<!-- 			            <goals> -->
-<!-- 			              <goal>generateStubs</goal> -->
-<!-- 			              <goal>compile</goal> -->
-<!-- 			              <goal>generateTestStubs</goal> -->
-<!-- 			              <goal>testCompile</goal> -->
-<!-- 			            </goals> -->
-<!-- 			          </execution> -->
-<!-- 			        </executions> -->
-<!-- 			        <dependencies> -->
-<!-- 			         <dependency> -->
-<!-- 			           <groupId>org.codehaus.groovy</groupId> -->
-<!-- 			           <artifactId>groovy-all</artifactId> -->
-<!-- 			           <version>${version.groovy}</version> -->
-<!-- 			         </dependency> -->
-<!-- 			       </dependencies> -->
-<!-- 			    </plugin> -->
+
+				<!-- <plugin> -->
+				<!-- <groupId>org.codehaus.gmaven</groupId> -->
+				<!-- <artifactId>gmaven-plugin</artifactId> -->
+				<!-- <version>1.5</version> -->
+				<!-- <configuration> -->
+				<!-- <providerSelection>${groovy.version}</providerSelection> -->
+				<!-- <sourceEncoding>UTF-8</sourceEncoding> -->
+				<!-- </configuration> -->
+				<!-- <executions> -->
+				<!-- <execution> -->
+				<!-- <goals> -->
+				<!-- <goal>generateStubs</goal> -->
+				<!-- <goal>compile</goal> -->
+				<!-- <goal>generateTestStubs</goal> -->
+				<!-- <goal>testCompile</goal> -->
+				<!-- </goals> -->
+				<!-- </execution> -->
+				<!-- </executions> -->
+				<!-- <dependencies> -->
+				<!-- <dependency> -->
+				<!-- <groupId>org.codehaus.groovy</groupId> -->
+				<!-- <artifactId>groovy-all</artifactId> -->
+				<!-- <version>${version.groovy}</version> -->
+				<!-- </dependency> -->
+				<!-- </dependencies> -->
+				<!-- </plugin> -->
 
 			</plugins>
 		</pluginManagement>

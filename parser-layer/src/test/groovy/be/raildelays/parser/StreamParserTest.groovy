@@ -1,10 +1,6 @@
-package be.railrelays.parser
+package be.raildelays.parser
 
-import java.io.InputStreamReader
-import java.io.Reader
-import java.util.Date
-
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger
 import org.junit.Assert
 import org.junit.Test
 
@@ -12,7 +8,6 @@ import be.raildelays.domain.railtime.Direction
 import be.raildelays.domain.railtime.Step
 import be.raildelays.httpclient.RequestStreamer
 import be.raildelays.httpclient.impl.RailtimeRequestStreamer
-import be.raildelays.parser.StreamParser
 import be.raildelays.parser.impl.RailtimeStreamParser
 import be.raildelays.util.ParsingUtil
 

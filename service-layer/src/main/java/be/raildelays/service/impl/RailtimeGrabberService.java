@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
-import javax.xml.validation.Validator;
+import javax.validation.Validator;
 
 import org.apache.log4j.Logger;
 import org.dozer.Mapper;
@@ -61,7 +61,6 @@ public class RailtimeGrabberService implements RaildelaysGrabberService {
 	
 	@Resource
 	private Validator validator;
-	
 
 	private Logger log = Logger.getLogger(RailtimeGrabberService.class);
 
@@ -183,6 +182,11 @@ public class RailtimeGrabberService implements RaildelaysGrabberService {
 		}
 		
 		return persistedStation;
+	}
+	
+
+	public void setValidator(Validator validator) {
+		this.validator = validator;
 	}
 
 }
