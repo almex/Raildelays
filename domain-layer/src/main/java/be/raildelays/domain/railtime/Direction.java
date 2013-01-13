@@ -98,7 +98,9 @@ public class Direction implements Serializable {
 		}
 		
 		if (stepTo != null && isDelayedAt(stepTo.getStation().getName(), delayThreshold)) {
-			builder.append(stepFrom.getStation().getName());
+			if (stepFrom != null && stepFrom.getStation() != null) {
+				builder.append(stepFrom.getStation().getName());
+			}
 			builder.append(" -> ");
 			builder.append(stepTo.getStation().getName());
 			builder.append(" (");

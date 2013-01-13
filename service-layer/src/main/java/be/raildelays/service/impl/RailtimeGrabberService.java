@@ -163,7 +163,7 @@ public class RailtimeGrabberService implements RaildelaysGrabberService {
 	}
 	
 	private RailtimeTrain createOrRetrieveRailtimeTrain(RailtimeTrain train) {
-		RailtimeTrain persistedTrain = railtimeTrainDao.findOne(train.getRailtimeId());
+		RailtimeTrain persistedTrain = railtimeTrainDao.findByRailtimeId(train.getRailtimeId());
 		
 		if (persistedTrain == null) {
 			persistedTrain = railtimeTrainDao.save(train);

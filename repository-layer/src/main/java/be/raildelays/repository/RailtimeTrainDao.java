@@ -16,9 +16,9 @@ public interface RailtimeTrainDao extends JpaRepository<RailtimeTrain, String> {
 	 * 
 	 * @param name strict name that should match to find a RailtimeTrain.
 	 * @param language in which you want to do the search.
-	 * @return a {@link RailtimeTrain}
+	 * @return a {@link RailtimeTrain} if found, <code>null</code> otherwise. 
 	 */
-	public RailtimeTrain findByEnglishName(String englishName);
+	RailtimeTrain findByEnglishName(String englishName);
 	
 	
 	/**
@@ -26,9 +26,9 @@ public interface RailtimeTrainDao extends JpaRepository<RailtimeTrain, String> {
 	 * 
 	 * @param name strict name that should match to find a RailtimeTrain.
 	 * @param language in which you want to do the search.
-	 * @return a {@link RailtimeTrain}
+	 * @return a {@link RailtimeTrain} if found, <code>null</code> otherwise. 
 	 */
-	public RailtimeTrain findByFrenchName(String frenchName);
+	RailtimeTrain findByFrenchName(String frenchName);
 	
 	
 	/**
@@ -36,8 +36,16 @@ public interface RailtimeTrainDao extends JpaRepository<RailtimeTrain, String> {
 	 * 
 	 * @param name strict name that should match to find a RailtimeTrain.
 	 * @param language in which you want to do the search.
-	 * @return a {@link RailtimeTrain}
+	 * @return a {@link RailtimeTrain} if found, <code>null</code> otherwise. 
 	 */
-	public RailtimeTrain findByDutchName(String dutchName);
+	RailtimeTrain findByDutchName(String dutchName);
+
 	
+	/**
+	 * Search for a RailtimeTrain by its Id coming from Railtime.
+	 * 
+	 * @param railtimeId Id coming from Railtime
+	 * @return a {@link RailtimeTrain} if found, <code>null</code> otherwise. 
+	 */
+	RailtimeTrain findByRailtimeId(String railtimeId);
 }
