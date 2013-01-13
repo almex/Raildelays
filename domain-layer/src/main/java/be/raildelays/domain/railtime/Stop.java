@@ -3,11 +3,16 @@ package be.raildelays.domain.railtime;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.validation.constraints.NotNull;
+
 public class Stop implements Serializable {
 
 	private static final long serialVersionUID = 3019492480070457922L;
 	
+	@NotNull
 	protected Station station;
+	
+	@NotNull
 	protected Date timestamp;
 
 	public Stop (String stationName, Date timestamp) {

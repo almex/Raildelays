@@ -16,6 +16,7 @@ class RailtimeStreamParser implements StreamParser {
 	def tagsoupParser;
 	def slurper;
 	def html;
+	
 
 	public RailtimeStreamParser(reader) {
 		this.reader = reader;

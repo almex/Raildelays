@@ -4,14 +4,27 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 public class Direction implements Serializable {
 
 	private static final long serialVersionUID = -546508375202547836L;
 	
+	@NotNull
 	private Train train;
+	
+	@NotNull
 	private List<Step> steps = new ArrayList<>();
+	
+	@NotNull
 	private Station from;
+	
+	@NotNull
 	private Station to;
+	
+	@NotNull
+	@Size(min=1, max=256)
 	private String libelle;
 	
 	public Direction (Train train) {
