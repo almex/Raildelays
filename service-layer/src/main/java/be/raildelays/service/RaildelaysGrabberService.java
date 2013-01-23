@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Date;
 
 import be.raildelays.domain.entities.LineStop;
+import be.raildelays.domain.entities.Station;
 
 /**
  * Service used to collect data from Railtime and persist them.
@@ -36,4 +37,15 @@ public interface RaildelaysGrabberService {
 	 * @return the a list of {@LineStop} which has been persisted.
 	 */
 	public Collection<LineStop> grabTrainLine(String idTrainRailtime);
+	
+	/**
+	 * Retrieve all delays between a departure station to an arrival station for a certain date. 
+	 * 
+	 * @param date date for which you do the search
+	 * @param departure departure station
+	 * @param arrival arrival station
+	 * @param delayTreshold minimum delay (in minutes)
+	 * @return a collection of {@link LineStop} belonging to departure or arrival
+	 */
+	public Collection<LineStop> searchAllDelays(Date date, Station departure, Station arrival, int delayTreshold);
 }

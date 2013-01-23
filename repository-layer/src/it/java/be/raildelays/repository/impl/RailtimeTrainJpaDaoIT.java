@@ -10,34 +10,31 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import be.raildelays.domain.entities.RailtimeTrain;
-import be.raildelays.repository.RailtimeTrainDao;
+import be.raildelays.domain.entities.Station;
+import be.raildelays.repository.StationDao;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:spring/repository/raildelays-repository-integration-context.xml","classpath:spring/test/raildelays-tx-context.xml"})
 @Transactional
 @TransactionConfiguration(defaultRollback=true)
-public class StationJpaDaoIT {
+public class RailtimeTrainJpaDaoIT {
 	
 	@Resource
-	private RailtimeTrainDao railtimeTrainDao;
+	private StationDao stationDao;
 	
 	@Test
 	public void createTest() {
-		RailtimeTrain train = railtimeTrainDao.save(new RailtimeTrain("466"));
-		
-		Assert.assertNotNull("The create method should return a result", train);
-		Assert.assertNotNull("The persisted station should returned with an id", train.getId());
+		Station station = stationDao.save(new Station("Liège-Guillemins"));
+		Assert.assertNotNull("The create method should return a result", station);
+		Assert.assertNotNull("The persisted station should returned with an id", station.getId());
 	}
 	
 	@Test
 	public void searchTest() {
-		String id = "466";
-		RailtimeTrain expected = railtimeTrainDao.save(new RailtimeTrain(id));
-		RailtimeTrain train = railtimeTrainDao.findByRailtimeId(id);
-		
-		Assert.assertNotNull("The create method should return a result", train);
-		Assert.assertEquals("We should retrieve the one previously created", expected, train);
+		String name = "Liège-Guillemins";
+		stationDao.save(new Station(name));
+		Station station = stationDao.findByEnglishName(name);
+		Assert.assertNotNull("The create method should return a result", station);
 	}
 
 	

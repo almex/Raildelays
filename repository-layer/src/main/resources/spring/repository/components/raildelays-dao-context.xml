@@ -12,7 +12,9 @@
 
 	<context:annotation-config />
 
+	<!-- Entities -->
 	<context:component-scan base-package="be.raildelays.domain.entities" />
 	
+	<!-- Repositories -->
 	<jpa:repositories base-package="be.raildelays.repository" repository-impl-postfix="CustomJpa"/>
 </beans>

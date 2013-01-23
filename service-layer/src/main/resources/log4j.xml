@@ -9,20 +9,20 @@
 		</layout>
 	</appender>
 
-	<logger name="be.raildelays">
-		<level value="debug" />
+	<logger name="be.raildelays.service">
+		<level value="info" />
 	</logger>
 
 	<logger name="org.springframework">
-		<level value="warn" />
+		<level value="info" />
 	</logger>
 
 	<logger name="org.hsqldb">
-		<level value="warn" />
+		<level value="info" />
 	</logger>
 
 	<logger name="org.hibernate">
-		<level value="warn" />
+		<level value="info" />
 	</logger>
 
 

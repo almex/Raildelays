@@ -4,17 +4,17 @@
           xsi:schemaLocation="http://dozer.sourceforge.net
           http://dozer.sourceforge.net/schema/beanmapping.xsd">
           
-  <mapping> 
+  <mapping map-null="false"> 
     <class-a>be.raildelays.domain.railtime.Step</class-a>
     <class-b>be.raildelays.domain.entities.LineStop</class-b>   
   </mapping>   
   
-  <mapping> 
+  <mapping map-null="false"> 
     <class-a>be.raildelays.domain.railtime.Train</class-a>
     <class-b>be.raildelays.domain.entities.Train</class-b>   
   </mapping> 
   
-  <mapping> 
+  <mapping map-null="false"> 
     <class-a>be.raildelays.domain.railtime.Station</class-a>
     <class-b>be.raildelays.domain.entities.Station</class-b>   
   </mapping> 

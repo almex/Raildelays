@@ -11,7 +11,8 @@
 <!-- 		p:url="jdbc:derby:directory:D:\DEV\Raildelays\service-layer\src\main\resources\database" -->
 <!-- 		p:username="" p:password=""  /> -->
 		
-	<bean id="dataSource" class="be.raildelays.repository.LoadDatabase" init-method="startUp" destroy-method="shutdown" />
+	<bean id="dataSource" factory-bean="databaseLoader" factory-method="getDataSource" />
+	<bean id="databaseLoader" class="be.raildelays.repository.LoadDatabase" init-method="startUp" destroy-method="shutdown" />
 		
 <!-- 	<bean id="dataSource" -->
 <!-- 		class="org.springframework.jdbc.datasource.DriverManagerDataSource" -->
@@ -28,9 +29,9 @@
 		</property>
 		<property name="jpaProperties">
 			<props>
-<!-- 				<prop key="hibernate.hbm2ddl.auto">validate</prop> -->
-				<prop key="hibernate.show_sql">true</prop>
-				<prop key="hibernate.format_sql">true</prop>
+ 				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.format_sql">false</prop>
 				<prop key="hibernate.dialect">org.hibernate.dialect.DerbyTenSevenDialect</prop>
 			</props>
 		</property>

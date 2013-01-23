@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import be.raildelays.domain.entities.LineStop;
+import be.raildelays.domain.entities.Station;
 
 public interface LineStopDaoCustom {
 
@@ -21,15 +22,26 @@ public interface LineStopDaoCustom {
 //	public List<LineStop> findByStation(Station departure, Station arrival,
 //			Date date);
 	
+
 	/**
-	 * Search a list of line stops that belong to a train for a certain day.
+	 * Search a list of arrival delayed line stops that belong departure or arrival for a certain day.
 	 * 
-	 * @param idTrain
-	 *            train's id in Railtime format.
-	 * @param date
-	 *            day of the year for which you do the search
-	 * @return a list of line stop
+	 * @param date date for which you do the search
+	 * @param departure departure station
+	 * @param arrival arrival station
+	 * @param delayTreshold minimum delay (in minutes)
+	 * @return a collection of {@link LineStop} belonging to departure
 	 */
-	List<LineStop> findByTrain(String idTrain, Date date);
+	List<LineStop> findDepartureDelays(Date date, Station station, int delayThreshold);
+	/**
+	 * Search a list of departure delayed line stops that belong departure or arrival for a certain day.
+	 * 
+	 * @param date date for which you do the search
+	 * @param departure departure station
+	 * @param arrival arrival station
+	 * @param delayTreshold minimum delay (in minutes)
+	 * @return a collection of {@link LineStop} belonging to arrival
+	 */
+	List<LineStop> findArrivalDelays(Date date, Station station, int delayThreshold);
 
 }

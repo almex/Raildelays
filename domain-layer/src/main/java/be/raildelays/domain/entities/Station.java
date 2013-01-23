@@ -22,29 +22,30 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * @author Almex
  */
 @Entity
-@Table(name="STATION")
-@Inheritance(strategy=InheritanceType.SINGLE_TABLE)
+@Table(name = "STATION")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Station implements Serializable {
 
 	private static final long serialVersionUID = -3436298381031779337L;
-	
-	@Id @GeneratedValue(strategy=GenerationType.AUTO)
-	private Long id;	
-	
-	@Column(nullable=false, updatable=false, unique=true)
-	private String englishName;
-	
-	private String frenchName;
-	
-	private String dutchName;
-	
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.TABLE)
+	protected Long id;
+
+	@Column(nullable = false, updatable = false, unique = true)
+	protected String englishName;
+
+	protected String frenchName;
+
+	protected String dutchName;
+
 	public Station() {
 		this.id = null;
 		this.englishName = "";
 		this.dutchName = "";
 		this.frenchName = "";
 	}
-	
+
 	public Station(String name) {
 		this.englishName = name;
 	}
@@ -57,19 +58,20 @@ public class Station implements Serializable {
 	@Override
 	public boolean equals(Object obj) {
 		boolean result = false;
-		
-		if(obj == this) {			
+
+		if (obj == this) {
 			result = true;
 		} else {
-			if(obj instanceof Station) {				
+			if (obj instanceof Station) {
 				Station station = (Station) obj;
-				
-				result = new EqualsBuilder().append(englishName, station.getEnglishName()).isEquals();
+
+				result = new EqualsBuilder().append(englishName,
+						station.getEnglishName()).isEquals();
 			} else {
-				result =  false;
+				result = false;
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -99,6 +101,17 @@ public class Station implements Serializable {
 
 	public void setDutchName(String dutchName) {
 		this.dutchName = dutchName;
+	}
+
+	@Override
+	public String toString() {
+		return new StringBuilder("Station: ") //
+				.append("{ ") //
+				.append("id: ").append(id).append(", ") //
+				.append("dutchName: ").append(dutchName).append(", ") //
+				.append("englishName: ").append(englishName).append(", ") //
+				.append("frenchName: ").append(frenchName) //
+				.append(" }").toString();
 	}
 
 }

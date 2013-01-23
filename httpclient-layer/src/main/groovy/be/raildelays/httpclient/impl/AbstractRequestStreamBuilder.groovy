@@ -33,6 +33,9 @@ abstract class AbstractRequestStreamBuilder {
 			uri.query = parameters
 		
 			headers.'User-Agent' = USER_AGENT
+			
+			log.debug("path="+path);
+			log.debug("parameters="+parameters);
 				
 			// handler for any failure status code:
 			response.failure = { resp ->

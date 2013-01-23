@@ -1,11 +1,10 @@
 package be.raildelays.service.impl;
 
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.validation.Validator;
@@ -58,7 +57,7 @@ public class RailtimeGrabberService implements RaildelaysGrabberService {
 
 	@Resource
 	private Mapper mapper;
-	
+
 	@Resource
 	private Validator validator;
 
@@ -68,74 +67,95 @@ public class RailtimeGrabberService implements RaildelaysGrabberService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Collection<LineStop> grabTrainLine(String idTrain, Date date) {
-		Map<Station, LineStop> result = new HashMap<>();
-		List<LineStop> lineStops = lineStopDao.findByTrain(idTrain, date);
-		
+	@Transactional
+	public List<LineStop> grabTrainLine(String idTrain, Date date) {
+		List<LineStop> result = new ArrayList<LineStop>();
+		RailtimeTrain train = saveOrRetrieveRailtimeTrain(new RailtimeTrain(
+				idTrain));
+		List<LineStop> lineStops = lineStopDao.findByTrainAndDate(train, date);
+
+		log.debug("Grabbing for tain=" + train + " date=" + date);
+
 		if (lineStops.isEmpty()) {
 
-			//-- 1) We do request/mapping for departures
-			result.putAll(requestAndParse(idTrain, date, Sens.DEPARTURE));
-			//-- 2) We do request/mapping with arrivals
-			result.putAll(requestAndParse(idTrain, date, Sens.ARRIVAL));
-			
-			//-- 3) Persist line stops
-			for(LineStop lineStop : result.values()) {
-				lineStopDao.save(lineStop);
-			}
-			
-			return result.values();
+			// -- 1) We do request/mapping for departures
+			requestAndPersist(train, date, Sens.DEPARTURE);
+			// -- 2) We do request/mapping with arrivals
+			lineStops = requestAndPersist(train, date, Sens.ARRIVAL);
+
 		} else {
-			log.debug("The result already exists for idTrain="+idTrain+" and date="+date);
-			
-			return lineStops;
+			log.debug("The result already exists for idTrain=" + idTrain
+					+ " and date=" + date);
+
+			result = lineStops;
 		}
 
+		return result;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Transactional
 	public Collection<LineStop> grabTrainLine(String idTrain) {
 		return grabTrainLine(idTrain, new Date());
 	}
 
-	private Map<Station, LineStop> requestAndParse(String idTrain, Date date, Sens sens) {
-		return requestAndParse(new HashMap<Station, LineStop>(),idTrain, date, sens);
+	private List<LineStop> requestAndPersist(RailtimeTrain train, Date date,
+			Sens sens) {
+		List<LineStop> result = new ArrayList<LineStop>();
+
+		for (LineStop lineStop : requestAndParse(train, date, sens)) {
+			result.add(lineStopDao.save(lineStop));
+		}
+
+		return result;
 	}
-	
-	private Map<Station, LineStop> requestAndParse(Map<Station, LineStop> cache, String idTrain, Date date, Sens sens) {
+
+	private List<LineStop> requestAndParse(RailtimeTrain train, Date date,
+			Sens sens) {
 		// -- Create a request to target Railtime
-		Reader englishStream = streamer.getDelays(idTrain, date,
+		Reader englishStream = streamer.getDelays(train.getEnglishName(), date,
 				Language.ENGLISH.getRailtimeParameter(),
-				Sens.ARRIVAL.getRailtimeParameter());
+				sens.getRailtimeParameter());
 
 		// -- Parse the content
 		StreamParser parser = new RailtimeStreamParser(englishStream);
-		Direction direction = parser.parseDelay(idTrain, date);
+		Direction direction = parser.parseDelay(train.getEnglishName(), date);
 
-		return mapStepToLineStop(cache, direction, sens);
+		return convertStepToLineStop(train, date, direction, sens);
 	}
 
-	private Map<Station, LineStop> mapStepToLineStop(Map<Station, LineStop> cache, Direction direction, Sens sens) {
+	private List<LineStop> convertStepToLineStop(RailtimeTrain train,
+			Date date, Direction direction, Sens sens) {
+		List<LineStop> result = new ArrayList<LineStop>();
+
+		log.debug("direction=" + direction + " date=" + date + " sens="
+				+ sens.name());
 
 		for (Step step : direction.getSteps()) {
-			// -- Map the result to an entity
-			LineStop lineStop = mapper.map(step, LineStop.class);
-
-			// -- Map manually translation
-
+			LineStop lineStop = null;
 			// -- Retrieve/Create/Update a station from the lineStopDao
-			Station station = createOrRetrieveStation(step.getStation().getName());
-			
-			//-- Check in cache if its already exists or not
-			if(cache.containsKey(station)) {
-				lineStop = cache.get(station);
+			Station station = saveOrRetrieveStation(step.getStation().getName());
+			LineStop persistedLineStop = lineStopDao
+					.findByTrainAndDateAndStation(train, date, station);
+
+			if (persistedLineStop != null) {
+				lineStop = persistedLineStop;
 			} else {
+				lineStop = new LineStop();
+				lineStop.setDate(date);
+				lineStop.setTrain(train);
 				lineStop.setStation(station);
 			}
 
+			// -- Map the result to an entity
+			mapper.map(step, lineStop);
+
+			// -- TODO Map manually translation
+
+			// -- Set the time stamp delay to the right sens
 			TimestampDelay timestampDelay = new TimestampDelay(
 					step.getTimestamp(), step.getDelay() == null ? 0L
 							: step.getDelay());
@@ -149,44 +169,57 @@ public class RailtimeGrabberService implements RaildelaysGrabberService {
 				break;
 			}
 
-			// -- Retrieve/Create/Update a train from the lineStopDao
-			RailtimeTrain train = new RailtimeTrain(direction.getTrain().getIdRailtime());
-			train.setEnglishName(direction.getTrain().getIdRailtime());
-			
-			lineStop.setTrain(createOrRetrieveRailtimeTrain(train));
+			log.debug("lineStop=" + lineStop);
 
 			// -- Persist and return the result
-			cache.put(station, lineStop);
+			result.add(lineStop);
 		}
 
-		return cache;
+		return result;
 	}
-	
-	private RailtimeTrain createOrRetrieveRailtimeTrain(RailtimeTrain train) {
-		RailtimeTrain persistedTrain = railtimeTrainDao.findByRailtimeId(train.getRailtimeId());
+
+	private RailtimeTrain saveOrRetrieveRailtimeTrain(RailtimeTrain train) {
+		RailtimeTrain result = null;
+		RailtimeTrain persistedTrain = railtimeTrainDao.findByRailtimeId(train
+				.getRailtimeId());
 		
 		if (persistedTrain == null) {
-			persistedTrain = railtimeTrainDao.save(train);
+			result = railtimeTrainDao.saveAndFlush(train);
+		} else {
+			result = persistedTrain;
 		}
-		
-		return persistedTrain;
+
+		return result;
 	}
-	
-	private Station createOrRetrieveStation(String stationName) {
-		Station persistedStation = stationDao.findByEnglishName(stationName);
-		
-		if (persistedStation == null) {
+
+	private Station saveOrRetrieveStation(String stationName) {
+		Station result = stationDao.findByEnglishName(stationName);
+
+		if (result == null) {
 			Station station = new Station(stationName);
-			
-			persistedStation = stationDao.save(station);
+
+			result = stationDao.saveAndFlush(station);
 		}
-		
-		return persistedStation;
+
+		return result;
 	}
-	
 
 	public void setValidator(Validator validator) {
 		this.validator = validator;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Collection<LineStop> searchAllDelays(Date date, Station departure,
+			Station arrival, int delayThreshold) {
+		Collection<LineStop> result = new ArrayList<LineStop>();
+
+		// result.addAll(lineStopDao.findDepartureDelays(date, departure,
+		// delayThreshold));
+		result.addAll(lineStopDao.findArrivalDelays(date, arrival,
+				delayThreshold));
+
+		return result;
 	}
 
 }

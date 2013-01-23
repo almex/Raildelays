@@ -1,6 +1,7 @@
 package be.raildelays.domain.entities;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.persistence.Embeddable;
@@ -47,5 +48,14 @@ public class TimestampDelay implements Serializable, Cloneable {
 
 	public void setExpected(Date expected) {
 		this.expected = expected;
+	}
+
+	@Override
+	public String toString() {
+		return new StringBuilder("TimestampDelay: ") //
+				.append("{ ") //
+				.append("expected: ").append(expected != null ? new SimpleDateFormat("HH:mm").format(expected) : null).append(", ") //
+				.append("delay: ").append(delay) //
+				.append(" }").toString();
 	}
 }
