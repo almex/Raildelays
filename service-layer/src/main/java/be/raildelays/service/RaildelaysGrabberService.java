@@ -1,7 +1,7 @@
 package be.raildelays.service;
 
-import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
@@ -24,7 +24,7 @@ public interface RaildelaysGrabberService {
 	 *            account).
 	 * @return the a list of {@LineStop} which has been persisted.
 	 */
-	public Collection<LineStop> grabTrainLine(String idTrainRailtime, Date date);
+	public List<LineStop> grabTrainLine(String idTrainRailtime, Date date);
 	
 
 
@@ -36,7 +36,7 @@ public interface RaildelaysGrabberService {
 	 *            train's id in a Railtime format.
 	 * @return the a list of {@LineStop} which has been persisted.
 	 */
-	public Collection<LineStop> grabTrainLine(String idTrainRailtime);
+	public List<LineStop> grabTrainLine(String idTrainRailtime);
 	
 	/**
 	 * Retrieve all delays between a departure station to an arrival station for a certain date. 
@@ -47,5 +47,5 @@ public interface RaildelaysGrabberService {
 	 * @param delayTreshold minimum delay (in minutes)
 	 * @return a collection of {@link LineStop} belonging to departure or arrival
 	 */
-	public Collection<LineStop> searchAllDelays(Date date, Station departure, Station arrival, int delayTreshold);
+	public List<LineStop> searchDelaysBetween(Date date, Station departure, Station arrival, int delayTreshold);
 }

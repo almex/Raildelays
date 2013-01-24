@@ -39,7 +39,7 @@ public class Station implements Serializable {
 
 	protected String dutchName;
 
-	public Station() {
+	protected Station() {
 		this.id = null;
 		this.englishName = "";
 		this.dutchName = "";
@@ -47,12 +47,19 @@ public class Station implements Serializable {
 	}
 
 	public Station(String name) {
+		this();
 		this.englishName = name;
 	}
 
 	@Override
-	public int hashCode() {
-		return new HashCodeBuilder().append(englishName).toHashCode();
+	public String toString() {
+		return new StringBuilder("Station: ") //
+				.append("{ ") //
+				.append("id: ").append(id).append(", ") //
+				.append("dutchName: ").append(dutchName).append(", ") //
+				.append("englishName: ").append(englishName).append(", ") //
+				.append("frenchName: ").append(frenchName) //
+				.append(" }").toString();
 	}
 
 	@Override
@@ -73,6 +80,13 @@ public class Station implements Serializable {
 		}
 
 		return result;
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder() //
+				.append(englishName) //
+				.toHashCode();
 	}
 
 	public Long getId() {
@@ -101,17 +115,6 @@ public class Station implements Serializable {
 
 	public void setDutchName(String dutchName) {
 		this.dutchName = dutchName;
-	}
-
-	@Override
-	public String toString() {
-		return new StringBuilder("Station: ") //
-				.append("{ ") //
-				.append("id: ").append(id).append(", ") //
-				.append("dutchName: ").append(dutchName).append(", ") //
-				.append("englishName: ").append(englishName).append(", ") //
-				.append("frenchName: ").append(frenchName) //
-				.append(" }").toString();
 	}
 
 }

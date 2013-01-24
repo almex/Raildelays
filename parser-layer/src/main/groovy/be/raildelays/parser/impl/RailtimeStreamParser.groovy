@@ -47,6 +47,7 @@ class RailtimeStreamParser implements StreamParser {
 
 
 		// Parse the page
+		int ordinance = 0;
 		body.findAll { it.name() == 'tr' && it.@class.text().contains('rowHeightTraject') }.each { tr ->
 			String station = tr.td[1].text()
 			String hour = tr.td[2].text()
@@ -58,10 +59,11 @@ class RailtimeStreamParser implements StreamParser {
 			log.debug("delay="+delay)
 			log.debug("canceled="+canceled)
 
-			Step step = new Step(station, ParsingUtil.parseTimestamp(ParsingUtil.formatDate(date)+hour), parseDelay(delay), canceled)
+			Step step = new Step(ordinance, station, ParsingUtil.parseTimestamp(ParsingUtil.formatDate(date)+hour), parseDelay(delay), canceled)
 			
 
 			steps.add(step)
+			ordinance++
 		}
 		direction.steps = steps
 

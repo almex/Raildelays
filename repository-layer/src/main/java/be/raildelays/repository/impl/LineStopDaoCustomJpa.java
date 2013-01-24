@@ -24,22 +24,22 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 
 	private Logger logger = Logger.getLogger(LineStopDaoCustomJpa.class);
 
-//	/**
-//	 * {@inheritDoc}
-//	 */
-//	@SuppressWarnings("unchecked")
-//	@Override
-//	public List<LineStop> findByTrain(String idTrain, Date date) {
-//		return (List<LineStop>) entityManager
-//				.createQuery(
-//						"select o from LineStop o "
-//								+ "where o.train.railtimeId = :idTrain "
-//								+ "and o.date = :date ")
-//				.setParameter("idTrain", idTrain)
-//				.setParameter("date", date, TemporalType.DATE)
-//				.getResultList();
-//
-//	}
+	// /**
+	// * {@inheritDoc}
+	// */
+	// @SuppressWarnings("unchecked")
+	// @Override
+	// public List<LineStop> findByTrain(String idTrain, Date date) {
+	// return (List<LineStop>) entityManager
+	// .createQuery(
+	// "select o from LineStop o "
+	// + "where o.train.railtimeId = :idTrain "
+	// + "and o.date = :date ")
+	// .setParameter("idTrain", idTrain)
+	// .setParameter("date", date, TemporalType.DATE)
+	// .getResultList();
+	//
+	// }
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -65,11 +65,11 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 			int delayThreshold) {
 		return (List<LineStop>) entityManager
 				.createQuery(
-						"select o from LineStop o "
-								+ "where o.station.englishName = :stationName "
-								+ "and o.date = :date "
-								+ "and o.arrivalTime.delay is not null "
-								+ "and o.arrivalTime.delay >= :delayThreshold ")
+						"Select o From LineStop o "
+								+ "Where o.station.englishName = :stationName "
+								+ "And o.date = :date "
+								+ "And o.arrivalTime.delay Is Not Null "
+								+ "And o.arrivalTime.delay >= :delayThreshold ")
 				.setParameter("delayThreshold", new Long(delayThreshold))
 				.setParameter("date", date, TemporalType.DATE)
 				.setParameter("stationName", station.getEnglishName())

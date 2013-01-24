@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 @Entity
 public class RailtimeStation extends Station {
@@ -13,13 +14,9 @@ public class RailtimeStation extends Station {
 	@Column(unique=true)
 	private String railtimeId;
 	
-	public RailtimeStation() {
-		railtimeId = "";
-	}
-
-	public RailtimeStation(String railtimeId) {
-		super(railtimeId);
-		this.railtimeId = railtimeId;
+	protected RailtimeStation() {
+		super();
+		this.railtimeId = "";
 	}
 	
 	public RailtimeStation(String name, String railtimeId) {
@@ -53,6 +50,13 @@ public class RailtimeStation extends Station {
 		}
 
 		return result;
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder() //
+				.append(railtimeId) //
+				.toHashCode();
 	}
 	
 	@Override

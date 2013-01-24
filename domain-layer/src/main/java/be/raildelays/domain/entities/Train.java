@@ -12,6 +12,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
  * Entity that represent a train. Unicity of a train is done on the English
@@ -38,7 +39,7 @@ public class Train implements Serializable {
 
 	protected String dutchName;
 
-	public Train() {
+	protected Train() {
 		this.id = null;
 		this.englishName = "";
 		this.dutchName = "";
@@ -46,6 +47,7 @@ public class Train implements Serializable {
 	}
 
 	public Train(String name) {
+		this();
 		this.englishName = name;
 	}
 
@@ -79,11 +81,9 @@ public class Train implements Serializable {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((englishName == null) ? 0 : englishName.hashCode());
-		return result;
+		return new HashCodeBuilder() //
+				.append(englishName) //
+				.toHashCode();
 	}
 
 

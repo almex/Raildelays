@@ -18,9 +18,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
  * Line stop determine a stop for train line.
@@ -52,7 +56,7 @@ public class LineStop implements Serializable {
 
 	@Column(name = "CANCELED")
 	private boolean canceled;
-	
+
 	@Temporal(TemporalType.DATE)
 	@Column(name = "DATE")
 	private Date date;
@@ -68,8 +72,16 @@ public class LineStop implements Serializable {
 			@AttributeOverride(column = @Column(name = "DEPARTURE_TIME_EXPECTED"), name = "expected"),
 			@AttributeOverride(column = @Column(name = "DEPARTURE_TIME_DELAY"), name = "delay") })
 	private TimestampDelay departureTime;
+	
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional=true)
+	@JoinColumn(name="PREVIOUS_ID")
+	private LineStop previous;
+	
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional=true)
+	@JoinColumn(name="NEXT_ID")
+	private LineStop next;
 
-	public LineStop() {
+	private LineStop() {
 		this.train = null;
 		this.station = null;
 		this.arrivalTime = null;
@@ -78,8 +90,10 @@ public class LineStop implements Serializable {
 		this.date = new Date();
 	}
 
-	public LineStop(Train train, Station station, TimestampDelay arrivalTime,
+	public LineStop(Date date, Train train, Station station, TimestampDelay arrivalTime,
 			TimestampDelay departureTime, boolean canceled) {
+		this();
+		this.date = date;
 		this.train = train;
 		this.station = station;
 		this.arrivalTime = arrivalTime;
@@ -87,9 +101,13 @@ public class LineStop implements Serializable {
 		this.canceled = canceled;
 	}
 
-	public LineStop(Train train, Station station, TimestampDelay arrivalTime,
+	public LineStop(Date date, Train train, Station station, TimestampDelay arrivalTime,
 			TimestampDelay departureTime) {
-		this(train, station, arrivalTime, departureTime, false);
+		this(date, train, station, arrivalTime, departureTime, false);
+	}
+	
+	public LineStop(Date date, Train train, Station station) {
+		this(date, train, station, null, null, false);
 	}
 
 	@Override
@@ -97,13 +115,81 @@ public class LineStop implements Serializable {
 		return new StringBuilder("LineStop: ") //
 				.append("{ ") //
 				.append("id: " + id + ", ") //
-				.append("train: {").append(train).append("}, ") //
-				.append("station: {").append(station).append("}, ") //
-				.append("date: ").append(new SimpleDateFormat("dd/MM/yyyy").format(date)).append(", ") //
+				.append("date: ")
+				.append(new SimpleDateFormat("dd/MM/yyyy").format(date)) 
+				.append(", ") //
+				.append("train: {").append(train) //
+				.append("}, ") //
+				.append("station: {").append(station) //
+				.append("}, ") //
 				.append("arrivalTime: {").append(arrivalTime).append("}, ") //
 				.append("departureTime: {").append(departureTime).append("}, ") //
 				.append("canceled: " + canceled + " ") //
 				.append("} ").toString();
+	}
+	
+	public String toStringUntilDeparture() {
+		StringBuilder builder = new StringBuilder();
+		
+		if (getPrevious() != null) {
+			builder.append(getPrevious().toStringUntilDeparture());
+			builder.append(getPrevious().toString());
+			builder.append("\n");
+		}
+		
+		return builder.toString();
+	}
+	
+	public String toStringUntilArrival() {
+		StringBuilder builder = new StringBuilder();
+		
+		if (getNext() != null) {
+			builder.append("\n");
+			builder.append(getNext().toString());
+			builder.append(getNext().toStringUntilArrival());
+		}				
+		
+		return builder.toString();		
+	}
+	
+	public String toStringAll() {
+		StringBuilder builder = new StringBuilder();
+		
+		builder.append(toStringUntilDeparture());
+		builder.append("<<").append(toString()).append(">>");
+		builder.append(toStringUntilArrival());
+		
+		return builder.toString();		
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		boolean result = false;
+
+		if (obj == this) {
+			result = true;
+		} else {
+			if (obj instanceof Station) {
+				LineStop lineStop = (LineStop) obj;
+
+				result = new EqualsBuilder() //
+						.append(train, lineStop.getTrain()) //
+						.append(station, lineStop.getStation()) //
+						.append(date, lineStop.getDate()) //
+						.isEquals();
+			}
+		}
+
+		return result;
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(11,3) //
+				.append(train) //
+				.append(station) //
+				.append(date) //
+				.toHashCode();
 	}
 
 	public Long getId() {
@@ -156,6 +242,22 @@ public class LineStop implements Serializable {
 
 	public void setCanceled(boolean canceled) {
 		this.canceled = canceled;
+	}
+
+	public LineStop getPrevious() {
+		return previous;
+	}
+
+	public void setPrevious(LineStop previous) {
+		this.previous = previous;
+	}
+
+	public LineStop getNext() {
+		return next;
+	}
+
+	public void setNext(LineStop next) {
+		this.next = next;
 	}
 
 }

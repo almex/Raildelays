@@ -2,13 +2,13 @@ package be.raildelays.service.impl;
 
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
 import javax.validation.Validator;
 
+import org.apache.commons.collections.ListUtils;
 import org.apache.log4j.Logger;
 import org.dozer.Mapper;
 import org.springframework.stereotype.Service;
@@ -66,7 +66,6 @@ public class RailtimeGrabberService implements RaildelaysGrabberService {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	@Transactional
 	public List<LineStop> grabTrainLine(String idTrain, Date date) {
 		List<LineStop> result = new ArrayList<LineStop>();
@@ -96,9 +95,8 @@ public class RailtimeGrabberService implements RaildelaysGrabberService {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	@Transactional
-	public Collection<LineStop> grabTrainLine(String idTrain) {
+	public List<LineStop> grabTrainLine(String idTrain) {
 		return grabTrainLine(idTrain, new Date());
 	}
 
@@ -130,12 +128,14 @@ public class RailtimeGrabberService implements RaildelaysGrabberService {
 	private List<LineStop> convertStepToLineStop(RailtimeTrain train,
 			Date date, Direction direction, Sens sens) {
 		List<LineStop> result = new ArrayList<LineStop>();
+		LineStop previous = null;
 
 		log.debug("direction=" + direction + " date=" + date + " sens="
 				+ sens.name());
-
+		
 		for (Step step : direction.getSteps()) {
 			LineStop lineStop = null;
+			
 			// -- Retrieve/Create/Update a station from the lineStopDao
 			Station station = saveOrRetrieveStation(step.getStation().getName());
 			LineStop persistedLineStop = lineStopDao
@@ -144,11 +144,11 @@ public class RailtimeGrabberService implements RaildelaysGrabberService {
 			if (persistedLineStop != null) {
 				lineStop = persistedLineStop;
 			} else {
-				lineStop = new LineStop();
-				lineStop.setDate(date);
-				lineStop.setTrain(train);
-				lineStop.setStation(station);
+				lineStop = new LineStop(date, train, station);
 			}
+			
+			// -- We are making the link to keep trace of direction
+			previous = link(previous, lineStop);
 
 			// -- Map the result to an entity
 			mapper.map(step, lineStop);
@@ -169,20 +169,33 @@ public class RailtimeGrabberService implements RaildelaysGrabberService {
 				break;
 			}
 
-			log.debug("lineStop=" + lineStop);
-
+			log.debug("lineStop=" + lineStop.toStringAll());
+			
 			// -- Persist and return the result
-			result.add(lineStop);
+			result.add(lineStop);			
 		}
 
 		return result;
+	}
+
+	private static LineStop link(LineStop previous, LineStop current) {
+		
+		if (previous != null) {
+			previous.setNext(current);
+		}
+		
+		if (current != null) {
+			current.setPrevious(previous);
+		}
+		
+		return current;
 	}
 
 	private RailtimeTrain saveOrRetrieveRailtimeTrain(RailtimeTrain train) {
 		RailtimeTrain result = null;
 		RailtimeTrain persistedTrain = railtimeTrainDao.findByRailtimeId(train
 				.getRailtimeId());
-		
+
 		if (persistedTrain == null) {
 			result = railtimeTrainDao.saveAndFlush(train);
 		} else {
@@ -208,15 +221,14 @@ public class RailtimeGrabberService implements RaildelaysGrabberService {
 		this.validator = validator;
 	}
 
-	@Override
 	@Transactional(readOnly = true)
-	public Collection<LineStop> searchAllDelays(Date date, Station departure,
-			Station arrival, int delayThreshold) {
-		Collection<LineStop> result = new ArrayList<LineStop>();
+	public List<LineStop> searchDelaysBetween(Date date, Station stationA,
+			Station stationB, int delayThreshold) {
+		List<LineStop> result = new ArrayList<LineStop>();
 
-		// result.addAll(lineStopDao.findDepartureDelays(date, departure,
-		// delayThreshold));
-		result.addAll(lineStopDao.findArrivalDelays(date, arrival,
+		result.addAll(lineStopDao.findArrivalDelays(date, stationA,
+				delayThreshold));
+		result.addAll(lineStopDao.findArrivalDelays(date, stationB,
 				delayThreshold));
 
 		return result;
