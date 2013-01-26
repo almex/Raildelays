@@ -19,6 +19,14 @@
 		<module>java-fx-layer</module>
 	</modules>
 
+	<repositories>
+		<repository>
+			<id>spring-s3</id>
+			<name>Spring Maven MILESTONE Repository</name>
+			<url>http://maven.springframework.org/milestone</url>
+		</repository>
+	</repositories>
+
 	<prerequisites>
 		<maven>3.0.0</maven>
 	</prerequisites>
@@ -27,7 +35,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
 		<version.spring>3.2.0.RELEASE</version.spring>
-		<version.spring.batch>2.1.9.RELEASE</version.spring.batch>
+		<version.spring.batch>2.2.0.M1</version.spring.batch>
 		<version.spring.data>1.2.0.RELEASE</version.spring.data>
 		<version.hibernate>4.0.1.Final</version.hibernate>
 		<version.hibernate.validator>4.3.1.Final</version.hibernate.validator>
@@ -39,7 +47,7 @@
 		<groovy.version>2.0</groovy.version>
 		<jdk.version>1.7</jdk.version>
 		<path.javafx>C:\Program Files\Oracle\JavaFX 2.0 SDK</path.javafx>
-		
+
 		<!-- Sonar -->
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>

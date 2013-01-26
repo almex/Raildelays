@@ -51,6 +51,14 @@
 			<groupId>be.raildelays</groupId>
 			<artifactId>raildelays-service</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>be.raildelays</groupId>
+			<artifactId>raildelays-httpclient</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>be.raildelays</groupId>
+			<artifactId>raildelays-parser</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>

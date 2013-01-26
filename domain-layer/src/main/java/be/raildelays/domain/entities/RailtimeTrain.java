@@ -21,20 +21,7 @@ public class RailtimeTrain extends Train {
 	
 	public RailtimeTrain(String name, String railtimeId) {
 		super(name);
-		this.railtimeId = railtimeId;
-	}
-
-	public RailtimeTrain(String railtimeId) {
-		super(railtimeId);
-		this.railtimeId = railtimeId;		
-	}
-
-	public String getRailtimeId() {
-		return railtimeId;
-	}
-
-	public void setRailtimeId(String railtimeId) {
-		this.railtimeId = railtimeId;
+		setRailtimeId(railtimeId);
 	}
 
 	@Override
@@ -74,6 +61,19 @@ public class RailtimeTrain extends Train {
 		return new HashCodeBuilder() //
 				.append(railtimeId) //
 				.toHashCode();
+	}
+
+	@Override
+	public RailtimeTrain clone() {
+		return (RailtimeTrain) super.clone();
+	}
+
+	public String getRailtimeId() {
+		return railtimeId;
+	}
+
+	public void setRailtimeId(final String railtimeId) {
+		this.railtimeId = railtimeId;
 	}
 
 }

@@ -8,7 +8,9 @@
 	<import resource="classpath:spring/batch/components/raildelays-batch-context.xml" />
 	<import resource="classpath:spring/batch/components/raildelays-batch-launcher.xml" />
 	<import resource="classpath:spring/batch/components/raildelays-batch-db.xml" />
-	
+		
 	<import resource="classpath:spring/service/raildelays-service-integration-context.xml" />
+	<import resource="classpath:spring/parser/raildelays-parser-integration-context.xml" />
+	<import resource="classpath:spring/streamer/raildelays-streamer-integration-context.xml" />
 
 </beans>

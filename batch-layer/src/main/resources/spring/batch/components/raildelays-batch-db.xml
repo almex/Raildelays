@@ -5,11 +5,13 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 
-	<bean id="batchDataSource"
-		class="org.springframework.jdbc.datasource.DriverManagerDataSource"
-		p:driverClassName="org.apache.derby.jdbc.EmbeddedDriver"
-		p:url="jdbc:derby:directory:D:\DEV\Raildelays\service-layer\src\main\resources\database"
-		p:username="" p:password="" p:connectionProperties="" />
+<!-- 	<bean id="batchDataSource" -->
+<!-- 		class="org.springframework.jdbc.datasource.DriverManagerDataSource" -->
+<!-- 		p:driverClassName="org.apache.derby.jdbc.EmbeddedDriver" -->
+<!-- 		p:url="jdbc:derby:directory:D:\DEV\Raildelays\service-layer\src\main\resources\database" -->
+<!-- 		p:username="" p:password="" p:connectionProperties="" /> -->
+	
+	<alias name="dataSource" alias="batchDataSource"/>
 
 	<bean id="batchTransactionManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager"

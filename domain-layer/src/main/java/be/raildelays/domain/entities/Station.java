@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -24,7 +25,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 @Entity
 @Table(name = "STATION")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public class Station implements Serializable {
+public class Station implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = -3436298381031779337L;
 
@@ -32,7 +33,8 @@ public class Station implements Serializable {
 	@GeneratedValue(strategy = GenerationType.TABLE)
 	protected Long id;
 
-	@Column(nullable = false, updatable = false, unique = true)
+	@Column(updatable = false, unique = true)
+	@NotNull
 	protected String englishName;
 
 	protected String frenchName;
@@ -48,7 +50,7 @@ public class Station implements Serializable {
 
 	public Station(String name) {
 		this();
-		this.englishName = name;
+		setEnglishName(name);
 	}
 
 	@Override
@@ -89,6 +91,15 @@ public class Station implements Serializable {
 				.toHashCode();
 	}
 
+	@Override
+	public Station clone() {		
+		try {	
+			return (Station) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new AssertionError("Parent class doesn't support clone", e);
+		}
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -97,7 +108,7 @@ public class Station implements Serializable {
 		return englishName;
 	}
 
-	public void setEnglishName(String englishName) {
+	public void setEnglishName(final String englishName) {
 		this.englishName = englishName;
 	}
 
@@ -105,7 +116,7 @@ public class Station implements Serializable {
 		return frenchName;
 	}
 
-	public void setFrenchName(String frenchName) {
+	public void setFrenchName(final String frenchName) {
 		this.frenchName = frenchName;
 	}
 
@@ -113,7 +124,7 @@ public class Station implements Serializable {
 		return dutchName;
 	}
 
-	public void setDutchName(String dutchName) {
+	public void setDutchName(final String dutchName) {
 		this.dutchName = dutchName;
 	}
 

@@ -22,6 +22,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -29,15 +31,13 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 /**
  * Line stop determine a stop for train line.
  * 
- * @author Almex
+ * @author Alexis SOUMAGNE.
  */
 @Entity
-@Table(name = "LINE_STOP")
-@NamedQueries({
-// @NamedQuery(name="LineStop.findByStation",
-// query="select o from LineStop o where o.train.railtimeId = :idTrain and o.departureTime.expected >= :departure and o.departureTime.expected <= :arrival"),
-@NamedQuery(name = "LineStop.findByTrain", query = "select o from LineStop o where o.train.railtimeId = ?1 and o.departureTime.expected >= ?2 and o.departureTime.expected <= ?3") })
-public class LineStop implements Serializable {
+@Table(name = "LINE_STOP", uniqueConstraints = @UniqueConstraint(columnNames = {
+		"TRAIN_ID", "DATE", "STATION_ID" }))
+@NamedQueries({ @NamedQuery(name = "LineStop.findByTrain", query = "select o from LineStop o where o.train.railtimeId = ?1 and o.departureTime.expected >= ?2 and o.departureTime.expected <= ?3") })
+public class LineStop implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 7142886242889314414L;
 
@@ -47,11 +47,13 @@ public class LineStop implements Serializable {
 	private Long id;
 
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinColumn(name = "TRAIN_ID", nullable = false)
+	@JoinColumn(name = "TRAIN_ID")
+	@NotNull
 	private Train train;
 
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinColumn(name = "STATION_ID", nullable = false)
+	@JoinColumn(name = "STATION_ID")
+	@NotNull
 	private Station station;
 
 	@Column(name = "CANCELED")
@@ -59,6 +61,7 @@ public class LineStop implements Serializable {
 
 	@Temporal(TemporalType.DATE)
 	@Column(name = "DATE")
+	@NotNull
 	private Date date;
 
 	@Embedded
@@ -72,16 +75,17 @@ public class LineStop implements Serializable {
 			@AttributeOverride(column = @Column(name = "DEPARTURE_TIME_EXPECTED"), name = "expected"),
 			@AttributeOverride(column = @Column(name = "DEPARTURE_TIME_DELAY"), name = "delay") })
 	private TimestampDelay departureTime;
-	
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional=true)
-	@JoinColumn(name="PREVIOUS_ID")
+
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional = true)
+	@JoinColumn(name = "PREVIOUS_ID")
 	private LineStop previous;
-	
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional=true)
-	@JoinColumn(name="NEXT_ID")
+
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional = true)
+	@JoinColumn(name = "NEXT_ID")
 	private LineStop next;
 
 	private LineStop() {
+		this.id = null;
 		this.train = null;
 		this.station = null;
 		this.arrivalTime = null;
@@ -90,33 +94,51 @@ public class LineStop implements Serializable {
 		this.date = new Date();
 	}
 
-	public LineStop(Date date, Train train, Station station, TimestampDelay arrivalTime,
-			TimestampDelay departureTime, boolean canceled) {
+	public LineStop(final Date date, final Train train, final Station station,
+			final TimestampDelay arrivalTime, final TimestampDelay departureTime,
+			final boolean canceled, final LineStop previous) {
 		this();
-		this.date = date;
 		this.train = train;
 		this.station = station;
 		this.arrivalTime = arrivalTime;
 		this.departureTime = departureTime;
 		this.canceled = canceled;
+		this.date = date;
+		if (previous != null) {
+			previous.next = this;
+		}
+		this.previous = previous;
 	}
 
-	public LineStop(Date date, Train train, Station station, TimestampDelay arrivalTime,
-			TimestampDelay departureTime) {
-		this(date, train, station, arrivalTime, departureTime, false);
+	public LineStop(final Date date, final Train train, final Station station,
+			final TimestampDelay arrivalTime, final TimestampDelay departureTime,
+			final boolean canceled) {
+		this(date, train, station, arrivalTime, departureTime, canceled, null);
 	}
-	
+
+	public LineStop(Date date, Train train, Station station,
+			TimestampDelay arrivalTime, TimestampDelay departureTime) {
+		this(date, train, station, arrivalTime, departureTime, false, null);
+	}
+
+	public LineStop(Date date, Train train, Station station, final LineStop previous) {
+		this(date, train, station, null, null, false, previous);
+	}
+
 	public LineStop(Date date, Train train, Station station) {
-		this(date, train, station, null, null, false);
+		this(date, train, station, null, null, false, null);
 	}
 
 	@Override
 	public String toString() {
-		return new StringBuilder("LineStop: ") //
-				.append("{ ") //
-				.append("id: " + id + ", ") //
+		return new StringBuilder("LineStop: ")
+				//
+				.append("{ ")
+				//
+				.append("id: " + id + ", ")
+				//
 				.append("date: ")
-				.append(new SimpleDateFormat("dd/MM/yyyy").format(date)) 
+				.append(new SimpleDateFormat("dd/MM/yyyy").format(date))
 				.append(", ") //
 				.append("train: {").append(train) //
 				.append("}, ") //
@@ -127,39 +149,39 @@ public class LineStop implements Serializable {
 				.append("canceled: " + canceled + " ") //
 				.append("} ").toString();
 	}
-	
+
 	public String toStringUntilDeparture() {
 		StringBuilder builder = new StringBuilder();
-		
-		if (getPrevious() != null) {
-			builder.append(getPrevious().toStringUntilDeparture());
-			builder.append(getPrevious().toString());
+
+		if (previous != null) {
+			builder.append(previous.toStringUntilDeparture());
+			builder.append(previous.toString());
 			builder.append("\n");
 		}
-		
+
 		return builder.toString();
 	}
-	
+
 	public String toStringUntilArrival() {
 		StringBuilder builder = new StringBuilder();
-		
-		if (getNext() != null) {
+
+		if (next != null) {
 			builder.append("\n");
-			builder.append(getNext().toString());
-			builder.append(getNext().toStringUntilArrival());
-		}				
-		
-		return builder.toString();		
+			builder.append(next.toString());
+			builder.append(next.toStringUntilArrival());
+		}
+
+		return builder.toString();
 	}
-	
+
 	public String toStringAll() {
 		StringBuilder builder = new StringBuilder();
-		
+
 		builder.append(toStringUntilDeparture());
 		builder.append("<<").append(toString()).append(">>");
 		builder.append(toStringUntilArrival());
-		
-		return builder.toString();		
+
+		return builder.toString();
 	}
 
 	@Override
@@ -185,11 +207,28 @@ public class LineStop implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder(11,3) //
+		return new HashCodeBuilder(11, 3) //
 				.append(train) //
 				.append(station) //
 				.append(date) //
 				.toHashCode();
+	}
+
+	@Override
+	public LineStop clone() {		
+		try {
+			LineStop result = (LineStop) super.clone();
+			
+			result.date = (Date) (date != null ? date.clone() : null);
+			result.train = train != null ? train.clone() : null;
+			result.station = station != null ? station.clone() : null;
+			result.arrivalTime = arrivalTime != null ? arrivalTime.clone() : null;
+			result.departureTime = departureTime != null ? departureTime.clone() : null;
+	
+			return result;
+		} catch (CloneNotSupportedException e) {
+			throw new AssertionError("Parent class doesn't support clone", e);
+		}
 	}
 
 	public Long getId() {
@@ -197,43 +236,43 @@ public class LineStop implements Serializable {
 	}
 
 	public TimestampDelay getArrivalTime() {
-		return arrivalTime;
+		return arrivalTime != null ? arrivalTime.clone() : null;
 	}
 
-	public void setArrivalTime(TimestampDelay arrivalTime) {
-		this.arrivalTime = arrivalTime;
+	public void setArrivalTime(final TimestampDelay arrivalTime) {
+		this.arrivalTime = arrivalTime != null ? arrivalTime.clone() : null;
 	}
 
 	public TimestampDelay getDepartureTime() {
-		return departureTime;
+		return departureTime != null ? departureTime.clone() : null;
 	}
 
-	public void setDepartureTime(TimestampDelay departureTime) {
-		this.departureTime = departureTime;
+	public void setDepartureTime(final TimestampDelay departureTime) {
+		this.departureTime = departureTime != null ? departureTime.clone() : null;
 	}
 
 	public Train getTrain() {
-		return train;
+		return train != null ? train.clone() : null;
 	}
 
-	public void setTrain(Train train) {
-		this.train = train;
+	public void setTrain(final Train train) {
+		this.train = train != null ? train.clone() : null;
 	}
 
 	public Station getStation() {
-		return station;
+		return station != null ? station.clone() : null;
 	}
 
 	public void setStation(Station station) {
-		this.station = station;
+		this.station = station != null ? station.clone() : null;
 	}
 
 	public Date getDate() {
-		return date;
+		return (Date) (date != null ? date.clone() : null);
 	}
 
-	public void setDate(Date date) {
-		this.date = date;
+	public void setDate(final Date date) {
+		this.date = (Date) (date != null ? date.clone() : null);
 	}
 
 	public boolean isCanceled() {
@@ -245,19 +284,19 @@ public class LineStop implements Serializable {
 	}
 
 	public LineStop getPrevious() {
-		return previous;
+		return previous != null ? previous.clone() : null;
 	}
 
-	public void setPrevious(LineStop previous) {
-		this.previous = previous;
+	public void setPrevious(final LineStop previous) {
+		this.previous = previous != null ? previous.clone() : null;
 	}
 
 	public LineStop getNext() {
-		return next;
+		return next != null ? next.clone() : null;
 	}
 
-	public void setNext(LineStop next) {
-		this.next = next;
+	public void setNext(final LineStop next) {
+		this.next = next != null ? next.clone() : null;
 	}
 
 }

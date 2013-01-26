@@ -1,50 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
-	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
 
-	<job id="grabTrainFromRailtime" xmlns="http://www.springframework.org/schema/batch">
-		<step id="step1">
-			<tasklet transaction-manager="batchTransactionManager">
-				<chunk reader="flatFileItemReader" writer="serviceWriter"
-					commit-interval="1" />
-			</tasklet>
-		</step>
-	</job>
+	<batch:job id="grabDelaysFromRailtime" restartable="true">
+		<batch:step id="step1">
+			<batch:tasklet transaction-manager="batchTransactionManager">
+				<batch:chunk reader="flatFileItemReader" writer="raildelaysServiceWriter"
+					commit-interval="10" processor="railtimeItemProcessor">
+				</batch:chunk>
+			</batch:tasklet>
+		</batch:step>
+	</batch:job>
 
+	<!-- The input is simply a list of trainId read from a flat file -->
 	<bean id="flatFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader"
 		scope="step">
 		<property name="lineMapper">
-			<bean class="org.springframework.batch.item.file.mapping.PassThroughLineMapper">
-<!-- 				<property name="lineTokenizer"> -->
-<!-- 					<bean -->
-<!-- 						class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer"> -->
-<!-- 						<property name="delimiter" value="," /> -->
-<!-- 						<property name="names" value="idRailtime" /> -->
-<!-- 					</bean> -->
-<!-- 				</property> -->
-<!-- 				<property name="fieldSetMapper"> -->
-<!-- 					<bean -->
-<!-- 						class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper"> -->
-<!-- 						<property name="targetType" value="be.raildelays.domain.railtime.Train" /> -->
-<!-- 					</bean> -->
-<!-- 				</property> -->
+			<bean
+				class="org.springframework.batch.item.file.mapping.PassThroughLineMapper">
 			</bean>
 		</property>
 		<property name="resource" value="#{jobParameters[inputFile]}" />
 	</bean>
 
-<!-- 	<bean id="serviceWriter" -->
-<!-- 		class="org.springframework.batch.item.adapter.ItemWriterAdapter" -->
-<!-- 		scope="step"> -->
-<!-- 		<property name="targetObject" ref="grabberService" /> -->
-<!-- 		<property name="targetMethod" value="grabTrainLine" /> -->
-<!-- 	</bean> -->
+	<bean id="railtimeItemProcessor" class="be.raildelays.batch.RailtimeItemProcessor"
+		scope="step">
+		<property name="date" value="#{jobParameters[date]}" />
+		<property name="arrivalReader">
+			<bean id="" class="be.raildelays.batch.RailtimeItemReader" scope="step">
+				<property name="trainId" value="#{stepExecutionContext[trainId]}" />
+				<property name="date" value="#{jobParameters[date]}" />
+				<property name="sens">
+					<util:constant static-field="be.raildelays.domain.Sens.ARRIVAL" />
+				</property>
+			</bean>
+		</property>
+		<property name="departureReader">
+			<bean id="" class="be.raildelays.batch.RailtimeItemReader" scope="step">
+				<property name="trainId" value="#{stepExecutionContext[trainId]}" />
+				<property name="date" value="#{jobParameters[date]}" />
+				<property name="sens">
+					<util:constant static-field="be.raildelays.domain.Sens.DEPARTURE" />
+				</property>
+			</bean>
+		</property>
+	</bean>
 
-	<bean id="serviceWriter" class="be.raildelays.batch.GrabberServiceBatch" />
+	<bean id="raildelaysServiceWriter" class="be.raildelays.batch.RaildelaysServiceWriter"
+		scope="step">
+		<property name="trainId" value="#{stepExecutionContext[trainId]}" />
+		<property name="date" value="#{jobParameters[date]}" />
+	</bean>
 
-	<!-- <bean id="compositeProcessor"></bean> -->
+	<!-- Write via a service -->
+	<!-- <bean id="serviceWriter" class="be.raildelays.batch.GrabberServiceBatch" 
+		/> -->
+
+	<!-- <bean id="raildelaysServiceWriter" -->
+	<!-- class="org.springframework.batch.item.adapter.ItemWriterAdapter" -->
+	<!-- scope="step"> -->
+	<!-- <property name="targetObject" ref="raildelaysService" /> -->
+	<!-- <property name="targetMethod" value="saveTimetable" /> -->
+	<!-- <property name="arguments"> -->
+	<!-- <array> -->
+	<!-- <value>#{jobParameters[date]}</value> -->
+	<!-- <value>#{stepExecution.executionContext['trainId']}</value> -->
+	<!-- </array> -->
+	<!-- </property> -->
+	<!-- </bean> -->
+
+
 
 </beans>

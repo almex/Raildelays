@@ -25,8 +25,8 @@ public class Shell {
 				"/spring/service/raildelays-service-integration-context.xml");
 
 		try {
-			RaildelaysGrabberService service = ctx
-					.getBean(RaildelaysGrabberService.class);
+			RaildelaysService service = ctx
+					.getBean(RaildelaysService.class);
 			String[] trainIds = new String[] { "466", "467", "468", "514",
 					"515", "516", "477", "478", "479", "529", "530", "531" };
 			Calendar oneWeekBefore = Calendar.getInstance();
@@ -43,7 +43,7 @@ public class Shell {
 				Station stationB = new Station("Brussels (Bruxelles)-Central");
 				
 				for (String idTrain : Arrays.asList(trainIds)) {					
-					service.grabTrainLine(idTrain, calendar.getTime());	
+					//service.grabTrainLine(idTrain, calendar.getTime());	
 				}				
 
 				stops.addAll(service.searchDelaysBetween(calendar.getTime(),

@@ -24,7 +24,7 @@ public class StationJpaDaoIT {
 	
 	@Test
 	public void createTest() {
-		RailtimeTrain train = railtimeTrainDao.save(new RailtimeTrain("466"));
+		RailtimeTrain train = railtimeTrainDao.save(new RailtimeTrain("466", "466"));
 		
 		Assert.assertNotNull("The create method should return a result", train);
 		Assert.assertNotNull("The persisted station should returned with an id", train.getId());
@@ -33,7 +33,7 @@ public class StationJpaDaoIT {
 	@Test
 	public void searchTest() {
 		String id = "466";
-		RailtimeTrain expected = railtimeTrainDao.save(new RailtimeTrain(id));
+		RailtimeTrain expected = railtimeTrainDao.save(new RailtimeTrain(id, id));
 		RailtimeTrain train = railtimeTrainDao.findByRailtimeId(id);
 		
 		Assert.assertNotNull("The create method should return a result", train);

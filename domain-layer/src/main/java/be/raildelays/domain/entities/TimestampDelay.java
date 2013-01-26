@@ -7,6 +7,7 @@ import java.util.Date;
 import javax.persistence.Embeddable;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -22,8 +23,10 @@ public class TimestampDelay implements Serializable, Cloneable {
 	private static final long serialVersionUID = -1026179811764044178L;
 
 	@Temporal(TemporalType.TIME)
+	@NotNull
 	protected Date expected;
 
+	@NotNull
 	protected Long delay; // in number of milliseconds
 
 	/**
@@ -43,8 +46,9 @@ public class TimestampDelay implements Serializable, Cloneable {
 	 *            delay in milliseconds
 	 */
 	public TimestampDelay(Date expected, Long delay) {
-		this.expected = expected;
-		this.delay = delay;
+		this();
+		setExpected(expected);
+		setDelay(delay);
 	}
 
 	@Override
@@ -87,20 +91,33 @@ public class TimestampDelay implements Serializable, Cloneable {
 				.append(delay) //
 				.toHashCode();
 	}
-
-	public Date getExpected() {
-		return (Date) expected.clone();
+	
+	@Override
+	public TimestampDelay clone() {		
+		try {
+			TimestampDelay timestampDelay = (TimestampDelay) super.clone();
+			
+			timestampDelay.expected = (Date) (expected != null ? expected.clone() : null);
+	
+			return timestampDelay;
+		} catch (CloneNotSupportedException e) {
+			throw new AssertionError("Parent class doesn't support clone", e);
+		}
 	}
 
-	public void setExpected(Date expected) {
-		this.expected = expected;
+	public final Date getExpected() {
+		return (Date) (expected != null ? expected.clone() : null);
 	}
 
-	public Long getDelay() {
+	public final void setExpected(Date expected) {
+		this.expected = (Date) (expected != null ? expected.clone() : null);
+	}
+
+	public final Long getDelay() {
 		return delay;
 	}
 
-	public void setDelay(Long delay) {
+	public final void setDelay(Long delay) {
 		this.delay = delay;
 	}
 }

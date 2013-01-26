@@ -21,15 +21,7 @@ public class RailtimeStation extends Station {
 	
 	public RailtimeStation(String name, String railtimeId) {
 		super(name);
-		this.railtimeId = railtimeId;
-	}
-
-	public String getRailtimeId() {
-		return railtimeId;
-	}
-
-	public void setRailtimeId(String railtimeId) {
-		this.railtimeId = railtimeId;
+		setRailtimeId(railtimeId);
 	}
 	
 	@Override
@@ -69,5 +61,18 @@ public class RailtimeStation extends Station {
 				.append("englishName: ").append(englishName).append(", ") //
 				.append("frenchName: ").append(frenchName) //
 				.append(" }").toString();
+	}
+
+	@Override
+	public RailtimeStation clone() {
+		return (RailtimeStation) super.clone();
+	}
+
+	public String getRailtimeId() {
+		return railtimeId;
+	}
+
+	public void setRailtimeId(final String railtimeId) {
+		this.railtimeId = railtimeId;
 	}
 }
