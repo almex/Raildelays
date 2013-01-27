@@ -68,3 +68,8 @@
 /parser-layer/bin
 /repository-layer/bin
 /java-fx-layer/target
+/batch-admin-presentation/target
+/java-fx-layer/.classpath
+/java-fx-layer/.project
+/java-fx-layer/bin
+/service-layer/bin
