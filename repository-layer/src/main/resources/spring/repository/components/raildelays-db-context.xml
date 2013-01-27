@@ -11,22 +11,17 @@
 <!-- 		p:url="jdbc:derby:directory:D:\DEV\Raildelays\service-layer\src\main\resources\database" -->
 <!-- 		p:username="" p:password=""  /> -->
 		
-	<bean id="dataSource" factory-bean="databaseLoader" factory-method="getDataSource" />
 	<bean id="databaseLoader" class="be.raildelays.repository.LoadDatabase" init-method="startUp" destroy-method="shutdown">
 		<property name="databaseName" value="database" />
 	</bean>
-	
-<!-- 	<bean id="transactionManager" -->
-<!-- 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager" -->
-<!-- 		lazy-init="true"> -->
-<!-- 		<property name="dataSource" ref="dataSource" /> -->
-<!-- 	</bean> -->
 		
-<!-- 	<bean id="dataSource" -->
-<!-- 		class="org.springframework.jdbc.datasource.DriverManagerDataSource" -->
-<!-- 		p:driverClassName="org.apache.derby.jdbc.EmbeddedDriver" -->
-<!-- 		p:url="jdbc:derby:raildelays;create=true" -->
-<!-- 		p:username="" p:password="" /> -->
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource" depends-on="databaseLoader" >
+		<property name="driverClassName" value="org.apache.derby.jdbc.EmbeddedDriver" />
+		<property name="username" value="" />
+		<property name="password" value="" />
+		<property name="url" value="jdbc:derby:database" />
+	</bean>
 		
 		
 	<bean id="entityManagerFactory"
@@ -38,8 +33,8 @@
 		<property name="jpaProperties">
 			<props>
  				<prop key="hibernate.hbm2ddl.auto">update</prop>
-				<prop key="hibernate.show_sql">true</prop>
-				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.format_sql">false</prop>
 				<prop key="hibernate.dialect">org.hibernate.dialect.DerbyTenSevenDialect</prop>
 			</props>
 		</property>

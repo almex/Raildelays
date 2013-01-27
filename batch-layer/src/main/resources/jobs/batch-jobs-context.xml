@@ -12,23 +12,14 @@
 			<batch:tasklet transaction-manager="batchTransactionManager">
 				<batch:chunk reader="compositeRailtimeItemReader"
 					writer="raildelaysServiceWriter" commit-interval="1">
-					<batch:streams merge="true">
-						<batch:stream ref="fileReader" />
-					</batch:streams>
 				</batch:chunk>
+				<batch:transaction-attributes isolation="READ_COMMITTED" propagation="REQUIRES_NEW"/>
 			</batch:tasklet>
 		</batch:step>
 	</batch:job>
 
 	<!-- The input is simply a list of trainId read from a flat file -->
-	<bean id="fileReader" class="org.springframework.batch.item.file.FlatFileItemReader">
-		<property name="lineMapper">
-			<bean
-				class="org.springframework.batch.item.file.mapping.PassThroughLineMapper">
-			</bean>
-		</property>
-		<property name="resource" value="train-list.properties" />
-	</bean>
+	
 
 	<bean id="compositeRailtimeItemReader" class="be.raildelays.batch.reader.CompositeRailtimeItemReader"
 		scope="step">
@@ -48,7 +39,16 @@
 				</property>
 			</bean>
 		</property>
-		<property name="fileReader" ref="fileReader" />
+		<property name="fileReader" >
+			<bean class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
+				<property name="lineMapper">
+					<bean
+						class="org.springframework.batch.item.file.mapping.PassThroughLineMapper">
+					</bean>
+				</property>
+				<property name="resource" value="train-list.properties" />
+			</bean>
+		</property>
 	</bean>
 
 	<bean id="raildelaysServiceWriter" class="be.raildelays.batch.writer.RaildelaysServiceWriter"

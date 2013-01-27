@@ -1,32 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+<!-- 	<bean id="batchDataSource" factory-bean="batchDatabaseLoader" -->
+<!-- 		factory-method="getDataSource" /> -->
 
-<!-- 	<bean id="batchDataSource" -->
-<!-- 		class="org.springframework.jdbc.datasource.DriverManagerDataSource" -->
-<!-- 		p:driverClassName="org.apache.derby.jdbc.EmbeddedDriver" -->
-<!-- 		p:url="jdbc:derby:directory:D:\DEV\Raildelays\service-layer\src\main\resources\database" -->
-<!-- 		p:username="" p:password="" p:connectionProperties="" /> -->
+	<bean id="batchDataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource" depends-on="batchDatabaseLoader" >
+		<property name="driverClassName" value="org.apache.derby.jdbc.EmbeddedDriver" />
+		<property name="username" value="" />
+		<property name="password" value="" />
+		<property name="url" value="jdbc:derby:batchRepository" />
+	</bean>
 		
-	
-	<bean id="batchDataSource" factory-bean="batchDatabaseLoader" factory-method="getDataSource" />
-	<bean id="batchDatabaseLoader" class="be.raildelays.repository.LoadDatabase" init-method="startUp" destroy-method="shutdown">
+	<bean id="batchDatabaseLoader" class="be.raildelays.repository.LoadDatabase"
+		init-method="startUp" destroy-method="shutdown">
 		<property name="databaseName" value="batchRepository" />
 		<property name="initScriptPath" value="spring-batch-schema-derby.ddl" />
 	</bean>
-<!-- 	<bean id="batchTransactionManager" -->
-<!-- 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager" -->
-<!-- 		lazy-init="true"> -->
-<!-- 		<property name="dataSource" ref="batchDataSource" /> -->
-<!-- 	</bean> -->
-	
-	<bean id="batchTransactionManager" class="org.springframework.orm.jpa.JpaTransactionManager"
-		p:entityManagerFactory-ref="entityManagerFactory" />
 	
 <!-- 	<alias name="transactionManager" alias="batchTransactionManager"/> -->
+
+	<bean id="batchTransactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	
+	<bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+		<property name="transactionManager" ref="batchTransactionManager"/>
+	</bean>
 
 	<!-- <jdbc:embedded-database id="batchDataSource" /> -->
 

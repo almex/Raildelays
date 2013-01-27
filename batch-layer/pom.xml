@@ -12,24 +12,85 @@
 	</parent>
 
 	<build>
-		<testSourceDirectory>src/it/java</testSourceDirectory>
-		<testResources>
-			<testResource>
-				<directory>src/it/resources</directory>
-			</testResource>
-		</testResources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
 					<archive>
-						<manifest>
+						<manifest>						
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
 							<mainClass>be.raildelays.batch.Bootstrap</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>package</phase>
+						<configuration>
+							<outputDirectory>${project.build.directory}/lib</outputDirectory>
+							<overwritereleases>false</overwritereleases>
+							<overwritesnapshots>false</overwritesnapshots>
+							<overwriteifnewer>true</overwriteifnewer>
+						</configuration>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>			
+				<configuration>
+					<workingDirectory>${project.build.directory}</workingDirectory>
+					<executable>java</executable>	
+					<mainClass>be.raildelays.batch.Bootstrap</mainClass>
+					<classpathScope>compile</classpathScope>		
+					<arguments>
+						<!--argument>-Djava.library.path=${project.build.directory}/lib</argument-->
+						<argument>-jar</argument>
+						<argument>${project.build.finalName}.jar</argument>
+						<argument>be.raildelays.batch.Bootstrap</argument>
+					</arguments>
+				</configuration>
+				<executions>
+					<execution>				
+						<goals>
+							<goal>exec</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+<!-- 			  <plugin> -->
+<!-- 				<groupId>org.apache.maven.plugins</groupId> -->
+<!-- 				<artifactId>maven-shade-plugin</artifactId> -->
+<!-- 				<version>2.0</version> -->
+<!-- 				<executions> -->
+<!-- 				  <execution> -->
+<!-- 					<phase>package</phase> -->
+<!-- 					<goals> -->
+<!-- 					  <goal>shade</goal> -->
+<!-- 					</goals> -->
+<!-- 					<configuration> -->
+<!-- 					  <shadedArtifactAttached>true</shadedArtifactAttached> -->
+<!-- 					  <transformers> -->
+<!-- 						<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"> -->
+<!-- 						  <manifestEntries> -->
+<!-- 							<Main-Class>be.raildelays.batch.Bootstrap</Main-Class> -->
+<!-- 						  </manifestEntries> -->
+<!-- 						</transformer> -->
+<!-- 					  </transformers> -->
+<!-- 					</configuration> -->
+<!-- 				  </execution> -->
+<!-- 				</executions> -->
+<!-- 			  </plugin> -->
 
 		</plugins>
 	</build>

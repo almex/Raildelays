@@ -1,5 +1,6 @@
 package be.raildelays.batch.reader;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.validation.Validator;
@@ -8,7 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.annotation.BeforeStep;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
@@ -20,7 +24,7 @@ import be.raildelays.domain.dto.ServedStopDTO;
 import be.raildelays.domain.railtime.Direction;
 import be.raildelays.domain.railtime.Step;
 
-public class CompositeRailtimeItemReader implements ItemReader<RouteLogDTO> {
+public class CompositeRailtimeItemReader implements ItemReader<RouteLogDTO>, ItemStreamReader<RouteLogDTO> {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(CompositeRailtimeItemReader.class);
@@ -34,7 +38,7 @@ public class CompositeRailtimeItemReader implements ItemReader<RouteLogDTO> {
 
 	private FlatFileItemReader<String> fileReader;
 	
-	private Date date;
+	private String date;
 
 	private Resource resource;
 	
@@ -45,11 +49,33 @@ public class CompositeRailtimeItemReader implements ItemReader<RouteLogDTO> {
 		this.stepExecution = stepExecution;
 	}
 
+	@Override
+	public void open(ExecutionContext executionContext)
+			throws ItemStreamException {
+		fileReader.open(executionContext);
+		
+	}
+
+	@Override
+	public void update(ExecutionContext executionContext)
+			throws ItemStreamException {
+		fileReader.update(executionContext);
+		
+	}
+
+	@Override
+	public void close() throws ItemStreamException {
+		fileReader.close();		
+	}
+
 	public RouteLogDTO read() throws Exception, UnexpectedInputException,
 			ParseException, NonTransientResourceException {	
 		RouteLogDTO result = null;
 		fileReader.setResource(resource);
 		String trainId = fileReader.read();
+		SimpleDateFormat formater = new SimpleDateFormat("dd/mm/yyyy");
+		Date date = formater.parse(this.date);
+		
 		
 		if (trainId != null) {
 			departureReader.setTrainId(trainId);
@@ -86,11 +112,11 @@ public class CompositeRailtimeItemReader implements ItemReader<RouteLogDTO> {
 		return result;
 	}
 
-	public Date getDate() {
+	public String getDate() {
 		return date;
 	}
 
-	public void setDate(Date date) {
+	public void setDate(String date) {
 		this.date = date;
 	}
 

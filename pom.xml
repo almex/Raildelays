@@ -41,10 +41,11 @@
 		<version.hibernate.validator>4.3.1.Final</version.hibernate.validator>
 		<version.hsqldb>2.2.9</version.hsqldb>
 		<version.derby>10.8.2.2</version.derby>
-		<version.groovy>2.0.6</version.groovy>
 		<version.slf4j>1.5.10</version.slf4j>
 		<version.validator>1.0.0.GA</version.validator>
-		<groovy.version>2.0</groovy.version>
+		<version.groovy>2.0</version.groovy>
+		<version.groovy-all>2.0.6</version.groovy-all>
+		<version.groovy.eclipse.compiler>2.7.0-01</version.groovy.eclipse.compiler>
 		<jdk.version>1.7</jdk.version>
 		<path.javafx>C:\Program Files\Oracle\JavaFX 2.0 SDK</path.javafx>
 	</properties>
@@ -108,7 +109,7 @@
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
 				<artifactId>groovy-all</artifactId>
-				<version>${version.groovy}</version>
+				<version>${version.groovy-all}</version>
 			</dependency>
 
 			<!-- Persistence -->
@@ -157,7 +158,7 @@
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
 				<artifactId>groovy-eclipse-compiler</artifactId>
-				<version>2.5.1-1</version>
+				<version>${version.groovy.eclipse.compiler}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.aspectj</groupId>
@@ -327,6 +328,13 @@
 	</dependencies>
 
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+	
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -420,7 +428,7 @@
 				<!-- <artifactId>gmaven-plugin</artifactId> -->
 				<!-- <version>1.5</version> -->
 				<!-- <configuration> -->
-				<!-- <providerSelection>${groovy.version}</providerSelection> -->
+				<!-- <providerSelection>${version.groovy}</providerSelection> -->
 				<!-- <sourceEncoding>UTF-8</sourceEncoding> -->
 				<!-- </configuration> -->
 				<!-- <executions> -->
@@ -472,7 +480,21 @@
 			</dependencies>
 
 			<build>
-				<plugins>
+				<plugins>					
+					<!--plugin>
+						<groupId>org.codehaus.gmaven</groupId>
+						<artifactId>gmaven-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>generateStubs</goal>
+									<goal>compile</goal>
+									<goal>generateTestStubs</goal>
+									<goal>testCompile</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin-->
 					<plugin>
 						<artifactId>maven-compiler-plugin</artifactId>
 						<configuration>
@@ -487,7 +509,7 @@
 							<dependency>
 								<groupId>org.codehaus.groovy</groupId>
 								<artifactId>groovy-eclipse-compiler</artifactId>
-								<version>2.7.0-01</version>
+								<version>${version.groovy.eclipse.compiler}</version>
 							</dependency>
 						</dependencies>
 					</plugin>

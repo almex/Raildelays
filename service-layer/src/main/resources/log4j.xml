@@ -10,7 +10,7 @@
 	</appender>
 
 	<logger name="be.raildelays.service">
-		<level value="info" />
+		<level value="debug" />
 	</logger>
 
 	<logger name="org.springframework">

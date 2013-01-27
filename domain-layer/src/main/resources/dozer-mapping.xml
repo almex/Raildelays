@@ -20,6 +20,22 @@
 			<a>previous</a>
 			<b>previous</b>
 		</field-exclude>
+		<field-exclude>
+			<a>id</a>
+			<b>id</b>
+		</field-exclude>
+		<field-exclude>
+			<a>train</a>
+			<b>train</b>
+		</field-exclude>
+		<field-exclude>
+			<a>station</a>
+			<b>station</b>
+		</field-exclude>
+		<field-exclude>
+			<a>date</a>
+			<b>date</b>
+		</field-exclude>
 	</mapping>
 
 	<mapping map-null="false">

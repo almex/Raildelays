@@ -8,6 +8,13 @@
 			<param name="ConversionPattern" value="%d{DATE} %-5p %-15c{1}: %m%n" />
 		</layout>
 	</appender>
+	
+	<appender name="file" class="org.apache.log4j.FileAppender">
+		<param name="file" value="log/output.log"/>		
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{DATE} %-5p %-15c{1}: %m%n" />
+		</layout>
+	</appender>
 
 	<logger name="be.raildelays">
 		<level value="debug" />
@@ -15,6 +22,10 @@
 
 	<logger name="org.springframework">
 		<level value="warn" />
+	</logger>
+	
+	<logger name="org.springframework.transaction">
+		<level value="trace" />
 	</logger>
 
 	<logger name="org.hsqldb">
@@ -25,10 +36,10 @@
 		<level value="warn" />
 	</logger>
 
-
 	<root>
 		<priority value="info" />
 		<appender-ref ref="console" />
+		<appender-ref ref="file" />
 	</root>
 
 </log4j:configuration>

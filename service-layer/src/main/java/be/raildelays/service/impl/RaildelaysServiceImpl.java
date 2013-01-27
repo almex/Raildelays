@@ -11,6 +11,8 @@ import org.dozer.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -44,7 +46,7 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 
 	@Resource
 	private RailtimeTrainDao railtimeTrainDao;
-	
+
 	@Resource
 	private TrainDao trainDao;
 
@@ -57,14 +59,15 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 	@Resource
 	private Validator validator;
 
-	private Logger log = LoggerFactory.getLogger(RaildelaysServiceImpl.class);
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(RaildelaysServiceImpl.class);
 
 	@Override
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT)
 	public List<LineStop> saveRouteLog(final RouteLogDTO routeLog) {
 		List<LineStop> result = new ArrayList<>();
 
-		log.debug("Saving timetable for train={} and date={}...",
+		LOGGER.debug("Saving timetable for train={} and date={}...",
 				routeLog.getTrainId(), routeLog.getDate());
 
 		// -- Validate our inputs
@@ -75,12 +78,13 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 		return result;
 	}
 
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT)
 	public LineStop saveServedStop(final Date date, final String trainId,
 			final ServedStopDTO stop, final LineStop previous) {
 
-		log.debug("Saving timetable for train={}, date={} and lineStop={}...",
-				trainId, date, stop);
+		LOGGER.debug(
+				"Saving timetable for train={}, date={} and lineStop={}...",
+				new Object[] { trainId, date, stop });
 
 		// -- Validate our inputs
 		Assert.notNull(date, "You should provide a date for this served stop");
@@ -93,7 +97,8 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 				trainId, trainId));
 		Station persistedStation = saveOrRetrieveStation(new Station(
 				stop.getStationName()));
-		LineStop lineStop = new LineStop(date, persistedTrain, persistedStation, previous);
+		LineStop lineStop = new LineStop(date, persistedTrain,
+				persistedStation, previous);
 
 		mapper.map(stop, lineStop);
 
@@ -104,15 +109,27 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = true, isolation = Isolation.DEFAULT)
 	public List<LineStop> searchDelaysBetween(Date date, Station stationA,
 			Station stationB, int delayThreshold) {
 		List<LineStop> result = new ArrayList<LineStop>();
 
+		LOGGER.info(
+				"Searching line stops for date={} stationA={} stationB={} delayThreshold={}",
+				new Object[] { date, stationA, stationB, delayThreshold });
+
 		result.addAll(lineStopDao.findArrivalDelays(date, stationA,
 				delayThreshold));
+
+		LOGGER.debug("Retrieved {} line stops from station A", result.size());
+
 		result.addAll(lineStopDao.findArrivalDelays(date, stationB,
 				delayThreshold));
+
+		LOGGER.debug("Retrieved {} line stops from station A and station B",
+				result.size());
+
+		LOGGER.trace("Retrieved line stops =", result.toString());
 
 		return result;
 	}
@@ -124,7 +141,7 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 
 		for (ServedStopDTO stop : stops) {
 			LineStop current = saveServedStop(date, trainId, stop, previous);
-			
+
 			result.add(current);
 
 			// -- We are making the link to keep trace of direction
@@ -137,15 +154,15 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 	private LineStop createUpdateOrRetrieve(LineStop lineStop) {
 		Train train = saveOrRetrieveTrain(lineStop.getTrain());
 		Station station = saveOrRetrieveStation(lineStop.getStation());
-		LineStop result = lineStopDao.findByTrainAndDateAndStation(
-				train, lineStop.getDate(), station);
+		LineStop result = lineStopDao.findByTrainAndDateAndStation(train,
+				lineStop.getDate(), station);
 
 		if (result != null) {
-			log.debug("We update a LineStop={}.", result);
+			LOGGER.debug("We update a LineStop={}.", result);
 
 			mapper.map(lineStop, result);
 		} else {
-			log.debug("We create a new LineStop.");
+			LOGGER.debug("We create a new LineStop.");
 
 			result = lineStop;
 		}
@@ -168,12 +185,11 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 	}
 
 	private Train saveOrRetrieveTrain(Train train) {
-		Train result = trainDao.findByEnglishName(train
-				.getEnglishName());
+		Train result = trainDao.findByEnglishName(train.getEnglishName());
 
 		if (result == null) {
 			result = trainDao.save(train);
-		} 
+		}
 
 		return result;
 	}

@@ -9,7 +9,7 @@ import java.util.Date;
  * 
  * @author Almex
  */
-final class ParsingUtil {
+public final class ParsingUtil {
 
 	/**
 	 * Default constructor. 
@@ -18,9 +18,9 @@ final class ParsingUtil {
 		// No instantiation is possible.
 	}
 
-	static final String DATE_FORMAT = "dd/MM/yyyy";
-	static final String TIME_FORMAT = "hh:mm";
-	static final String TIMESTAMP_FORMAT = DATE_FORMAT+TIME_FORMAT;
+	public static final String DATE_FORMAT = "dd/MM/yyyy";
+	public static final String TIME_FORMAT = "hh:mm";
+	public static final String TIMESTAMP_FORMAT = DATE_FORMAT+TIME_FORMAT;
 
 	public static Date parseTimestamp(String value) {
 		final SimpleDateFormat sdc = new SimpleDateFormat(TIMESTAMP_FORMAT);
