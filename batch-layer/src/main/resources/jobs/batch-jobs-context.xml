@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
-	xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
@@ -29,19 +30,19 @@
 		<property name="resource" value="train-list.properties" />
 	</bean>
 
-	<bean id="compositeRailtimeItemReader" class="be.raildelays.batch.CompositeRailtimeItemReader"
+	<bean id="compositeRailtimeItemReader" class="be.raildelays.batch.reader.CompositeRailtimeItemReader"
 		scope="step">
 		<property name="date" value="#{jobParameters[date]}" />
 		<property name="resource" value="#{jobParameters[inputFile]}" />
 		<property name="arrivalReader">
-			<bean class="be.raildelays.batch.RailtimeItemReader" scope="step">
+			<bean class="be.raildelays.batch.reader.RailtimeItemReader" scope="step">
 				<property name="sens">
 					<util:constant static-field="be.raildelays.domain.Sens.ARRIVAL" />
 				</property>
 			</bean>
 		</property>
 		<property name="departureReader">
-			<bean class="be.raildelays.batch.RailtimeItemReader" scope="step">
+			<bean class="be.raildelays.batch.reader.RailtimeItemReader" scope="step">
 				<property name="sens">
 					<util:constant static-field="be.raildelays.domain.Sens.DEPARTURE" />
 				</property>
@@ -50,7 +51,7 @@
 		<property name="fileReader" ref="fileReader" />
 	</bean>
 
-	<bean id="raildelaysServiceWriter" class="be.raildelays.batch.RaildelaysServiceWriter"
+	<bean id="raildelaysServiceWriter" class="be.raildelays.batch.writer.RaildelaysServiceWriter"
 		scope="step">
 	</bean>
 

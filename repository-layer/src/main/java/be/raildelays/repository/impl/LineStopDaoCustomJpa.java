@@ -1,6 +1,5 @@
 package be.raildelays.repository.impl;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -8,8 +7,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TemporalType;
 
-import org.apache.commons.lang.time.DateUtils;
-import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
 import be.raildelays.domain.entities.LineStop;
@@ -21,25 +18,6 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 
 	@PersistenceContext(unitName = "raildelays-repository")
 	private EntityManager entityManager;
-
-	private Logger logger = Logger.getLogger(LineStopDaoCustomJpa.class);
-
-	// /**
-	// * {@inheritDoc}
-	// */
-	// @SuppressWarnings("unchecked")
-	// @Override
-	// public List<LineStop> findByTrain(String idTrain, Date date) {
-	// return (List<LineStop>) entityManager
-	// .createQuery(
-	// "select o from LineStop o "
-	// + "where o.train.railtimeId = :idTrain "
-	// + "and o.date = :date ")
-	// .setParameter("idTrain", idTrain)
-	// .setParameter("date", date, TemporalType.DATE)
-	// .getResultList();
-	//
-	// }
 
 	@SuppressWarnings("unchecked")
 	@Override

@@ -34,7 +34,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
-		<version.spring>3.1.2.RELEASE</version.spring>
+		<version.spring>3.2.0.RELEASE</version.spring>
 		<version.spring.batch>2.2.0.M1</version.spring.batch>
 		<version.spring.data>1.2.0.RELEASE</version.spring.data>
 		<version.hibernate>4.0.1.Final</version.hibernate>
@@ -42,21 +42,11 @@
 		<version.hsqldb>2.2.9</version.hsqldb>
 		<version.derby>10.8.2.2</version.derby>
 		<version.groovy>2.0.6</version.groovy>
-		<version.slf4j>1.7.2</version.slf4j>
+		<version.slf4j>1.5.10</version.slf4j>
 		<version.validator>1.0.0.GA</version.validator>
 		<groovy.version>2.0</groovy.version>
 		<jdk.version>1.7</jdk.version>
 		<path.javafx>C:\Program Files\Oracle\JavaFX 2.0 SDK</path.javafx>
-
-		<!-- Sonar -->
-		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-		<!-- The destination file for the code coverage report has to be set to 
-			the same value in the parent pom and in each module pom. Then JaCoCo will 
-			add up information in the same report, so that, it will give the cross-module 
-			code coverage. -->
-		<sonar.jacoco.itReportPath>${project.basedir}/../target/jacoco-it.exec</sonar.jacoco.itReportPath>
-		<sonar.language>java</sonar.language>
 	</properties>
 
 	<dependencyManagement>
@@ -229,6 +219,11 @@
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
+				<artifactId>spring-webmvc</artifactId>
+				<version>${version.spring}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
 				<artifactId>spring-beans</artifactId>
 				<version>${version.spring}</version>
 			</dependency>
@@ -349,25 +344,6 @@
 					<encoding>${project.build.sourceEncoding}</encoding>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>pre-test</id>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>post-test</id>
-						<phase>test</phase>
-						<goals>
-							<goal>report</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 
 		<pluginManagement>
@@ -376,7 +352,17 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>2.3.2</version>
+					<version>2.4</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>2.4</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>2.4</version>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
@@ -412,12 +398,6 @@
 					<groupId>org.easytesting</groupId>
 					<artifactId>javafxc-maven-plugin</artifactId>
 					<version>1.0b2</version>
-				</plugin>
-
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-dependency-plugin</artifactId>
-					<version>2.4</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -465,5 +445,266 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+	
+	<profiles>
+		<profile>
+			<id>groovy</id>
+			
+			<activation>
+			   <file>
+					<exists>src/main/groovy</exists>
+			   </file>
+            </activation>
+			
+			<dependencies>
 
+				<dependency>
+					<groupId>org.codehaus.groovy</groupId>
+					<artifactId>groovy-all</artifactId>
+					<type>jar</type>
+				</dependency>
+
+				<dependency>
+					<groupId>org.ccil.cowan.tagsoup</groupId>
+					<artifactId>tagsoup</artifactId>
+					<version>1.2.1</version>
+				</dependency>
+			</dependencies>
+
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<configuration>
+							<compilerId>groovy-eclipse-compiler</compilerId>
+							<compilerArgument>nowarn</compilerArgument>
+							<verbose>false</verbose>
+							<source>${jdk.version}</source>
+							<target>${jdk.version}</target>
+							<encoding>${project.build.sourceEncoding}</encoding>
+						</configuration>
+						<dependencies>
+							<dependency>
+								<groupId>org.codehaus.groovy</groupId>
+								<artifactId>groovy-eclipse-compiler</artifactId>
+								<version>2.7.0-01</version>
+							</dependency>
+						</dependencies>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>add-source</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>add-source</goal>
+								</goals>
+								<configuration>
+									<sources>
+										<source>src/main/groovy</source>
+									</sources>
+								</configuration>
+							</execution>
+							<execution>
+								<id>add-test-source</id>
+								<phase>generate-test-sources</phase>
+								<goals>
+									<goal>add-test-source</goal>
+								</goals>
+								<configuration>
+									<sources>
+										<source>src/test/groovy</source>
+									</sources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	
+        <profile>
+            <id>it</id>
+            
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+         
+            <dependencies>                          	
+				<dependency>
+					<groupId>org.hsqldb</groupId>
+					<artifactId>hsqldb</artifactId>
+					<scope>test</scope>
+                    <optional>true</optional>
+				</dependency>
+            </dependencies>
+         
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>default-test</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>test</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>false</skip>
+                                    <argLine>${coverage.test.argLine} -Xmx256m -Xms128m -XX:MaxPermSize=128m -XX:PermSize=64m</argLine>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                         
+                    <plugin>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <sources>
+                                <source>src/it/java</source>
+                            </sources>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>failsafe-test</id>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>false</skip>
+                                    <argLine>${coverage.it.argLine} -Xmx512m -Xms256m -XX:MaxPermSize=256m -XX:PermSize=128m</argLine>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>failsafe-verify</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+         
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>compute-surefire-argLine</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <configuration>
+                                    <propertyName>coverage.test.argLine</propertyName>
+                                    <destFile>${jacoco.test.destFile}</destFile>
+                                    <skip>false</skip>
+                                    <append>true</append>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>compute-failsafe-argLine</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <configuration>
+                                    <propertyName>coverage.it.argLine</propertyName>
+                                    <destFile>${jacoco.it.destFile}</destFile>
+                                    <skip>false</skip>
+                                    <append>true</append>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+         
+                </plugins>
+            </build>
+         
+            <properties>
+                <!-- groupId allow concurrent analyze -->
+                <jacoco.test.destFile>${java.io.tmpdir}/${project.groupId}/jacoco-test.exec</jacoco.test.destFile>
+                <jacoco.it.destFile>${java.io.tmpdir}/${project.groupId}/jacoco-it.exec</jacoco.it.destFile>
+                <!-- The destination file for the code coverage report has to be set to the same value
+                     in the parent pom and in each module pom. Then JaCoCo will add up information in
+                     the same report, so that, it will give the cross-module code coverage. -->
+                <sonar.jacoco.itReportPath>${jacoco.it.destFile}</sonar.jacoco.itReportPath>
+                <sonar.jacoco.reportPath>${jacoco.test.destFile}</sonar.jacoco.reportPath>
+                <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
+            </properties>
+         
+        </profile>
+        
+        <profile>
+            
+            <id>it-directories</id>
+            
+            <activation>
+                <property>
+                   <name>!maven.test.skip</name>
+                </property>
+            </activation>
+			
+			<dependencies>
+				
+				<dependency>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-test</artifactId>
+					<scope>test</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-context</artifactId>
+					<scope>test</scope>
+				</dependency>				
+				
+			</dependencies>
+            
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-it-source</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>add-test-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>src/it/java</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>add-it-resource</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>add-test-resource</goal>
+                                </goals>
+                                <configuration>
+                                    <resources>
+                                        <resource>
+                                            <directory>src/it/resources</directory>
+                                            <filtering>true</filtering>
+                                        </resource>         
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+	</profiles>
 </project>

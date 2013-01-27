@@ -48,7 +48,7 @@ public class LineStopJpaDaoIT {
 		//Assert.assertNull("No data should get back.", lineStopDao.retrieveLineStop("466", new java.sql.Date(new Date().getTime())));
 		Date date = new Date();
 		Train train = trainDao.saveAndFlush(new Train("466"));
-		LineStop lineStop = lineStopDao.save(new LineStop(date, train, new Station("Liège-Guillemins"), new TimestampDelay(), new TimestampDelay()));
+		//LineStop lineStop = lineStopDao.save(new LineStop(date, train, new Station("Liège-Guillemins"), new TimestampDelay(), new TimestampDelay()));
 		assertEquals("You should have a certain number of results.", 1, lineStopDao.findByTrainAndDate(train, date).size());
 	}
 	

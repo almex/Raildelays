@@ -15,29 +15,6 @@
 		class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean"
 		p:dataSource-ref="batchDataSource" p:tablePrefix="BATCH_" />
 
-	<bean id="jobRegistry"
-		class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
-
-	<bean id="jobRegistryBeanPostProcessor"
-		class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
-		<property name="jobRegistry" ref="jobRegistry" />
-	</bean>
-
-	<bean
-		class="org.springframework.batch.core.configuration.support.AutomaticJobRegistrar">
-		<property name="applicationContextFactories">
-			<bean
-				class="org.springframework.batch.core.configuration.support.ClasspathXmlApplicationContextsFactoryBean">
-				<property name="resources" value="classpath*:/jobs/*job*.xml" />
-			</bean>
-		</property>
-		<property name="jobLoader">
-			<bean
-				class="org.springframework.batch.core.configuration.support.DefaultJobLoader">
-				<property name="jobRegistry" ref="jobRegistry" />
-			</bean>
-		</property>
-	</bean>
 
 	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator">
 		<property name="jobExplorer" ref="jobExplorer" />

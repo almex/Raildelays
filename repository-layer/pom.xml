@@ -12,27 +12,7 @@
 	</parent>
 
 	<build>
-		<testSourceDirectory>src/it/java</testSourceDirectory>
-		<testResources>
-			<testResource>
-				<directory>src/it/resources</directory>
-			</testResource>
-		</testResources>
 		<plugins>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-failsafe-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>integration-test</id>
-						<goals>
-							<goal>integration-test</goal>
-							<goal>verify</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 
 		</plugins>
 	</build>
@@ -235,11 +215,6 @@
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>sql-maven-plugin</artifactId>
 						<dependencies>
-							<!-- <dependency> -->
-							<!-- <groupId>org.hsqldb</groupId> -->
-							<!-- <artifactId>hsqldb</artifactId> -->
-							<!-- <version>${version.hsqldb}</version> -->
-							<!-- </dependency> -->
 							<dependency>
 								<groupId>org.apache.derby</groupId>
 								<artifactId>derby</artifactId>
@@ -251,17 +226,6 @@
 								<version>${version.derby}</version>
 							</dependency>
 						</dependencies>
-						<!-- <configuration> -->
-						<!-- <driver>org.hsqldb.jdbcDriver</driver> -->
-						<!-- <url>jdbc:hsqldb:file:target/storage/database;shutdown=true</url> -->
-						<!-- <username>sa</username> -->
-						<!-- <password></password> -->
-						<!-- <autocommit>true</autocommit> -->
-						<!-- <encoding>${project.build.sourceEncoding}</encoding> -->
-						<!-- <srcFiles> -->
-						<!-- <srcFile>target/hibernate3/sql/schema.ddl</srcFile> -->
-						<!-- </srcFiles> -->
-						<!-- </configuration> -->
 						<configuration>
 							<driver>org.apache.derby.jdbc.EmbeddedDriver</driver>
 							<url>jdbc:derby:target/storage/database;create=true</url>

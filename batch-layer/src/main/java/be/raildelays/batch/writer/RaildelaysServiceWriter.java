@@ -1,4 +1,4 @@
-package be.raildelays.batch;
+package be.raildelays.batch.writer;
 
 import java.util.List;
 
