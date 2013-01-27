@@ -32,8 +32,7 @@ public class GrabberServiceBatchIT {
 		
 		try {
 			Map<String, JobParameter> parameters = new HashMap<>();
-			
-			parameters.put("inputFile", new JobParameter("file:D:\\DEV\\Raildelays\\batch-layer\\src\\it\\resources\\train-list.properties"));
+						
 			parameters.put("date", new JobParameter(new Date()));	
 			
 			batchStatus = jobLauncherTestUtils.launchJob(new JobParameters(parameters)).getStatus();

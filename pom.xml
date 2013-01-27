@@ -34,7 +34,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
-		<version.spring>3.2.0.RELEASE</version.spring>
+		<version.spring>3.1.2.RELEASE</version.spring>
 		<version.spring.batch>2.2.0.M1</version.spring.batch>
 		<version.spring.data>1.2.0.RELEASE</version.spring.data>
 		<version.hibernate>4.0.1.Final</version.hibernate>
@@ -156,6 +156,11 @@
 				<groupId>org.springframework.data</groupId>
 				<artifactId>spring-data-jpa</artifactId>
 				<version>${version.spring.data}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.data</groupId>
+				<artifactId>spring-data-commons-core</artifactId>
+				<version>1.4.0.RELEASE</version>
 			</dependency>
 
 

@@ -7,7 +7,7 @@
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
 
 	<batch:job-repository id="jobRepository" data-source="batchDataSource"
-		transaction-manager="batchTransactionManager" isolation-level-for-create="DEFAULT"
+		transaction-manager="batchTransactionManager" isolation-level-for-create="SERIALIZABLE"
 		table-prefix="BATCH_" max-varchar-length="1000"  />
 		
 </beans>

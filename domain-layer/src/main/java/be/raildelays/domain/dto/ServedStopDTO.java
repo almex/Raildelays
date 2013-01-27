@@ -5,6 +5,9 @@ import java.util.Date;
 
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 public final class ServedStopDTO implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 3019492480070457922L;
@@ -19,14 +22,6 @@ public final class ServedStopDTO implements Serializable, Cloneable {
 	private final Date departureTime;
 
 	private final long arrivalDelay;
-
-	public long getArrivalDelay() {
-		return arrivalDelay;
-	}
-
-	public long getDepartureDelay() {
-		return departureDelay;
-	}
 
 	private final long departureDelay;
 
@@ -43,6 +38,41 @@ public final class ServedStopDTO implements Serializable, Cloneable {
 		this.arrivalDelay = arrivalDelay;
 	}
 
+	@Override
+	public ServedStopDTO clone() {
+		try {
+			return (ServedStopDTO) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new AssertionError("The parent class is not cloneable", e);
+		}
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		boolean result = false;
+
+		if (obj == this) {
+			result = true;
+		} else {
+			if (obj instanceof ServedStopDTO) {
+				ServedStopDTO stop = (ServedStopDTO) obj;
+
+				result = new EqualsBuilder() //
+						.append(stationName, stop.getStationName())
+						.isEquals();
+			}
+		}
+
+		return result;
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(11, 3) //
+				.append(stationName)
+				.toHashCode();
+	}
+
 	public String getStationName() {
 		return stationName;
 	}
@@ -55,16 +85,15 @@ public final class ServedStopDTO implements Serializable, Cloneable {
 		return (Date) (departureTime != null ? departureTime.clone() : null);
 	}
 
-	public boolean isCanceled() {
-		return canceled;
+	public long getArrivalDelay() {
+		return arrivalDelay;
 	}
 
-	@Override
-	public ServedStopDTO clone() {
-		try {
-			return (ServedStopDTO) super.clone();
-		} catch (CloneNotSupportedException e) {
-			throw new AssertionError("The parent class is not cloneable", e);
-		}
+	public long getDepartureDelay() {
+		return departureDelay;
+	}
+
+	public boolean isCanceled() {
+		return canceled;
 	}
 }

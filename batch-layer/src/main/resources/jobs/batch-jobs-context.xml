@@ -9,51 +9,49 @@
 	<batch:job id="grabDelaysFromRailtime" restartable="true">
 		<batch:step id="step1">
 			<batch:tasklet transaction-manager="batchTransactionManager">
-				<batch:chunk reader="flatFileItemReader" writer="raildelaysServiceWriter"
-					commit-interval="10" processor="railtimeItemProcessor">
+				<batch:chunk reader="compositeRailtimeItemReader"
+					writer="raildelaysServiceWriter" commit-interval="1">
+					<batch:streams merge="true">
+						<batch:stream ref="fileReader" />
+					</batch:streams>
 				</batch:chunk>
 			</batch:tasklet>
 		</batch:step>
 	</batch:job>
 
 	<!-- The input is simply a list of trainId read from a flat file -->
-	<bean id="flatFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader"
-		scope="step">
+	<bean id="fileReader" class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="lineMapper">
 			<bean
 				class="org.springframework.batch.item.file.mapping.PassThroughLineMapper">
 			</bean>
 		</property>
-		<property name="resource" value="#{jobParameters[inputFile]}" />
+		<property name="resource" value="train-list.properties" />
 	</bean>
 
-	<bean id="railtimeItemProcessor" class="be.raildelays.batch.RailtimeItemProcessor"
+	<bean id="compositeRailtimeItemReader" class="be.raildelays.batch.CompositeRailtimeItemReader"
 		scope="step">
 		<property name="date" value="#{jobParameters[date]}" />
+		<property name="resource" value="#{jobParameters[inputFile]}" />
 		<property name="arrivalReader">
-			<bean id="" class="be.raildelays.batch.RailtimeItemReader" scope="step">
-				<property name="trainId" value="#{stepExecutionContext[trainId]}" />
-				<property name="date" value="#{jobParameters[date]}" />
+			<bean class="be.raildelays.batch.RailtimeItemReader" scope="step">
 				<property name="sens">
 					<util:constant static-field="be.raildelays.domain.Sens.ARRIVAL" />
 				</property>
 			</bean>
 		</property>
 		<property name="departureReader">
-			<bean id="" class="be.raildelays.batch.RailtimeItemReader" scope="step">
-				<property name="trainId" value="#{stepExecutionContext[trainId]}" />
-				<property name="date" value="#{jobParameters[date]}" />
+			<bean class="be.raildelays.batch.RailtimeItemReader" scope="step">
 				<property name="sens">
 					<util:constant static-field="be.raildelays.domain.Sens.DEPARTURE" />
 				</property>
 			</bean>
 		</property>
+		<property name="fileReader" ref="fileReader" />
 	</bean>
 
 	<bean id="raildelaysServiceWriter" class="be.raildelays.batch.RaildelaysServiceWriter"
 		scope="step">
-		<property name="trainId" value="#{stepExecutionContext[trainId]}" />
-		<property name="date" value="#{jobParameters[date]}" />
 	</bean>
 
 	<!-- Write via a service -->

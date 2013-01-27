@@ -191,7 +191,7 @@ public class LineStop implements Serializable, Cloneable {
 		if (obj == this) {
 			result = true;
 		} else {
-			if (obj instanceof Station) {
+			if (obj instanceof LineStop) {
 				LineStop lineStop = (LineStop) obj;
 
 				result = new EqualsBuilder() //

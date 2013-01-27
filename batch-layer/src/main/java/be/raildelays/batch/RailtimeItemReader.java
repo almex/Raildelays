@@ -52,8 +52,6 @@ public class RailtimeItemReader implements ItemReader<Direction> {
 		Reader englishStream = streamer.getDelays(trainId, date,
 				Language.ENGLISH.getRailtimeParameter(),
 				sens.getRailtimeParameter());
-		
-		//trainId = (String) stepExecution.getExecutionContext().get("trainId");
 
 		// -- Parse the content
 		StreamParser parser = new RailtimeStreamParser(englishStream);
