@@ -13,7 +13,7 @@
 				<batch:chunk reader="compositeRailtimeItemReader"
 					writer="raildelaysServiceWriter" commit-interval="1">
 				</batch:chunk>
-				<batch:transaction-attributes isolation="READ_COMMITTED" propagation="REQUIRES_NEW"/>
+				<batch:transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
 			</batch:tasklet>
 		</batch:step>
 	</batch:job>

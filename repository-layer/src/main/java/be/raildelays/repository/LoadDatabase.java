@@ -10,96 +10,104 @@ import javax.sql.DataSource;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.jdbc.datasource.SingleConnectionDataSource;
-import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.util.Assert;
 
-public class LoadDatabase {
+public class LoadDatabase implements InitializingBean {
 
 	static final private Logger LOGGER = LoggerFactory
 			.getLogger(LoadDatabase.class);
 
-	private Connection connection;
-
+	
 	private String initScriptPath;
 
 	private String databaseName;
 	
-	private DataSource datasource; 
+	private DataSource dataSource;
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(dataSource);
+	}
 
 	public void startUp() throws InstantiationException,
 			IllegalAccessException, ClassNotFoundException, SQLException {
-		Properties properties = new Properties();
+		/*Properties properties = new Properties();
+		Connection connection = null;
 		
-		LOGGER.debug("Loading database...");
-		
-		properties.put("hibernate.dialect", "org.hibernate.dialect.DerbyTenSevenDialect");
-		
-		Class.forName("org.apache.derby.jdbc.EmbeddedDriver").newInstance();
-		
-		LOGGER.debug("Driver loaded!");
+		LOGGER.debug("Loading database '" + databaseName + "'...");
 
-		try {
+		properties.put("hibernate.dialect",
+				"org.hibernate.dialect.DerbyTenSevenDialect");
+
+		Class.forName("org.apache.derby.jdbc.EmbeddedDriver").newInstance();
+
+		LOGGER.debug("Driver loaded!");*/
+
+		/*try {
 			DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition(
 					TransactionDefinition.PROPAGATION_SUPPORTS);
 			transactionDefinition
 					.setIsolationLevel(TransactionDefinition.ISOLATION_SERIALIZABLE);
 			transactionDefinition.setReadOnly(false);
-			
+
 			connection = DriverManager.getConnection("jdbc:derby:"
 					+ databaseName + ";create=true", properties);
-			connection.setAutoCommit(true);
-			
-			datasource = new SingleConnectionDataSource(connection, true);
-			
-			DataSourceUtils.prepareConnectionForTransaction(connection,
-					transactionDefinition);			
+			//connection.setAutoCommit(false);
 
-			LOGGER.debug("Connexion created!");
-			
-			initDatabase();
-		} finally  {
-			if (connection != null && !connection.isClosed()) {
+			DataSourceUtils.prepareConnectionForTransaction(connection,
+					transactionDefinition);
+
+			LOGGER.debug("Connexion created!");*/
+
+			initDatabase(dataSource.getConnection());
+		/*} finally {
+			if (connection != null) {
 				connection.close();
 			}
-		}
-		
-		
+			shutdown();
+		}*/
+
 	}
 
-	public void shutdown() throws SQLException {
+	private void shutdown() throws SQLException {
 		LOGGER.debug("Shutting down database...");
-		DriverManager.getConnection("jdbc:derby:" + databaseName
-				+ ";shutdown=true");
-	}
+		try {
+			DriverManager.getConnection("jdbc:derby:" + databaseName
+					+ ";shutdown=true");
+		} catch (SQLException e) {
+			// The message say erroCode=08006 but e.getErrorCode() return 45000 don't know why...
+			// So I do it dirty and swallow the exception instead of filtering  the right error code
+			LOGGER.debug("erroCode={}", e.getErrorCode());
+			LOGGER.debug("Database '{}' shutdown!", databaseName);
+		}
 
-	public DataSource getDataSource() {
-		return datasource;
 	}
 
 	/**
 	 * Hook to initialize the embedded database. Subclasses may call to force
 	 * initialization. After calling this method, {@link #getDataSource()}
 	 * returns the DataSource providing connectivity to the db.
-	 * @throws SQLException 
+	 * 
+	 * @throws SQLException
 	 */
-	protected void initDatabase() throws SQLException {
+	protected void initDatabase(final Connection connection)
+			throws SQLException {
 		if (StringUtils.isNotBlank(initScriptPath)) {
 			ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
 			databasePopulator.addScript(new ClassPathResource(initScriptPath));
-			
-			
+
 			try {
 				LOGGER.debug("Loading script={} ...", initScriptPath);
-//				DatabasePopulatorUtils.execute(databasePopulator,
-//						getDataSource());
+//				 DatabasePopulatorUtils.execute(databasePopulator,
+//						 datatsource);
 				databasePopulator.populate(connection);
-			} catch (DataAccessResourceFailureException e) {
+			} catch (Exception e) {
 				LOGGER.warn(
 						"Exception occured during database initilization : {}",
 						e.getMessage());
@@ -113,6 +121,10 @@ public class LoadDatabase {
 
 	public void setDatabaseName(String databaseName) {
 		this.databaseName = databaseName;
+	}
+
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
 	}
 
 }

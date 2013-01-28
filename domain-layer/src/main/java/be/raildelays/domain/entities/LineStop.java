@@ -195,9 +195,9 @@ public class LineStop implements Serializable, Cloneable {
 				LineStop lineStop = (LineStop) obj;
 
 				result = new EqualsBuilder() //
-						.append(train, lineStop.getTrain()) //
-						.append(station, lineStop.getStation()) //
-						.append(date, lineStop.getDate()) //
+						.append(train, lineStop.train) //
+						.append(station, lineStop.station) //
+						.append(date, lineStop.date) //
 						.isEquals();
 			}
 		}

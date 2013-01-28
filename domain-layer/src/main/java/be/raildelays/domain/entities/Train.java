@@ -75,7 +75,7 @@ public class Train implements Serializable, Cloneable {
 				Train train = (Train) obj;
 
 				result = new EqualsBuilder().append(englishName,
-						train.getEnglishName()).isEquals();
+						train.englishName).isEquals();
 			} else {
 				result = false;
 			}

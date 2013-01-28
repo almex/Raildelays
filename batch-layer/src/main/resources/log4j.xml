@@ -17,23 +17,27 @@
 	</appender>
 
 	<logger name="be.raildelays">
-		<level value="debug" />
+		<level value="info" />
 	</logger>
 
 	<logger name="org.springframework">
-		<level value="warn" />
+		<level value="error" />
+	</logger>
+	
+	<logger name="org.springframework.batch">
+		<level value="error" />
 	</logger>
 	
 	<logger name="org.springframework.transaction">
-		<level value="trace" />
+		<level value="error" />
 	</logger>
 
 	<logger name="org.hsqldb">
-		<level value="warn" />
+		<level value="error" />
 	</logger>
 
 	<logger name="org.hibernate">
-		<level value="warn" />
+		<level value="error" />
 	</logger>
 
 	<root>

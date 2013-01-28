@@ -3,19 +3,19 @@ package be.raildelays.batch;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.JobParameter;
-import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersInvalidException;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobExecutionNotRunningException;
@@ -25,12 +25,12 @@ import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.NoSuchJobExecutionException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.httpclient.RequestStreamer;
 import be.raildelays.service.RaildelaysService;
 
 public class Bootstrap {
@@ -70,7 +70,8 @@ public class Bootstrap {
 				JobRegistry jobRegistry = ctx.getBean(JobRegistry.class);
 				JobExplorer jobExplorer = ctx.getBean(JobExplorer.class);
 				JobOperator jobOperator = ctx.getBean(JobOperator.class);
-				recover(jobExplorer, jobOperator);
+				JobRepository jobRepository = ctx.getBean(JobRepository.class);
+				recover(jobExplorer, jobRepository, jobOperator);
 				while (iterator.hasNext()) {
 					Calendar calendar = (Calendar) iterator.next();
 					//				Map<String, JobParameter> parameters = new HashMap<>();
@@ -107,7 +108,7 @@ public class Bootstrap {
 		}
 	}
 
-	private static Long recover(JobExplorer jobExplorer, JobOperator jobOperator)
+	private static Long recover(JobExplorer jobExplorer, JobRepository jobRepository, JobOperator jobOperator)
 			throws NoSuchJobException, NoSuchJobExecutionException,
 			JobExecutionNotRunningException, InterruptedException,
 			JobExecutionAlreadyRunningException, JobInstanceAlreadyCompleteException, JobRestartException, JobParametersInvalidException {
@@ -118,31 +119,26 @@ public class Bootstrap {
 		for (Long jobExecutionId : jobExecutionIds) {
 			LOGGER.debug("Found a job already running jobExecutionId={}",
 					jobExecutionId);
-			jobOperator.stop(jobExecutionId);
-			System.out.print("Stopping job");
-			boolean stopped = false;
-			for (int i = 0; i < 30; i++) {
-				System.out.print('.');
-				Thread.sleep(1000);
-				stopped = jobExplorer.getJobExecution(jobExecutionId)
-						.getEndTime() != null;
-				if (stopped) {
-					break;
+
+			JobExecution jobExecution = jobExplorer.getJobExecution(jobExecutionId);
+			jobExecution.setEndTime(new Date());
+			jobExecution.setStatus(BatchStatus.FAILED);
+			jobExecution.setExitStatus(ExitStatus.FAILED);
+			
+			for(StepExecution stepExecution : jobExecution.getStepExecutions()) {
+				if (stepExecution.getStatus().isRunning()) {
+					stepExecution.setEndTime(new Date());
+					stepExecution.setStatus(BatchStatus.FAILED);
+					stepExecution.setExitStatus(ExitStatus.FAILED);
 				}
 			}
-
-			System.out.println(" DONE!");
-
-			if (stopped) {
-				System.out.println("Job stopped!");
-			} else {
-				jobOperator.abandon(jobExecutionId);
-				System.out.println("Job abandonned!");
-			}
-
+				
+			jobRepository.update(jobExecution);
+			System.out.println("Setted job as FAILED!");
+			
 			lastJobExectutionId = jobExecutionId;
 			
-			LOGGER.debug("Restarting jobExecutionId={}",
+			LOGGER.debug("Restarting jobExecutionId={}...",
 					lastJobExectutionId);
 			jobOperator.restart(lastJobExectutionId);
 		}
@@ -155,8 +151,8 @@ public class Bootstrap {
 	private static void print(Collection<LineStop> stops, Station departure,
 			Station arrival) {
 		for (LineStop stop : stops) {
-			System.out.println(stop.toStringAll());
-			System.out.println("=================================");
+			LOGGER.info(stop.toStringAll());
+			LOGGER.info("=================================");
 		}
 	}
 

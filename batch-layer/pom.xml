@@ -57,7 +57,7 @@
 						<!--argument>-Djava.library.path=${project.build.directory}/lib</argument-->
 						<argument>-jar</argument>
 						<argument>${project.build.finalName}.jar</argument>
-						<argument>be.raildelays.batch.Bootstrap</argument>
+						<!--argument>be.raildelays.batch.Bootstrap</argument-->
 					</arguments>
 				</configuration>
 				<executions>

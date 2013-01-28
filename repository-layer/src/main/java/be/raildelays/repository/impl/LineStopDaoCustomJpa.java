@@ -7,13 +7,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TemporalType;
 
-import org.springframework.stereotype.Repository;
-
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.repository.LineStopDaoCustom;
 
-@Repository(value = "lineStopDao")
 public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 
 	@PersistenceContext(unitName = "raildelays-repository")

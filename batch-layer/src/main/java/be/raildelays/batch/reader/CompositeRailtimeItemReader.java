@@ -78,6 +78,7 @@ public class CompositeRailtimeItemReader implements ItemReader<RouteLogDTO>, Ite
 		
 		
 		if (trainId != null) {
+			System.out.printf("Processing %s...\n", trainId);
 			departureReader.setTrainId(trainId);
 			departureReader.setDate(date);
 			arrivalReader.setTrainId(trainId);

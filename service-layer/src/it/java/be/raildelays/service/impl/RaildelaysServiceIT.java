@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import be.raildelays.domain.dto.RouteLogDTO;
@@ -20,7 +21,7 @@ import be.raildelays.service.RaildelaysService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:/spring/service/raildelays-service-integration-context.xml" })
-@Transactional
+@TransactionConfiguration(defaultRollback=true)
 public class RaildelaysServiceIT {
 
 	/**
@@ -30,6 +31,7 @@ public class RaildelaysServiceIT {
 	RaildelaysService raildelaysService;
 
 	@Test
+	@Transactional
 	public void test466LineStop() throws ParseException {
 		Date today = new Date();
 		RouteLogDTO routeLog = new RouteLogDTO("466", today);
@@ -43,6 +45,7 @@ public class RaildelaysServiceIT {
 	}
 
 	@Test
+	@Transactional
 	public void testLinkedLineStop() throws ParseException {
 		Date today = new Date();
 		RouteLogDTO routeLog = new RouteLogDTO("466", today);
@@ -58,6 +61,7 @@ public class RaildelaysServiceIT {
 	}
 
 	@Test
+	@Transactional
 	public void testSearchLineStop() throws ParseException {
 		Date today = new Date();
 		RouteLogDTO routeLog = new RouteLogDTO("466", today);
@@ -69,8 +73,8 @@ public class RaildelaysServiceIT {
 		routeLog.addStop(new ServedStopDTO("Bruxelles-Central", formater
 				.parse("08:20"), 20, formater.parse("08:25"), 20, false));
 
-		Assert.assertNotNull(raildelaysService.saveRouteLog(routeLog));
-		Assert.assertEquals(2, raildelaysService.searchDelaysBetween(today, new Station("Liège-Guillemins"), new Station("Liège-Guillemins"), 0).size());
+		Assert.assertEquals(3, raildelaysService.saveRouteLog(routeLog).size());
+		Assert.assertEquals(2, raildelaysService.searchDelaysBetween(today, new Station("Liège-Guillemins"), new Station("Bruxelles-Central"), 1).size());
 	}
 
 }

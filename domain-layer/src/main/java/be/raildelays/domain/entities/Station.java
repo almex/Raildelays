@@ -75,7 +75,7 @@ public class Station implements Serializable, Cloneable {
 				Station station = (Station) obj;
 
 				result = new EqualsBuilder().append(englishName,
-						station.getEnglishName()).isEquals();
+						station.englishName).isEquals();
 			} else {
 				result = false;
 			}

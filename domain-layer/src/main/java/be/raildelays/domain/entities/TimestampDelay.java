@@ -33,8 +33,8 @@ public class TimestampDelay implements Serializable, Cloneable {
 	 * Default constructor.
 	 */
 	public TimestampDelay() {
-		this.expected = new Date();
-		this.delay = 0L;
+		this.expected = null;
+		this.delay = null;
 	}
 
 	/**
@@ -47,8 +47,8 @@ public class TimestampDelay implements Serializable, Cloneable {
 	 */
 	public TimestampDelay(Date expected, Long delay) {
 		this();
-		setExpected(expected);
-		setDelay(delay);
+		this.expected = expected;
+		this.delay = delay;
 	}
 
 	@Override
@@ -73,8 +73,8 @@ public class TimestampDelay implements Serializable, Cloneable {
 				TimestampDelay delay = (TimestampDelay) obj;
 
 				result = new EqualsBuilder() //
-						.append(expected, delay.getExpected()) //
-						.append(delay, delay.getDelay()) //
+						.append(expected, delay.expected) //
+						.append(delay, delay.delay) //
 						.isEquals();
 			} else {
 				result = false;
