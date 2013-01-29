@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
 	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
@@ -13,34 +12,47 @@
 				<batch:chunk reader="compositeRailtimeItemReader"
 					writer="raildelaysServiceWriter" commit-interval="1">
 				</batch:chunk>
-				<batch:transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
+				<batch:transaction-attributes
+					isolation="DEFAULT" propagation="REQUIRED" />
+			</batch:tasklet>
+		</batch:step>
+		<batch:step id="step2">
+			<batch:tasklet transaction-manager="batchTransactionManager">
+				<batch:chunk reader="raildelaysItemReader" writer="flatFileItemWriter"
+					commit-interval="1">
+				</batch:chunk>
+				<batch:transaction-attributes
+					isolation="DEFAULT" propagation="REQUIRED" />
 			</batch:tasklet>
 		</batch:step>
 	</batch:job>
 
 	<!-- The input is simply a list of trainId read from a flat file -->
-	
+
 
 	<bean id="compositeRailtimeItemReader" class="be.raildelays.batch.reader.CompositeRailtimeItemReader"
 		scope="step">
 		<property name="date" value="#{jobParameters[date]}" />
 		<property name="resource" value="#{jobParameters[inputFile]}" />
 		<property name="arrivalReader">
-			<bean class="be.raildelays.batch.reader.RailtimeItemReader" scope="step">
+			<bean class="be.raildelays.batch.reader.RailtimeItemReader"
+				scope="step">
 				<property name="sens">
 					<util:constant static-field="be.raildelays.domain.Sens.ARRIVAL" />
 				</property>
 			</bean>
 		</property>
 		<property name="departureReader">
-			<bean class="be.raildelays.batch.reader.RailtimeItemReader" scope="step">
+			<bean class="be.raildelays.batch.reader.RailtimeItemReader"
+				scope="step">
 				<property name="sens">
 					<util:constant static-field="be.raildelays.domain.Sens.DEPARTURE" />
 				</property>
 			</bean>
 		</property>
-		<property name="fileReader" >
-			<bean class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
+		<property name="fileReader">
+			<bean class="org.springframework.batch.item.file.FlatFileItemReader"
+				scope="step">
 				<property name="lineMapper">
 					<bean
 						class="org.springframework.batch.item.file.mapping.PassThroughLineMapper">
@@ -59,18 +71,32 @@
 	<!-- <bean id="serviceWriter" class="be.raildelays.batch.GrabberServiceBatch" 
 		/> -->
 
-	<!-- <bean id="raildelaysServiceWriter" -->
-	<!-- class="org.springframework.batch.item.adapter.ItemWriterAdapter" -->
-	<!-- scope="step"> -->
-	<!-- <property name="targetObject" ref="raildelaysService" /> -->
-	<!-- <property name="targetMethod" value="saveTimetable" /> -->
-	<!-- <property name="arguments"> -->
-	<!-- <array> -->
-	<!-- <value>#{jobParameters[date]}</value> -->
-	<!-- <value>#{stepExecution.executionContext['trainId']}</value> -->
-	<!-- </array> -->
-	<!-- </property> -->
-	<!-- </bean> -->
+
+
+	<bean id="compositeRaildelaysItemReader" class="be.raildelays.batch.reader.CompositeRaildelaysItemReader"
+		scope="step">
+		<property name="date" value="#{jobParameters[date]}" />
+		<property name="resource" value="#{jobParameters[inputFile]}" />
+		<property name="fileReader">
+			<bean class="org.springframework.batch.item.file.FlatFileItemReader"
+				scope="step">
+				<property name="lineMapper">
+					<bean
+						class="org.springframework.batch.item.file.mapping.PassThroughLineMapper">
+					</bean>
+				</property>
+				<property name="resource" value="train-list.properties" />
+			</bean>
+		</property>
+		<property name="delegate">
+			<bean id="raildelaysItemReader"
+				class="org.springframework.batch.item.adapter.ItemReaderAdapter"
+				scope="step">
+				<property name="targetObject" ref="raildelaysService" />
+				<property name="targetMethod" value="searchDelaysBetween" />
+			</bean>
+		</property>
+	</bean>
 
 
 
