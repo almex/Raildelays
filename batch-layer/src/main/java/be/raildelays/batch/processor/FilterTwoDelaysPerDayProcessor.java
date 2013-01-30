@@ -9,9 +9,12 @@ import javax.validation.Validator;
 
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.time.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
 
+import be.raildelays.batch.reader.CompositeRailtimeItemReader;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
@@ -19,6 +22,8 @@ import be.raildelays.domain.xls.ExcelRow;
 
 public class FilterTwoDelaysPerDayProcessor implements
 		ItemProcessor<List<LineStop>, List<ExcelRow>>, InitializingBean {
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(FilterTwoDelaysPerDayProcessor.class);
 
 	@Resource
 	Validator validator;
@@ -32,6 +37,9 @@ public class FilterTwoDelaysPerDayProcessor implements
 		Validate.notNull(stationA, "Station A name is mandatory");
 		Validate.notNull(stationB, "Station B name is mandatory");
 		Validate.notNull(validator, "You must provide a validator");
+		
+		LOGGER.info("Processing for stationA={} and stationB={}...", stationA,
+				stationB);
 	}
 
 	@Override
@@ -40,16 +48,19 @@ public class FilterTwoDelaysPerDayProcessor implements
 		List<ExcelRow> excelRows = extractSens(removeCanceled(items), stationA,
 				stationB);
 
-		ExcelRow arrival = extractBiggerDelay(excelRows, Sens.ARRIVAL);
-		ExcelRow departure = extractBiggerDelay(excelRows, Sens.DEPARTURE);
-	
-		if (arrival != null) {
-			result.add(arrival);
+		ExcelRow fromAtoB = extractMaxDelay(excelRows, Sens.DEPARTURE);
+		ExcelRow fromBtoA = extractMaxDelay(excelRows, Sens.ARRIVAL);
+
+		if (fromBtoA != null) {
+			result.add(fromBtoA);
 		}
-		
-		if (departure != null) {
-			result.add(departure);
-		}
+
+		if (fromAtoB != null) {
+			result.add(fromAtoB);
+		}		
+
+		LOGGER.debug("From A to B : {}", fromBtoA);
+		LOGGER.debug("From B to A : {}", fromAtoB);
 
 		return result;
 	}
@@ -105,7 +116,9 @@ public class FilterTwoDelaysPerDayProcessor implements
 			if (arrival == departure) {
 				throw new IllegalStateException(
 						"Arrival must not be equal to departure");
-			}
+			}			
+
+			LOGGER.trace("departure={} arrival={}", departure, arrival);
 
 			if (departure.getStation().equals(stationA)
 					&& arrival.getStation().equals(stationB)) {
@@ -138,6 +151,8 @@ public class FilterTwoDelaysPerDayProcessor implements
 			result = readPrevious(lineStop.getPrevious(), stationA, stationB);
 		}
 
+		LOGGER.trace("Extracted from left={}", result);
+
 		return result;
 	}
 
@@ -151,12 +166,14 @@ public class FilterTwoDelaysPerDayProcessor implements
 			result = lineStop;
 		} else if (lineStop.getNext() != null) {
 			result = readNext(lineStop.getNext(), stationA, stationB);
-		}
+		}		
+
+		LOGGER.trace("Extracted from rigth={}", result);
 
 		return result;
 	}
 
-	private ExcelRow extractBiggerDelay(List<ExcelRow> items, Sens sens) {
+	private ExcelRow extractMaxDelay(List<ExcelRow> items, Sens sens) {
 		ExcelRow result = null;
 		long maxDelay = 0;
 
@@ -166,7 +183,9 @@ public class FilterTwoDelaysPerDayProcessor implements
 				maxDelay = excelRow.getDelay();
 				result = excelRow;
 			}
-		}
+		}		
+
+		LOGGER.trace("maxDelay={}", maxDelay);
 
 		return result;
 	}
@@ -178,6 +197,7 @@ public class FilterTwoDelaysPerDayProcessor implements
 		for (LineStop stop : items) {
 			if (!stop.isCanceled()) {
 				result.add(stop);
+				LOGGER.trace("Keep processing lineStop={}", stop);
 			}
 		}
 

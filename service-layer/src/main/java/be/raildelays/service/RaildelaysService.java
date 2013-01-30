@@ -44,5 +44,5 @@ public interface RaildelaysService {
 	 * @param startFrom
 	 * @return a list of unique {@link Date}
 	 */
-	List<Date> searchAllDates();
+	List<Date> searchAllDates(Date date);
 }

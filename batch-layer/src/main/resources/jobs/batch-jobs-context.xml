@@ -19,7 +19,10 @@
 		<batch:step id="step2">
 			<batch:tasklet transaction-manager="batchTransactionManager">
 				<batch:chunk reader="compositeRaildelaysItemReader" processor="delaysPerDayProcessor" writer="flatFileItemWriter"
-					commit-interval="1">
+					commit-interval="1" skip-limit="100">
+					<batch:skippable-exception-classes>
+						<batch:include class="java.lang.StringIndexOutOfBoundsException"/>
+					</batch:skippable-exception-classes>
 				</batch:chunk>
 				<batch:transaction-attributes
 					isolation="DEFAULT" propagation="REQUIRED" />
@@ -101,6 +104,9 @@
 
 	<bean id="flatFileItemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter" scope="step">
 		<property name="resource" value="#{jobParameters['output.file.path']}" />
+		<property name="appendAllowed" value="false" />
+		<property name="shouldDeleteIfExists" value="true" />
+		<property name="saveState" value="true" />
 		<property name="lineAggregator">
 			<bean class="org.springframework.batch.item.file.transform.RecursiveCollectionLineAggregator">
 				<property name="delegate">

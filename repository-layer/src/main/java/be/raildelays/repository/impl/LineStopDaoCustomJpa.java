@@ -54,9 +54,24 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 
 	@SuppressWarnings("unchecked")
 	@Override
+	public List<Date> findAllUniqueDates(Date after) {
+		return (List<Date>) entityManager
+				.createQuery(
+						"SELECT DISTINCT o.date " 
+								+ "FROM LineStop o "
+								+ "WHERE o.date > :after "
+								+ "ORDER BY o.date ASC")
+				.setParameter("after", after).getResultList();
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
 	public List<Date> findAllUniqueDates() {
 		return (List<Date>) entityManager
-				.createQuery("SELECT DISTINCT o.date FROM LineStop o ")
+				.createQuery(
+						"SELECT DISTINCT o.date " 
+								+ "FROM LineStop o "
+								+ "ORDER BY o.date ASC")
 				.getResultList();
 	}
 

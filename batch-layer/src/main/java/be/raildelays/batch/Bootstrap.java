@@ -66,7 +66,9 @@ public class Bootstrap {
 				JobOperator jobOperator = ctx.getBean(JobOperator.class);
 				JobRepository jobRepository = ctx.getBean(JobRepository.class);
 				Job job = ctx.getBean(Job.class);
+				
 				recover(jobRegistry, jobExplorer, jobRepository, jobOperator);
+				
 				while (iterator.hasNext()) {
 					Calendar calendar = (Calendar) iterator.next();
 					jobOperator
@@ -152,9 +154,9 @@ public class Bootstrap {
 				lastJobExectutionId = jobExecutionId;
 
 				System.out.println("Restarting jobExecutionId="
-						+ lastJobExectutionId + "...");
+						+ jobExecutionId + "...");
 
-				jobOperator.restart(lastJobExectutionId);
+				jobOperator.restart(jobExecutionId);
 			}
 		}
 

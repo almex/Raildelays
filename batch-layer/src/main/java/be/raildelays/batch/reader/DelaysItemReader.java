@@ -7,8 +7,6 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
@@ -30,18 +28,11 @@ public class DelaysItemReader implements ItemReader<List<LineStop>> {
 	
 	private String stationB;
 	
-	private StepExecution stepExecution;
-	
-	@BeforeStep
-	public void beforeStep(StepExecution stepExecution) {
-		this.stepExecution = stepExecution;
-	}
+	private Date date;
 
 	public List<LineStop> read() throws Exception, UnexpectedInputException,
 			ParseException, NonTransientResourceException {
 		List<LineStop> result = null;
-		
-		Date date = (Date) stepExecution.getExecutionContext().get("date");
 		
 		LOGGER.debug("Searching delays for date={}", date);
 		
@@ -58,6 +49,10 @@ public class DelaysItemReader implements ItemReader<List<LineStop>> {
 
 	public void setStationB(String stationB) {
 		this.stationB = stationB;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
 	}
 
 }

@@ -12,6 +12,14 @@ public interface LineStopDaoCustom {
 	/**
 	 * Search all dates containing a line stop already stored in the database.
 	 * 
+	 * @param after all dates returned must be greater than after
+	 * @return a list of {@link Date}
+	 */
+	List<Date> findAllUniqueDates(Date after);
+	
+	/**
+	 * Search all dates containing a line stop already stored in the database.
+	 * 
 	 * @return a list of {@link Date}
 	 */
 	List<Date> findAllUniqueDates();

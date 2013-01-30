@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.NonTransientResourceException;
@@ -24,7 +23,7 @@ import be.raildelays.domain.dto.ServedStopDTO;
 import be.raildelays.domain.railtime.Direction;
 import be.raildelays.domain.railtime.Step;
 
-public class CompositeRailtimeItemReader implements ItemReader<RouteLogDTO>, ItemStreamReader<RouteLogDTO> {
+public class CompositeRailtimeItemReader implements ItemStreamReader<RouteLogDTO> {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(CompositeRailtimeItemReader.class);
@@ -74,11 +73,11 @@ public class CompositeRailtimeItemReader implements ItemReader<RouteLogDTO>, Ite
 		RouteLogDTO result = null;
 		SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy");
 		Date date = formater.parse(this.date);	
-		String trainId = fileReader.read();
-		
+		String trainId = fileReader.read();		
 		
 		if (trainId != null) {
-			System.out.printf("Processing date=%s trainId=%s...\n", this.date, trainId);
+			LOGGER.debug("Processing date={} trainId={}...", this.date, trainId);
+			
 			departureReader.setTrainId(trainId);
 			departureReader.setDate(date);
 			arrivalReader.setTrainId(trainId);

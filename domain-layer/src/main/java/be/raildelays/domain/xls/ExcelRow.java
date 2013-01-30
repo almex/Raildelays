@@ -178,9 +178,9 @@ public class ExcelRow {
 		builder.append(" ");
 		builder.append(notNullToString(expectedTrain2));
 		builder.append(" ");
-		builder.append(notNullToString(effectiveDepartureHour));
+		builder.append(tf.format(effectiveDepartureHour));
 		builder.append(" ");
-		builder.append(notNullToString(effectiveArrivalHour));
+		builder.append(tf.format(effectiveArrivalHour));
 		builder.append(" ");
 		builder.append(notNullToString(effectiveTrain1));
 		builder.append(" ");
@@ -191,6 +191,26 @@ public class ExcelRow {
 		builder.append(sens);
 		
 		return builder.toString();
+	}
+	
+	private static String notNullToString(Station station) { 
+		String result = "";
+		
+		if (station != null) {
+			result = notNullToString(station.getEnglishName());
+		}
+		
+		return result;
+	}
+	
+	private static String notNullToString(Train train) { 
+		String result = "";
+		
+		if (train != null) {
+			result = notNullToString(train.getEnglishName());
+		}
+		
+		return result;
 	}
 	
 	private static String notNullToString(Object obj) {

@@ -20,10 +20,14 @@ public class RaildelaysServiceWriter implements ItemWriter<RouteLogDTO> {
 	@Override
 	public void write(List<? extends RouteLogDTO> items) throws Exception {
 
-		logger.debug("Entering into batch worker...");
+		if (items != null) {
+			logger.debug("Writing {} route logs...", items.size());
+			
+			for (RouteLogDTO routeLog : items) {
+				raildelaysService.saveRouteLog(routeLog);
 
-		for (RouteLogDTO routeLog : items) {
-			raildelaysService.saveRouteLog(routeLog);
+				logger.debug("Writed routeLog={}", routeLog);
+			}
 		}
 	}
 	
