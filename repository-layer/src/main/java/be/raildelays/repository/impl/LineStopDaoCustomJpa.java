@@ -22,11 +22,11 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 			int delayThreshold) {
 		return (List<LineStop>) entityManager
 				.createQuery(
-						"select o from LineStop o "
-								+ "where o.station.englishName = :stationName "
-								+ "and o.date = :date "
-								+ "and o.departureTime.delay is not null "
-								+ "and o.departureTime.delay >= :delayThreshold ")
+						"SELECT o FROM LineStop o "
+								+ "WHERE o.station.englishName = :stationName "
+								+ "AND o.date = :date "
+								+ "AND o.departureTime.delay IS NOT NULL "
+								+ "AND o.departureTime.delay >= :delayThreshold ")
 				.setParameter("delayThreshold", new Long(delayThreshold))
 				.setParameter("date", date, TemporalType.DATE)
 				.setParameter("stationName", station.getEnglishName())
@@ -40,16 +40,24 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 			int delayThreshold) {
 		return (List<LineStop>) entityManager
 				.createQuery(
-						"Select o From LineStop o "
-								+ "Where o.station.englishName = :stationName "
-								+ "And o.date = :date "
-								+ "And o.arrivalTime.delay Is Not Null "
-								+ "And o.arrivalTime.delay >= :delayThreshold ")
+						"SELECT o FROM LineStop o "
+								+ "WHERE o.station.englishName = :stationName "
+								+ "AND o.date = :date "
+								+ "AND o.arrivalTime.delay IS NOT NULL "
+								+ "AND o.arrivalTime.delay >= :delayThreshold ")
 				.setParameter("delayThreshold", new Long(delayThreshold))
 				.setParameter("date", date, TemporalType.DATE)
 				.setParameter("stationName", station.getEnglishName())
 				.getResultList();
 
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Date> findAllUniqueDates() {
+		return (List<Date>) entityManager
+				.createQuery("SELECT DISTINCT o.date FROM LineStop o ")
+				.getResultList();
 	}
 
 }

@@ -7,7 +7,7 @@
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
 
 	<batch:job id="grabDelaysFromRailtime" restartable="true">
-		<batch:step id="step1">
+		<batch:step id="step1" next="step2">
 			<batch:tasklet transaction-manager="batchTransactionManager">
 				<batch:chunk reader="compositeRailtimeItemReader"
 					writer="raildelaysServiceWriter" commit-interval="1">
@@ -18,7 +18,7 @@
 		</batch:step>
 		<batch:step id="step2">
 			<batch:tasklet transaction-manager="batchTransactionManager">
-				<batch:chunk reader="raildelaysItemReader" writer="flatFileItemWriter"
+				<batch:chunk reader="compositeRaildelaysItemReader" processor="delaysPerDayProcessor" writer="flatFileItemWriter"
 					commit-interval="1">
 				</batch:chunk>
 				<batch:transaction-attributes
@@ -27,19 +27,21 @@
 		</batch:step>
 	</batch:job>
 
-	<!-- The input is simply a list of trainId read from a flat file -->
-
+	<!-- Readers -->	
 
 	<bean id="compositeRailtimeItemReader" class="be.raildelays.batch.reader.CompositeRailtimeItemReader"
 		scope="step">
 		<property name="date" value="#{jobParameters[date]}" />
-		<property name="resource" value="#{jobParameters[inputFile]}" />
-		<property name="arrivalReader">
-			<bean class="be.raildelays.batch.reader.RailtimeItemReader"
+		<property name="resource" value="#{jobParameters['input.file.path']}" />
+		<property name="fileReader">	
+			<bean class="org.springframework.batch.item.file.FlatFileItemReader"
 				scope="step">
-				<property name="sens">
-					<util:constant static-field="be.raildelays.domain.Sens.ARRIVAL" />
+				<property name="lineMapper">
+					<bean
+						class="org.springframework.batch.item.file.mapping.PassThroughLineMapper">
+					</bean>
 				</property>
+<!-- 				<property name="resource" value="dummy" /> -->
 			</bean>
 		</property>
 		<property name="departureReader">
@@ -50,54 +52,62 @@
 				</property>
 			</bean>
 		</property>
-		<property name="fileReader">
-			<bean class="org.springframework.batch.item.file.FlatFileItemReader"
+		<property name="arrivalReader">
+			<bean class="be.raildelays.batch.reader.RailtimeItemReader"
 				scope="step">
-				<property name="lineMapper">
-					<bean
-						class="org.springframework.batch.item.file.mapping.PassThroughLineMapper">
-					</bean>
+				<property name="sens">
+					<util:constant static-field="be.raildelays.domain.Sens.ARRIVAL" />
 				</property>
-				<property name="resource" value="train-list.properties" />
 			</bean>
 		</property>
 	</bean>
+
+	<bean id="compositeRaildelaysItemReader"
+		class="be.raildelays.batch.reader.CompositeRaildelaysItemReader"
+		scope="step">
+		<property name="stationA" value="#{jobParameters['station.a.name']}" />
+		<property name="stationB" value="#{jobParameters['station.b.name']}" />				
+		<property name="datesItemReader">
+			<bean class="be.raildelays.batch.reader.DatesItemReader"
+				scope="step">
+			</bean>
+		</property>
+		<property name="delaysItemReader">
+			<bean class="be.raildelays.batch.reader.DelaysItemReader"
+				scope="step">
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="delaysItemReader" class="be.raildelays.batch.reader.DelaysItemReader"
+				scope="step">
+		<property name="date" value="#{jobParameters[date]}" />
+		<property name="stationA" value="#{jobParameters['station.a.name']}" />
+		<property name="stationB" value="#{jobParameters['station.b.name']}" />	
+	</bean>
+	
+	<!-- Processors -->
+	
+	<bean id="delaysPerDayProcessor" class="be.raildelays.batch.processor.FilterTwoDelaysPerDayProcessor" scope="step">
+		<property name="stationA" value="#{jobParameters['station.a.name']}" />
+		<property name="stationB" value="#{jobParameters['station.b.name']}" />
+	</bean>
+
+	<!-- Writers -->
 
 	<bean id="raildelaysServiceWriter" class="be.raildelays.batch.writer.RaildelaysServiceWriter"
 		scope="step">
 	</bean>
 
-	<!-- Write via a service -->
-	<!-- <bean id="serviceWriter" class="be.raildelays.batch.GrabberServiceBatch" 
-		/> -->
-
-
-
-	<bean id="compositeRaildelaysItemReader" class="be.raildelays.batch.reader.CompositeRaildelaysItemReader"
-		scope="step">
-		<property name="date" value="#{jobParameters[date]}" />
-		<property name="resource" value="#{jobParameters[inputFile]}" />
-		<property name="fileReader">
-			<bean class="org.springframework.batch.item.file.FlatFileItemReader"
-				scope="step">
-				<property name="lineMapper">
-					<bean
-						class="org.springframework.batch.item.file.mapping.PassThroughLineMapper">
-					</bean>
+	<bean id="flatFileItemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter" scope="step">
+		<property name="resource" value="#{jobParameters['output.file.path']}" />
+		<property name="lineAggregator">
+			<bean class="org.springframework.batch.item.file.transform.RecursiveCollectionLineAggregator">
+				<property name="delegate">
+					<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
 				</property>
-				<property name="resource" value="train-list.properties" />
-			</bean>
-		</property>
-		<property name="delegate">
-			<bean id="raildelaysItemReader"
-				class="org.springframework.batch.item.adapter.ItemReaderAdapter"
-				scope="step">
-				<property name="targetObject" ref="raildelaysService" />
-				<property name="targetMethod" value="searchDelaysBetween" />
 			</bean>
 		</property>
 	</bean>
-
-
 
 </beans>

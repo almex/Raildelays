@@ -51,7 +51,8 @@ public class CompositeRailtimeItemReader implements ItemReader<RouteLogDTO>, Ite
 
 	@Override
 	public void open(ExecutionContext executionContext)
-			throws ItemStreamException {
+			throws ItemStreamException {	
+		fileReader.setResource(resource);
 		fileReader.open(executionContext);
 		
 	}
@@ -71,14 +72,13 @@ public class CompositeRailtimeItemReader implements ItemReader<RouteLogDTO>, Ite
 	public RouteLogDTO read() throws Exception, UnexpectedInputException,
 			ParseException, NonTransientResourceException {	
 		RouteLogDTO result = null;
-		fileReader.setResource(resource);
+		SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy");
+		Date date = formater.parse(this.date);	
 		String trainId = fileReader.read();
-		SimpleDateFormat formater = new SimpleDateFormat("dd/mm/yyyy");
-		Date date = formater.parse(this.date);
 		
 		
 		if (trainId != null) {
-			System.out.printf("Processing %s...\n", trainId);
+			System.out.printf("Processing date=%s trainId=%s...\n", this.date, trainId);
 			departureReader.setTrainId(trainId);
 			departureReader.setDate(date);
 			arrivalReader.setTrainId(trainId);
@@ -87,7 +87,9 @@ public class CompositeRailtimeItemReader implements ItemReader<RouteLogDTO>, Ite
 			Direction arrivalDirection = arrivalReader.read();
 			Direction departureDirection = departureReader.read();
 			
-			result = subProcess(date, departureDirection, arrivalDirection);
+			if (departureDirection != null && arrivalDirection != null) {
+				result = subProcess(date, departureDirection, arrivalDirection);
+			}
 		}
 		
 		return result;

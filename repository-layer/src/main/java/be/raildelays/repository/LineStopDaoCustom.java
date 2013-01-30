@@ -8,20 +8,13 @@ import be.raildelays.domain.entities.Station;
 
 public interface LineStopDaoCustom {
 
-//	/**
-//	 * Search a list of line stops that belong to a direction for a certain day.
-//	 * 
-//	 * @param departure
-//	 *            station where you are coming from
-//	 * @param arrival
-//	 *            station where you are going to
-//	 * @param date
-//	 *            day of the year for which you do the search
-//	 * @return a list of line stop
-//	 */
-//	public List<LineStop> findByStation(Station departure, Station arrival,
-//			Date date);
 	
+	/**
+	 * Search all dates containing a line stop already stored in the database.
+	 * 
+	 * @return a list of {@link Date}
+	 */
+	List<Date> findAllUniqueDates();
 
 	/**
 	 * Search a list of arrival delayed line stops that belong departure or arrival for a certain day.
@@ -33,6 +26,7 @@ public interface LineStopDaoCustom {
 	 * @return a collection of {@link LineStop} belonging to departure
 	 */
 	List<LineStop> findDepartureDelays(Date date, Station station, int delayThreshold);
+	
 	/**
 	 * Search a list of departure delayed line stops that belong departure or arrival for a certain day.
 	 * 

@@ -1,17 +1,20 @@
 package be.raildelays.batch.writer;
 
+import java.io.FileOutputStream;
 import java.util.List;
 
-import jxl.Workbook;
-import jxl.write.biff.File;
-
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.batch.item.ItemWriter;
 
-public class ExcelSheetItemWriter implements ItemWriter<String> {
+import be.raildelays.domain.entities.LineStop;
+
+public class ExcelSheetItemWriter implements ItemWriter<LineStop> {
 
 	@Override
-	public void write(List<? extends String> items) throws Exception {
-		//Workbook workbook = Workbook.createWorkbook(new File("myfile.xls"));
+	public void write(List<? extends LineStop> items) throws Exception {
+		Workbook workbook = new HSSFWorkbook();
+		FileOutputStream out = new FileOutputStream("workbook.xls");
 	}
 
 }

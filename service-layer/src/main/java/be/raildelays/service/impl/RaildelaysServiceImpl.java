@@ -165,6 +165,15 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 		return result;
 	}
 
+	@Override
+	public List<Date> searchAllDates() {
+		List<Date> result = null;
+		
+		result = lineStopDao.findAllUniqueDates();
+		
+		return result;
+	}
+
 	private RailtimeTrain saveOrRetrieveRailtimeTrain(RailtimeTrain train) {
 		RailtimeTrain result = null;
 		RailtimeTrain persistedTrain = railtimeTrainDao.findByRailtimeId(train

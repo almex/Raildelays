@@ -3,7 +3,7 @@ package be.raildelays.batch.reader;
 import java.util.Date;
 import java.util.List;
 
-import javax.validation.Validator;
+import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,26 +15,23 @@ import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 
 import be.raildelays.domain.entities.LineStop;
+import be.raildelays.domain.entities.Station;
+import be.raildelays.service.RaildelaysService;
 
-public class CompositeRaildelaysItemReader implements
-		ItemReader<List<LineStop>> {
+public class DelaysItemReader implements ItemReader<List<LineStop>> {
 
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(CompositeRaildelaysItemReader.class);
+			.getLogger(DelaysItemReader.class);
 
-	@javax.annotation.Resource
-	Validator validator;
-
-	private DelaysItemReader delaysItemReader;
-	
-	private DatesItemReader datesItemReader;
+	@Resource
+	private RaildelaysService service;
 	
 	private String stationA;
 	
 	private String stationB;
-
+	
 	private StepExecution stepExecution;
-
+	
 	@BeforeStep
 	public void beforeStep(StepExecution stepExecution) {
 		this.stepExecution = stepExecution;
@@ -44,15 +41,12 @@ public class CompositeRaildelaysItemReader implements
 			ParseException, NonTransientResourceException {
 		List<LineStop> result = null;
 		
-		delaysItemReader.setStationA(stationA);
-		delaysItemReader.setStationB(stationB);
-
-		Date date = datesItemReader.read();
+		Date date = (Date) stepExecution.getExecutionContext().get("date");
+		
+		LOGGER.debug("Searching delays for date={}", date);
+		
 		if (date != null) {
-			stepExecution.getExecutionContext().put("date", date);
-			result = delaysItemReader.read();
-			
-			LOGGER.debug("Found {} line stops for {}", result.size(), date);
+			result = service.searchDelaysBetween(date, new Station(stationA), new Station(stationB), 15);
 		}
 
 		return result;
@@ -64,14 +58,6 @@ public class CompositeRaildelaysItemReader implements
 
 	public void setStationB(String stationB) {
 		this.stationB = stationB;
-	}
-
-	public void setDelaysItemReader(DelaysItemReader delaysItemReader) {
-		this.delaysItemReader = delaysItemReader;
-	}
-
-	public void setDatesItemReader(DatesItemReader datesItemReader) {
-		this.datesItemReader = datesItemReader;
 	}
 
 }

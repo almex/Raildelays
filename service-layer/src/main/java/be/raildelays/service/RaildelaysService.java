@@ -36,4 +36,13 @@ public interface RaildelaysService {
 	 * @return a list of {@link LineStop} linked each other following a direction
 	 */
 	List<LineStop> searchDelaysBetween(final Date date, final Station stationA, final Station stationB, final int delayTreshold);
+	
+	
+	/**
+	 * Search all dates already stored within the database.
+	 * 
+	 * @param startFrom
+	 * @return a list of unique {@link Date}
+	 */
+	List<Date> searchAllDates();
 }

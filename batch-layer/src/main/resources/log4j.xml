@@ -9,41 +9,82 @@
 		</layout>
 	</appender>
 	
-	<appender name="file" class="org.apache.log4j.FileAppender">
+	<appender name="output" class="org.apache.log4j.FileAppender">
 		<param name="file" value="log/output.log"/>		
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d{DATE} %-5p %-15c{1}: %m%n" />
 		</layout>
+	</appender>	
+	
+	<appender name="input" class="org.apache.log4j.FileAppender">
+		<param name="file" value="log/input.log"/>		
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{DATE} %-5p %-15c{1}: %m%n" />
+		</layout>
 	</appender>
-
+	
+	<appender name="error" class="org.apache.log4j.FileAppender">
+		<param name="file" value="log/error.log"/>		
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{DATE} %-5p %-15c{1}: %m%n" />
+		</layout>
+	</appender>
+	
 	<logger name="be.raildelays">
-		<level value="info" />
+		<level value="error" />
+		<appender-ref ref="error" />
+	</logger>
+	
+	<logger name="be.raildelays.batch.reader">
+		<level value="debug" />
+		<appender-ref ref="input" />
+	</logger>
+	<logger name="be.raildelays.httpclient">
+		<level value="debug" />
+		<appender-ref ref="input" />
+	</logger>	
+	<logger name="be.raildelays.parser">
+		<level value="debug" />
+		<appender-ref ref="input" />
+	</logger>
+	
+	<logger name="be.raildelays.batch.writer">
+		<level value="debug" />
+		<appender-ref ref="output" />
+	</logger>
+	<logger name="be.raildelays.service.RaildelaysService">
+		<level value="debug" />
+		<appender-ref ref="output" />
 	</logger>
 
 	<logger name="org.springframework">
 		<level value="error" />
+		<appender-ref ref="error" />
 	</logger>
 	
 	<logger name="org.springframework.batch">
 		<level value="error" />
+		<appender-ref ref="error" />
 	</logger>
 	
 	<logger name="org.springframework.transaction">
 		<level value="error" />
+		<appender-ref ref="error" />
 	</logger>
 
 	<logger name="org.hsqldb">
 		<level value="error" />
+		<appender-ref ref="error" />
 	</logger>
 
 	<logger name="org.hibernate">
 		<level value="error" />
+		<appender-ref ref="error" />
 	</logger>
 
-	<root>
-		<priority value="info" />
-		<appender-ref ref="console" />
-		<appender-ref ref="file" />
-	</root>
+<!-- 	<root> -->
+<!-- 		<priority value="info" /> -->
+<!-- 		<appender-ref ref="console" /> -->
+<!-- 	</root> -->
 
 </log4j:configuration>

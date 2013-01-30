@@ -1,5 +1,6 @@
 package be.raildelays.batch;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,9 +32,14 @@ public class GrabberServiceBatchIT {
 		BatchStatus batchStatus;
 		
 		try {
+			SimpleDateFormat formater = new SimpleDateFormat("dd/mm/yyyy");
 			Map<String, JobParameter> parameters = new HashMap<>();
-						
-			parameters.put("date", new JobParameter(new Date()));	
+
+			parameters.put("input.file.path", new JobParameter("train-list.properties"));	
+			parameters.put("date", new JobParameter(formater.format(new Date())));	
+			parameters.put("station.a.name", new JobParameter("Liège-Guillemins"));	
+			parameters.put("station.b.name", new JobParameter("Brussels (Bruxelles)-Central"));	
+			parameters.put("output.file.path", new JobParameter("file:./output.dat"));	
 			
 			batchStatus = jobLauncherTestUtils.launchJob(new JobParameters(parameters)).getStatus();
 			

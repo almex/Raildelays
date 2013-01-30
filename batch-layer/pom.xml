@@ -18,7 +18,7 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
 					<archive>
-						<manifest>						
+						<manifest>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>lib/</classpathPrefix>
 							<mainClass>be.raildelays.batch.Bootstrap</mainClass>
@@ -47,50 +47,50 @@
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>			
+				<artifactId>exec-maven-plugin</artifactId>
 				<configuration>
 					<workingDirectory>${project.build.directory}</workingDirectory>
-					<executable>java</executable>	
+					<executable>java</executable>
 					<mainClass>be.raildelays.batch.Bootstrap</mainClass>
-					<classpathScope>compile</classpathScope>		
+					<classpathScope>compile</classpathScope>
 					<arguments>
-						<!--argument>-Djava.library.path=${project.build.directory}/lib</argument-->
+						<!--argument>-Djava.library.path=${project.build.directory}/lib</argument -->
 						<argument>-jar</argument>
 						<argument>${project.build.finalName}.jar</argument>
-						<!--argument>be.raildelays.batch.Bootstrap</argument-->
+						<!--argument>be.raildelays.batch.Bootstrap</argument -->
 					</arguments>
 				</configuration>
 				<executions>
-					<execution>				
+					<execution>
 						<goals>
 							<goal>exec</goal>
 						</goals>
 					</execution>
 				</executions>
 			</plugin>
-<!-- 			  <plugin> -->
-<!-- 				<groupId>org.apache.maven.plugins</groupId> -->
-<!-- 				<artifactId>maven-shade-plugin</artifactId> -->
-<!-- 				<version>2.0</version> -->
-<!-- 				<executions> -->
-<!-- 				  <execution> -->
-<!-- 					<phase>package</phase> -->
-<!-- 					<goals> -->
-<!-- 					  <goal>shade</goal> -->
-<!-- 					</goals> -->
-<!-- 					<configuration> -->
-<!-- 					  <shadedArtifactAttached>true</shadedArtifactAttached> -->
-<!-- 					  <transformers> -->
-<!-- 						<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"> -->
-<!-- 						  <manifestEntries> -->
-<!-- 							<Main-Class>be.raildelays.batch.Bootstrap</Main-Class> -->
-<!-- 						  </manifestEntries> -->
-<!-- 						</transformer> -->
-<!-- 					  </transformers> -->
-<!-- 					</configuration> -->
-<!-- 				  </execution> -->
-<!-- 				</executions> -->
-<!-- 			  </plugin> -->
+			<!-- <plugin> -->
+			<!-- <groupId>org.apache.maven.plugins</groupId> -->
+			<!-- <artifactId>maven-shade-plugin</artifactId> -->
+			<!-- <version>2.0</version> -->
+			<!-- <executions> -->
+			<!-- <execution> -->
+			<!-- <phase>package</phase> -->
+			<!-- <goals> -->
+			<!-- <goal>shade</goal> -->
+			<!-- </goals> -->
+			<!-- <configuration> -->
+			<!-- <shadedArtifactAttached>true</shadedArtifactAttached> -->
+			<!-- <transformers> -->
+			<!-- <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"> -->
+			<!-- <manifestEntries> -->
+			<!-- <Main-Class>be.raildelays.batch.Bootstrap</Main-Class> -->
+			<!-- </manifestEntries> -->
+			<!-- </transformer> -->
+			<!-- </transformers> -->
+			<!-- </configuration> -->
+			<!-- </execution> -->
+			<!-- </executions> -->
+			<!-- </plugin> -->
 
 		</plugins>
 	</build>
@@ -152,9 +152,10 @@
 			<artifactId>quartz</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>net.sourceforge.jexcelapi</groupId>
-			<artifactId>jxl</artifactId>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
 		</dependency>
+
 
 		<!-- For testing -->
 		<dependency>
