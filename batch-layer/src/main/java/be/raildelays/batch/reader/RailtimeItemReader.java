@@ -56,7 +56,7 @@ public class RailtimeItemReader implements ItemReader<Direction> {
 		// -- Parse the content
 		StreamParser parser = new RailtimeStreamParser(englishStream);
 
-		//waitRandomly();
+		waitRandomly();
 
 		return parser.parseDelay(trainId, date);
 	}

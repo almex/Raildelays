@@ -101,9 +101,9 @@ public class FilterTwoDelaysPerDayProcessor implements
 		Sens sens = null;
 
 		for (LineStop lineStop : items) {
-			LineStop departure = readPrevious(lineStop.getPrevious(), stationA,
-					stationB);
-			LineStop arrival = readNext(lineStop.getNext(), stationA, stationB);
+			LineStop departure = lineStop.getPrevious() != null ? readPrevious(lineStop.getPrevious(), stationA,
+					stationB) : null;
+			LineStop arrival = lineStop.getNext() != null ? readNext(lineStop.getNext(), stationA, stationB) : null;
 
 			if (departure == null) {
 				departure = lineStop;
