@@ -89,6 +89,6 @@ public abstract class AbstractPojoTest {
      * Override this method to provide initialize your data points.
      */
     @Before
-    public abstract void setUp();
+    public abstract void setUp() throws Exception;
 
 }

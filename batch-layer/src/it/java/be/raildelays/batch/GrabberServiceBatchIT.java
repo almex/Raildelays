@@ -32,7 +32,7 @@ public class GrabberServiceBatchIT {
 		BatchStatus batchStatus;
 		
 		try {
-			SimpleDateFormat formater = new SimpleDateFormat("dd/mm/yyyy");
+			SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy");
 			Map<String, JobParameter> parameters = new HashMap<>();
 
 			parameters.put("input.file.path", new JobParameter("train-list.properties"));	

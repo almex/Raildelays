@@ -6,22 +6,28 @@ import javax.persistence.Entity;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
+/**
+ * Station specific to Railtime portal. 
+ * 
+ * @author Almex
+ */
 @Entity
 public class RailtimeStation extends Station {
 
 	private static final long serialVersionUID = -8940001829880027858L;
 
 	@Column(unique=true)
-	private String railtimeId;
+	private final String railtimeId;
 	
-	protected RailtimeStation() {
+	@SuppressWarnings("unused")
+	private RailtimeStation() {
 		super();
 		this.railtimeId = "";
 	}
 	
-	public RailtimeStation(String name, String railtimeId) {
+	public RailtimeStation(final String name, final String railtimeId) {
 		super(name);
-		setRailtimeId(railtimeId);
+		this.railtimeId = railtimeId;
 	}
 	
 	@Override
@@ -53,7 +59,7 @@ public class RailtimeStation extends Station {
 	
 	@Override
 	public String toString() {
-		return new StringBuilder("Station: ") //
+		return new StringBuilder("RailtimeStation: ") //
 				.append("{ ") //
 				.append("id: ").append(id).append(", ") //
 				.append("railtimeId: ").append(railtimeId).append(", ") //
@@ -63,16 +69,7 @@ public class RailtimeStation extends Station {
 				.append(" }").toString();
 	}
 
-	@Override
-	public RailtimeStation clone() {
-		return (RailtimeStation) super.clone();
-	}
-
 	public String getRailtimeId() {
 		return railtimeId;
-	}
-
-	public void setRailtimeId(final String railtimeId) {
-		this.railtimeId = railtimeId;
 	}
 }

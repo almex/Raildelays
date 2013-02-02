@@ -40,7 +40,7 @@ public class LineStopJpaDaoIT {
 	@Test
 	@Transactional
 	public void createTest() {
-		assertNotNull("Creation should return a result", lineStopDao.save(new LineStop(new Date(), new Train("466"), new Station("Liège-Guillemins"), new TimestampDelay(), new TimestampDelay())));
+		assertNotNull("Creation should return a result", lineStopDao.save(new LineStop(new Date(), new Train("466"), new Station("Liège-Guillemins"), new TimestampDelay(), new TimestampDelay(), false)));
 	}
 	
 	@Test
@@ -49,7 +49,7 @@ public class LineStopJpaDaoIT {
 		//Assert.assertNull("No data should get back.", lineStopDao.retrieveLineStop("466", new java.sql.Date(new Date().getTime())));
 		Date date = new Date();
 		Train train = trainDao.saveAndFlush(new Train("466"));
-		LineStop expectedLineStop = lineStopDao.save(new LineStop(date, train, new Station("Liège-Guillemins"), new TimestampDelay(), new TimestampDelay()));
+		LineStop expectedLineStop = lineStopDao.save(new LineStop(date, train, new Station("Liège-Guillemins"), new TimestampDelay(), new TimestampDelay(), false));
 		List<LineStop> lineStops = lineStopDao.findByTrainAndDate(train, date);
 		
 		assertEquals("You should have a certain number of results.", 1, lineStops.size());

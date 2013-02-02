@@ -28,7 +28,7 @@ public class Direction implements Serializable {
 	private String libelle;
 	
 	public Direction (Train train) {
-		this.setTrain(train);
+		this.train = train;
 	}
 	
 	@Override

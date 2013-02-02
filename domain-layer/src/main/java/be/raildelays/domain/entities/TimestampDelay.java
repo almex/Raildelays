@@ -24,10 +24,10 @@ public class TimestampDelay implements Serializable, Cloneable {
 
 	@Temporal(TemporalType.TIME)
 	@NotNull
-	protected Date expected;
+	protected final Date expected;
 
 	@NotNull
-	protected Long delay; // in number of milliseconds
+	protected final Long delay; // in number of milliseconds
 
 	/**
 	 * Default constructor.
@@ -45,9 +45,8 @@ public class TimestampDelay implements Serializable, Cloneable {
 	 * @param delay
 	 *            delay in milliseconds
 	 */
-	public TimestampDelay(Date expected, Long delay) {
-		this();
-		this.expected = expected;
+	public TimestampDelay(final Date expected, final Long delay) {
+		this.expected = (Date) (expected != null ? expected.clone() : null);
 		this.delay = delay;
 	}
 
@@ -91,33 +90,12 @@ public class TimestampDelay implements Serializable, Cloneable {
 				.append(delay) //
 				.toHashCode();
 	}
-	
-	@Override
-	public TimestampDelay clone() {		
-		try {
-			TimestampDelay timestampDelay = (TimestampDelay) super.clone();
-			
-			timestampDelay.expected = (Date) (expected != null ? expected.clone() : null);
-	
-			return timestampDelay;
-		} catch (CloneNotSupportedException e) {
-			throw new AssertionError("Parent class doesn't support clone", e);
-		}
-	}
 
 	public final Date getExpected() {
 		return (Date) (expected != null ? expected.clone() : null);
 	}
 
-	public final void setExpected(Date expected) {
-		this.expected = (Date) (expected != null ? expected.clone() : null);
-	}
-
 	public final Long getDelay() {
 		return delay;
-	}
-
-	public final void setDelay(Long delay) {
-		this.delay = delay;
 	}
 }

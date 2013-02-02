@@ -16,7 +16,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
- * Entity representing a train station.
+ * Immutable entity defining a train station.
  * 
  * Uniqueness is based on the English name (i.e. : business key).
  * 
@@ -31,16 +31,17 @@ public class Station implements Serializable, Cloneable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.TABLE)
-	protected Long id;
+	protected final Long id;
 
 	@Column(updatable = false, unique = true)
 	@NotNull
-	protected String englishName;
+	protected final String englishName;
 
-	protected String frenchName;
+	protected final String frenchName;
 
-	protected String dutchName;
+	protected final String dutchName;
 
+	// Already implemented for future use
 	protected Station() {
 		this.id = null;
 		this.englishName = "";
@@ -48,9 +49,16 @@ public class Station implements Serializable, Cloneable {
 		this.frenchName = "";
 	}
 
-	public Station(String name) {
-		this();
-		setEnglishName(name);
+	/**
+	 * Initialization constructor.
+	 * 
+	 * @param name English name for this train station.
+	 */
+	public Station(final String name) {
+		this.id = null;
+		this.englishName = name;
+		this.dutchName = "";
+		this.frenchName = "";
 	}
 
 	@Override
@@ -91,15 +99,6 @@ public class Station implements Serializable, Cloneable {
 				.toHashCode();
 	}
 
-	@Override
-	public Station clone() {		
-		try {	
-			return (Station) super.clone();
-		} catch (CloneNotSupportedException e) {
-			throw new AssertionError("Parent class doesn't support clone", e);
-		}
-	}
-
 	public Long getId() {
 		return id;
 	}
@@ -108,24 +107,12 @@ public class Station implements Serializable, Cloneable {
 		return englishName;
 	}
 
-	public void setEnglishName(final String englishName) {
-		this.englishName = englishName;
-	}
-
 	public String getFrenchName() {
 		return frenchName;
 	}
 
-	public void setFrenchName(final String frenchName) {
-		this.frenchName = frenchName;
-	}
-
 	public String getDutchName() {
 		return dutchName;
-	}
-
-	public void setDutchName(final String dutchName) {
-		this.dutchName = dutchName;
 	}
 
 }

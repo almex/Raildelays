@@ -6,6 +6,9 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
 
+	<!-- Needed if w use a AutomaticJobRegistrar -->
+	<context:annotation-config />
+
 	<batch:job id="grabDelaysFromRailtime" restartable="true">
 		<batch:step id="step1" next="step2">
 			<batch:tasklet transaction-manager="batchTransactionManager">

@@ -14,7 +14,7 @@ public class Train implements Serializable {
 	private String idRailtime;
 
 	public Train(String idRailtime) {
-		this.setIdRailtime(idRailtime);
+		this.idRailtime = idRailtime;
 	}
 
 	public String getIdRailtime() {

@@ -1,10 +1,11 @@
 package be.raildelays.batch;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.time.DateUtils;
@@ -19,18 +20,16 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobExecutionNotRunningException;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobInstanceAlreadyExistsException;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.NoSuchJobExecutionException;
+import org.springframework.batch.core.launch.NoSuchJobInstanceException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import be.raildelays.domain.entities.LineStop;
-import be.raildelays.domain.entities.Station;
 
 public class Bootstrap {
 
@@ -42,16 +41,9 @@ public class Bootstrap {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		String[] contextPaths = new String[] {
-				"/spring/batch/raildelays-batch-integration-context.xml",
-				"/jobs/batch-jobs-context.xml" };
+		String[] contextPaths = new String[] { "/spring/batch/raildelays-batch-integration-context.xml" };
 		SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy");
-		Calendar oneWeekBefore = Calendar.getInstance();
-		oneWeekBefore.add(Calendar.DAY_OF_MONTH, -7);
-		oneWeekBefore = DateUtils
-				.truncate(oneWeekBefore, Calendar.DAY_OF_MONTH);
-		Iterator<?> iterator = DateUtils.iterator(oneWeekBefore,
-				DateUtils.RANGE_WEEK_RELATIVE);
+		List<Date> dates = generateListOfDates();
 
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(
 				contextPaths);
@@ -60,46 +52,35 @@ public class Bootstrap {
 		try {
 
 			if (args.length == 0) {
-				JobLauncher jobLauncher = ctx.getBean(JobLauncher.class);
 				JobRegistry jobRegistry = ctx.getBean(JobRegistry.class);
 				JobExplorer jobExplorer = ctx.getBean(JobExplorer.class);
 				JobOperator jobOperator = ctx.getBean(JobOperator.class);
 				JobRepository jobRepository = ctx.getBean(JobRepository.class);
 				Job job = ctx.getBean(Job.class);
-				
+
 				recover(jobRegistry, jobExplorer, jobRepository, jobOperator);
-				
-				while (iterator.hasNext()) {
-					Calendar calendar = (Calendar) iterator.next();
-					jobOperator
-							.start(job.getName(),
-									"input.file.path=train-list.properties,"
-											+ "date="
-											+ formater.format(calendar
-													.getTime())
-											+ ","
-											+ "station.a.name=Liège-Guillemins,"
-											+ "station.b.name=Brussels (Bruxelles)-Central,"
-											+ "output.file.path=file:./output.dat");
+
+				for (Date date : dates) {
+					StringBuilder parameters = new StringBuilder();
+
+					parameters.append("input.file.path=train-list.properties,");
+					parameters.append("date=");
+					parameters.append(formater.format(date));
+					parameters.append(",");
+					parameters.append("station.a.name=Liège-Guillemins,");
+					parameters
+							.append("station.b.name=Brussels (Bruxelles)-Central,");
+					parameters.append("output.file.path=file:./output.dat");
+
+					try {
+						jobOperator.start(job.getName(), parameters.toString());
+					} catch (JobInstanceAlreadyExistsException e) {
+						LOGGER.info(
+								"Job '{}' already exists with thoses parameters: {}",
+								job.getName(), parameters.toString());
+					}
 				}
 			}
-			/*
-			 * RaildelaysService service = ctx.getBean(RaildelaysService.class);
-			 * LOGGER.debug("Searching delays...");
-			 * 
-			 * iterator = DateUtils.iterator(oneWeekBefore,
-			 * DateUtils.RANGE_WEEK_RELATIVE);
-			 * 
-			 * while (iterator.hasNext()) { Calendar calendar = (Calendar)
-			 * iterator.next(); Set<LineStop> stops = new HashSet<LineStop>();
-			 * Station sationA = new Station("Liège-Guillemins"); Station
-			 * stationB = new Station("Brussels (Bruxelles)-Central");
-			 * 
-			 * stops.addAll(service.searchDelaysBetween(calendar.getTime(),
-			 * sationA, stationB, 15));
-			 * 
-			 * print(stops, sationA, stationB); }
-			 */
 
 		} finally {
 			if (ctx != null) {
@@ -111,34 +92,100 @@ public class Bootstrap {
 		System.exit(0);
 	}
 
-	private static Long recover(JobRegistry jobRegistry,
+	/**
+	 * Generate a list of day of week from today to 7 in the past.
+	 * 
+	 * @return a list of {@link Date} from Monday to Friday.
+	 */
+	private static List<Date> generateListOfDates() {
+		List<Date> result = new ArrayList<>();
+		Date today = DateUtils.truncate(new Date(), Calendar.DAY_OF_MONTH);
+		Date monday = null;
+		Date tuesday = null;
+		Date wednesday = null;
+		Date thursday = null;
+		Date friday = null;
+
+		for (int i = -8; i < 0; i++) {
+			Calendar date = DateUtils.toCalendar(DateUtils.addDays(today, i));
+
+			switch (date.get(Calendar.DAY_OF_WEEK)) {
+			case Calendar.MONDAY:
+				monday = date.getTime();
+				break;
+			case Calendar.TUESDAY:
+				tuesday = date.getTime();
+				break;
+			case Calendar.WEDNESDAY:
+				wednesday = date.getTime();
+				break;
+			case Calendar.THURSDAY:
+				thursday = date.getTime();
+				break;
+			case Calendar.FRIDAY:
+				friday = date.getTime();
+				break;
+			default:
+				break;
+			}
+		}
+
+		result.add(monday);
+		result.add(tuesday);
+		result.add(wednesday);
+		result.add(thursday);
+		result.add(friday);
+
+		return result;
+	}
+
+	/**
+	 * This method must be call before any start of a job to recover
+	 * inconsitency within batch job repository due to an unproper shutdown.
+	 * 
+	 * @param jobRegistry
+	 * @param jobExplorer
+	 * @param jobRepository
+	 * @param jobOperator
+	 * @throws NoSuchJobException
+	 * @throws NoSuchJobExecutionException
+	 * @throws JobExecutionNotRunningException
+	 * @throws InterruptedException
+	 * @throws JobExecutionAlreadyRunningException
+	 * @throws JobInstanceAlreadyCompleteException
+	 * @throws JobRestartException
+	 * @throws JobParametersInvalidException
+	 * @throws NoSuchJobInstanceException
+	 */
+	private static void recover(JobRegistry jobRegistry,
 			JobExplorer jobExplorer, JobRepository jobRepository,
 			JobOperator jobOperator) throws NoSuchJobException,
 			NoSuchJobExecutionException, JobExecutionNotRunningException,
 			InterruptedException, JobExecutionAlreadyRunningException,
 			JobInstanceAlreadyCompleteException, JobRestartException,
-			JobParametersInvalidException {
+			JobParametersInvalidException, NoSuchJobInstanceException {
 		Collection<String> jobNames = jobRegistry.getJobNames();
 
-		Long lastJobExectutionId = null;
 		for (String jobName : jobNames) {
-			System.out.println("Searching to recover jobName=" + jobName);
+			LOGGER.info("Searching to recover jobName={}", jobName);
 
+			// -- Retrieve all jobs marked as STARTED or STOPPING
 			Set<Long> jobExecutionIds = jobOperator
 					.getRunningExecutions(jobName);
 
-			lastJobExectutionId = null;
+			// -- Set incoherent running jobs as FAILED
 			for (Long jobExecutionId : jobExecutionIds) {
-				System.out
-						.println("Found a job already running jobExecutionId="
-								+ lastJobExectutionId + "...");
+				LOGGER.info("Found a job already running jobExecutionId={}...",
+						jobExecutionId);
 
+				// -- Set Job Execution as FAILED
 				JobExecution jobExecution = jobExplorer
 						.getJobExecution(jobExecutionId);
 				jobExecution.setEndTime(new Date());
 				jobExecution.setStatus(BatchStatus.FAILED);
 				jobExecution.setExitStatus(ExitStatus.FAILED);
 
+				// -- Set all running Step Execution as FAILED
 				for (StepExecution stepExecution : jobExecution
 						.getStepExecutions()) {
 					if (stepExecution.getStatus().isRunning()) {
@@ -149,25 +196,49 @@ public class Bootstrap {
 				}
 
 				jobRepository.update(jobExecution);
-				System.out.println("Setted job as FAILED!");
-
-				lastJobExectutionId = jobExecutionId;
-
-				System.out.println("Restarting jobExecutionId="
-						+ jobExecutionId + "...");
-
-				jobOperator.restart(jobExecutionId);
+				LOGGER.info("Setted job as FAILED!");
 			}
-		}
 
-		return lastJobExectutionId;
+			restartFailedJobs(jobExplorer, jobOperator, jobName);
+		}
 	}
 
-	private static void print(Collection<LineStop> stops, Station departure,
-			Station arrival) {
-		for (LineStop stop : stops) {
-			LOGGER.info(stop.toStringAll());
-			LOGGER.info("=================================");
+	private static void restartFailedJobs(JobExplorer jobExplorer,
+			JobOperator jobOperator, String jobName) throws NoSuchJobException,
+			JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
+			JobRestartException, JobParametersInvalidException,
+			NoSuchJobInstanceException {
+		final Date sevenDaysBefore = DateUtils.addDays(new Date(), -7);
+
+		// -- We are retrieving ten per ten job instances
+		final int count = 10;
+		for (int start = 0;; start += count) {
+			List<Long> jobInstanceIds = jobOperator.getJobInstances(jobName,
+					start, count);
+
+			for (Long jobInstanceId : jobInstanceIds) {
+				List<Long> jobExecutionIds = jobOperator
+						.getExecutions(jobInstanceId);
+
+				for (Long jobExecutionId : jobExecutionIds) {
+					JobExecution jobExecution = jobExplorer
+							.getJobExecution(jobExecutionId);
+
+					// We will not search batch jobs older than 7 days
+					if (jobExecution.getCreateTime().before(sevenDaysBefore)) {
+						return;
+					}
+
+					// Restartable jobs are FAILED or STOPPED
+					if (jobExecution.getStatus().equals(BatchStatus.FAILED)
+							|| jobExecution.getStatus().equals(
+									BatchStatus.STOPPED)) {
+						LOGGER.info("Restarting jobExecutionId={}...",
+								jobExecutionId);
+						jobOperator.restart(jobExecutionId);
+					}
+				}
+			}
 		}
 	}
 

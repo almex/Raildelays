@@ -40,27 +40,30 @@ public class FilterTwoDelaysPerDayProcessorTest {
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		
 		//      1         ->      A          ->      2          ->    B            ->      3
-		// 12:00-12:05(5) -> 12:20-12:25(10) -> 12:45-12:50(15) -> 12:55-13:00(20) -> 13:45-<null>(25) 
+		// 12:00-12:05(5) -> 12:20-12:25(10) -> 12:45-12:50(15) -> 12:55-13:00(20) -> 13:45-<null>(25)
+		TimestampDelay arrivalTime;
+		TimestampDelay departureTime;
+		
+		arrivalTime = new TimestampDelay(f.parse("12:00"), 5L);
+		departureTime = new TimestampDelay(f.parse("12:05"), 5L);		
 		LineStop stop1 = new LineStop(today, new Train("466"), new Station(
-				"station1"));
-		stop1.setArrivalTime(new TimestampDelay(f.parse("12:00"), 5L));
-		stop1.setDepartureTime(new TimestampDelay(f.parse("12:05"), 5L));
+				"station1"), arrivalTime, departureTime, false);
+		arrivalTime = new TimestampDelay(f.parse("12:20"), 10L);
+		departureTime = new TimestampDelay(f.parse("12:25"), 10L);
 		LineStop stopA = new LineStop(today, new Train("466"), new Station(
-				"stationA"), stop1);
-		stopA.setArrivalTime(new TimestampDelay(f.parse("12:20"), 10L));
-		stopA.setDepartureTime(new TimestampDelay(f.parse("12:25"), 10L));
+				"stationA"), arrivalTime, departureTime, false, stop1);
+		arrivalTime = new TimestampDelay(f.parse("12:45"), 15L);
+		departureTime = new TimestampDelay(f.parse("12:50"), 15L);
 		LineStop stop2 = new LineStop(today, new Train("466"), new Station(
-				"station2"), stopA);
-		stop2.setArrivalTime(new TimestampDelay(f.parse("12:45"), 15L));
-		stop2.setDepartureTime(new TimestampDelay(f.parse("12:50"), 15L));
+				"station2"), arrivalTime, departureTime, false, stopA);
+		arrivalTime = new TimestampDelay(f.parse("12:55"), 20L);
+		departureTime = new TimestampDelay(f.parse("13:00"), 20L);
 		LineStop stopB = new LineStop(today, new Train("466"), new Station(
-				"stationB"), stop2);
-		stopB.setArrivalTime(new TimestampDelay(f.parse("12:55"), 20L));
-		stopB.setDepartureTime(new TimestampDelay(f.parse("13:00"), 20L));
+				"stationB"), arrivalTime, departureTime, false, stop2);
+		arrivalTime = new TimestampDelay(f.parse("13:45"), 25L);
+		departureTime = null;
 		LineStop stop3 = new LineStop(today, new Train("466"), new Station(
-				"station3"), stopB);
-		stop3.setArrivalTime(new TimestampDelay(f.parse("13:45"), 25L));
-		stop3.setDepartureTime(null);
+				"station3"), arrivalTime, departureTime, false, stopB);
 
 		fromA = new ArrayList<>();
 		fromA.add(stopA);

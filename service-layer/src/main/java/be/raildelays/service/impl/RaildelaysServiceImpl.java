@@ -70,7 +70,8 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 		// -- Validate our inputs
 		validator.validate(routeLog);
 
-		return persist(routeLog.getDate(), routeLog.getTrainId(), routeLog.getStops());
+		return persist(routeLog.getDate(), routeLog.getTrainId(),
+				routeLog.getStops());
 	}
 
 	private List<LineStop> persist(final Date date, final String trainId,
@@ -108,12 +109,14 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 				trainId, trainId));
 		Station persistedStation = saveOrRetrieveStation(new Station(
 				stop.getStationName()));
+		TimestampDelay arrivalTime = new TimestampDelay(stop.getArrivalTime(),
+				stop.getArrivalDelay());
+		TimestampDelay departureTime = new TimestampDelay(
+				stop.getDepartureTime(), stop.getDepartureDelay());
 		LineStop lineStop = new LineStop(date, persistedTrain,
-				persistedStation, previous);
+				persistedStation, arrivalTime, departureTime,
+				stop.isCanceled(), previous);
 
-		lineStop.setArrivalTime(new TimestampDelay(stop.getArrivalTime(), stop.getArrivalDelay()));
-		lineStop.setDepartureTime(new TimestampDelay(stop.getDepartureTime(), stop.getDepartureDelay()));
-		
 		// -- Validate our output
 		validator.validate(lineStop);
 
@@ -168,13 +171,13 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 	@Override
 	public List<Date> searchAllDates(Date date) {
 		List<Date> result = null;
-		
+
 		if (date == null) {
 			result = lineStopDao.findAllUniqueDates();
 		} else {
 			result = lineStopDao.findAllUniqueDates(date);
 		}
-		
+
 		return result;
 	}
 

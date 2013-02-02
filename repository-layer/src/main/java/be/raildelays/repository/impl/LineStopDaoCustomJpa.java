@@ -27,7 +27,7 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 								+ "AND o.date = :date "
 								+ "AND o.departureTime.delay IS NOT NULL "
 								+ "AND o.departureTime.delay >= :delayThreshold ")
-				.setParameter("delayThreshold", new Long(delayThreshold))
+				.setParameter("delayThreshold", Long.valueOf(delayThreshold))
 				.setParameter("date", date, TemporalType.DATE)
 				.setParameter("stationName", station.getEnglishName())
 				.getResultList();
@@ -45,7 +45,7 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 								+ "AND o.date = :date "
 								+ "AND o.arrivalTime.delay IS NOT NULL "
 								+ "AND o.arrivalTime.delay >= :delayThreshold ")
-				.setParameter("delayThreshold", new Long(delayThreshold))
+				.setParameter("delayThreshold", Long.valueOf(delayThreshold))
 				.setParameter("date", date, TemporalType.DATE)
 				.setParameter("stationName", station.getEnglishName())
 				.getResultList();

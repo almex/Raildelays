@@ -21,7 +21,7 @@ public class Step extends Stop implements Serializable, Comparable<Step> {
 			Long delay, boolean canceled) {
 		super(stationName, timestamp);
 		this.ordinance = ordinance;
-		this.setDelay(delay);
+		this.delay = delay;
 		this.canceled = canceled;
 	}
 

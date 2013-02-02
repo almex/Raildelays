@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
 
-import be.raildelays.batch.reader.CompositeRailtimeItemReader;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
@@ -26,7 +25,7 @@ public class FilterTwoDelaysPerDayProcessor implements
 			.getLogger(FilterTwoDelaysPerDayProcessor.class);
 
 	@Resource
-	Validator validator;
+	private Validator validator;
 
 	private String stationA;
 

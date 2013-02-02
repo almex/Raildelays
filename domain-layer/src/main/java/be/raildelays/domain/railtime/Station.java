@@ -14,7 +14,7 @@ public class Station implements Serializable {
 	private String name;
 
 	public Station(String name) {
-		this.setName(name);
+		this.name = name;
 	}
 
 	public String getName() {

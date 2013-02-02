@@ -16,8 +16,8 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
- * Entity that represent a train. Unicity of a train is done on the English
- * name.
+ * Immutable entity defining a train. 
+ * Unicity of a train is done on the English name.
  * 
  * @author Almex
  * @see Entity
@@ -25,21 +25,21 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 @Entity
 @Table(name = "TRAIN")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public class Train implements Serializable, Cloneable {
+public class Train implements Serializable {
 
 	private static final long serialVersionUID = -1527666012499664304L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.TABLE)
-	protected Long id;
+	protected final Long id;
 
 	@Column(updatable = false, unique = true)
 	@NotNull
-	protected String englishName;
+	protected final String englishName;
 
-	protected String frenchName;
+	protected final String frenchName;
 
-	protected String dutchName;
+	protected final String dutchName;
 
 	protected Train() {
 		this.id = null;
@@ -47,14 +47,23 @@ public class Train implements Serializable, Cloneable {
 		this.dutchName = "";
 		this.frenchName = "";
 	}
-	
-	protected Train(Train train) {
+
+	@SuppressWarnings("unused")
+	// Already implemented for future use
+	private Train(Train train) {
 		this();
 	}
 
+	/**
+	 * Initialization constructor.
+	 * 
+	 * @param name English name for this train
+	 */
 	public Train(String name) {
-		this();
+		this.id = null;
 		this.englishName = name;
+		this.dutchName = "";
+		this.frenchName = "";
 	}
 
 	@Override
@@ -95,15 +104,6 @@ public class Train implements Serializable, Cloneable {
 				.append(" }").toString();
 	}
 
-	@Override
-	public Train clone() {		
-		try {
-			return (Train) super.clone();
-		} catch (CloneNotSupportedException e) {
-			throw new AssertionError("Parent class doesn't support clone", e);
-		}
-	}
-
 	public Long getId() {
 		return id;
 	}
@@ -112,23 +112,11 @@ public class Train implements Serializable, Cloneable {
 		return englishName;
 	}
 
-	public void setEnglishName(String englishName) {
-		this.englishName = englishName;
-	}
-
 	public String getFrenchName() {
 		return frenchName;
 	}
 
-	public void setFrenchName(String frenchName) {
-		this.frenchName = frenchName;
-	}
-
 	public String getDutchName() {
 		return dutchName;
-	}
-
-	public void setDutchName(String dutchName) {
-		this.dutchName = dutchName;
 	}
 }

@@ -3,7 +3,6 @@ package be.raildelays.repository;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
 
 import javax.sql.DataSource;
 
@@ -12,10 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.util.Assert;
 
 public class LoadDatabase implements InitializingBean {
@@ -37,54 +33,25 @@ public class LoadDatabase implements InitializingBean {
 
 	public void startUp() throws InstantiationException,
 			IllegalAccessException, ClassNotFoundException, SQLException {
-		/*Properties properties = new Properties();
-		Connection connection = null;
-		
-		LOGGER.debug("Loading database '" + databaseName + "'...");
-
-		properties.put("hibernate.dialect",
-				"org.hibernate.dialect.DerbyTenSevenDialect");
-
-		Class.forName("org.apache.derby.jdbc.EmbeddedDriver").newInstance();
-
-		LOGGER.debug("Driver loaded!");*/
-
-		/*try {
-			DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition(
-					TransactionDefinition.PROPAGATION_SUPPORTS);
-			transactionDefinition
-					.setIsolationLevel(TransactionDefinition.ISOLATION_SERIALIZABLE);
-			transactionDefinition.setReadOnly(false);
-
-			connection = DriverManager.getConnection("jdbc:derby:"
-					+ databaseName + ";create=true", properties);
-			//connection.setAutoCommit(false);
-
-			DataSourceUtils.prepareConnectionForTransaction(connection,
-					transactionDefinition);
-
-			LOGGER.debug("Connexion created!");*/
 
 			initDatabase(dataSource.getConnection());
-		/*} finally {
-			if (connection != null) {
-				connection.close();
-			}
-			shutdown();
-		}*/
-
 	}
 
-	private void shutdown() throws SQLException {
+	public void shutdown() throws SQLException {
 		LOGGER.debug("Shutting down database...");
+		Connection connection = null;
 		try {
-			DriverManager.getConnection("jdbc:derby:" + databaseName
+			connection = DriverManager.getConnection("jdbc:derby:" + databaseName
 					+ ";shutdown=true");
 		} catch (SQLException e) {
 			// The message say erroCode=08006 but e.getErrorCode() return 45000 don't know why...
 			// So I do it dirty and swallow the exception instead of filtering  the right error code
 			LOGGER.debug("erroCode={}", e.getErrorCode());
 			LOGGER.debug("Database '{}' shutdown!", databaseName);
+		} finally{
+			if (connection != null) {
+				connection.close();
+			}
 		}
 
 	}
@@ -104,13 +71,15 @@ public class LoadDatabase implements InitializingBean {
 
 			try {
 				LOGGER.debug("Loading script={} ...", initScriptPath);
-//				 DatabasePopulatorUtils.execute(databasePopulator,
-//						 datatsource);
 				databasePopulator.populate(connection);
 			} catch (Exception e) {
 				LOGGER.warn(
 						"Exception occured during database initilization : {}",
 						e.getMessage());
+			} finally{
+				if (connection != null) {
+					connection.close();
+				}
 			}
 		}
 	}

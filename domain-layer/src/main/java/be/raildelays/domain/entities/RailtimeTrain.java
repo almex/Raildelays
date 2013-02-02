@@ -6,27 +6,33 @@ import javax.persistence.Entity;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
+/**
+ * Immutable entity of a {@link Train} specific to Railtime portal.
+ * 
+ * @author Almex
+ */
 @Entity
 public class RailtimeTrain extends Train {
 
 	private static final long serialVersionUID = -7755979419472957633L;
-	
-	@Column(unique=true)	
-	private String railtimeId;
-	
-	protected RailtimeTrain() {
+
+	@Column(unique = true)
+	private final String railtimeId;
+
+	@SuppressWarnings("unused")
+	private RailtimeTrain() {
 		super();
 		this.railtimeId = "";
 	}
-	
-	public RailtimeTrain(String name, String railtimeId) {
+
+	public RailtimeTrain(final String name, final String railtimeId) {
 		super(name);
-		setRailtimeId(railtimeId);
+		this.railtimeId = railtimeId;
 	}
 
 	@Override
 	public String toString() {
-		return new StringBuilder("Train: ") //
+		return new StringBuilder("RailtimeTrain: ") //
 				.append("{ ") //
 				.append("id: ").append(id).append(", ") //
 				.append("railtimeId: ").append(railtimeId).append(", ") //
@@ -63,17 +69,8 @@ public class RailtimeTrain extends Train {
 				.toHashCode();
 	}
 
-	@Override
-	public RailtimeTrain clone() {
-		return (RailtimeTrain) super.clone();
-	}
-
 	public String getRailtimeId() {
 		return railtimeId;
-	}
-
-	public void setRailtimeId(final String railtimeId) {
-		this.railtimeId = railtimeId;
 	}
 
 }

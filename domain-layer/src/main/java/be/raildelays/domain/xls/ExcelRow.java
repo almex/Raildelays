@@ -3,6 +3,21 @@ package be.raildelays.domain.xls;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang.StringUtils;
 
 import be.raildelays.domain.Sens;
@@ -14,34 +29,77 @@ import be.raildelays.domain.entities.Train;
  * 
  * @author Almex
  */
-public class ExcelRow {	
-	
-	private Date date;
-	
-	private Station arrivalStation;	
+@Entity
+@Table(name = "EXCEL_ROW", uniqueConstraints = @UniqueConstraint(columnNames = {
+		"DATE", "SENS" }))
+public class ExcelRow {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.TABLE)
+	@Column(name = "ID")
+	private Long id;
+
+	@Temporal(TemporalType.DATE)
+	@Column(name = "DATE")
+	@NotNull
+	private Date date;
+
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "ARRIVAL_STATION_ID")
+	@NotNull
+	private Station arrivalStation;
+
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "DEPARTURE_STATION_ID")
+	@NotNull
 	private Station departureStation;
 
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "LINK_STATION_ID")
 	private Station linkStation;
-	
-	private Date expectedDepartureHour;
-	
-	private Date expectedArrivalHour;
-	
+
+	@Temporal(TemporalType.TIME)
+	@Column(name = "EXPECTED_DEPARTURE_TIME")
+	@NotNull
+	private Date expectedDepartureTime;
+
+	@Temporal(TemporalType.TIME)
+	@Column(name = "EXPECTED_ARRIVAL_TIME")
+	@NotNull
+	private Date expectedArrivalTime;
+
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "EXPEXTED_TRAIN1_ID")
+	@NotNull
 	private Train expectedTrain1;
-	
+
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "EXPEXTED_TRAIN2_ID")
 	private Train expectedTrain2;
-	
-	private Date effectiveDepartureHour;
-	
-	private Date effectiveArrivalHour;
-	
+
+	@Temporal(TemporalType.TIME)
+	@Column(name = "EFFECTIVE_DEPARTURE_TIME")
+	@NotNull
+	private Date effectiveDepartureTime;
+
+	@Temporal(TemporalType.TIME)
+	@Column(name = "EFFECTIVE_ARRIVAL_TIME")
+	@NotNull
+	private Date effectiveArrivalTime;
+
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "EFFECTIVE_TRAIN1_ID")
+	@NotNull
 	private Train effectiveTrain1;
-	
+
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "EFFECTIVE_TRAIN2_ID")
 	private Train effectiveTrain2;
-	
-	private long delay;
-	
+
+	@Column(name = "DELAY")
+	private Long delay;
+
+	@Column(name = "SENS")
 	private Sens sens;
 
 	public Date getDate() {
@@ -77,19 +135,19 @@ public class ExcelRow {
 	}
 
 	public Date getExpectedDepartureHour() {
-		return expectedDepartureHour;
+		return expectedDepartureTime;
 	}
 
 	public void setExpectedDepartureHour(Date expectedDepartureHour) {
-		this.expectedDepartureHour = expectedDepartureHour;
+		this.expectedDepartureTime = expectedDepartureHour;
 	}
 
 	public Date getExpectedArrivalHour() {
-		return expectedArrivalHour;
+		return expectedArrivalTime;
 	}
 
 	public void setExpectedArrivalHour(Date expectedArrivalHour) {
-		this.expectedArrivalHour = expectedArrivalHour;
+		this.expectedArrivalTime = expectedArrivalHour;
 	}
 
 	public Train getExpectedTrain1() {
@@ -109,19 +167,19 @@ public class ExcelRow {
 	}
 
 	public Date getEffectiveDepartureHour() {
-		return effectiveDepartureHour;
+		return effectiveDepartureTime;
 	}
 
 	public void setEffectiveDepartureHour(Date effectiveDepartureHour) {
-		this.effectiveDepartureHour = effectiveDepartureHour;
+		this.effectiveDepartureTime = effectiveDepartureHour;
 	}
 
 	public Date getEffectiveArrivalHour() {
-		return effectiveArrivalHour;
+		return effectiveArrivalTime;
 	}
 
 	public void setEffectiveArrivalHour(Date effectiveArrivalHour) {
-		this.effectiveArrivalHour = effectiveArrivalHour;
+		this.effectiveArrivalTime = effectiveArrivalHour;
 	}
 
 	public Train getEffectiveTrain1() {
@@ -156,12 +214,16 @@ public class ExcelRow {
 		this.sens = sens;
 	}
 
+	public Long getId() {
+		return id;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 		SimpleDateFormat tf = new SimpleDateFormat("HH:mm");
-		
+
 		builder.append(df.format(date));
 		builder.append(" ");
 		builder.append(notNullToString(departureStation));
@@ -170,17 +232,17 @@ public class ExcelRow {
 		builder.append(" ");
 		builder.append(notNullToString(linkStation));
 		builder.append(" ");
-		builder.append(tf.format(expectedDepartureHour));
+		builder.append(tf.format(expectedDepartureTime));
 		builder.append(" ");
-		builder.append(tf.format(expectedArrivalHour));
+		builder.append(tf.format(expectedArrivalTime));
 		builder.append(" ");
 		builder.append(notNullToString(expectedTrain1));
 		builder.append(" ");
 		builder.append(notNullToString(expectedTrain2));
 		builder.append(" ");
-		builder.append(tf.format(effectiveDepartureHour));
+		builder.append(tf.format(effectiveDepartureTime));
 		builder.append(" ");
-		builder.append(tf.format(effectiveArrivalHour));
+		builder.append(tf.format(effectiveArrivalTime));
 		builder.append(" ");
 		builder.append(notNullToString(effectiveTrain1));
 		builder.append(" ");
@@ -189,38 +251,38 @@ public class ExcelRow {
 		builder.append(delay);
 		builder.append(" ");
 		builder.append(sens);
-		
+
 		return builder.toString();
 	}
-	
-	private static String notNullToString(Station station) { 
+
+	private static String notNullToString(Station station) {
 		String result = "";
-		
+
 		if (station != null) {
 			result = notNullToString(station.getEnglishName());
 		}
-		
+
 		return result;
 	}
-	
-	private static String notNullToString(Train train) { 
+
+	private static String notNullToString(Train train) {
 		String result = "";
-		
+
 		if (train != null) {
 			result = notNullToString(train.getEnglishName());
 		}
-		
+
 		return result;
 	}
-	
+
 	private static String notNullToString(Object obj) {
 		String result = "";
-		
+
 		if (obj != null) {
 			result = StringUtils.trimToEmpty(obj.toString());
 		}
-		
+
 		return result;
 	}
-	
+
 }

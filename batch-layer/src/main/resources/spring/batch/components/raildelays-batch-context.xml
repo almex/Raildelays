@@ -18,21 +18,21 @@
 		<property name="jobRegistry" ref="jobRegistry" />
 	</bean>
 
-<!-- 	<bean -->
-<!-- 		class="org.springframework.batch.core.configuration.support.AutomaticJobRegistrar"> -->
-<!-- 		<property name="applicationContextFactories"> -->
-<!-- 			<bean -->
-<!-- 				class="org.springframework.batch.core.configuration.support.ClasspathXmlApplicationContextsFactoryBean"> -->
-<!-- 				<property name="resources" value="classpath:/**/*job*.xml" /> -->
-<!-- 			</bean> -->
-<!-- 		</property> -->
-<!-- 		<property name="jobLoader"> -->
-<!-- 			<bean -->
-<!-- 				class="org.springframework.batch.core.configuration.support.DefaultJobLoader"> -->
-<!-- 				<property name="jobRegistry" ref="jobRegistry" /> -->
-<!-- 			</bean> -->
-<!-- 		</property> -->
-<!-- 	</bean> -->
+	<bean
+		class="org.springframework.batch.core.configuration.support.AutomaticJobRegistrar">
+		<property name="applicationContextFactories">
+			<bean
+				class="org.springframework.batch.core.configuration.support.ClasspathXmlApplicationContextsFactoryBean">
+				<property name="resources" value="classpath:/**/*job*.xml" />
+			</bean>
+		</property>
+		<property name="jobLoader">
+			<bean
+				class="org.springframework.batch.core.configuration.support.DefaultJobLoader">
+				<property name="jobRegistry" ref="jobRegistry" />
+			</bean>
+		</property>
+	</bean>
 
 	<bean id="jobExplorer"
 		class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean"

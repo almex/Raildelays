@@ -44,46 +44,47 @@ public class LineStop implements Serializable, Cloneable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.TABLE)
 	@Column(name = "ID")
-	private Long id;
+	private final Long id;
 
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "TRAIN_ID")
 	@NotNull
-	private Train train;
+	private final Train train;
 
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "STATION_ID")
 	@NotNull
-	private Station station;
+	private final Station station;
 
 	@Column(name = "CANCELED")
-	private boolean canceled;
+	private final boolean canceled;
 
 	@Temporal(TemporalType.DATE)
 	@Column(name = "DATE")
 	@NotNull
-	private Date date;
+	private final Date date;
 
 	@Embedded
 	@AttributeOverrides({
 			@AttributeOverride(column = @Column(name = "ARRIVAL_TIME_EXPECTED"), name = "expected"),
 			@AttributeOverride(column = @Column(name = "ARRIVAL_TIME_DELAY"), name = "delay") })
-	private TimestampDelay arrivalTime;
+	private final TimestampDelay arrivalTime;
 
 	@Embedded
 	@AttributeOverrides({
 			@AttributeOverride(column = @Column(name = "DEPARTURE_TIME_EXPECTED"), name = "expected"),
 			@AttributeOverride(column = @Column(name = "DEPARTURE_TIME_DELAY"), name = "delay") })
-	private TimestampDelay departureTime;
+	private final TimestampDelay departureTime;
 
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "PREVIOUS_ID")
-	private LineStop previous;
+	private final LineStop previous;
 
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "NEXT_ID")
 	private LineStop next;
 
+	@SuppressWarnings("unused")
 	private LineStop() {
 		this.id = null;
 		this.train = null;
@@ -91,42 +92,33 @@ public class LineStop implements Serializable, Cloneable {
 		this.arrivalTime = null;
 		this.departureTime = null;
 		this.canceled = false;
-		this.date = new Date();
+		this.date = null;
+		this.previous = null;
+		this.next = null;
+		
 	}
 
 	public LineStop(final Date date, final Train train, final Station station,
 			final TimestampDelay arrivalTime, final TimestampDelay departureTime,
 			final boolean canceled, final LineStop previous) {
-		this();
+		this.id = null;
 		this.train = train;
 		this.station = station;
 		this.arrivalTime = arrivalTime;
 		this.departureTime = departureTime;
 		this.canceled = canceled;
-		this.date = date;
+		this.date = (Date) (date != null ? date.clone() : null);
 		if (previous != null) {
 			previous.next = this;
 		}
 		this.previous = previous;
+		this.next = null;
 	}
 
 	public LineStop(final Date date, final Train train, final Station station,
 			final TimestampDelay arrivalTime, final TimestampDelay departureTime,
 			final boolean canceled) {
 		this(date, train, station, arrivalTime, departureTime, canceled, null);
-	}
-
-	public LineStop(Date date, Train train, Station station,
-			TimestampDelay arrivalTime, TimestampDelay departureTime) {
-		this(date, train, station, arrivalTime, departureTime, false, null);
-	}
-
-	public LineStop(Date date, Train train, Station station, final LineStop previous) {
-		this(date, train, station, null, null, false, previous);
-	}
-
-	public LineStop(Date date, Train train, Station station) {
-		this(date, train, station, null, null, false, null);
 	}
 
 	@Override
@@ -214,89 +206,40 @@ public class LineStop implements Serializable, Cloneable {
 				.toHashCode();
 	}
 
-	@Override
-	public LineStop clone() {		
-		try {
-			LineStop result = (LineStop) super.clone();
-			
-			result.date = (Date) (date != null ? date.clone() : null);
-			result.train = train != null ? train.clone() : null;
-			result.station = station != null ? station.clone() : null;
-			result.arrivalTime = arrivalTime != null ? arrivalTime.clone() : null;
-			result.departureTime = departureTime != null ? departureTime.clone() : null;
-	
-			return result;
-		} catch (CloneNotSupportedException e) {
-			throw new AssertionError("Parent class doesn't support clone", e);
-		}
-	}
-
 	public Long getId() {
 		return id;
 	}
 
 	public TimestampDelay getArrivalTime() {
-		return arrivalTime != null ? arrivalTime.clone() : null;
-	}
-
-	public void setArrivalTime(final TimestampDelay arrivalTime) {
-		this.arrivalTime = arrivalTime != null ? arrivalTime.clone() : null;
+		return arrivalTime != null ? arrivalTime/*.clone()*/ : null;
 	}
 
 	public TimestampDelay getDepartureTime() {
-		return departureTime != null ? departureTime.clone() : null;
-	}
-
-	public void setDepartureTime(final TimestampDelay departureTime) {
-		this.departureTime = departureTime != null ? departureTime.clone() : null;
+		return departureTime != null ? departureTime/*.clone()*/ : null;
 	}
 
 	public Train getTrain() {
-		return train != null ? train.clone() : null;
-	}
-
-	public void setTrain(final Train train) {
-		this.train = train != null ? train.clone() : null;
+		return train;
 	}
 
 	public Station getStation() {
-		return station != null ? station.clone() : null;
-	}
-
-	public void setStation(Station station) {
-		this.station = station != null ? station.clone() : null;
+		return station;
 	}
 
 	public Date getDate() {
 		return (Date) (date != null ? date.clone() : null);
 	}
 
-	public void setDate(final Date date) {
-		this.date = (Date) (date != null ? date.clone() : null);
-	}
-
 	public boolean isCanceled() {
 		return canceled;
 	}
 
-	public void setCanceled(boolean canceled) {
-		this.canceled = canceled;
-	}
-
 	public LineStop getPrevious() {
-		return previous != null ? previous.clone() : null;
-	}
-
-	public void setPrevious(final LineStop previous) {
-		this.previous = previous != null ? previous.clone() : null;
+		return previous;
 	}
 
 	public LineStop getNext() {
-		return next != null ? next.clone() : null;
-	}
-
-	public void setNext(final LineStop next) {
-		this.next = next != null ? next.clone() : null;
+		return next;
 	}
 
 }
