@@ -74,3 +74,8 @@
 /java-fx-layer/bin
 /service-layer/bin
 /target
+/batch-layer/database
+/batch-layer/output.dat
+/service-layer/*.tlog
+/service-layer/*.tlog
+database
