@@ -41,6 +41,9 @@ public class Train implements Serializable {
 
 	protected final String dutchName;
 
+	/**
+	 * Default constructor.
+	 */
 	protected Train() {
 		this.id = null;
 		this.englishName = "";
@@ -48,22 +51,30 @@ public class Train implements Serializable {
 		this.frenchName = "";
 	}
 
-	@SuppressWarnings("unused")
-	// Already implemented for future use
-	private Train(Train train) {
-		this();
+	/**
+	 * Initialization constructor.
+	 * 
+	 * @param englishName English name for this train
+	 */
+	public Train(final String englishName) {
+		this.id = null;
+		this.englishName = englishName;
+		this.dutchName = "";
+		this.frenchName = "";
 	}
 
 	/**
 	 * Initialization constructor.
 	 * 
-	 * @param name English name for this train
+	 * @param englishName English name for this train
+	 * @param dutchName Dutch name for this train
+	 * @param frenchName French name for this train
 	 */
-	public Train(String name) {
+	public Train(final String englishName, final String dutchName, final String frenchName) {
 		this.id = null;
-		this.englishName = name;
-		this.dutchName = "";
-		this.frenchName = "";
+		this.englishName = englishName;
+		this.dutchName = dutchName;
+		this.frenchName = frenchName;
 	}
 
 	@Override

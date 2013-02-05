@@ -31,7 +31,8 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 /**
  * Line stop determine a stop for train line.
  * 
- * @author Alexis SOUMAGNE.
+ * @author Almex * 
+ * @see Entity
  */
 @Entity
 @Table(name = "LINE_STOP", uniqueConstraints = @UniqueConstraint(columnNames = {
@@ -95,7 +96,6 @@ public class LineStop implements Serializable, Cloneable {
 		this.date = null;
 		this.previous = null;
 		this.next = null;
-		
 	}
 
 	public LineStop(final Date date, final Train train, final Station station,

@@ -10,6 +10,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * Station specific to BRail portal. 
  * 
  * @author Almex
+ * @see Entity
  */
 @Entity
 public class BRailStation extends Station {

@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
 	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
-		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
 
 	<!-- Needed if w use a AutomaticJobRegistrar -->
 	<context:annotation-config />
 
-	<batch:job id="grabDelaysFromRailtime" restartable="true">
-		<batch:step id="step1" next="step2">
+	<batch:job id="searchDelaysJob" restartable="true">
+		<batch:step id="retrieveDataFromRailtime" next="searchDelays">
 			<batch:tasklet transaction-manager="batchTransactionManager">
 				<batch:chunk reader="compositeRailtimeItemReader"
 					writer="raildelaysServiceWriter" commit-interval="1">
@@ -19,7 +22,7 @@
 					isolation="DEFAULT" propagation="REQUIRED" />
 			</batch:tasklet>
 		</batch:step>
-		<batch:step id="step2">
+		<batch:step id="searchDelays">
 			<batch:tasklet transaction-manager="batchTransactionManager">
 				<batch:chunk reader="compositeRaildelaysItemReader" processor="delaysPerDayProcessor" writer="flatFileItemWriter"
 					commit-interval="1" skip-limit="100">

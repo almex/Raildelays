@@ -95,7 +95,7 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 			final ServedStopDTO stop, final LineStop previous) {
 
 		LOGGER.debug(
-				"Saving timetable for train={}, date={} and lineStop={}...",
+				"Saving timetable for train={}, date={} and stop={}...",
 				new Object[] { trainId, date, stop });
 
 		// -- Validate our inputs
@@ -124,15 +124,17 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 	}
 
 	private LineStop createOrUpdate(LineStop lineStop) {
+		LineStop result = null;
 		Train train = saveOrRetrieveTrain(lineStop.getTrain());
 		Station station = saveOrRetrieveStation(lineStop.getStation());
-		LineStop result = lineStopDao.findByTrainAndDateAndStation(train,
+		LineStop persistedLineStop = lineStopDao.findByTrainAndDateAndStation(train,
 				lineStop.getDate(), station);
 
-		if (result != null) {
-			LOGGER.debug("We update a LineStop={}.", result);
+		if (persistedLineStop != null) {
+			LOGGER.debug("We update a LineStop={}.", persistedLineStop);
 
-			mapper.map(lineStop, result);
+			mapper.map(lineStop, persistedLineStop);
+			result = persistedLineStop;
 		} else {
 			LOGGER.debug("We create a new LineStop.");
 

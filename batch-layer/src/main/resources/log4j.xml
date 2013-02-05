@@ -105,7 +105,7 @@
 <!-- 	</logger> -->
 	
 	<logger name="org.springframework.batch">
-		<level value="debug" />
+		<level value="trace" />
 		<appender-ref ref="springbatch" />
 	</logger>
 	

@@ -10,6 +10,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * Immutable entity defining a {@link Train} specific to BRail portal.
  * 
  * @author Almex
+ * @see Entity
  */
 @Entity
 public class BRailTrain extends Train {

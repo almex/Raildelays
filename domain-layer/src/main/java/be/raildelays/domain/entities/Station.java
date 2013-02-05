@@ -18,9 +18,10 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 /**
  * Immutable entity defining a train station.
  * 
- * Uniqueness is based on the English name (i.e. : business key).
+ * Unicity of a train is done on the English name.
  * 
  * @author Almex
+ * @see Entity
  */
 @Entity
 @Table(name = "STATION")
@@ -41,7 +42,9 @@ public class Station implements Serializable, Cloneable {
 
 	protected final String dutchName;
 
-	// Already implemented for future use
+	/**
+	 * Default contrcutor.
+	 */
 	protected Station() {
 		this.id = null;
 		this.englishName = "";
@@ -52,13 +55,27 @@ public class Station implements Serializable, Cloneable {
 	/**
 	 * Initialization constructor.
 	 * 
-	 * @param name English name for this train station.
+	 * @param englishName English name for this train station.
 	 */
-	public Station(final String name) {
+	public Station(final String englishName) {
 		this.id = null;
-		this.englishName = name;
+		this.englishName = englishName;
 		this.dutchName = "";
 		this.frenchName = "";
+	}
+	
+	/**
+	 * Initialization constructor.
+	 * 
+	 * @param englishName English name for this train
+	 * @param dutchName Dutch name for this train
+	 * @param frenchName French name for this train
+	 */
+	public Station(final String englishName, final String dutchName, final String frenchName) {
+		this.id = null;
+		this.englishName = englishName;
+		this.dutchName = dutchName;
+		this.frenchName = frenchName;
 	}
 
 	@Override

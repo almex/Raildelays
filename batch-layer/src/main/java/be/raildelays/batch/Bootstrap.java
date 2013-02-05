@@ -1,11 +1,13 @@
 package be.raildelays.batch;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.lang.time.DateUtils;
@@ -18,9 +20,12 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.configuration.JobRegistry;
+import org.springframework.batch.core.converter.DefaultJobParametersConverter;
+import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobExecutionNotRunningException;
 import org.springframework.batch.core.launch.JobInstanceAlreadyExistsException;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.NoSuchJobExecutionException;
@@ -41,7 +46,7 @@ public class Bootstrap {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		String[] contextPaths = new String[] { "/spring/batch/raildelays-batch-integration-context.xml" };
+		String[] contextPaths = new String[] { "/spring/batch/raildelays-batch-integration-context.xml", "/jobs/batch-jobs-context.xml" };
 		SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy");
 		List<Date> dates = generateListOfDates();
 
@@ -56,29 +61,33 @@ public class Bootstrap {
 				JobExplorer jobExplorer = ctx.getBean(JobExplorer.class);
 				JobOperator jobOperator = ctx.getBean(JobOperator.class);
 				JobRepository jobRepository = ctx.getBean(JobRepository.class);
-				Job job = ctx.getBean(Job.class);
+				JobLauncher jobLauncher = ctx.getBean(JobLauncher.class);
+				DefaultJobParametersConverter converter = new DefaultJobParametersConverter();
+				converter.setDateFormat(new SimpleDateFormat("dd/MM/yyyy"));
+				
+				LOGGER.info("jobNames=", jobRegistry.getJobNames());
+				
+				Job job =  ctx.getBean(Job.class);//jobRegistry.getJob("searchDelaysJob");
 
 				recover(jobRegistry, jobExplorer, jobRepository, jobOperator);
 
 				for (Date date : dates) {
-					StringBuilder parameters = new StringBuilder();
+					Properties parameters = new Properties();
 
-					parameters.append("input.file.path=train-list.properties,");
-					parameters.append("date=");
-					parameters.append(formater.format(date));
-					parameters.append(",");
-					parameters.append("station.a.name=Liège-Guillemins,");
-					parameters
-							.append("station.b.name=Brussels (Bruxelles)-Central,");
-					parameters.append("output.file.path=file:./output.dat");
+					parameters.put("input.file.path", "train-list.properties");
+					parameters.put("date", formater.format(date));
+					parameters.put("station.a.name", "Liège-Guillemins");
+					parameters.put("station.b.name", "Brussels (Bruxelles)-Central");
+					parameters.put("output.file.path", "file:./output.dat");
 
-					try {
-						jobOperator.start(job.getName(), parameters.toString());
-					} catch (JobInstanceAlreadyExistsException e) {
-						LOGGER.info(
-								"Job '{}' already exists with thoses parameters: {}",
-								job.getName(), parameters.toString());
-					}
+//					try {
+//						jobOperator.start(job.getName(), parameters.toString());
+//					} catch (JobInstanceAlreadyExistsException e) {
+//						LOGGER.info(
+//								"Job '{}' already exists with thoses parameters: {}",
+//								job.getName(), parameters.toString());
+//					}
+					startOrRestartJob(jobLauncher, job, parameters, converter);
 				}
 			}
 
@@ -137,6 +146,31 @@ public class Bootstrap {
 		result.add(friday);
 
 		return result;
+	}
+
+	/**
+	 * Start or restart a batch Job
+	 * @param jobLauncher job launcher
+	 * @param job to execute
+	 * @param parameters parameters for this job instance
+	 * @param converter to convert job parameters
+	 * @throws JobParametersInvalidException thrown when a parameter conversion failed
+	 */
+	public static void startOrRestartJob(final JobLauncher jobLauncher,
+			final Job job, final Properties parameters,
+			final JobParametersConverter converter)
+			throws JobParametersInvalidException {
+		try {
+			jobLauncher.run(job, converter.getJobParameters(parameters));
+		} catch (JobExecutionAlreadyRunningException e) {
+			LOGGER.error("This job is already running", e);
+		} catch (JobInstanceAlreadyCompleteException e) {
+			LOGGER.info(
+					"This job is already complete. Maybe you need to change the input parameters?",
+					e);
+		} catch (JobRestartException e) {
+			LOGGER.error("Unspecified restart exception", e);
+		}
 	}
 
 	/**
@@ -216,16 +250,29 @@ public class Bootstrap {
 			List<Long> jobInstanceIds = jobOperator.getJobInstances(jobName,
 					start, count);
 
+			LOGGER.debug("Number of jobInstanceIds={} start={} count={} ", new Object[]{jobInstanceIds.size(), start, count});
+			
+			if (jobInstanceIds.size() == 0) {
+				return;
+			}
+			
 			for (Long jobInstanceId : jobInstanceIds) {
 				List<Long> jobExecutionIds = jobOperator
 						.getExecutions(jobInstanceId);
 
+				LOGGER.debug("Number of jobExecutionIds={} start={} count={} ", new Object[]{jobExecutionIds.size(), start, count});
+				
+				if (jobExecutionIds.size() == 0) {
+					return;
+				}
+				
 				for (Long jobExecutionId : jobExecutionIds) {
 					JobExecution jobExecution = jobExplorer
 							.getJobExecution(jobExecutionId);
 
 					// We will not search batch jobs older than 7 days
 					if (jobExecution.getCreateTime().before(sevenDaysBefore)) {
+						LOGGER.debug("Last job execution analyzed for a restart : {}", jobExecution);
 						return;
 					}
 

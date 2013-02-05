@@ -10,6 +10,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * Immutable entity of a {@link Train} specific to Railtime portal.
  * 
  * @author Almex
+ * @see Train
  */
 @Entity
 public class RailtimeTrain extends Train {

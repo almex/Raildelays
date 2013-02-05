@@ -10,6 +10,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * Station specific to Railtime portal. 
  * 
  * @author Almex
+ * @see Station
  */
 @Entity
 public class RailtimeStation extends Station {

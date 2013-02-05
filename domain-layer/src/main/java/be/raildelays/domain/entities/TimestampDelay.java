@@ -13,12 +13,13 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
- * {@link Embeddable} entity that express an arrival or departure delay.
+ * Immutable object that express an arrival or departure delay.
  * 
  * @author Almex
+ * @see Embeddable
  */
 @Embeddable
-public class TimestampDelay implements Serializable, Cloneable {
+public class TimestampDelay implements Serializable {
 
 	private static final long serialVersionUID = -1026179811764044178L;
 

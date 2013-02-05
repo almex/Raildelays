@@ -23,7 +23,7 @@
 		<property name="applicationContextFactories">
 			<bean
 				class="org.springframework.batch.core.configuration.support.ClasspathXmlApplicationContextsFactoryBean">
-				<property name="resources" value="classpath:/**/*job*.xml" />
+				<property name="resources" value="classpath*:/**/*job*.xml" />
 			</bean>
 		</property>
 		<property name="jobLoader">
