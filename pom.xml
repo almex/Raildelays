@@ -46,6 +46,7 @@
 		<version.groovy>2.0</version.groovy>
 		<version.groovy-all>2.0.6</version.groovy-all>
 		<version.groovy.eclipse.compiler>2.7.0-01</version.groovy.eclipse.compiler>
+		<version.apache.poi>3.9</version.apache.poi>
 		<jdk.version>1.7</jdk.version>
 		<path.javafx>C:\Program Files\Oracle\JavaFX 2.0 SDK</path.javafx>
 	</properties>
@@ -181,9 +182,9 @@
 				<version>5.3.2</version>
 			</dependency>
 			<dependency>
-				<groupId>commons-lang</groupId>
-				<artifactId>commons-lang</artifactId>
-				<version>2.6</version>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>3.1</version>
 			</dependency>
 
 			<dependency>
@@ -307,7 +308,12 @@
 			<dependency>
 				<groupId>org.apache.poi</groupId>
 				<artifactId>poi</artifactId>
-				<version>3.9</version>
+				<version>${version.apache.poi}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.poi</groupId>
+				<artifactId>poi-ooxml</artifactId>
+				<version>${version.apache.poi}</version>
 			</dependency>
             
 

@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.apache.commons.lang.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.CompareToBuilder;
 
 public class Step extends Stop implements Serializable, Comparable<Step> {
 

@@ -1,6 +1,5 @@
 package be.raildelays.batch;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -24,7 +23,6 @@ import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobExecutionNotRunningException;
-import org.springframework.batch.core.launch.JobInstanceAlreadyExistsException;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.NoSuchJobException;
@@ -78,15 +76,10 @@ public class Bootstrap {
 					parameters.put("date", formater.format(date));
 					parameters.put("station.a.name", "Liège-Guillemins");
 					parameters.put("station.b.name", "Brussels (Bruxelles)-Central");
-					parameters.put("output.file.path", "file:./output.dat");
+//					parameters.put("output.file.path", "file:./output.dat");
+					parameters.put("excel.input.template", "target/test-classes/template.xlsx");
+					parameters.put("excel.output.file", "output.xlsx");
 
-//					try {
-//						jobOperator.start(job.getName(), parameters.toString());
-//					} catch (JobInstanceAlreadyExistsException e) {
-//						LOGGER.info(
-//								"Job '{}' already exists with thoses parameters: {}",
-//								job.getName(), parameters.toString());
-//					}
 					startOrRestartJob(jobLauncher, job, parameters, converter);
 				}
 			}
@@ -108,7 +101,7 @@ public class Bootstrap {
 	 */
 	private static List<Date> generateListOfDates() {
 		List<Date> result = new ArrayList<>();
-		Date today = DateUtils.truncate(new Date(), Calendar.DAY_OF_MONTH);
+		Calendar date = DateUtils.truncate(Calendar.getInstance(), Calendar.DAY_OF_MONTH);
 		Date monday = null;
 		Date tuesday = null;
 		Date wednesday = null;
@@ -116,7 +109,7 @@ public class Bootstrap {
 		Date friday = null;
 
 		for (int i = -8; i < 0; i++) {
-			Calendar date = DateUtils.toCalendar(DateUtils.addDays(today, i));
+			date.add(Calendar.DAY_OF_MONTH, -1);
 
 			switch (date.get(Calendar.DAY_OF_WEEK)) {
 			case Calendar.MONDAY:

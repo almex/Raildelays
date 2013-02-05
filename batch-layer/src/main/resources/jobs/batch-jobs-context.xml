@@ -24,7 +24,7 @@
 		</batch:step>
 		<batch:step id="searchDelays">
 			<batch:tasklet transaction-manager="batchTransactionManager">
-				<batch:chunk reader="compositeRaildelaysItemReader" processor="delaysPerDayProcessor" writer="flatFileItemWriter"
+				<batch:chunk reader="compositeRaildelaysItemReader" processor="delaysPerDayProcessor" writer="excelSheetItemWriter"
 					commit-interval="1" skip-limit="100">
 					<batch:skippable-exception-classes>
 						<batch:include class="java.lang.StringIndexOutOfBoundsException"/>
@@ -118,6 +118,21 @@
 				<property name="delegate">
 					<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
 				</property>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="excelSheetItemWriter" class="be.raildelays.batch.writer.ExcelSheetItemWriter" scope="step">
+		<property name="input">
+			<bean class="java.io.FileInputStream">
+				<constructor-arg index="0" type="java.lang.String"
+					value="#{jobParameters['excel.input.template']}" />
+			</bean>
+		</property>
+		<property name="output">
+			<bean class="java.io.FileOutputStream">
+				<constructor-arg index="0" type="java.lang.String"
+					value="#{jobParameters['excel.output.file']}" />
 			</bean>
 		</property>
 	</bean>
