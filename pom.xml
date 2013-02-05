@@ -730,7 +730,7 @@
                                     <resources>
                                         <resource>
                                             <directory>src/it/resources</directory>
-                                            <filtering>true</filtering>
+                                            <!--filtering>true</filtering-->
                                         </resource>         
                                     </resources>
                                 </configuration>
