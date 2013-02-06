@@ -1,4 +1,3 @@
-
 # Raildelays
 
 Raildelays is a multi-module application comparable to [iRail project](http://project.irail.be/).
@@ -39,17 +38,17 @@ the complete train traject.
 
 Clone the git repository using the URL on the Github home page:
 
-    $ git clone git://github.com/almex/raildelays.git
-    $ cd raildelays
+    $ git clone git://github.com/almex/Raildelays.git
+    $ cd Raildelays
 
 ## Command Line
 Use Maven 3.0, then on the command line:
 
-    $ mvn install
+    $ mvn install
 
 or, you can execute integration tests via:
 
-    $ mvn install -Pit
+    $ mvn install -Pit
 
 # Application Design
 
@@ -88,7 +87,7 @@ of the application to a high level.
 * JUnit: as a testing framework.
 * Spring Test: as an add-on to JUnit to simply testing.
 * Derby: as an embedded database (Desktop).
-* HSQLDB: as an in-memory database to execute integration tests (default with Srping Test)
+* HSQLDB: as an in-memory database to execute integration tests (default with Spring Test)
 
 
 # Quality Assurance
