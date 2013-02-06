@@ -1,8 +1,8 @@
 # Raildelays
 
 Raildelays is a multi-module application comparable to [iRail project](http://project.irail.be/).
-Main goal of this application is to collect all train delays from Belgium train company called SNCB/NMBS.
-It was developed with extensibility in mind and is able to deal with other vehicule delays (i.e: airplane, truck,
+Main goal of this application is to collect all train delays from Belgium train company called [SNCB](http://www.belgianrail.be/fr)/[NMBS](http://www.belgianrail.be/nl).
+It was developed with extensibility in mind and is able to deal with other vehicule delays (i.e: bus, airplane, truck,
 cars,...).
 
 ## Comparing to iRail
