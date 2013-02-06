@@ -13,7 +13,8 @@ If you talk about position and time of any vehicule traject you can view those d
 * Route log
 
 iRail can query a timetable per train and per date or a liveboard per station. In contrario, Raildelays can query 
-the route log of a train.
+the route log of a train. iRail is capabale to give route log for a vehicule but only for the date of today and only
+the effective time. iRail can't search delays within the past while Raildelays can.
 
 ### Timetable (futur)
 When we talk about train timetable or scheduling we only talk about what is the planed route for a train.
