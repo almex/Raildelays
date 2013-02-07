@@ -1,8 +1,9 @@
 # Raildelays
 
-Raildelays is a multi-module application comparable to [iRail project](http://project.irail.be/).
-Main goal of this application is to collect all train delays from Belgium train company called [SNCB](http://www.belgianrail.be/fr)/[NMBS](http://www.belgianrail.be/nl).
-It was developed with extensibility in mind and is able to deal with other vehicule delays (i.e: bus, airplane, truck,
+Raildelays is a multi-module application including an API, front-ends and input/output modules.
+Main goal of this application is to collect all train delays from Belgian railway company called 
+[NMBS](http://www.belgianrail.be/nl)/[SNCB](http://www.belgianrail.be/fr).
+It was developed with extensibility in mind and is able to deal with other railway company or other vehicules (i.e: bus, airplane, truck,
 cars,...).
 
 ## Comparing to iRail
@@ -12,8 +13,9 @@ If you talk about position and time of any vehicule traject you can view those d
 * Liveboard
 * Route log
 
-iRail can query a timetable per train and per date or a liveboard per station. In contrario, Raildelays can query 
-the route log of a train. iRail is capabale to give route log for a vehicule but only for the date of today and only
+[iRail project](http://project.irail.be/) is an other project on which a lot of Belgian train application are based
+It can query a timetable per train and per date or a liveboard per station. In contrario, Raildelays API query only 
+the route logs. iRail API is capabale to give route log for a vehicule but only for the date of the day and only
 the effective time. iRail can't search delays within the past while Raildelays can.
 
 ### Timetable (futur)
