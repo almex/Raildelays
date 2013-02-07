@@ -3,8 +3,8 @@
 Raildelays is a multi-module application including an API, front-ends and input/output modules.
 Main goal of this application is to collect all train delays from Belgian railway company called 
 [NMBS](http://www.belgianrail.be/nl)/[SNCB](http://www.belgianrail.be/fr).
-It was developed with extensibility in mind and is able to deal with other railway company or other vehicules (i.e: bus, airplane, truck,
-cars,...).
+It was developed with extensibility in mind and is able to deal with other railway company or other vehicules
+ (i.e: bus, airplane, truck, cars,...).
 
 ## Comparing to iRail
 
@@ -25,15 +25,15 @@ time and the exepected departure time for each stop.
 
 ### Liveboard (present)
 We use a liveboard to know directly if your train is on time or not. It gives you the expected time and the delay 
-comparing to what is expected. It only show trains that are not arrived yet to a certain station.
+comparing to what is expected. It only show trains which are not arrived yet to a certain station.
 
 ### Route log (past)
 Give you the expected time, the effective time and if a stop was deserved or not.
 
-In the partical of SNCB/NMBS train, you should be able to know the timetable of a train based on its collected 
-route log because timetables remains commonly the same for every day of a week and are subject to unfrequent changes.
+In practical with NMBS/SNCB trains, you should be able to know the timetable of a train based on its collected 
+route log because timetables remain commonly the same for every day of a week and are subject to unfrequent changes.
 But, you should consider all of those views as seperate source of data. You can have change of a timetable
-leading to historying a timetable and then a route log should used as expected time the last version of the timetable.
+leading to different versions and then a route log should used, as expected time, the last version of the timetable.
 A liveboard is a little in between but it gives you information only for a certain station and you cannot follow
 the complete train traject.
 
@@ -59,6 +59,10 @@ or, you can execute integration tests via:
 * HTTP Client/Streamer
 * HTTP Parser
 
+## Output 
+* Excel Sheet
+* Flat file
+
 ## API
 * repository layer
 * service layer
@@ -70,7 +74,7 @@ or, you can execute integration tests via:
 
 # Application Architecture
 
-To be able to analyze data from an external system (e.g. : www.railtime.be), we have to persiste them in our 
+To be able to analyze data from an external system (e.g. : www.railtime.be), we have to persist them in our 
 data model.
 
 ## Langages
