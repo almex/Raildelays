@@ -79,3 +79,5 @@
 /service-layer/*.tlog
 /service-layer/*.tlog
 database
+
+.externalToolBuilders

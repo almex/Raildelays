@@ -14,8 +14,6 @@ import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.Assert;
 
 import be.raildelays.domain.entities.LineStop;
 

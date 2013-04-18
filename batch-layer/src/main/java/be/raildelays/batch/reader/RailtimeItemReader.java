@@ -8,12 +8,12 @@ import javax.annotation.Resource;
 import org.dozer.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 
 import be.raildelays.domain.Language;
 import be.raildelays.domain.Sens;
@@ -22,7 +22,7 @@ import be.raildelays.httpclient.RequestStreamer;
 import be.raildelays.parser.StreamParser;
 import be.raildelays.parser.impl.RailtimeStreamParser;
 
-public class RailtimeItemReader implements ItemReader<Direction> {
+public class RailtimeItemReader implements ItemReader<Direction>, InitializingBean {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(RailtimeItemReader.class);
@@ -38,12 +38,12 @@ public class RailtimeItemReader implements ItemReader<Direction> {
 	private Date date;
 
 	private Sens sens;
-	
-	private StepExecution stepExecution;
-	
-	@BeforeStep
-	public void beforeStep(StepExecution stepExecution) {
-		this.stepExecution = stepExecution;
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		// Validate all job parameters
+		Assert.notNull(date, "You must provide the date parameter to this Reader.");
+		Assert.notNull(sens, "You must provide the sens parameter to this Reader.");
 	}
 
 	public Direction read() throws Exception, UnexpectedInputException,

@@ -24,7 +24,7 @@
 		</batch:step>
 		<batch:step id="searchDelays">
 			<batch:tasklet transaction-manager="batchTransactionManager">
-				<batch:chunk reader="compositeRaildelaysItemReader" processor="delaysPerDayProcessor" writer="flatFileItemWriter"
+				<batch:chunk reader="compositeRaildelaysItemReader" processor="chainedProcessors" writer="flatFileItemWriter"
 					commit-interval="1" skip-limit="100">
 					<batch:skippable-exception-classes>
 						<batch:include class="java.lang.StringIndexOutOfBoundsException"/>
@@ -40,8 +40,6 @@
 
 	<bean id="compositeRailtimeItemReader" class="be.raildelays.batch.reader.CompositeRailtimeItemReader"
 		scope="step">
-		<property name="date" value="#{jobParameters[date]}" />
-		<property name="resource" value="#{jobParameters['input.file.path']}" />
 		<property name="fileReader">	
 			<bean class="org.springframework.batch.item.file.FlatFileItemReader"
 				scope="step">
@@ -56,6 +54,8 @@
 		<property name="departureReader">
 			<bean class="be.raildelays.batch.reader.RailtimeItemReader"
 				scope="step">
+				<property name="date" value="#{jobParameters[date]}" />
+				<property name="resource" value="#{jobParameters['input.file.path']}" />
 				<property name="sens">
 					<util:constant static-field="be.raildelays.domain.Sens.DEPARTURE" />
 				</property>
@@ -64,6 +64,8 @@
 		<property name="arrivalReader">
 			<bean class="be.raildelays.batch.reader.RailtimeItemReader"
 				scope="step">
+				<property name="date" value="#{jobParameters[date]}" />
+				<property name="resource" value="#{jobParameters['input.file.path']}" />
 				<property name="sens">
 					<util:constant static-field="be.raildelays.domain.Sens.ARRIVAL" />
 				</property>

@@ -76,7 +76,7 @@ public class Bootstrap {
 					parameters.put("date", formater.format(date));
 					parameters.put("station.a.name", "Liège-Guillemins");
 					parameters.put("station.b.name", "Brussels (Bruxelles)-Central");
-//					parameters.put("output.file.path", "file:./output.dat");
+					parameters.put("output.file.path", "file:./output.dat");
 					parameters.put("excel.input.template", "./test-classes/template.xlsx");
 					parameters.put("excel.output.file", "output.xlsx");
 
