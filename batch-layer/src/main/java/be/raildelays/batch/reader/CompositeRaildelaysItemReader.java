@@ -7,45 +7,38 @@ import javax.validation.Validator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 
 import be.raildelays.domain.entities.LineStop;
 
+/**
+ * Composition between {@link DelaysItemReader} and {@link DatabaseDatesItemReader}.
+ * 
+ * @author Almex
+ */
 public class CompositeRaildelaysItemReader implements ItemStreamReader<List<LineStop>> {
 
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(CompositeRaildelaysItemReader.class);
+			.getLogger(ItemReader.class);
 
 	@javax.annotation.Resource
 	Validator validator;
 
 	private DelaysItemReader delaysItemReader;
 	
-	private DatesItemReader datesItemReader;
-	
-	private String stationA;
-	
-	private String stationB;
-
-	private StepExecution stepExecution;
-
-	@BeforeStep
-	public void beforeStep(StepExecution stepExecution) {
-		this.stepExecution = stepExecution;
-	}
+	private DatabaseDatesItemReader datesItemReader;
 
 	@Override
 	public void open(ExecutionContext executionContext)
 			throws ItemStreamException {
-		delaysItemReader.setStationA(stationA);
-		delaysItemReader.setStationB(stationB);
 		datesItemReader.open(executionContext);
 	}
 
@@ -62,32 +55,24 @@ public class CompositeRaildelaysItemReader implements ItemStreamReader<List<Line
 
 	public List<LineStop> read() throws Exception, UnexpectedInputException,
 			ParseException, NonTransientResourceException {
-		List<LineStop> result = null;		
-
+		List<LineStop> result = null;	
 		Date date = datesItemReader.read();
+		
 		if (date != null) {
 			delaysItemReader.setDate(date);
 			result = delaysItemReader.read();
 			
-			LOGGER.debug("Found {} delays for {}", result.size(), date);
+			LOGGER.debug("Found {} delays for {}", result != null ? result.size() : 0, date);
 		}
 
 		return result;
-	}
-
-	public void setStationA(String stationA) {
-		this.stationA = stationA;
-	}
-
-	public void setStationB(String stationB) {
-		this.stationB = stationB;
 	}
 
 	public void setDelaysItemReader(DelaysItemReader delaysItemReader) {
 		this.delaysItemReader = delaysItemReader;
 	}
 
-	public void setDatesItemReader(DatesItemReader datesItemReader) {
+	public void setDatesItemReader(DatabaseDatesItemReader datesItemReader) {
 		this.datesItemReader = datesItemReader;
 	}
 

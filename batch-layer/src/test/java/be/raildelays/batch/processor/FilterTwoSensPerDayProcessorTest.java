@@ -22,7 +22,7 @@ import be.raildelays.domain.entities.Train;
 import be.raildelays.domain.xls.ExcelRow;
 
 @RunWith(value = BlockJUnit4ClassRunner.class)
-public class FilterTwoDelaysPerDayProcessorTest {
+public class FilterTwoSensPerDayProcessorTest {
 
 	private List<LineStop> fromA;
 

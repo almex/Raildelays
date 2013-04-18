@@ -35,7 +35,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
 		<version.spring>3.2.0.RELEASE</version.spring>
-		<version.spring.batch>2.2.0.M1</version.spring.batch>
+		<version.spring.batch>2.2.0.RC1</version.spring.batch>
 		<version.spring.data>1.2.0.RELEASE</version.spring.data>
 		<version.hibernate>4.0.1.Final</version.hibernate>
 		<version.hibernate.validator>4.3.1.Final</version.hibernate.validator>
@@ -432,35 +432,8 @@
 				<plugin>
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>0.6.1.201212231917</version>
+					<version>0.6.2.201302030002</version>
 				</plugin>
-
-				<!-- <plugin> -->
-				<!-- <groupId>org.codehaus.gmaven</groupId> -->
-				<!-- <artifactId>gmaven-plugin</artifactId> -->
-				<!-- <version>1.5</version> -->
-				<!-- <configuration> -->
-				<!-- <providerSelection>${version.groovy}</providerSelection> -->
-				<!-- <sourceEncoding>UTF-8</sourceEncoding> -->
-				<!-- </configuration> -->
-				<!-- <executions> -->
-				<!-- <execution> -->
-				<!-- <goals> -->
-				<!-- <goal>generateStubs</goal> -->
-				<!-- <goal>compile</goal> -->
-				<!-- <goal>generateTestStubs</goal> -->
-				<!-- <goal>testCompile</goal> -->
-				<!-- </goals> -->
-				<!-- </execution> -->
-				<!-- </executions> -->
-				<!-- <dependencies> -->
-				<!-- <dependency> -->
-				<!-- <groupId>org.codehaus.groovy</groupId> -->
-				<!-- <artifactId>groovy-all</artifactId> -->
-				<!-- <version>${version.groovy}</version> -->
-				<!-- </dependency> -->
-				<!-- </dependencies> -->
-				<!-- </plugin> -->
 
 			</plugins>
 		</pluginManagement>
@@ -492,21 +465,7 @@
 			</dependencies>
 
 			<build>
-				<plugins>					
-					<!--plugin>
-						<groupId>org.codehaus.gmaven</groupId>
-						<artifactId>gmaven-plugin</artifactId>
-						<executions>
-							<execution>
-								<goals>
-									<goal>generateStubs</goal>
-									<goal>compile</goal>
-									<goal>generateTestStubs</goal>
-									<goal>testCompile</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin-->
+				<plugins>	
 					<plugin>
 						<artifactId>maven-compiler-plugin</artifactId>
 						<configuration>
@@ -563,19 +522,18 @@
             <id>it</id>
             
             <activation>
-                <activeByDefault>false</activeByDefault>
                 <property>
                     <name>performRelease</name>
-                    <value>true</value>
                 </property>
             </activation>
          
-            <dependencies>                          	
+            <dependencies>    
+				<!-- To support unit tests tracking with Sonar -->
 				<dependency>
-					<groupId>org.hsqldb</groupId>
-					<artifactId>hsqldb</artifactId>
-					<scope>test</scope>
-                    <optional>true</optional>
+				  <groupId>org.codehaus.sonar-plugins.java</groupId>
+				  <artifactId>sonar-jacoco-listeners</artifactId>
+				  <version>1.2</version>
+				  <scope>test</scope>
 				</dependency>
             </dependencies>
          
@@ -596,6 +554,15 @@
                                 </configuration>
                             </execution>
                         </executions>
+						<!-- To support unit tests tracking with Sonar -->
+						<configuration>
+						  <properties>
+							<property>
+							  <name>listener</name>
+							  <value>org.sonar.java.jacoco.JUnitListener</value>
+							</property>
+						  </properties>
+						</configuration>
                     </plugin>
                          
                     <plugin>

@@ -48,17 +48,34 @@ public class RailtimeItemReader implements ItemReader<Direction> {
 
 	public Direction read() throws Exception, UnexpectedInputException,
 			ParseException, NonTransientResourceException {
-		// -- Create a request to target Railtime
-		Reader englishStream = streamer.getDelays(trainId, date,
-				Language.ENGLISH.getRailtimeParameter(),
-				sens.getRailtimeParameter());
-
-		// -- Parse the content
-		StreamParser parser = new RailtimeStreamParser(englishStream);
-
-		waitRandomly();
-
-		return parser.parseDelay(trainId, date);
+		Direction result = null;
+		
+		if (trainId != null && date != null && sens != null) {
+			// -- Create a request to target Railtime
+			Reader englishStream = streamer.getDelays(trainId, date,
+					Language.ENGLISH.getRailtimeParameter(),
+					sens.getRailtimeParameter());
+	
+			// -- Parse the content
+			StreamParser parser = new RailtimeStreamParser(englishStream);
+	
+			waitRandomly();
+	
+			result = parser.parseDelay(trainId, date);
+			
+			reset();
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Reset the reader for the next iteration
+	 */
+	private void reset() {
+		trainId = null;
+		date = null;
+		sens = null;		
 	}
 
 	/**

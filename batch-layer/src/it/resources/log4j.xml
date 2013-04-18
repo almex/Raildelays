@@ -18,15 +18,15 @@
 	</logger>
 	
 	<logger name="org.springframework.batch">
-		<level value="debug" />
+		<level value="info" />
 	</logger>
 
 	<logger name="org.hsqldb">
-		<level value="warn" />
+		<level value="info" />
 	</logger>
 
 	<logger name="org.hibernate">
-		<level value="warn" />
+		<level value="info" />
 	</logger>
 
 

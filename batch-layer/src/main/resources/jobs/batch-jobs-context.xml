@@ -24,7 +24,7 @@
 		</batch:step>
 		<batch:step id="searchDelays">
 			<batch:tasklet transaction-manager="batchTransactionManager">
-				<batch:chunk reader="compositeRaildelaysItemReader" processor="delaysPerDayProcessor" writer="excelSheetItemWriter"
+				<batch:chunk reader="compositeRaildelaysItemReader" processor="delaysPerDayProcessor" writer="flatFileItemWriter"
 					commit-interval="1" skip-limit="100">
 					<batch:skippable-exception-classes>
 						<batch:include class="java.lang.StringIndexOutOfBoundsException"/>
@@ -73,17 +73,18 @@
 
 	<bean id="compositeRaildelaysItemReader"
 		class="be.raildelays.batch.reader.CompositeRaildelaysItemReader"
-		scope="step">
-		<property name="stationA" value="#{jobParameters['station.a.name']}" />
-		<property name="stationB" value="#{jobParameters['station.b.name']}" />				
+		scope="step">			
 		<property name="datesItemReader">
-			<bean class="be.raildelays.batch.reader.DatesItemReader"
+			<bean class="be.raildelays.batch.reader.DatabaseDatesItemReader"
 				scope="step">
+				<property name="lastDate" value="#{jobParameters[date]}" />
 			</bean>
 		</property>
 		<property name="delaysItemReader">
 			<bean class="be.raildelays.batch.reader.DelaysItemReader"
 				scope="step">
+				<property name="stationA" value="#{jobParameters['station.a.name']}" />
+				<property name="stationB" value="#{jobParameters['station.b.name']}" />	
 			</bean>
 		</property>
 	</bean>
@@ -101,6 +102,42 @@
 		<property name="stationA" value="#{jobParameters['station.a.name']}" />
 		<property name="stationB" value="#{jobParameters['station.b.name']}" />
 	</bean>
+    
+    <bean id="excelRowMapperProcessor" class="be.raildelays.batch.processor.ExcelRowMapperProcessor" scope="step">
+		<property name="stationA" value="#{jobParameters['station.a.name']}" />
+		<property name="stationB" value="#{jobParameters['station.b.name']}" />
+	</bean>
+    
+    <bean id="filterTwoSensPerDayProcessor" class="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor" scope="step">
+		<property name="stationA" value="#{jobParameters['station.a.name']}" />
+		<property name="stationB" value="#{jobParameters['station.b.name']}" />
+	</bean>
+    
+    <bean id="dispatchProcessor" class="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor" scope="step">
+		<property name="stationA" value="#{jobParameters['station.a.name']}" />
+		<property name="stationB" value="#{jobParameters['station.b.name']}" />
+	</bean>
+	
+	<bean id="validatorProcessor" class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+	    <property name="validator">
+	    	<bean class="org.springframework.batch.item.validator.SpringValidator">
+	    		<property name="validator">
+	    			<bean class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" />
+	    		</property>
+	    	</bean>
+	    </property>
+	</bean>
+    
+    <bean id="chainedProcessors" class="org.springframework.batch.item.support.CompositeItemProcessor">
+        <property name="delegates">
+            <list>
+                <ref bean="excelRowMapperProcessor" />
+                <ref bean="validatorProcessor" />
+                <ref bean="filterTwoSensPerDayProcessor" />
+                <ref bean="dispatchProcessor" />
+            </list>
+        </property>
+    </bean>
 
 	<!-- Writers -->
 

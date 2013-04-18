@@ -102,6 +102,7 @@ public class Bootstrap {
 	private static List<Date> generateListOfDates() {
 		List<Date> result = new ArrayList<>();
 		Calendar date = DateUtils.truncate(Calendar.getInstance(), Calendar.DAY_OF_MONTH);
+		date.setLenient(false);
 		Date monday = null;
 		Date tuesday = null;
 		Date wednesday = null;

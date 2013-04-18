@@ -7,18 +7,15 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.annotation.DirtiesContext;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/spring/batch/raildelays-batch-integration-context.xml","classpath:/jobs/batch-jobs-context.xml"})
-public class GrabberServiceBatchIT {
+@DirtiesContext // Because of issue [SPR-8849] (https://jira.springsource.org/browse/SPR-8849)
+public class GrabberServiceBatchIT extends AbstractContextIT {
 
 	/**
 	 * SUT.
