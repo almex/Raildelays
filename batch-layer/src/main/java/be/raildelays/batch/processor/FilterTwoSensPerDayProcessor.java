@@ -33,20 +33,25 @@ public class FilterTwoSensPerDayProcessor implements
 
 	@Override
 	public List<ExcelRow> process(final List<ExcelRow> items) throws Exception {
-		List<ExcelRow> result = new ArrayList<>();
-		ExcelRow fromAtoB = extractMaxDelay(items, Sens.DEPARTURE);
-		ExcelRow fromBtoA = extractMaxDelay(items, Sens.ARRIVAL);
-
-		LOGGER.debug("From A to B : {}", fromBtoA);
-		LOGGER.debug("From B to A : {}", fromAtoB);
-
-		if (fromBtoA != null) {
-			result.add(fromBtoA);
+		List<ExcelRow> result = null;
+		
+		if (items != null && items.size() > 0) {			
+			ExcelRow fromAtoB = extractMaxDelay(items, Sens.DEPARTURE);
+			ExcelRow fromBtoA = extractMaxDelay(items, Sens.ARRIVAL);
+	
+			LOGGER.debug("From A to B : {}", fromBtoA);
+			LOGGER.debug("From B to A : {}", fromAtoB);
+	
+			if (fromAtoB != null || fromBtoA != null) {
+				result = new ArrayList<>();
+				
+				if (fromAtoB != null) {
+					result.add(fromAtoB);
+				} else {
+					result.add(fromBtoA);
+				}
+			}
 		}
-
-		if (fromAtoB != null) {
-			result.add(fromAtoB);
-		}		
 
 		return result;
 	}

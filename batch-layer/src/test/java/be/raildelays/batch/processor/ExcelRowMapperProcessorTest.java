@@ -38,7 +38,6 @@ public class ExcelRowMapperProcessorTest {
 	public void setUp() throws ParseException {
 		Date today = new Date();
 		SimpleDateFormat f = new SimpleDateFormat("HH:mm");
-		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		
 		//      1         ->      A          ->      2          ->    B            ->      3
 		// 12:00-12:05(5) -> 12:20-12:25(10) -> 12:45-12:50(15) -> 12:55-13:00(20) -> 13:45-<null>(25)

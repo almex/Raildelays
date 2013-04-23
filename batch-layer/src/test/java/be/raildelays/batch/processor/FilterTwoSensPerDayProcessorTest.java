@@ -6,9 +6,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.validation.Validation;
-import javax.validation.ValidatorFactory;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +34,6 @@ public class FilterTwoSensPerDayProcessorTest {
 	public void setUp() throws ParseException {
 		Date today = new Date();
 		SimpleDateFormat f = new SimpleDateFormat("HH:mm");
-		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		
 		//      1         ->      A          ->      2          ->    B            ->      3
 		// 12:00-12:05(5) -> 12:20-12:25(10) -> 12:45-12:50(15) -> 12:55-13:00(20) -> 13:45-<null>(25)
@@ -75,7 +71,6 @@ public class FilterTwoSensPerDayProcessorTest {
 		processor = new FilterTwoDelaysPerDayProcessor();
 		processor.setStationA("stationA"); 
 		processor.setStationB("stationB"); 
-		processor.setValidator(factory.getValidator());
 	}
 
 	@Test
