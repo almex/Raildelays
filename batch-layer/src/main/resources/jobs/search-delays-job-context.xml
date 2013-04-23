@@ -9,16 +9,16 @@
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
 
-	<!-- Needed if w use a AutomaticJobRegistrar -->
+	<!-- Needed if we use a AutomaticJobRegistrar -->
 	<context:annotation-config />
 	
-	<batch:job id="searchDelaysJob">		
+	<batch:job id="searchDelaysJob" restartable="true">		
 		<batch:step id="searchDelays">
-			<batch:tasklet transaction-manager="batchTransactionManager">
+			<batch:tasklet transaction-manager="batchTransactionManager" allow-start-if-complete="true">
 				<batch:chunk reader="compositeRaildelaysItemReader" processor="chainedProcessorsForDelays" writer="flatFileItemWriter"
-					commit-interval="1" skip-limit="100">
+					commit-interval="10" skip-limit="100">					
 					<batch:skippable-exception-classes>
-						<batch:include class="java.lang.StringIndexOutOfBoundsException"/>
+						<batch:include class="org.springframework.batch.item.validator.ValidationException"/>
 					</batch:skippable-exception-classes>
 				</batch:chunk>
 				<batch:transaction-attributes
@@ -34,7 +34,7 @@
 		<property name="datesItemReader">
 			<bean class="be.raildelays.batch.reader.DatabaseDatesItemReader"
 				scope="step">
-				<property name="lastDate" value="#{jobParameters[date]}" />
+				<property name="lastDate" value="#{jobParameters['date']}" />
 			</bean>
 		</property>
 		<property name="delaysItemReader">

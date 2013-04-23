@@ -1,5 +1,6 @@
 package be.raildelays.batch.reader;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -53,14 +54,22 @@ public class CompositeRaildelaysItemReader implements ItemStreamReader<List<Line
 
 	public List<LineStop> read() throws Exception, UnexpectedInputException,
 			ParseException, NonTransientResourceException {
-		List<LineStop> result = null;	
+		List<LineStop> result = null; // The end of this reader is when we have no more date	
 		Date date = datesItemReader.read();
 		
-		if (date != null) {
+		if (date != null) {			
 			delaysItemReader.setDate(date);
-			result = delaysItemReader.read();
 			
-			LOGGER.debug("Found {} delays for {}", result != null ? result.size() : 0, date);
+			List<LineStop> lineStops = delaysItemReader.read();
+			
+			// At this point we must return a non null value to continue reading
+			result = new ArrayList<>();
+			
+			if (lineStops != null) {
+				result.addAll(lineStops);
+			}
+			
+			LOGGER.debug("Found {} delays for {}", result.size(), date);
 		}
 
 		return result;

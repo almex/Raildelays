@@ -40,8 +40,11 @@ public class ExcelRowMapperProcessor implements
 
 	@Override
 	public List<ExcelRow> process(final List<LineStop> items) throws Exception {
-		List<ExcelRow> result = extractSens(items, stationA,
-				stationB);	
+		List<ExcelRow> result = null;
+		
+		if (items.size() > 0) { // We remove empty list (a null returned value do not pass-through the Writer)
+			result = extractSens(items, stationA, stationB);
+		}	
 
 		return result;
 	}

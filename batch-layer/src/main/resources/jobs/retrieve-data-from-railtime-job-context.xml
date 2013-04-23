@@ -16,7 +16,10 @@
 		<batch:step id="retrieveDataFromRailtime">
 			<batch:tasklet transaction-manager="batchTransactionManager">
 				<batch:chunk reader="compositeRailtimeItemReader" processor="chainedProcessorsForRailtime"
-					writer="raildelaysServiceWriter" commit-interval="1">
+					writer="raildelaysServiceWriter" commit-interval="10" skip-limit="100">
+					<batch:skippable-exception-classes>
+						<batch:include class="org.springframework.batch.item.validator.ValidationException"/>
+					</batch:skippable-exception-classes>
 				</batch:chunk>
 				<batch:transaction-attributes
 					isolation="DEFAULT" propagation="REQUIRED" />
@@ -41,7 +44,7 @@
 		<property name="departureReader">
 			<bean class="be.raildelays.batch.reader.RailtimeItemReader"
 				scope="step">
-				<property name="date" value="#{jobParameters[date]}" />
+				<property name="date" value="#{jobParameters['date']}" />
 				<property name="sens">
 					<util:constant static-field="be.raildelays.domain.Sens.DEPARTURE" />
 				</property>
@@ -50,7 +53,7 @@
 		<property name="arrivalReader">
 			<bean class="be.raildelays.batch.reader.RailtimeItemReader"
 				scope="step">
-				<property name="date" value="#{jobParameters[date]}" />
+				<property name="date" value="#{jobParameters['date']}" />
 				<property name="sens">
 					<util:constant static-field="be.raildelays.domain.Sens.ARRIVAL" />
 				</property>

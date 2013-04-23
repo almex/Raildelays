@@ -171,13 +171,26 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 	}
 
 	@Override
-	public List<Date> searchAllDates(Date date) {
+	public List<Date> searchAllDates(Date from, Date to) {
 		List<Date> result = null;
 
-		if (date == null) {
+		if (from == null && to == null) {
 			result = lineStopDao.findAllUniqueDates();
 		} else {
-			result = lineStopDao.findAllUniqueDates(date);
+			result = lineStopDao.findAllUniqueDates(from, to);
+		}
+
+		return result;
+	}
+
+	@Override
+	public List<Date> searchAllDates(Date lastDate) {
+		List<Date> result = null;
+
+		if (lastDate == null) {
+			result = lineStopDao.findAllUniqueDates();
+		} else {
+			result = lineStopDao.findAllUniqueDates(lastDate);
 		}
 
 		return result;

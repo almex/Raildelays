@@ -5,10 +5,16 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.commons.cli.BasicParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.Options;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +22,8 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameter;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.configuration.JobRegistry;
@@ -38,17 +46,23 @@ public class Bootstrap {
 
 	static final private Logger LOGGER = LoggerFactory
 			.getLogger(Bootstrap.class);
-
+	
 	/**
 	 * @param args
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
 		String[] contextPaths = new String[] {
-				"/spring/batch/raildelays-batch-integration-context.xml",
-				"/jobs/batch-jobs-context.xml" };
+				"/spring/batch/raildelays-batch-integration-context.xml" };
 		SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy");
 		List<Date> dates = generateListOfDates();
+		CommandLineParser parser = new BasicParser();
+		Options options = new Options();
+		options.addOption("offline", false, "activate offline mode");
+		options.addOption("norecovery", false, "do not execute recovery");
+		CommandLine cmd = parser.parse( options , args);
+		boolean online = !cmd.hasOption("offline");
+		boolean recovery = !cmd.hasOption("norecovery");
 
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(
 				contextPaths);
@@ -64,58 +78,51 @@ public class Bootstrap {
 			converter.setDateFormat(new SimpleDateFormat("dd/MM/yyyy"));
 			Job retrieveDataFromRailtimeJob = null;
 			Job searchDelaysJob = null;
-			String mode = "";
 
-			LOGGER.info("jobNames=", jobRegistry.getJobNames());
+			LOGGER.info("jobNames={}", jobRegistry.getJobNames());
 
-			if (args.length >= 1) {
-				mode = args[0];
-			}
-
-			if (!("offline".equals(mode)) || mode.isEmpty()) {
+			if (online) {
+				LOGGER.info("[ONline mode activated]");
 				retrieveDataFromRailtimeJob = jobRegistry
 						.getJob("retrieveDataFromRailtimeJob");
+			} else {
+				LOGGER.info("[OFFline mode activated]");				
 			}
 
-			if ("offline".equals(mode) || mode.isEmpty()) {
-				searchDelaysJob = jobRegistry.getJob("searchDelaysJob");
+			searchDelaysJob = jobRegistry.getJob("searchDelaysJob");
+
+			if (recovery) {
+				LOGGER.info("[Recovery activated]");
+				recover(jobRegistry, jobExplorer, jobRepository, jobOperator);
 			}
 
-			recover(jobRegistry, jobExplorer, jobRepository, jobOperator);
+			Map<String, JobParameter> parameters = new HashMap<>();
 
+			parameters.put("input.file.path", new JobParameter("train-list.properties"));
+			parameters.put("date", new JobParameter(new Date()));
+			parameters.put("station.a.name", new JobParameter("Liège-Guillemins"));
+			parameters.put("station.b.name",
+					new JobParameter("new JobParameter(Brussels (Bruxelles)-Central"));
+			parameters.put("output.file.path", new JobParameter("file:./output.dat"));
+			parameters.put("excel.input.template",
+					new JobParameter("./test-classes/template.xlsx"));
+			parameters.put("excel.output.file", new JobParameter("output.xlsx"));
+			
 			if (retrieveDataFromRailtimeJob != null) {
 				for (Date date : dates) {
-					Properties parameters = new Properties();
-
-					parameters.put("input.file.path", "train-list.properties");
-					parameters.put("date", formater.format(date));
-					parameters.put("station.a.name", "Liège-Guillemins");
-					parameters.put("station.b.name",
-							"Brussels (Bruxelles)-Central");
-					parameters.put("output.file.path", "file:./output.dat");
-					parameters.put("excel.input.template",
-							"./test-classes/template.xlsx");
-					parameters.put("excel.output.file", "output.xlsx");
-
+					parameters.put("date", new JobParameter(date));
+					
+					JobParameters jobParameters = new JobParameters(parameters);
+					
 					startOrRestartJob(jobLauncher, retrieveDataFromRailtimeJob,
-							parameters, converter);
+							jobParameters, converter);
 				}
 			}
 
 			if (searchDelaysJob != null) {
-				Properties parameters = new Properties();
-
-				parameters.put("input.file.path", "train-list.properties");
-				parameters.put("date", formater.format(new Date()));
-				parameters.put("station.a.name", "Liège-Guillemins");
-				parameters
-						.put("station.b.name", "Brussels (Bruxelles)-Central");
-				parameters.put("output.file.path", "file:./output.dat");
-				parameters.put("excel.input.template",
-						"./test-classes/template.xlsx");
-				parameters.put("excel.output.file", "output.xlsx");
-
-				startOrRestartJob(jobLauncher, searchDelaysJob, parameters,
+				JobParameters jobParameters = new JobParameters(parameters);
+				
+				startOrRestartJob(jobLauncher, searchDelaysJob, jobParameters,
 						converter);
 			}
 		} finally {
@@ -192,11 +199,12 @@ public class Bootstrap {
 	 *             thrown when a parameter conversion failed
 	 */
 	public static void startOrRestartJob(final JobLauncher jobLauncher,
-			final Job job, final Properties parameters,
+			final Job job, final JobParameters jobParameters,
 			final JobParametersConverter converter)
 			throws JobParametersInvalidException {
 		try {
-			jobLauncher.run(job, converter.getJobParameters(parameters));
+			LOGGER.info("Try to run job={}...", job.getName());
+			jobLauncher.run(job, jobParameters);
 		} catch (JobExecutionAlreadyRunningException e) {
 			LOGGER.error("This job is already running", e);
 		} catch (JobInstanceAlreadyCompleteException e) {
@@ -236,7 +244,7 @@ public class Bootstrap {
 		Collection<String> jobNames = jobRegistry.getJobNames();
 
 		for (String jobName : jobNames) {
-			LOGGER.info("Searching to recover jobName={}", jobName);
+			LOGGER.info("Searching to recover jobName={}...", jobName);
 
 			// -- Retrieve all jobs marked as STARTED or STOPPING
 			Set<Long> jobExecutionIds = jobOperator
@@ -244,7 +252,7 @@ public class Bootstrap {
 
 			// -- Set incoherent running jobs as FAILED
 			for (Long jobExecutionId : jobExecutionIds) {
-				LOGGER.info("Found a job already running jobExecutionId={}...",
+				LOGGER.info("Found a job already running jobExecutionId={}.",
 						jobExecutionId);
 
 				// -- Set Job Execution as FAILED
@@ -285,7 +293,7 @@ public class Bootstrap {
 			List<Long> jobInstanceIds = jobOperator.getJobInstances(jobName,
 					start, count);
 
-			LOGGER.debug("Number of jobInstanceIds={} start={} count={} ",
+			LOGGER.debug("Number of jobInstanceIds={} start={} count={}.",
 					new Object[] { jobInstanceIds.size(), start, count });
 
 			if (jobInstanceIds.size() == 0) {
@@ -296,8 +304,8 @@ public class Bootstrap {
 				List<Long> jobExecutionIds = jobOperator
 						.getExecutions(jobInstanceId);
 
-				LOGGER.debug("Number of jobExecutionIds={} start={} count={} ",
-						new Object[] { jobExecutionIds.size(), start, count });
+				LOGGER.debug("Number of jobExecutionIds={}.",
+						new Object[] { jobExecutionIds.size() });
 
 				if (jobExecutionIds.size() == 0) {
 					return;

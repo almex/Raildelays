@@ -39,10 +39,19 @@ public interface RaildelaysService {
 	
 	
 	/**
-	 * Search all dates already stored within the database.
+	 * Search all dates already stored within the database between two dates.
 	 * 
-	 * @param startFrom
+	 * @param from all dates after from
+	 * @param to all dates before to
 	 * @return a list of unique {@link Date}
 	 */
-	List<Date> searchAllDates(Date date);
+	List<Date> searchAllDates(Date from, Date to);
+	
+	/**
+	 * Search all dates already stored within the database until a last date.
+	 * 
+	 * @param lastDate all dates before to
+	 * @return a list of unique {@link Date}
+	 */
+	List<Date> searchAllDates(Date lastDate);
 }

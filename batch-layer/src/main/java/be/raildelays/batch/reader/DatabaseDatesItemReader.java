@@ -15,8 +15,11 @@ import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.batch.item.database.JdbcCursorItemReader;
+import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 import be.raildelays.service.RaildelaysService;
 
@@ -25,9 +28,7 @@ import be.raildelays.service.RaildelaysService;
  * 
  * @author Almex
  */
-public class DatabaseDatesItemReader implements ItemStreamReader<Date>, InitializingBean  {
-
-	private static final String LAST_DATE = "last.date";
+public class DatabaseDatesItemReader extends AbstractItemCountingItemStreamItemReader <Date> implements InitializingBean  {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ItemReader.class);
@@ -35,9 +36,17 @@ public class DatabaseDatesItemReader implements ItemStreamReader<Date>, Initiali
 	@Resource
 	private RaildelaysService service;
 	
-	private Iterator<Date> iterator;
-	
 	private Date lastDate;
+	
+	private List<Date> dates;
+	
+	/**
+	 * Default constructor.
+	 */
+	public DatabaseDatesItemReader() {
+		super();
+		setName(ClassUtils.getShortName(DatabaseDatesItemReader.class));
+	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -46,46 +55,27 @@ public class DatabaseDatesItemReader implements ItemStreamReader<Date>, Initiali
 	}
 
 	@Override
-	public void open(ExecutionContext executionContext)
-			throws ItemStreamException {		
+	protected void doOpen() throws Exception {		
+		LOGGER.debug("Opening the stream with for dates until {}", lastDate);
 		
-		if (iterator == null) {			
-			lastDate = (Date) executionContext.get(LAST_DATE);
-			
-			LOGGER.debug("Opening the stream with date={}", lastDate);
-			
-			List<Date> dates = service.searchAllDates(lastDate);
-			
-			LOGGER.trace("Retrieved {} dates", dates.size());
-			
-			iterator = dates.iterator();
-			
-			executionContext.put(LAST_DATE, null);
-		}
+		dates = service.searchAllDates(lastDate);
+		
+		LOGGER.debug("Retrieved {} dates", dates.size());
 	}
 
 	@Override
-	public void update(ExecutionContext executionContext)
-			throws ItemStreamException {
-		LOGGER.debug("Updating the date={} within the execution context", lastDate);
-		
-		executionContext.put(LAST_DATE, lastDate);				
+	protected void doClose() throws Exception {
+		LOGGER.debug("Closing the stream...");
 	}
 
 	@Override
-	public void close() throws ItemStreamException {
-		LOGGER.debug("Closing the stream...");		
-		iterator = null;
-	}
-
-	public Date read() throws Exception, UnexpectedInputException,
-			ParseException, NonTransientResourceException {
-		Date result = lastDate = null;
+	protected Date doRead() throws Exception {
+		Date result = null;
 		
-		if (iterator.hasNext()) {
-			result = lastDate = iterator.next();
+		if (getCurrentItemCount() < dates.size()) {
+			result = dates.get(getCurrentItemCount());
 			
-			LOGGER.debug("Iterator have one more date={}", result);
+			LOGGER.debug("Reading one more date={}", result);
 		}
 		
 		return result;
