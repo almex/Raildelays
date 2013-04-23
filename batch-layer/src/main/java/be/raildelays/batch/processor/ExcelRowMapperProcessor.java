@@ -20,6 +20,8 @@ import be.raildelays.domain.xls.ExcelRow;
 public class ExcelRowMapperProcessor implements
 		ItemProcessor<List<LineStop>, List<ExcelRow>>, InitializingBean {
         
+	private static final int DELAY_THRESHOLD = 15;
+
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ItemProcessor.class);
 
@@ -43,6 +45,91 @@ public class ExcelRowMapperProcessor implements
 		if (items.size() > 0) { // We remove empty list (a null returned value do not pass-through the Writer)
 			result = extractSens(items, stationA, stationB);
 		}	
+
+		return result;
+	}
+
+	private List<ExcelRow> extractSens(List<LineStop> items,
+			String stationAName, String stationBName) {
+		List<ExcelRow> result = new ArrayList<>();
+		Station stationA = new Station(stationAName);
+		Station stationB = new Station(stationBName);
+		Sens sens = null;
+
+		for (LineStop lineStop : items) {
+			LineStop departure = readPrevious(lineStop.getPrevious(), stationA, stationB);
+			LineStop arrival = readNext(lineStop.getNext(), stationA, stationB);
+
+			if (departure == null) {
+				departure = lineStop;
+			}
+
+			if (arrival == null) {
+				arrival = lineStop;
+			}
+
+			if (arrival == departure) {
+				throw new IllegalStateException(
+						"Arrival must not be equal to departure");
+			}			
+
+			LOGGER.trace("departure={} arrival={}", departure, arrival);
+
+			if (departure.getStation().equals(stationA)
+					&& arrival.getStation().equals(stationB)) {
+				sens = Sens.DEPARTURE;
+			} else if (departure.getStation().equals(stationB)
+					&& arrival.getStation().equals(stationA)) {
+				sens = Sens.ARRIVAL;
+			}
+
+			// We filters row a minimum delay of 15 minutes 
+			if (arrival.getArrivalTime().getDelay() >= DELAY_THRESHOLD) {
+				ExcelRow excelRow = map(departure, arrival, sens);
+				
+				result.add(excelRow);
+			}
+		}
+
+		return result;
+	}
+
+	private LineStop readPrevious(LineStop lineStop, Station stationA,
+			Station stationB) {
+		LineStop result = null;
+
+		if (lineStop != null) {
+			if (lineStop.getStation().equals(stationA)) {
+				result = lineStop;
+			} else if (lineStop.getStation().equals(stationB)) {
+				result = lineStop;
+			} else if (lineStop.getPrevious() != null) {
+				result = readPrevious(lineStop.getPrevious(), stationA,
+						stationB);
+			}
+		}
+		
+		LOGGER.trace("Extracted from left={}", result);
+
+		return result;
+	}
+
+	private LineStop readNext(LineStop lineStop, Station stationA,
+			Station stationB) {
+		LineStop result = null;
+
+
+		if (lineStop != null) {
+			if (lineStop.getStation().equals(stationA)) {
+				result = lineStop;
+			} else if (lineStop.getStation().equals(stationB)) {
+				result = lineStop;
+			} else if (lineStop.getNext() != null) {
+				result = readNext(lineStop.getNext(), stationA, stationB);
+			}		
+		}
+
+		LOGGER.trace("Extracted from rigth={}", result);
 
 		return result;
 	}
@@ -81,83 +168,6 @@ public class ExcelRowMapperProcessor implements
 					timestampDelay.getDelay().intValue());
 		}
 		
-		return result;
-	}
-
-	private List<ExcelRow> extractSens(List<LineStop> items,
-			String stationAName, String stationBName) {
-		List<ExcelRow> result = new ArrayList<>();
-		Station stationA = new Station(stationAName);
-		Station stationB = new Station(stationBName);
-		Sens sens = null;
-
-		for (LineStop lineStop : items) {
-			LineStop departure = lineStop.getPrevious() != null ? readPrevious(lineStop.getPrevious(), stationA,
-					stationB) : null;
-			LineStop arrival = lineStop.getNext() != null ? readNext(lineStop.getNext(), stationA, stationB) : null;
-
-			if (departure == null) {
-				departure = lineStop;
-			}
-
-			if (arrival == null) {
-				arrival = lineStop;
-			}
-
-			if (arrival == departure) {
-				throw new IllegalStateException(
-						"Arrival must not be equal to departure");
-			}			
-
-			LOGGER.trace("departure={} arrival={}", departure, arrival);
-
-			if (departure.getStation().equals(stationA)
-					&& arrival.getStation().equals(stationB)) {
-				sens = Sens.DEPARTURE;
-			} else if (departure.getStation().equals(stationB)
-					&& arrival.getStation().equals(stationA)) {
-				sens = Sens.ARRIVAL;
-			}
-
-			ExcelRow excelRow = map(departure, arrival, sens);
-
-			result.add(excelRow);
-		}
-
-		return result;
-	}
-
-	private LineStop readPrevious(LineStop lineStop, Station stationA,
-			Station stationB) {
-		LineStop result = null;
-
-		if (lineStop.getStation().equals(stationA)) {
-			result = lineStop;
-		} else if (lineStop.getStation().equals(stationB)) {
-			result = lineStop;
-		} else if (lineStop.getPrevious() != null) {
-			result = readPrevious(lineStop.getPrevious(), stationA, stationB);
-		}
-
-		LOGGER.trace("Extracted from left={}", result);
-
-		return result;
-	}
-
-	private LineStop readNext(LineStop lineStop, Station stationA,
-			Station stationB) {
-		LineStop result = null;
-
-		if (lineStop.getStation().equals(stationA)) {
-			result = lineStop;
-		} else if (lineStop.getStation().equals(stationB)) {
-			result = lineStop;
-		} else if (lineStop.getNext() != null) {
-			result = readNext(lineStop.getNext(), stationA, stationB);
-		}		
-
-		LOGGER.trace("Extracted from rigth={}", result);
-
 		return result;
 	}
 
