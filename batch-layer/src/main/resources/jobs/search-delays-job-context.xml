@@ -53,7 +53,7 @@
                 <ref bean="excelRowMapperProcessor" />
                 <ref bean="validatorProcessor" />
                 <ref bean="filterTwoSensPerDayProcessor" />
-                <ref bean="dispatchProcessor" />
+                <!-- ref bean="dispatchProcessor" /-->
             </list>
         </property>
     </bean>
@@ -78,10 +78,10 @@
 		<property name="stationB" value="#{jobParameters['station.b.name']}" />
 	</bean>
     
-    <bean id="dispatchProcessor" class="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor" scope="step">
+    <!-- bean id="dispatchProcessor" class="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor" scope="step">
 		<property name="stationA" value="#{jobParameters['station.a.name']}" />
 		<property name="stationB" value="#{jobParameters['station.b.name']}" />
-	</bean>
+	</bean-->
     
 	<!-- bean id="delaysPerDayProcessor" class="be.raildelays.batch.processor.FilterTwoDelaysPerDayProcessor" scope="step">
 		<property name="stationA" value="#{jobParameters['station.a.name']}" />

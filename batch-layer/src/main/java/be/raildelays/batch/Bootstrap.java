@@ -102,7 +102,7 @@ public class Bootstrap {
 			parameters.put("date", new JobParameter(new Date()));
 			parameters.put("station.a.name", new JobParameter("Liège-Guillemins"));
 			parameters.put("station.b.name",
-					new JobParameter("new JobParameter(Brussels (Bruxelles)-Central"));
+					new JobParameter("Brussels (Bruxelles)-Central"));
 			parameters.put("output.file.path", new JobParameter("file:./output.dat"));
 			parameters.put("excel.input.template",
 					new JobParameter("./test-classes/template.xlsx"));

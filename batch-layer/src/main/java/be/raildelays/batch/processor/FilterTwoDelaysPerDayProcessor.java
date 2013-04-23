@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.Resource;
-import javax.validation.Validator;
-
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
@@ -24,9 +21,6 @@ public class FilterTwoDelaysPerDayProcessor implements
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(FilterTwoDelaysPerDayProcessor.class);
 
-	@Resource
-	private Validator validator;
-
 	private String stationA;
 
 	private String stationB;
@@ -35,7 +29,6 @@ public class FilterTwoDelaysPerDayProcessor implements
 	public void afterPropertiesSet() throws Exception {
 		Validate.notNull(stationA, "Station A name is mandatory");
 		Validate.notNull(stationB, "Station B name is mandatory");
-		Validate.notNull(validator, "You must provide a validator");
 		
 		LOGGER.info("Processing for stationA={} and stationB={}...", stationA,
 				stationB);
@@ -50,13 +43,13 @@ public class FilterTwoDelaysPerDayProcessor implements
 		ExcelRow fromAtoB = extractMaxDelay(excelRows, Sens.DEPARTURE);
 		ExcelRow fromBtoA = extractMaxDelay(excelRows, Sens.ARRIVAL);
 
-		if (fromBtoA != null) {
-			result.add(fromBtoA);
-		}
-
 		if (fromAtoB != null) {
 			result.add(fromAtoB);
-		}		
+		}	
+		
+		if (fromBtoA != null) {
+			result.add(fromBtoA);
+		}	
 
 		LOGGER.debug("From A to B : {}", fromBtoA);
 		LOGGER.debug("From B to A : {}", fromAtoB);
@@ -97,9 +90,9 @@ public class FilterTwoDelaysPerDayProcessor implements
 		List<ExcelRow> result = new ArrayList<>();
 		Station stationA = new Station(stationAName);
 		Station stationB = new Station(stationBName);
-		Sens sens = null;
 
 		for (LineStop lineStop : items) {
+			Sens sens = null;
 			LineStop departure = lineStop.getPrevious() != null ? readPrevious(lineStop.getPrevious(), stationA,
 					stationB) : null;
 			LineStop arrival = lineStop.getNext() != null ? readNext(lineStop.getNext(), stationA, stationB) : null;
@@ -128,9 +121,6 @@ public class FilterTwoDelaysPerDayProcessor implements
 			}
 
 			ExcelRow excelRow = map(departure, arrival, sens);
-
-			// -- We validate the output
-			validator.validate(excelRow);
 
 			result.add(excelRow);
 		}
@@ -201,10 +191,6 @@ public class FilterTwoDelaysPerDayProcessor implements
 		}
 
 		return result;
-	}
-
-	public void setValidator(Validator validator) {
-		this.validator = validator;
 	}
 
 	public void setStationA(String stationA) {

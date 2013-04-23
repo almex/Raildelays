@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.Resource;
-import javax.validation.Validator;
-
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
@@ -17,13 +14,14 @@ import org.springframework.beans.factory.InitializingBean;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
+import be.raildelays.domain.entities.TimestampDelay;
 import be.raildelays.domain.xls.ExcelRow;
 
 public class ExcelRowMapperProcessor implements
 		ItemProcessor<List<LineStop>, List<ExcelRow>>, InitializingBean {
         
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(ExcelRowMapperProcessor.class);
+			.getLogger(ItemProcessor.class);
 
 	private String stationA;
 
@@ -51,12 +49,10 @@ public class ExcelRowMapperProcessor implements
 
 	private ExcelRow map(LineStop lineStopFrom, LineStop lineStopTo, Sens sens) {
 		ExcelRow result = new ExcelRow();
-		Date effectiveDepartureHour = DateUtils.addMinutes(lineStopFrom
-				.getDepartureTime().getExpected(), lineStopFrom
-				.getDepartureTime().getDelay().intValue());
-		Date effectiveArrivalHour = DateUtils.addMinutes(lineStopTo
-				.getArrivalTime().getExpected(), lineStopTo.getArrivalTime()
-				.getDelay().intValue());
+		Date effectiveDepartureHour = computeEffectiveHour(lineStopFrom
+				.getDepartureTime());
+		Date effectiveArrivalHour = computeEffectiveHour(lineStopTo
+				.getArrivalTime());
 
 		result.setDate(lineStopFrom.getDate());
 		result.setDepartureStation(lineStopFrom.getStation());
@@ -74,6 +70,17 @@ public class ExcelRowMapperProcessor implements
 		result.setDelay(lineStopTo.getArrivalTime().getDelay());
 		result.setSens(sens);
 
+		return result;
+	}
+	
+	private static Date computeEffectiveHour(TimestampDelay timestampDelay) {
+		Date result = null;
+		
+		if (timestampDelay.getExpected() != null) {
+			result = DateUtils.addMinutes(timestampDelay.getExpected(), 
+					timestampDelay.getDelay().intValue());
+		}
+		
 		return result;
 	}
 

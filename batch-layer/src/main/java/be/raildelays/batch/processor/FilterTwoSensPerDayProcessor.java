@@ -1,29 +1,22 @@
 package be.raildelays.batch.processor;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import javax.annotation.Resource;
-import javax.validation.Validator;
-
 import org.apache.commons.lang.Validate;
-import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
 
 import be.raildelays.domain.Sens;
-import be.raildelays.domain.entities.LineStop;
-import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.xls.ExcelRow;
 
 public class FilterTwoSensPerDayProcessor implements
 		ItemProcessor<List<ExcelRow>, List<ExcelRow>>, InitializingBean {
         
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(FilterTwoSensPerDayProcessor.class);
+			.getLogger(ItemProcessor.class);
 
 	private String stationA;
 
