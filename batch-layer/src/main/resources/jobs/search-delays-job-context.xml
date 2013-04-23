@@ -11,20 +11,11 @@
 
 	<!-- Needed if w use a AutomaticJobRegistrar -->
 	<context:annotation-config />
-
-	<batch:job id="searchDelaysJob" restartable="true">
-		<batch:step id="retrieveDataFromRailtime" next="searchDelays">
-			<batch:tasklet transaction-manager="batchTransactionManager">
-				<batch:chunk reader="compositeRailtimeItemReader"
-					writer="raildelaysServiceWriter" commit-interval="1">
-				</batch:chunk>
-				<batch:transaction-attributes
-					isolation="DEFAULT" propagation="REQUIRED" />
-			</batch:tasklet>
-		</batch:step>
+	
+	<batch:job id="searchDelaysJob">		
 		<batch:step id="searchDelays">
 			<batch:tasklet transaction-manager="batchTransactionManager">
-				<batch:chunk reader="compositeRaildelaysItemReader" processor="chainedProcessors" writer="flatFileItemWriter"
+				<batch:chunk reader="compositeRaildelaysItemReader" processor="chainedProcessorsForDelays" writer="flatFileItemWriter"
 					commit-interval="1" skip-limit="100">
 					<batch:skippable-exception-classes>
 						<batch:include class="java.lang.StringIndexOutOfBoundsException"/>
@@ -37,42 +28,6 @@
 	</batch:job>
 
 	<!-- Readers -->	
-
-	<bean id="compositeRailtimeItemReader" class="be.raildelays.batch.reader.CompositeRailtimeItemReader"
-		scope="step">
-		<property name="fileReader">	
-			<bean class="org.springframework.batch.item.file.FlatFileItemReader"
-				scope="step">
-				<property name="lineMapper">
-					<bean
-						class="org.springframework.batch.item.file.mapping.PassThroughLineMapper">
-					</bean>
-				</property>
-<!-- 				<property name="resource" value="dummy" /> -->
-			</bean>
-		</property>
-		<property name="departureReader">
-			<bean class="be.raildelays.batch.reader.RailtimeItemReader"
-				scope="step">
-				<property name="date" value="#{jobParameters[date]}" />
-				<property name="resource" value="#{jobParameters['input.file.path']}" />
-				<property name="sens">
-					<util:constant static-field="be.raildelays.domain.Sens.DEPARTURE" />
-				</property>
-			</bean>
-		</property>
-		<property name="arrivalReader">
-			<bean class="be.raildelays.batch.reader.RailtimeItemReader"
-				scope="step">
-				<property name="date" value="#{jobParameters[date]}" />
-				<property name="resource" value="#{jobParameters['input.file.path']}" />
-				<property name="sens">
-					<util:constant static-field="be.raildelays.domain.Sens.ARRIVAL" />
-				</property>
-			</bean>
-		</property>
-	</bean>
-
 	<bean id="compositeRaildelaysItemReader"
 		class="be.raildelays.batch.reader.CompositeRaildelaysItemReader"
 		scope="step">			
@@ -91,31 +46,19 @@
 		</property>
 	</bean>
 	
-	<bean id="delaysItemReader" class="be.raildelays.batch.reader.DelaysItemReader"
-				scope="step">
-		<property name="date" value="#{jobParameters[date]}" />
-		<property name="stationA" value="#{jobParameters['station.a.name']}" />
-		<property name="stationB" value="#{jobParameters['station.b.name']}" />	
-	</bean>
-	
-	<!-- Processors -->
-	
-	<bean id="delaysPerDayProcessor" class="be.raildelays.batch.processor.FilterTwoDelaysPerDayProcessor" scope="step">
-		<property name="stationA" value="#{jobParameters['station.a.name']}" />
-		<property name="stationB" value="#{jobParameters['station.b.name']}" />
-	</bean>
+	<!-- Processors -->	    
+    <bean id="chainedProcessorsForDelays" class="org.springframework.batch.item.support.CompositeItemProcessor">
+        <property name="delegates">
+            <list>
+                <ref bean="excelRowMapperProcessor" />
+                <ref bean="validatorProcessor" />
+                <ref bean="filterTwoSensPerDayProcessor" />
+                <ref bean="dispatchProcessor" />
+            </list>
+        </property>
+    </bean>
     
     <bean id="excelRowMapperProcessor" class="be.raildelays.batch.processor.ExcelRowMapperProcessor" scope="step">
-		<property name="stationA" value="#{jobParameters['station.a.name']}" />
-		<property name="stationB" value="#{jobParameters['station.b.name']}" />
-	</bean>
-    
-    <bean id="filterTwoSensPerDayProcessor" class="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor" scope="step">
-		<property name="stationA" value="#{jobParameters['station.a.name']}" />
-		<property name="stationB" value="#{jobParameters['station.b.name']}" />
-	</bean>
-    
-    <bean id="dispatchProcessor" class="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor" scope="step">
 		<property name="stationA" value="#{jobParameters['station.a.name']}" />
 		<property name="stationB" value="#{jobParameters['station.b.name']}" />
 	</bean>
@@ -130,23 +73,22 @@
 	    </property>
 	</bean>
     
-    <bean id="chainedProcessors" class="org.springframework.batch.item.support.CompositeItemProcessor">
-        <property name="delegates">
-            <list>
-                <ref bean="excelRowMapperProcessor" />
-                <ref bean="validatorProcessor" />
-                <ref bean="filterTwoSensPerDayProcessor" />
-                <ref bean="dispatchProcessor" />
-            </list>
-        </property>
-    </bean>
+    <bean id="filterTwoSensPerDayProcessor" class="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor" scope="step">
+		<property name="stationA" value="#{jobParameters['station.a.name']}" />
+		<property name="stationB" value="#{jobParameters['station.b.name']}" />
+	</bean>
+    
+    <bean id="dispatchProcessor" class="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor" scope="step">
+		<property name="stationA" value="#{jobParameters['station.a.name']}" />
+		<property name="stationB" value="#{jobParameters['station.b.name']}" />
+	</bean>
+    
+	<!-- bean id="delaysPerDayProcessor" class="be.raildelays.batch.processor.FilterTwoDelaysPerDayProcessor" scope="step">
+		<property name="stationA" value="#{jobParameters['station.a.name']}" />
+		<property name="stationB" value="#{jobParameters['station.b.name']}" />
+	</bean-->
 
 	<!-- Writers -->
-
-	<bean id="raildelaysServiceWriter" class="be.raildelays.batch.writer.RaildelaysServiceWriter"
-		scope="step">
-	</bean>
-
 	<bean id="flatFileItemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter" scope="step">
 		<property name="resource" value="#{jobParameters['output.file.path']}" />
 		<property name="appendAllowed" value="false" />

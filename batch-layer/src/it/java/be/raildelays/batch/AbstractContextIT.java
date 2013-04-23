@@ -10,8 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {
-		"/spring/batch/raildelays-batch-integration-context.xml",
-		"/jobs/batch-jobs-context.xml" })
+		"/spring/batch/raildelays-batch-integration-context.xml" })
 @TransactionConfiguration(defaultRollback = false)
 @Transactional
 public abstract class AbstractContextIT extends

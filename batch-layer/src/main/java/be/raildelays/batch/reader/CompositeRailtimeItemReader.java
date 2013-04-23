@@ -1,6 +1,7 @@
 package be.raildelays.batch.reader;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.validation.Validator;
 
@@ -14,17 +15,14 @@ import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.file.FlatFileItemReader;
 
-import be.raildelays.domain.dto.RouteLogDTO;
-import be.raildelays.domain.dto.ServedStopDTO;
 import be.raildelays.domain.railtime.Direction;
-import be.raildelays.domain.railtime.Step;
 
 /**
  * Composition of {@link FlatFileItemReader} and two {@link RailtimeItemReader}.
  * 
  * @author Almex
  */
-public class CompositeRailtimeItemReader implements ItemStreamReader<RouteLogDTO> {
+public class CompositeRailtimeItemReader implements ItemStreamReader<List<? extends Direction>> {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(CompositeRailtimeItemReader.class);
@@ -57,9 +55,9 @@ public class CompositeRailtimeItemReader implements ItemStreamReader<RouteLogDTO
 		fileReader.close();		
 	}
 
-	public RouteLogDTO read() throws Exception, UnexpectedInputException,
+	public List<? extends Direction> read() throws Exception, UnexpectedInputException,
 			ParseException, NonTransientResourceException {	
-		RouteLogDTO result = null;
+		List<Direction> result = null;
 		String trainId = fileReader.read();		
 		
 		if (trainId != null) {
@@ -71,28 +69,10 @@ public class CompositeRailtimeItemReader implements ItemStreamReader<RouteLogDTO
 			Direction departureDirection = departureReader.read();
 			
 			if (departureDirection != null && arrivalDirection != null) {
-				result = subProcess(departureReader.getDate(), departureDirection, arrivalDirection);
+				result = new ArrayList<>();
+				result.add(departureDirection); 
+				result.add(arrivalDirection);
 			}
-		}
-		
-		return result;
-	}
-
-	private RouteLogDTO subProcess(final Date date, Direction departureDirection, final Direction arrivalDirection) {
-		RouteLogDTO result = new RouteLogDTO(arrivalDirection.getTrain().getIdRailtime(), date);
-		
-		for (Step arrivalStep : arrivalDirection.getSteps()) {
-			int index = arrivalDirection.getSteps().indexOf(arrivalStep);
-			Step departureStep = departureDirection.getSteps().get(index);
-						
-			ServedStopDTO stop = new ServedStopDTO(arrivalStep.getStation().getName(),
-					departureStep.getTimestamp(), departureStep.getDelay(),
-					arrivalStep.getTimestamp(), arrivalStep.getDelay(), arrivalStep.isCanceled() || departureStep.isCanceled());
-			
-			// We validate the result
-			validator.validate(stop);
-			
-			result.addStop(stop);
 		}
 		
 		return result;

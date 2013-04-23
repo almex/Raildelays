@@ -44,7 +44,9 @@ public class Bootstrap {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		String[] contextPaths = new String[] { "/spring/batch/raildelays-batch-integration-context.xml", "/jobs/batch-jobs-context.xml" };
+		String[] contextPaths = new String[] {
+				"/spring/batch/raildelays-batch-integration-context.xml",
+				"/jobs/batch-jobs-context.xml" };
 		SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy");
 		List<Date> dates = generateListOfDates();
 
@@ -53,37 +55,69 @@ public class Bootstrap {
 		ctx.start();
 
 		try {
+			JobRegistry jobRegistry = ctx.getBean(JobRegistry.class);
+			JobExplorer jobExplorer = ctx.getBean(JobExplorer.class);
+			JobOperator jobOperator = ctx.getBean(JobOperator.class);
+			JobRepository jobRepository = ctx.getBean(JobRepository.class);
+			JobLauncher jobLauncher = ctx.getBean(JobLauncher.class);
+			DefaultJobParametersConverter converter = new DefaultJobParametersConverter();
+			converter.setDateFormat(new SimpleDateFormat("dd/MM/yyyy"));
+			Job retrieveDataFromRailtimeJob = null;
+			Job searchDelaysJob = null;
+			String mode = "";
 
-			if (args.length == 0) {
-				JobRegistry jobRegistry = ctx.getBean(JobRegistry.class);
-				JobExplorer jobExplorer = ctx.getBean(JobExplorer.class);
-				JobOperator jobOperator = ctx.getBean(JobOperator.class);
-				JobRepository jobRepository = ctx.getBean(JobRepository.class);
-				JobLauncher jobLauncher = ctx.getBean(JobLauncher.class);
-				DefaultJobParametersConverter converter = new DefaultJobParametersConverter();
-				converter.setDateFormat(new SimpleDateFormat("dd/MM/yyyy"));
-				
-				LOGGER.info("jobNames=", jobRegistry.getJobNames());
-				
-				Job job =  ctx.getBean(Job.class);//jobRegistry.getJob("searchDelaysJob");
+			LOGGER.info("jobNames=", jobRegistry.getJobNames());
 
-				recover(jobRegistry, jobExplorer, jobRepository, jobOperator);
+			if (args.length >= 1) {
+				mode = args[0];
+			}
 
+			if (!("offline".equals(mode)) || mode.isEmpty()) {
+				retrieveDataFromRailtimeJob = jobRegistry
+						.getJob("retrieveDataFromRailtimeJob");
+			}
+
+			if ("offline".equals(mode) || mode.isEmpty()) {
+				searchDelaysJob = jobRegistry.getJob("searchDelaysJob");
+			}
+
+			recover(jobRegistry, jobExplorer, jobRepository, jobOperator);
+
+			if (retrieveDataFromRailtimeJob != null) {
 				for (Date date : dates) {
 					Properties parameters = new Properties();
 
 					parameters.put("input.file.path", "train-list.properties");
 					parameters.put("date", formater.format(date));
 					parameters.put("station.a.name", "Liège-Guillemins");
-					parameters.put("station.b.name", "Brussels (Bruxelles)-Central");
+					parameters.put("station.b.name",
+							"Brussels (Bruxelles)-Central");
 					parameters.put("output.file.path", "file:./output.dat");
-					parameters.put("excel.input.template", "./test-classes/template.xlsx");
+					parameters.put("excel.input.template",
+							"./test-classes/template.xlsx");
 					parameters.put("excel.output.file", "output.xlsx");
 
-					startOrRestartJob(jobLauncher, job, parameters, converter);
+					startOrRestartJob(jobLauncher, retrieveDataFromRailtimeJob,
+							parameters, converter);
 				}
 			}
 
+			if (searchDelaysJob != null) {
+				Properties parameters = new Properties();
+
+				parameters.put("input.file.path", "train-list.properties");
+				parameters.put("date", formater.format(new Date()));
+				parameters.put("station.a.name", "Liège-Guillemins");
+				parameters
+						.put("station.b.name", "Brussels (Bruxelles)-Central");
+				parameters.put("output.file.path", "file:./output.dat");
+				parameters.put("excel.input.template",
+						"./test-classes/template.xlsx");
+				parameters.put("excel.output.file", "output.xlsx");
+
+				startOrRestartJob(jobLauncher, searchDelaysJob, parameters,
+						converter);
+			}
 		} finally {
 			if (ctx != null) {
 				ctx.stop();
@@ -101,7 +135,8 @@ public class Bootstrap {
 	 */
 	private static List<Date> generateListOfDates() {
 		List<Date> result = new ArrayList<>();
-		Calendar date = DateUtils.truncate(Calendar.getInstance(), Calendar.DAY_OF_MONTH);
+		Calendar date = DateUtils.truncate(Calendar.getInstance(),
+				Calendar.DAY_OF_MONTH);
 		date.setLenient(false);
 		Date monday = null;
 		Date tuesday = null;
@@ -144,11 +179,17 @@ public class Bootstrap {
 
 	/**
 	 * Start or restart a batch Job
-	 * @param jobLauncher job launcher
-	 * @param job to execute
-	 * @param parameters parameters for this job instance
-	 * @param converter to convert job parameters
-	 * @throws JobParametersInvalidException thrown when a parameter conversion failed
+	 * 
+	 * @param jobLauncher
+	 *            job launcher
+	 * @param job
+	 *            to execute
+	 * @param parameters
+	 *            parameters for this job instance
+	 * @param converter
+	 *            to convert job parameters
+	 * @throws JobParametersInvalidException
+	 *             thrown when a parameter conversion failed
 	 */
 	public static void startOrRestartJob(final JobLauncher jobLauncher,
 			final Job job, final Properties parameters,
@@ -244,29 +285,33 @@ public class Bootstrap {
 			List<Long> jobInstanceIds = jobOperator.getJobInstances(jobName,
 					start, count);
 
-			LOGGER.debug("Number of jobInstanceIds={} start={} count={} ", new Object[]{jobInstanceIds.size(), start, count});
-			
+			LOGGER.debug("Number of jobInstanceIds={} start={} count={} ",
+					new Object[] { jobInstanceIds.size(), start, count });
+
 			if (jobInstanceIds.size() == 0) {
 				return;
 			}
-			
+
 			for (Long jobInstanceId : jobInstanceIds) {
 				List<Long> jobExecutionIds = jobOperator
 						.getExecutions(jobInstanceId);
 
-				LOGGER.debug("Number of jobExecutionIds={} start={} count={} ", new Object[]{jobExecutionIds.size(), start, count});
-				
+				LOGGER.debug("Number of jobExecutionIds={} start={} count={} ",
+						new Object[] { jobExecutionIds.size(), start, count });
+
 				if (jobExecutionIds.size() == 0) {
 					return;
 				}
-				
+
 				for (Long jobExecutionId : jobExecutionIds) {
 					JobExecution jobExecution = jobExplorer
 							.getJobExecution(jobExecutionId);
 
 					// We will not search batch jobs older than 7 days
 					if (jobExecution.getCreateTime().before(sevenDaysBefore)) {
-						LOGGER.debug("Last job execution analyzed for a restart : {}", jobExecution);
+						LOGGER.debug(
+								"Last job execution analyzed for a restart : {}",
+								jobExecution);
 						return;
 					}
 
