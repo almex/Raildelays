@@ -19,7 +19,7 @@ import org.springframework.test.context.ContextConfiguration;
 @DirtiesContext
 // Because of issue [SPR-8849] (https://jira.springsource.org/browse/SPR-8849)
 @ContextConfiguration(locations = {
-"/spring/jobs/retrieve-data-from-railtime-job-context.xml" })
+"/jobs/retrieve-data-from-railtime-job-context.xml" })
 public class RetrieveDataFromRailtimeJobIT extends AbstractContextIT {
 
 	/**

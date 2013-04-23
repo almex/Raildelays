@@ -24,6 +24,17 @@
 			<version>0.5.2</version>
 		</dependency>
 
+
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-all</artifactId>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>org.ccil.cowan.tagsoup</groupId>
+			<artifactId>tagsoup</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>
