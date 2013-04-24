@@ -34,16 +34,17 @@ public class ExcelRowMapperProcessor implements
 		Validate.notNull(stationA, "Station A name is mandatory");
 		Validate.notNull(stationB, "Station B name is mandatory");
 		
-		LOGGER.info("Processing for stationA={} and stationB={}...", stationA,
+		LOGGER.info("[Pxls] Processing for stationA={} and stationB={}...", stationA,
 				stationB);
 	}
 
 	@Override
 	public List<ExcelRow> process(final List<LineStop> items) throws Exception {
 		List<ExcelRow> result = null;
+		List<ExcelRow> temp = extractSens(items, stationA, stationB);
 		
-		if (items.size() > 0) { // We remove empty list (a null returned value do not pass-through the Writer)
-			result = extractSens(items, stationA, stationB);
+		if (temp.size() > 0) { // We remove empty list (a null returned value do not pass-through the Writer)
+			result = temp;
 		}	
 
 		return result;
@@ -73,7 +74,7 @@ public class ExcelRowMapperProcessor implements
 						"Arrival must not be equal to departure");
 			}			
 
-			LOGGER.trace("departure={} arrival={}", departure, arrival);
+			LOGGER.trace("[Pxls] departure={} arrival={}", departure, arrival);
 
 			if (departure.getStation().equals(stationA)
 					&& arrival.getStation().equals(stationB)) {
@@ -88,6 +89,7 @@ public class ExcelRowMapperProcessor implements
 				ExcelRow excelRow = map(departure, arrival, sens);
 				
 				result.add(excelRow);
+				LOGGER.trace("[Pxls] excelRow={} arrival={}", excelRow);
 			}
 		}
 
@@ -109,7 +111,7 @@ public class ExcelRowMapperProcessor implements
 			}
 		}
 		
-		LOGGER.trace("Extracted from left={}", result);
+		LOGGER.trace("[Pxls] Extracted from left={}", result);
 
 		return result;
 	}
@@ -129,7 +131,7 @@ public class ExcelRowMapperProcessor implements
 			}		
 		}
 
-		LOGGER.trace("Extracted from rigth={}", result);
+		LOGGER.trace("[Pxls] Extracted from rigth={}", result);
 
 		return result;
 	}

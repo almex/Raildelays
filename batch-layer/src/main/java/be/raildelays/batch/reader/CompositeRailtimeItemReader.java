@@ -3,32 +3,32 @@ package be.raildelays.batch.reader;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.validation.Validator;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.core.step.item.Chunk;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.support.CompositeItemStream;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 
 import be.raildelays.domain.railtime.Direction;
 
 /**
  * Composition of {@link FlatFileItemReader} and two {@link RailtimeItemReader}.
  * 
+ * This reader is restartable from the last FAILED {@link Chunk}.
+ * 
  * @author Almex
  */
-public class CompositeRailtimeItemReader implements ItemStreamReader<List<? extends Direction>> {
+public class CompositeRailtimeItemReader extends CompositeItemStream implements ItemReader<List<? extends Direction>>, InitializingBean {
 
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(CompositeRailtimeItemReader.class);
-	
-	@javax.annotation.Resource
-	Validator validator;
+			.getLogger(ItemReader.class);
 	
 	private RailtimeItemReader arrivalReader;
 
@@ -37,22 +37,11 @@ public class CompositeRailtimeItemReader implements ItemStreamReader<List<? exte
 	private FlatFileItemReader<String> fileReader;
 
 	@Override
-	public void open(ExecutionContext executionContext)
-			throws ItemStreamException {
-		fileReader.open(executionContext);
-		
-	}
-
-	@Override
-	public void update(ExecutionContext executionContext)
-			throws ItemStreamException {
-		fileReader.update(executionContext);
-		
-	}
-
-	@Override
-	public void close() throws ItemStreamException {
-		fileReader.close();		
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(arrivalReader, "You must provide a arrivalReader");
+		Assert.notNull(departureReader, "You must provide a departureReader");
+		Assert.notNull(fileReader, "You must provide a fileReader");
+		register(fileReader);
 	}
 
 	public List<? extends Direction> read() throws Exception, UnexpectedInputException,

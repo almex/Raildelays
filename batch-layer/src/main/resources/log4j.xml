@@ -82,7 +82,11 @@
 		<level value="debug" />
 		<appender-ref ref="parser" />
 	</logger>	
-	<logger name="be.raildelays.batch.processor.FilterTwoDelaysPerDayProcessor">
+	<logger name="org.springframework.batch.item.ItemProcessor">
+		<level value="trace" />
+		<appender-ref ref="processor" />
+	</logger>
+	<logger name="org.springframework.batch.item.validator.ValidatingItemProcessor">
 		<level value="trace" />
 		<appender-ref ref="processor" />
 	</logger>
@@ -90,7 +94,7 @@
 		<level value="debug" />
 		<appender-ref ref="output" />
 	</logger>
-	<logger name="be.raildelays.batch.writer">
+	<logger name="org.springframework.batch.item.ItemWriter">
 		<level value="debug" />
 		<appender-ref ref="output" />
 	</logger>

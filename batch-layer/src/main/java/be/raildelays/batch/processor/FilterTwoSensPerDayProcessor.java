@@ -27,38 +27,39 @@ public class FilterTwoSensPerDayProcessor implements
 		Validate.notNull(stationA, "Station A name is mandatory");
 		Validate.notNull(stationB, "Station B name is mandatory");
 		
-		LOGGER.info("Processing for stationA={} and stationB={}...", stationA,
+		LOGGER.info("[Pf] Processing for stationA={} and stationB={}...", stationA,
 				stationB);
 	}
 
 	@Override
 	public List<ExcelRow> process(final List<ExcelRow> items) throws Exception {
 		List<ExcelRow> result = null;
-		
-		if (items != null && items.size() > 0) {			
-			ExcelRow fromAtoB = extractMaxDelay(items, Sens.DEPARTURE);
-			ExcelRow fromBtoA = extractMaxDelay(items, Sens.ARRIVAL);
-	
-			LOGGER.debug("From A to B : {}", fromBtoA);
-			LOGGER.debug("From B to A : {}", fromAtoB);
-	
-			if (fromAtoB != null || fromBtoA != null) {
-				result = new ArrayList<>();
-				
-				if (fromAtoB != null) {
-					result.add(fromAtoB);
-				} else {
-					result.add(fromBtoA);
-				}
+			
+		ExcelRow fromAtoB = extractMaxDelay(items, Sens.DEPARTURE);
+		ExcelRow fromBtoA = extractMaxDelay(items, Sens.ARRIVAL);
+
+		LOGGER.debug("[Pf] From A to B : {}", fromBtoA);
+		LOGGER.debug("[Pf] From B to A : {}", fromAtoB);
+
+		if (fromAtoB != null || fromBtoA != null) {
+			result = new ArrayList<>();
+			
+			if (fromAtoB != null) {
+				result.add(fromAtoB);
+			} 
+			
+			if (fromBtoA != null) {
+				result.add(fromBtoA);
 			}
 		}
+
 
 		return result;
 	}
 
 	private ExcelRow extractMaxDelay(List<ExcelRow> items, Sens sens) {
 		ExcelRow result = null;
-		long maxDelay = 0;
+		long maxDelay = -1;
 
 		for (ExcelRow excelRow : items) {
 			if (excelRow.getSens().equals(sens)
@@ -68,7 +69,7 @@ public class FilterTwoSensPerDayProcessor implements
 			}
 		}		
 
-		LOGGER.trace("maxDelay={}", maxDelay);
+		LOGGER.trace("[Pf] maxDelay={}", maxDelay);
 
 		return result;
 	}

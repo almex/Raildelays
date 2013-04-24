@@ -4,52 +4,40 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.validation.Validator;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.core.step.item.Chunk;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.batch.item.support.CompositeItemStream;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 
 import be.raildelays.domain.entities.LineStop;
 
 /**
  * Composition between {@link DelaysItemReader} and {@link DatabaseDatesItemReader}.
  * 
+ * This reader is restartable from the last FAILED {@link Chunk}.
+ * 
  * @author Almex
  */
-public class CompositeRaildelaysItemReader implements ItemStreamReader<List<LineStop>> {
+public class CompositeRaildelaysItemReader extends CompositeItemStream implements ItemReader<List<LineStop>>, InitializingBean {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ItemReader.class);
-
-	@javax.annotation.Resource
-	Validator validator;
 
 	private DelaysItemReader delaysItemReader;
 	
 	private DatabaseDatesItemReader datesItemReader;
 
 	@Override
-	public void open(ExecutionContext executionContext)
-			throws ItemStreamException {
-		datesItemReader.open(executionContext);
-	}
-
-	@Override
-	public void update(ExecutionContext executionContext)
-			throws ItemStreamException {
-		datesItemReader.update(executionContext);		
-	}
-
-	@Override
-	public void close() throws ItemStreamException {
-		datesItemReader.close();
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(delaysItemReader, "You must provide a DelaysItemReader");
+		Assert.notNull(datesItemReader, "You must provide a DatabaseDatesItemReader");
+		register(datesItemReader);
 	}
 
 	public List<LineStop> read() throws Exception, UnexpectedInputException,
