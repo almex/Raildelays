@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.cli.BasicParser;
@@ -54,7 +53,6 @@ public class Bootstrap {
 	public static void main(String[] args) throws Exception {
 		String[] contextPaths = new String[] {
 				"/spring/batch/raildelays-batch-integration-context.xml" };
-		SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy");
 		List<Date> dates = generateListOfDates();
 		CommandLineParser parser = new BasicParser();
 		Options options = new Options();
@@ -78,39 +76,35 @@ public class Bootstrap {
 			converter.setDateFormat(new SimpleDateFormat("dd/MM/yyyy"));
 			Job retrieveDataFromRailtimeJob = null;
 			Job searchDelaysJob = null;
+			Job searchDelaysXlsJob = null;
 
 			LOGGER.info("jobNames={}", jobRegistry.getJobNames());
 
 			if (online) {
-				LOGGER.info("[ONline mode activated]");
+				LOGGER.info("[ON-line mode activated]");
 				retrieveDataFromRailtimeJob = jobRegistry
 						.getJob("retrieveDataFromRailtimeJob");
 			} else {
-				LOGGER.info("[OFFline mode activated]");				
+				LOGGER.info("[OFF-line mode activated]");				
 			}
 
 			searchDelaysJob = jobRegistry.getJob("searchDelaysJob");
+			searchDelaysXlsJob = jobRegistry.getJob("searchDelaysXlsJob");
 
 			if (recovery) {
 				LOGGER.info("[Recovery activated]");
 				recover(jobRegistry, jobExplorer, jobRepository, jobOperator);
 			}
-
-			Map<String, JobParameter> parameters = new HashMap<>();
-
-			parameters.put("input.file.path", new JobParameter("train-list.properties"));
-			parameters.put("date", new JobParameter(new Date()));
-			parameters.put("station.a.name", new JobParameter("Liège-Guillemins"));
-			parameters.put("station.b.name",
-					new JobParameter("Brussels (Bruxelles)-Central"));
-			parameters.put("output.file.path", new JobParameter("file:./output.dat"));
-			parameters.put("excel.input.template",
-					new JobParameter("./test-classes/template.xlsx"));
-			parameters.put("excel.output.file", new JobParameter("output.xlsx"));
 			
 			if (retrieveDataFromRailtimeJob != null) {
 				for (Date date : dates) {
+					Map<String, JobParameter> parameters = new HashMap<>();
+
+					parameters.put("input.file.path", new JobParameter("train-list.properties"));
 					parameters.put("date", new JobParameter(date));
+					parameters.put("station.a.name", new JobParameter("Liège-Guillemins"));
+					parameters.put("station.b.name",
+							new JobParameter("Brussels (Bruxelles)-Central"));
 					
 					JobParameters jobParameters = new JobParameters(parameters);
 					
@@ -120,9 +114,23 @@ public class Bootstrap {
 			}
 
 			if (searchDelaysJob != null) {
+				Map<String, JobParameter> parameters = new HashMap<>();
+				
+				parameters.put("date", new JobParameter(new Date()));
+				parameters.put("station.a.name", new JobParameter("Liège-Guillemins"));
+				parameters.put("station.b.name",
+						new JobParameter("Brussels (Bruxelles)-Central"));
+				parameters.put("output.file.path", new JobParameter("file:./output.dat"));
+				parameters.put("excel.input.template",
+						new JobParameter("./test-classes/template.xlsx"));
+				parameters.put("excel.output.file", new JobParameter("output.xlsx"));
+				
 				JobParameters jobParameters = new JobParameters(parameters);
 				
 				startOrRestartJob(jobLauncher, searchDelaysJob, jobParameters,
+						converter);
+				
+				startOrRestartJob(jobLauncher, searchDelaysXlsJob, jobParameters,
 						converter);
 			}
 		} finally {

@@ -61,7 +61,7 @@
 	<appender name="processor" class="org.apache.log4j.FileAppender">
 		<param name="file" value="log/processor.log"/>		
 		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%d{DATE} %-5p %-15c{1}: %m%n" />
+			<param name="ConversionPattern" value="%m%n" />
 		</layout>
 	</appender>
 	
