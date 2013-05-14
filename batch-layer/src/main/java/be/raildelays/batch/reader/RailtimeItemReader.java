@@ -25,7 +25,7 @@ import be.raildelays.parser.impl.RailtimeStreamParser;
 public class RailtimeItemReader implements ItemReader<Direction>, InitializingBean {
 
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(RailtimeItemReader.class);
+			.getLogger(ItemReader.class);
 
 	@Resource
 	private RequestStreamer streamer;
@@ -50,6 +50,8 @@ public class RailtimeItemReader implements ItemReader<Direction>, InitializingBe
 			ParseException, NonTransientResourceException {
 		Direction result = null;
 		
+		LOGGER.debug("Requesting Railtime for trainId={} date={} sens={}", new Object[]{trainId, date, sens});
+		
 		if (trainId != null && date != null && sens != null) {
 			// -- Create a request to target Railtime
 			Reader englishStream = streamer.getDelays(trainId, date,
@@ -73,9 +75,7 @@ public class RailtimeItemReader implements ItemReader<Direction>, InitializingBe
 	 * Reset the reader for the next iteration
 	 */
 	private void reset() {
-		trainId = null;
-		date = null;
-		sens = null;		
+		trainId = null;	
 	}
 
 	/**

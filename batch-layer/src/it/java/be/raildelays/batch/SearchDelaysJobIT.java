@@ -52,7 +52,7 @@ public class SearchDelaysJobIT extends AbstractContextIT {
 			
 			batchStatus = jobLauncherTestUtils.launchJob(new JobParameters(parameters)).getStatus();
 			
-			Assert.assertEquals(BatchStatus.COMPLETED, batchStatus);
+			Assert.assertFalse(batchStatus.isUnsuccessful());
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail("Your batch job has failed due to an exception.");

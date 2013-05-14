@@ -35,26 +35,32 @@ public class RouteLogMapperProcessor implements
 	public void afterPropertiesSet() throws Exception {
 		Validate.notNull(date, "Date is mandatory");
 		
-		LOGGER.info("Processing for date={}...", date);
+		LOGGER.info("[Rt] Processing for date={}...", date);
 	}
 
 	@Override
 	public RouteLogDTO process(final List<Direction> items) throws Exception {		
-		Direction arrivalDirection = items.get(0);
-		Direction departureDirection = items.get(1);
+		RouteLogDTO result = null;
 		
-		RouteLogDTO result = new RouteLogDTO(arrivalDirection.getTrain().getIdRailtime(), date);
+		LOGGER.info("[Rt] Processing {} Direction...", items.size());
 		
-		for (Step arrivalStep : arrivalDirection.getSteps()) {
-			int index = arrivalDirection.getSteps().indexOf(arrivalStep);
-			Step departureStep = departureDirection.getSteps().get(index);
-						
-			ServedStopDTO stop = new ServedStopDTO(arrivalStep.getStation().getName(),
-					departureStep.getTimestamp(), departureStep.getDelay(),
-					arrivalStep.getTimestamp(), arrivalStep.getDelay(), arrivalStep.isCanceled() || departureStep.isCanceled());
+		if (items.size() >= 2) {
+			Direction arrivalDirection = items.get(0);
+			Direction departureDirection = items.get(1);
 			
+			result = new RouteLogDTO(arrivalDirection.getTrain().getIdRailtime(), date);
 			
-			result.addStop(stop);
+			for (Step arrivalStep : arrivalDirection.getSteps()) {
+				int index = arrivalDirection.getSteps().indexOf(arrivalStep);
+				Step departureStep = departureDirection.getSteps().get(index);
+							
+				ServedStopDTO stop = new ServedStopDTO(arrivalStep.getStation().getName(),
+						departureStep.getTimestamp(), departureStep.getDelay(),
+						arrivalStep.getTimestamp(), arrivalStep.getDelay(), arrivalStep.isCanceled() || departureStep.isCanceled());
+				
+				
+				result.addStop(stop);
+			}
 		}
 		
 		return result;

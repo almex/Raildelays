@@ -49,7 +49,13 @@ public class CompositeRailtimeItemReader extends CompositeItemStream implements 
 		List<Direction> result = null;
 		String trainId = fileReader.read();		
 		
+		LOGGER.info("trainId={}", trainId);
+		
 		if (trainId != null) {
+			// From this point we consider that we can continue to read next item.
+			// No matter if we can retrieve some Direction or not from Railtime.
+			// So we return a non null value to satisfy ItemReader contract.
+			result = new ArrayList<>(); 
 			
 			departureReader.setTrainId(trainId);
 			arrivalReader.setTrainId(trainId);
@@ -58,7 +64,6 @@ public class CompositeRailtimeItemReader extends CompositeItemStream implements 
 			Direction departureDirection = departureReader.read();
 			
 			if (departureDirection != null && arrivalDirection != null) {
-				result = new ArrayList<>();
 				result.add(departureDirection); 
 				result.add(arrivalDirection);
 			}
