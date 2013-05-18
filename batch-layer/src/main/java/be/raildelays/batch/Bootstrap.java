@@ -7,7 +7,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.cli.BasicParser;
@@ -46,31 +48,31 @@ public class Bootstrap {
 
 	static final private Logger LOGGER = LoggerFactory
 			.getLogger(Bootstrap.class);
-	
+
 	/**
 	 * @param args
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		String[] contextPaths = new String[] {
-				"/spring/bootstrap-context.xml" };
+		String[] contextPaths = new String[] { "/spring/bootstrap-context.xml" };
 		List<Date> dates = generateListOfDates();
 		CommandLineParser parser = new BasicParser();
 		Options options = new Options();
-		
+
 		options.addOption("offline", false, "activate offline mode");
 		options.addOption("norecovery", false, "do not execute recovery");
-		
-		CommandLine cmd = parser.parse( options , args);
+
+		CommandLine cmd = parser.parse(options, args);
 		boolean online = !cmd.hasOption("offline");
 		boolean recovery = !cmd.hasOption("norecovery");
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(
 				contextPaths);
-		
+
 		ctx.start();
 
 		try {
-			MessageSource configuration = ctx.getBean("configuration", MessageSource.class);
+			Properties configuration = ctx.getBean("configuration",
+					Properties.class);
 			JobRegistry jobRegistry = ctx.getBean(JobRegistry.class);
 			JobExplorer jobExplorer = ctx.getBean(JobExplorer.class);
 			JobOperator jobOperator = ctx.getBean(JobOperator.class);
@@ -81,7 +83,15 @@ public class Bootstrap {
 			Job retrieveDataFromRailtimeJob = null;
 			Job searchDelaysJob = null;
 			Job searchDelaysXlsJob = null;
-			
+
+			String departure = configuration.getProperty("departure");
+			String arrival = configuration.getProperty("arrival");
+			String excelInputTemplate = configuration
+					.getProperty("excel.input.template");
+			String textOutputPath = configuration
+					.getProperty("text.output.path");
+			String excelOutputPath = configuration
+					.getProperty("excel.output.path");
 
 			LOGGER.info("jobNames={}", jobRegistry.getJobNames());
 
@@ -90,7 +100,7 @@ public class Bootstrap {
 				retrieveDataFromRailtimeJob = jobRegistry
 						.getJob("retrieveDataFromRailtimeJob");
 			} else {
-				LOGGER.info("[OFF-line mode activated]");				
+				LOGGER.info("[OFF-line mode activated]");
 			}
 
 			searchDelaysJob = jobRegistry.getJob("searchDelaysJob");
@@ -100,19 +110,20 @@ public class Bootstrap {
 				LOGGER.info("[Recovery activated]");
 				recover(jobRegistry, jobExplorer, jobRepository, jobOperator);
 			}
-			
+
 			if (retrieveDataFromRailtimeJob != null) {
 				for (Date date : dates) {
 					Map<String, JobParameter> parameters = new HashMap<>();
 
-					parameters.put("input.file.path", new JobParameter("file:./conf/train.list"));
+					parameters.put("input.file.path", new JobParameter(
+							"file:./conf/train.list"));
 					parameters.put("date", new JobParameter(date));
-					parameters.put("station.a.name", new JobParameter("Liège-Guillemins"));
-					parameters.put("station.b.name",
-							new JobParameter("Brussels (Bruxelles)-Central"));
-					
+					parameters.put("station.a.name",
+							new JobParameter(departure));
+					parameters.put("station.b.name", new JobParameter(arrival));
+
 					JobParameters jobParameters = new JobParameters(parameters);
-					
+
 					startOrRestartJob(jobLauncher, retrieveDataFromRailtimeJob,
 							jobParameters, converter);
 				}
@@ -120,23 +131,25 @@ public class Bootstrap {
 
 			if (searchDelaysJob != null) {
 				Map<String, JobParameter> parameters = new HashMap<>();
-				
+
 				parameters.put("date", new JobParameter(new Date()));
-				parameters.put("station.a.name", new JobParameter("Liège-Guillemins"));
-				parameters.put("station.b.name",
-						new JobParameter("Brussels (Bruxelles)-Central"));
-				parameters.put("output.file.path", new JobParameter("file:./output.dat"));
-				parameters.put("excel.input.template",
-						new JobParameter("./resources/template.xlsx"));
-				parameters.put("excel.output.file", new JobParameter("output.xlsx"));
-				
+				parameters.put("station.a.name", new JobParameter(departure));
+				parameters.put("station.b.name", new JobParameter(arrival));
+				parameters.put("output.file.path", new JobParameter(
+						textOutputPath));
+				parameters.put("excel.input.template", new JobParameter(
+						excelInputTemplate));
+				parameters.put("excel.output.file", new JobParameter(
+						excelOutputPath));
+
 				JobParameters jobParameters = new JobParameters(parameters);
-				
+
 				startOrRestartJob(jobLauncher, searchDelaysJob, jobParameters,
 						converter);
-				
-//				startOrRestartJob(jobLauncher, searchDelaysXlsJob, jobParameters,
-//						converter);
+
+				// startOrRestartJob(jobLauncher, searchDelaysXlsJob,
+				// jobParameters,
+				// converter);
 			}
 		} finally {
 			if (ctx != null) {

@@ -9,6 +9,12 @@
 		</layout>
 	</appender>
 	
+	<appender name="null" class="org.apache.log4j.varia.NullAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%m%n" />
+		</layout>
+	</appender>
+	
 	<appender name="railtime-data-reader" class="org.apache.log4j.DailyRollingFileAppender">
 		<param name="Append" value="false"/>
 		<param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/>
@@ -90,8 +96,7 @@
 		</layout>
 	</appender>
 	 
-	<logger name="be.raildelays.batch.Bootstrap">
-		<level value="info" />
+	<logger name="be.raildelays.batch.Bootstrap" level="info">
 		<appender-ref ref="console" />
 	</logger>
 	
@@ -172,7 +177,7 @@
 
 	<root>
 		<level value="error" />
-		<appender-ref ref="console" />
+		<appender-ref ref="null" />
 	</root>
 
 </log4j:configuration>
