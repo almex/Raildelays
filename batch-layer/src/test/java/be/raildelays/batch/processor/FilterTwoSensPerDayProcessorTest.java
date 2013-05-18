@@ -12,94 +12,128 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
-import be.raildelays.domain.entities.LineStop;
+import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.TimestampDelay;
 import be.raildelays.domain.entities.Train;
 import be.raildelays.domain.xls.ExcelRow;
+import be.raildelays.domain.xls.ExcelRow.ExcelRowBuilder;
 
 @RunWith(value = BlockJUnit4ClassRunner.class)
 public class FilterTwoSensPerDayProcessorTest {
 
-	private List<LineStop> fromA;
-
-	private List<LineStop> fromB;
+	private List<ExcelRow> list;
 
 	/**
 	 * S.U.T.
 	 */
-	private FilterTwoDelaysPerDayProcessor processor;
+	private FilterTwoSensPerDayProcessor processor;
 
 	@Before
 	public void setUp() throws ParseException {
 		Date today = new Date();
 		SimpleDateFormat f = new SimpleDateFormat("HH:mm");
+		Station stationA = new Station("A");
+		Station stationB = new Station("B");
+
+		list = new ArrayList<>();
 		
-		//      1         ->      A          ->      2          ->    B            ->      3
-		// 12:00-12:05(5) -> 12:20-12:25(10) -> 12:45-12:50(15) -> 12:55-13:00(20) -> 13:45-<null>(25)
-		TimestampDelay arrivalTime;
-		TimestampDelay departureTime;
-		
-		arrivalTime = new TimestampDelay(f.parse("12:00"), 5L);
-		departureTime = new TimestampDelay(f.parse("12:05"), 5L);		
-		LineStop stop1 = new LineStop(today, new Train("466"), new Station(
-				"station1"), arrivalTime, departureTime, false);
-		arrivalTime = new TimestampDelay(f.parse("12:20"), 10L);
-		departureTime = new TimestampDelay(f.parse("12:25"), 10L);
-		LineStop stopA = new LineStop(today, new Train("466"), new Station(
-				"stationA"), arrivalTime, departureTime, false, stop1);
-		arrivalTime = new TimestampDelay(f.parse("12:45"), 15L);
-		departureTime = new TimestampDelay(f.parse("12:50"), 15L);
-		LineStop stop2 = new LineStop(today, new Train("466"), new Station(
-				"station2"), arrivalTime, departureTime, false, stopA);
-		arrivalTime = new TimestampDelay(f.parse("12:55"), 20L);
-		departureTime = new TimestampDelay(f.parse("13:00"), 20L);
-		LineStop stopB = new LineStop(today, new Train("466"), new Station(
-				"stationB"), arrivalTime, departureTime, false, stop2);
-		arrivalTime = new TimestampDelay(f.parse("13:45"), 25L);
-		departureTime = null;
-		LineStop stop3 = new LineStop(today, new Train("466"), new Station(
-				"station3"), arrivalTime, departureTime, false, stopB);
+		list.add(new ExcelRowBuilder(today) //
+				.departureStation(stationA) //
+				.arrivalStation(stationB) //
+				.expectedTrain1(new Train("466")) //
+				.expectedArrivalTime(f.parse("07:00")) //
+				.expectedDepartureTime(f.parse("07:05")) //
+				.effectiveTrain1(new Train("466")) //
+				.effectiveDepartureTime(f.parse("07:03")) //
+				.effectiveDepartureTime(f.parse("07:10")) //
+				.sens(Sens.DEPARTURE) //
+				.delay(5L) //
+				.build());
 
-		fromA = new ArrayList<>();
-		fromA.add(stopA);
+		list.add(new ExcelRowBuilder(today) //
+				.departureStation(stationA) //
+				.arrivalStation(stationB) //
+				.expectedTrain1(new Train("530")) //
+				.expectedArrivalTime(f.parse("08:00")) //
+				.expectedDepartureTime(f.parse("08:05")) //
+				.effectiveTrain1(new Train("466")) //
+				.effectiveDepartureTime(f.parse("08:03")) //
+				.effectiveDepartureTime(f.parse("08:15")) //
+				.sens(Sens.DEPARTURE) //
+				.delay(10L) //
+				.build());
 
-		fromB = new ArrayList<>();
-		fromB.add(stopB);
+		list.add(new ExcelRowBuilder(today) //
+				.departureStation(stationA) //
+				.arrivalStation(stationB) //
+				.expectedTrain1(new Train("531")) //
+				.expectedArrivalTime(f.parse("12:00")) //
+				.expectedDepartureTime(f.parse("12:05")) //
+				.effectiveTrain1(new Train("466")) //
+				.effectiveDepartureTime(f.parse("12:03")) //
+				.effectiveDepartureTime(f.parse("12:20")) //
+				.sens(Sens.DEPARTURE) //
+				.delay(15L) //
+				.build());
 
-		fromA.add(stopA);
-		processor = new FilterTwoDelaysPerDayProcessor();
-		processor.setStationA("stationA"); 
-		processor.setStationB("stationB"); 
+		list.add(new ExcelRowBuilder(today) //
+				.departureStation(stationB) //
+				.arrivalStation(stationA) //
+				.expectedTrain1(new Train("467")) //
+				.expectedArrivalTime(f.parse("15:00")) //
+				.expectedDepartureTime(f.parse("15:05")) //
+				.effectiveTrain1(new Train("466")) //
+				.effectiveDepartureTime(f.parse("15:03")) //
+				.effectiveDepartureTime(f.parse("15:10")) //
+				.sens(Sens.ARRIVAL) //
+				.delay(5L) //
+				.build());
+
+		list.add(new ExcelRowBuilder(today) //
+				.departureStation(stationB) //
+				.arrivalStation(stationA) //
+				.expectedTrain1(new Train("477")) //
+				.expectedArrivalTime(f.parse("16:00")) //
+				.expectedDepartureTime(f.parse("16:05")) //
+				.effectiveTrain1(new Train("466")) //
+				.effectiveDepartureTime(f.parse("16:03")) //
+				.effectiveDepartureTime(f.parse("16:10")) //
+				.sens(Sens.ARRIVAL) //
+				.delay(5L) //
+				.build());
+
+		processor = new FilterTwoSensPerDayProcessor();
+		processor.setStationA(stationA.getEnglishName());
+		processor.setStationB(stationB.getEnglishName());
 	}
 
 	@Test
-	public void testProcessFromA() throws Exception {
-		List<ExcelRow> excelRows = processor.process(fromA);
-		SimpleDateFormat formater = new SimpleDateFormat("HH:mm");
+	public void testProcessReturnTwo() throws Exception {
+		List<ExcelRow> excelRows = processor.process(list);
 
-		Assert.assertEquals(1, excelRows.size());	
-		ExcelRow excelRow = excelRows.get(0);
-		Assert.assertEquals(new Station("stationA"), excelRow.getDepartureStation());
-		Assert.assertEquals(new Station("stationB"), excelRow.getArrivalStation());
-		Assert.assertEquals(new Train("466"), excelRow.getExpectedTrain1());
-		Assert.assertEquals(new Train("466"), excelRow.getEffectiveTrain1());
-		Assert.assertEquals(formater.parse("12:25"), excelRow.getExpectedDepartureHour());
-		Assert.assertEquals(formater.parse("12:55"), excelRow.getExpectedArrivalHour());
-		Assert.assertEquals(formater.parse("12:35"), excelRow.getEffectiveDepartureHour());
-		Assert.assertEquals(formater.parse("13:15"), excelRow.getEffectiveArrivalHour());
-		Assert.assertEquals(20, excelRow.getDelay());
+		Assert.assertEquals(2, excelRows.size());
 	}
-
+	
 	@Test
-	public void testProcessFromB() throws Exception {
-		List<ExcelRow> excelRows = processor.process(fromB);
+	public void testProcessOrder() throws Exception {
+		List<ExcelRow> excelRows = processor.process(list);
 
-		Assert.assertEquals(1, excelRows.size());
-		ExcelRow excelRow = excelRows.get(0);
-		Assert.assertEquals(new Station("stationA"), excelRow.getDepartureStation());
-		Assert.assertEquals(new Station("stationB"), excelRow.getArrivalStation());
-		Assert.assertEquals(20, excelRow.getDelay());
+		ExcelRow excelRow1 = excelRows.get(0);
+		ExcelRow excelRow2 = excelRows.get(1);
+		
+		Assert.assertEquals(Sens.DEPARTURE, excelRow1.getSens());
+		Assert.assertEquals(Sens.ARRIVAL, excelRow2.getSens());
+	}
+	
+	@Test
+	public void testProcessMaxDelaysPerSens() throws Exception {
+		List<ExcelRow> excelRows = processor.process(list);
+
+		ExcelRow excelRow1 = excelRows.get(0);
+		ExcelRow excelRow2 = excelRows.get(1);
+		
+		Assert.assertEquals(15, excelRow1.getDelay());
+		Assert.assertEquals(5, excelRow2.getDelay());
 	}
 
 }

@@ -22,44 +22,48 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
 import be.raildelays.domain.xls.ExcelRow;
+import static be.raildelays.domain.xls.ExcelRow.ExcelRowBuilder;
 
-@ContextConfiguration (locations = {"ExcelSheetItemWriterIT.xml"})
-@TestExecutionListeners( { DependencyInjectionTestExecutionListener.class, 
-    StepScopeTestExecutionListener.class })
+;
+
+@ContextConfiguration(locations = { "ExcelSheetItemWriterIT.xml" })
+@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
+		StepScopeTestExecutionListener.class })
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ExcelSheetItemWriterIT {
 
 	@Autowired
 	private ExcelSheetItemWriter writer;
-	
+
 	@Before
 	public void setUp() throws FileNotFoundException {
-		writer.open(MetaDataInstanceFactory.createStepExecution().getExecutionContext());
+		writer.open(MetaDataInstanceFactory.createStepExecution()
+				.getExecutionContext());
 	}
-	
+
 	@Test
 	public void testTemplate() throws Exception {
 		List<ExcelRow> items = new ArrayList<>();
-		ExcelRow row = new ExcelRow();
 		DateFormat formater = new SimpleDateFormat("HH:mm");
-		
-		row.setDate(new Date());
-		row.setDepartureStation(new Station("Liège-Guillemins"));
-		row.setArrivalStation(new Station("Bruxelles-central"));
-		row.setExpectedDepartureHour(formater.parse("14:00"));
-		row.setExpectedArrivalHour(formater.parse("15:00"));
-		row.setExpectedTrain1(new Train("466"));
-		row.setEffectiveDepartureHour(formater.parse("14:05"));
-		row.setEffectiveArrivalHour(formater.parse("15:15"));
-		row.setEffectiveTrain1(new Train("466"));
-		
+		ExcelRow row = new ExcelRowBuilder(new Date()) //
+				.departureStation(new Station("Liège-Guillemins")) //
+				.arrivalStation(new Station("Bruxelles-central")) //
+				.expectedDepartureTime(formater.parse("14:00")) //
+				.expectedArrivalTime(formater.parse("15:00")) //
+				.expectedTrain1(new Train("466")) //
+				.effectiveDepartureTime(formater.parse("14:05")) //
+				.effectiveArrivalTime(formater.parse("15:15")) //
+				.effectiveTrain1(new Train("466")) //
+				.build();
+
 		items.add(row);
-		
+
 		writer.write(items);
-		writer.update(MetaDataInstanceFactory.createStepExecution().getExecutionContext());
-		
+		writer.update(MetaDataInstanceFactory.createStepExecution()
+				.getExecutionContext());
+
 	}
-	
+
 	@After
 	public void tearDown() {
 		writer.close();

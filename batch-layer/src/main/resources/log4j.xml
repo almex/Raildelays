@@ -10,56 +10,56 @@
 	</appender>
 	
 	<appender name="output" class="org.apache.log4j.FileAppender">
-		<param name="file" value="log/output.log"/>		
+		<param name="file" value="logs/output.log"/>		
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d{DATE} %-5p %-15c{1}: %m%n" />
 		</layout>
 	</appender>	
 	
 	<appender name="service" class="org.apache.log4j.FileAppender">
-		<param name="file" value="log/service.log"/>		
+		<param name="file" value="logs/service.log"/>		
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d{DATE} %-5p %-15c{1}: %m%n" />
 		</layout>
 	</appender>	
 	
 	<appender name="streamer" class="org.apache.log4j.FileAppender">
-		<param name="file" value="log/streamer.log"/>		
+		<param name="file" value="logs/streamer.log"/>		
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d{DATE} %-5p %-15c{1}: %m%n" />
 		</layout>
 	</appender>
 	
 	<appender name="parser" class="org.apache.log4j.FileAppender">
-		<param name="file" value="log/parser.log"/>		
+		<param name="file" value="logs/parser.log"/>		
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d{DATE} %-5p %-15c{1}: %m%n" />
 		</layout>
 	</appender>
 	
 	<appender name="input" class="org.apache.log4j.FileAppender">
-		<param name="file" value="log/input.log"/>		
+		<param name="file" value="logs/input.log"/>		
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d{DATE} %-5p %-15c{1}: %m%n" />
 		</layout>
 	</appender>
 	
 	<appender name="springbatch" class="org.apache.log4j.FileAppender">
-		<param name="file" value="log/springbatch.log"/>		
+		<param name="file" value="logs/springbatch.log"/>		
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d{DATE} %-5p %-15c{1}: %m%n" />
 		</layout>
 	</appender>
 	
 	<appender name="error" class="org.apache.log4j.FileAppender">
-		<param name="file" value="log/error.log"/>		
+		<param name="file" value="logs/error.log"/>		
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d{DATE} %-5p %-15c{1}: %m%n" />
 		</layout>
 	</appender>
 	
 	<appender name="processor" class="org.apache.log4j.FileAppender">
-		<param name="file" value="log/processor.log"/>		
+		<param name="file" value="logs/processor.log"/>		
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%m%n" />
 		</layout>

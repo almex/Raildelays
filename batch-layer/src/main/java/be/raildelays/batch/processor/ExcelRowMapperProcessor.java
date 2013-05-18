@@ -16,10 +16,13 @@ import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.TimestampDelay;
 import be.raildelays.domain.xls.ExcelRow;
+import static be.raildelays.domain.xls.ExcelRow.ExcelRowBuilder;
+
+;
 
 public class ExcelRowMapperProcessor implements
 		ItemProcessor<List<LineStop>, List<ExcelRow>>, InitializingBean {
-        
+
 	private static final int DELAY_THRESHOLD = 15;
 
 	private static final Logger LOGGER = LoggerFactory
@@ -33,19 +36,20 @@ public class ExcelRowMapperProcessor implements
 	public void afterPropertiesSet() throws Exception {
 		Validate.notNull(stationA, "Station A name is mandatory");
 		Validate.notNull(stationB, "Station B name is mandatory");
-		
-		LOGGER.info("[Pxls] Processing for stationA={} and stationB={}...", stationA,
-				stationB);
+
+		LOGGER.info("[Pxls] Processing for stationA={} and stationB={}...",
+				stationA, stationB);
 	}
 
 	@Override
 	public List<ExcelRow> process(final List<LineStop> items) throws Exception {
 		List<ExcelRow> result = null;
 		List<ExcelRow> temp = extractSens(items, stationA, stationB);
-		
-		if (temp.size() > 0) { // We remove empty list (a null returned value do not pass-through the Writer)
+
+		if (temp.size() > 0) { // We remove empty list (a null returned value do
+								// not pass-through the Writer)
 			result = temp;
-		}	
+		}
 
 		return result;
 	}
@@ -58,7 +62,8 @@ public class ExcelRowMapperProcessor implements
 		Sens sens = null;
 
 		for (LineStop lineStop : items) {
-			LineStop departure = readPrevious(lineStop.getPrevious(), stationA, stationB);
+			LineStop departure = readPrevious(lineStop.getPrevious(), stationA,
+					stationB);
 			LineStop arrival = readNext(lineStop.getNext(), stationA, stationB);
 
 			if (departure == null) {
@@ -72,7 +77,7 @@ public class ExcelRowMapperProcessor implements
 			if (arrival == departure) {
 				throw new IllegalStateException(
 						"Arrival must not be equal to departure");
-			}			
+			}
 
 			LOGGER.trace("[Pxls] departure={} arrival={}", departure, arrival);
 
@@ -84,10 +89,10 @@ public class ExcelRowMapperProcessor implements
 				sens = Sens.ARRIVAL;
 			}
 
-			// We filters row a minimum delay of 15 minutes 
+			// We filters row a minimum delay of 15 minutes
 			if (arrival.getArrivalTime().getDelay() >= DELAY_THRESHOLD) {
 				ExcelRow excelRow = map(departure, arrival, sens);
-				
+
 				result.add(excelRow);
 				LOGGER.trace("[Pxls] excelRow={} arrival={}", excelRow);
 			}
@@ -110,7 +115,7 @@ public class ExcelRowMapperProcessor implements
 						stationB);
 			}
 		}
-		
+
 		LOGGER.trace("[Pxls] Extracted from left={}", result);
 
 		return result;
@@ -120,7 +125,6 @@ public class ExcelRowMapperProcessor implements
 			Station stationB) {
 		LineStop result = null;
 
-
 		if (lineStop != null) {
 			if (lineStop.getStation().equals(stationA)) {
 				result = lineStop;
@@ -128,7 +132,7 @@ public class ExcelRowMapperProcessor implements
 				result = lineStop;
 			} else if (lineStop.getNext() != null) {
 				result = readNext(lineStop.getNext(), stationA, stationB);
-			}		
+			}
 		}
 
 		LOGGER.trace("[Pxls] Extracted from rigth={}", result);
@@ -137,39 +141,35 @@ public class ExcelRowMapperProcessor implements
 	}
 
 	private ExcelRow map(LineStop lineStopFrom, LineStop lineStopTo, Sens sens) {
-		ExcelRow result = new ExcelRow();
-		Date effectiveDepartureHour = computeEffectiveHour(lineStopFrom
+		Date effectiveDepartureTime = computeEffectiveTime(lineStopFrom
 				.getDepartureTime());
-		Date effectiveArrivalHour = computeEffectiveHour(lineStopTo
+		Date effectiveArrivalTime = computeEffectiveTime(lineStopTo
 				.getArrivalTime());
-
-		result.setDate(lineStopFrom.getDate());
-		result.setDepartureStation(lineStopFrom.getStation());
-		result.setArrivalStation(lineStopTo.getStation());
-		result.setLinkStation(null);
-		result.setExpectedDepartureHour(lineStopFrom.getDepartureTime()
-				.getExpected());
-		result.setExpectedArrivalHour(lineStopTo.getArrivalTime().getExpected());
-		result.setExpectedTrain1(lineStopFrom.getTrain());
-		result.setExpectedTrain2(null);
-		result.setEffectiveDepartureHour(effectiveDepartureHour);
-		result.setEffectiveArrivalHour(effectiveArrivalHour);
-		result.setEffectiveTrain1(lineStopTo.getTrain());
-		result.setEffectiveTrain2(null);
-		result.setDelay(lineStopTo.getArrivalTime().getDelay());
-		result.setSens(sens);
+		ExcelRow result = new ExcelRowBuilder(lineStopFrom.getDate()) //
+				.departureStation(lineStopFrom.getStation()) //
+				.arrivalStation(lineStopTo.getStation()) //
+				.expectedDepartureTime(
+						lineStopFrom.getDepartureTime().getExpected()) //
+				.expectedArrivalTime(lineStopTo.getArrivalTime().getExpected()) //
+				.expectedTrain1(lineStopFrom.getTrain()) //
+				.effectiveDepartureTime(effectiveDepartureTime) //
+				.effectiveArrivalTime(effectiveArrivalTime) //
+				.effectiveTrain1(lineStopTo.getTrain()) //
+				.delay(lineStopTo.getArrivalTime().getDelay()) //
+				.sens(sens) //
+				.build();
 
 		return result;
 	}
-	
-	private static Date computeEffectiveHour(TimestampDelay timestampDelay) {
+
+	private static Date computeEffectiveTime(TimestampDelay timestampDelay) {
 		Date result = null;
-		
+
 		if (timestampDelay.getExpected() != null) {
-			result = DateUtils.addMinutes(timestampDelay.getExpected(), 
+			result = DateUtils.addMinutes(timestampDelay.getExpected(),
 					timestampDelay.getDelay().intValue());
 		}
-		
+
 		return result;
 	}
 

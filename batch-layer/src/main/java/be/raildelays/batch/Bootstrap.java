@@ -56,14 +56,16 @@ public class Bootstrap {
 		List<Date> dates = generateListOfDates();
 		CommandLineParser parser = new BasicParser();
 		Options options = new Options();
+		
 		options.addOption("offline", false, "activate offline mode");
 		options.addOption("norecovery", false, "do not execute recovery");
+		
 		CommandLine cmd = parser.parse( options , args);
 		boolean online = !cmd.hasOption("offline");
 		boolean recovery = !cmd.hasOption("norecovery");
-
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(
 				contextPaths);
+		
 		ctx.start();
 
 		try {
@@ -100,7 +102,7 @@ public class Bootstrap {
 				for (Date date : dates) {
 					Map<String, JobParameter> parameters = new HashMap<>();
 
-					parameters.put("input.file.path", new JobParameter("train-list.properties"));
+					parameters.put("input.file.path", new JobParameter("./conf/train-list.properties"));
 					parameters.put("date", new JobParameter(date));
 					parameters.put("station.a.name", new JobParameter("Liège-Guillemins"));
 					parameters.put("station.b.name",
@@ -122,7 +124,7 @@ public class Bootstrap {
 						new JobParameter("Brussels (Bruxelles)-Central"));
 				parameters.put("output.file.path", new JobParameter("file:./output.dat"));
 				parameters.put("excel.input.template",
-						new JobParameter("./test-classes/template.xlsx"));
+						new JobParameter("./resources/template.xlsx"));
 				parameters.put("excel.output.file", new JobParameter("output.xlsx"));
 				
 				JobParameters jobParameters = new JobParameters(parameters);

@@ -11,7 +11,7 @@
 		<property name="driverClassName" value="org.apache.derby.jdbc.EmbeddedDriver" />
 		<property name="username" value="" />
 		<property name="password" value="" />
-		<property name="url" value="jdbc:derby:batchRepository;create=true" />
+		<property name="url" value="jdbc:derby:data/batch;create=true" />
 	</bean>
 		
 	<bean id="batchDatabaseLoader" class="be.raildelays.repository.LoadDatabase"
@@ -31,17 +31,5 @@
 	<bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
 		<property name="transactionManager" ref="batchTransactionManager"/>
 	</bean>
-
-	<!-- <jdbc:embedded-database id="batchDataSource" /> -->
-
-	<!-- <bean id="entityManagerFactory" -->
-	<!-- class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" -->
-	<!-- p:dataSource-ref="dataSource" p:persistence-unit-name="raildelays-repository"> -->
-	<!-- <property name="jpaVendorAdapter"> -->
-	<!-- <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" -->
-	<!-- p:database="HSQL" p:databasePlatform="org.hibernate.dialect.HSQLDialect" -->
-	<!-- p:showSql="true" p:generate-ddl="true" /> -->
-	<!-- </property> -->
-	<!-- </bean> -->
 
 </beans>
