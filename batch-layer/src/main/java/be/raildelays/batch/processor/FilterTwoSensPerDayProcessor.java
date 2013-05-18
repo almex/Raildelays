@@ -38,8 +38,8 @@ public class FilterTwoSensPerDayProcessor implements
 		ExcelRow fromAtoB = extractMaxDelay(items, Sens.DEPARTURE);
 		ExcelRow fromBtoA = extractMaxDelay(items, Sens.ARRIVAL);
 
-		LOGGER.debug("From A to B : {}", fromBtoA);
-		LOGGER.debug("From B to A : {}", fromAtoB);
+		LOGGER.debug("From A to B : {}", fromAtoB);
+		LOGGER.debug("From B to A : {}", fromBtoA);
 
 		if (fromAtoB != null || fromBtoA != null) {
 			result = new ArrayList<>();
@@ -69,7 +69,7 @@ public class FilterTwoSensPerDayProcessor implements
 			}
 		}		
 
-		LOGGER.trace("maxDelay={}", maxDelay);
+		LOGGER.trace("sens={} maxDelay={}", sens, maxDelay);
 
 		return result;
 	}
