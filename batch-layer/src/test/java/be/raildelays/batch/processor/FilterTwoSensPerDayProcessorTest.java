@@ -37,7 +37,7 @@ public class FilterTwoSensPerDayProcessorTest {
 
 		list = new ArrayList<>();
 		
-		list.add(new ExcelRowBuilder(today) //
+		list.add(new ExcelRowBuilder(today, Sens.DEPARTURE) //
 				.departureStation(stationA) //
 				.arrivalStation(stationB) //
 				.expectedTrain1(new Train("466")) //
@@ -46,11 +46,10 @@ public class FilterTwoSensPerDayProcessorTest {
 				.effectiveTrain1(new Train("466")) //
 				.effectiveDepartureTime(f.parse("07:03")) //
 				.effectiveDepartureTime(f.parse("07:10")) //
-				.sens(Sens.DEPARTURE) //
 				.delay(5L) //
 				.build());
 
-		list.add(new ExcelRowBuilder(today) //
+		list.add(new ExcelRowBuilder(today, Sens.DEPARTURE) //
 				.departureStation(stationA) //
 				.arrivalStation(stationB) //
 				.expectedTrain1(new Train("530")) //
@@ -59,11 +58,10 @@ public class FilterTwoSensPerDayProcessorTest {
 				.effectiveTrain1(new Train("466")) //
 				.effectiveDepartureTime(f.parse("08:03")) //
 				.effectiveDepartureTime(f.parse("08:15")) //
-				.sens(Sens.DEPARTURE) //
 				.delay(10L) //
 				.build());
 
-		list.add(new ExcelRowBuilder(today) //
+		list.add(new ExcelRowBuilder(today, Sens.DEPARTURE) //
 				.departureStation(stationA) //
 				.arrivalStation(stationB) //
 				.expectedTrain1(new Train("531")) //
@@ -72,11 +70,10 @@ public class FilterTwoSensPerDayProcessorTest {
 				.effectiveTrain1(new Train("466")) //
 				.effectiveDepartureTime(f.parse("12:03")) //
 				.effectiveDepartureTime(f.parse("12:20")) //
-				.sens(Sens.DEPARTURE) //
 				.delay(15L) //
 				.build());
 
-		list.add(new ExcelRowBuilder(today) //
+		list.add(new ExcelRowBuilder(today, Sens.ARRIVAL) //
 				.departureStation(stationB) //
 				.arrivalStation(stationA) //
 				.expectedTrain1(new Train("467")) //
@@ -85,11 +82,10 @@ public class FilterTwoSensPerDayProcessorTest {
 				.effectiveTrain1(new Train("466")) //
 				.effectiveDepartureTime(f.parse("15:03")) //
 				.effectiveDepartureTime(f.parse("15:10")) //
-				.sens(Sens.ARRIVAL) //
 				.delay(5L) //
 				.build());
 
-		list.add(new ExcelRowBuilder(today) //
+		list.add(new ExcelRowBuilder(today, Sens.ARRIVAL) //
 				.departureStation(stationB) //
 				.arrivalStation(stationA) //
 				.expectedTrain1(new Train("477")) //
@@ -98,7 +94,6 @@ public class FilterTwoSensPerDayProcessorTest {
 				.effectiveTrain1(new Train("466")) //
 				.effectiveDepartureTime(f.parse("16:03")) //
 				.effectiveDepartureTime(f.parse("16:10")) //
-				.sens(Sens.ARRIVAL) //
 				.delay(5L) //
 				.build());
 

@@ -39,6 +39,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.context.MessageSource;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class Bootstrap {
@@ -52,7 +53,7 @@ public class Bootstrap {
 	 */
 	public static void main(String[] args) throws Exception {
 		String[] contextPaths = new String[] {
-				"/spring/batch/raildelays-batch-integration-context.xml" };
+				"/spring/bootstrap-context.xml" };
 		List<Date> dates = generateListOfDates();
 		CommandLineParser parser = new BasicParser();
 		Options options = new Options();
@@ -69,6 +70,7 @@ public class Bootstrap {
 		ctx.start();
 
 		try {
+			MessageSource configuration = ctx.getBean("configuration", MessageSource.class);
 			JobRegistry jobRegistry = ctx.getBean(JobRegistry.class);
 			JobExplorer jobExplorer = ctx.getBean(JobExplorer.class);
 			JobOperator jobOperator = ctx.getBean(JobOperator.class);
@@ -79,6 +81,7 @@ public class Bootstrap {
 			Job retrieveDataFromRailtimeJob = null;
 			Job searchDelaysJob = null;
 			Job searchDelaysXlsJob = null;
+			
 
 			LOGGER.info("jobNames={}", jobRegistry.getJobNames());
 
@@ -102,7 +105,7 @@ public class Bootstrap {
 				for (Date date : dates) {
 					Map<String, JobParameter> parameters = new HashMap<>();
 
-					parameters.put("input.file.path", new JobParameter("./conf/train-list.properties"));
+					parameters.put("input.file.path", new JobParameter("file:./conf/train.list"));
 					parameters.put("date", new JobParameter(date));
 					parameters.put("station.a.name", new JobParameter("Liège-Guillemins"));
 					parameters.put("station.b.name",
@@ -132,8 +135,8 @@ public class Bootstrap {
 				startOrRestartJob(jobLauncher, searchDelaysJob, jobParameters,
 						converter);
 				
-				startOrRestartJob(jobLauncher, searchDelaysXlsJob, jobParameters,
-						converter);
+//				startOrRestartJob(jobLauncher, searchDelaysXlsJob, jobParameters,
+//						converter);
 			}
 		} finally {
 			if (ctx != null) {
@@ -213,16 +216,17 @@ public class Bootstrap {
 			final JobParametersConverter converter)
 			throws JobParametersInvalidException {
 		try {
-			LOGGER.info("Try to run job={}...", job.getName());
+			LOGGER.info("Starting {}...", job.getName());
 			jobLauncher.run(job, jobParameters);
 		} catch (JobExecutionAlreadyRunningException e) {
-			LOGGER.error("This job is already running", e);
+			LOGGER.info("{} is already running!", job.getName());
+			LOGGER.error("Exception:", e);
 		} catch (JobInstanceAlreadyCompleteException e) {
-			LOGGER.info(
-					"This job is already complete. Maybe you need to change the input parameters?",
-					e);
+			LOGGER.info("{} is already complete!", job.getName());
+			LOGGER.error("Exception:", e);
 		} catch (JobRestartException e) {
-			LOGGER.error("Unspecified restart exception", e);
+			LOGGER.info("Unexpected restart exception");
+			LOGGER.error("Exception:", e);
 		}
 	}
 

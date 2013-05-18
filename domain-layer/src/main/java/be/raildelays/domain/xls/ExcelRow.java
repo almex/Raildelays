@@ -117,10 +117,11 @@ public class ExcelRow {
 		private Train effectiveTrain1;
 		private Train effectiveTrain2;
 		private Long delay;
-		private Sens sens;
+		private final Sens sens;
 		
-		public ExcelRowBuilder(final Date date) {
+		public ExcelRowBuilder(final Date date, final Sens sens) {
 			this.date = (Date) (date != null ? date.clone() : null);
+			this.sens = sens;
 		}
 		
 		public ExcelRowBuilder arrivalStation(final Station arrivalStation) { this.arrivalStation = arrivalStation; return this; }
@@ -134,8 +135,7 @@ public class ExcelRow {
 		public ExcelRowBuilder effectiveArrivalTime(final Date effectiveArrivalTime) { this.effectiveArrivalTime = effectiveArrivalTime; return this; }
 		public ExcelRowBuilder effectiveTrain1(final Train effectiveTrain1) { this.effectiveTrain1 = effectiveTrain1; return this; }
 		public ExcelRowBuilder effectiveTrain2(final Train effectiveTrain2) { this.effectiveTrain2 = effectiveTrain2; return this; }
-		public ExcelRowBuilder delay(final Long delay) { this.delay = delay; return this; }
-		public ExcelRowBuilder sens(final Sens sens) { this.sens = sens; return this; }		
+		public ExcelRowBuilder delay(final Long delay) { this.delay = delay; return this; }	
 		
 		public ExcelRow build() {
 			return new ExcelRow(this);

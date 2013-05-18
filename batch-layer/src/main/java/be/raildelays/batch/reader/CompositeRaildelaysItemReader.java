@@ -27,7 +27,7 @@ import be.raildelays.domain.entities.LineStop;
 public class CompositeRaildelaysItemReader extends CompositeItemStream implements ItemReader<List<LineStop>>, InitializingBean {
 
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(ItemReader.class);
+			.getLogger(CompositeRaildelaysItemReader.class);
 
 	private DelaysItemReader delaysItemReader;
 	

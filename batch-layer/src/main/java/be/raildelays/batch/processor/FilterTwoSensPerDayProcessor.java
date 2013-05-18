@@ -16,7 +16,7 @@ public class FilterTwoSensPerDayProcessor implements
 		ItemProcessor<List<ExcelRow>, List<ExcelRow>>, InitializingBean {
         
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(ItemProcessor.class);
+			.getLogger(FilterTwoSensPerDayProcessor.class);
 
 	private String stationA;
 
@@ -27,7 +27,7 @@ public class FilterTwoSensPerDayProcessor implements
 		Validate.notNull(stationA, "Station A name is mandatory");
 		Validate.notNull(stationB, "Station B name is mandatory");
 		
-		LOGGER.info("[Pf] Processing for stationA={} and stationB={}...", stationA,
+		LOGGER.info("Processing for stationA={} and stationB={}...", stationA,
 				stationB);
 	}
 
@@ -38,8 +38,8 @@ public class FilterTwoSensPerDayProcessor implements
 		ExcelRow fromAtoB = extractMaxDelay(items, Sens.DEPARTURE);
 		ExcelRow fromBtoA = extractMaxDelay(items, Sens.ARRIVAL);
 
-		LOGGER.debug("[Pf] From A to B : {}", fromBtoA);
-		LOGGER.debug("[Pf] From B to A : {}", fromAtoB);
+		LOGGER.debug("From A to B : {}", fromBtoA);
+		LOGGER.debug("From B to A : {}", fromAtoB);
 
 		if (fromAtoB != null || fromBtoA != null) {
 			result = new ArrayList<>();
@@ -69,7 +69,7 @@ public class FilterTwoSensPerDayProcessor implements
 			}
 		}		
 
-		LOGGER.trace("[Pf] maxDelay={}", maxDelay);
+		LOGGER.trace("maxDelay={}", maxDelay);
 
 		return result;
 	}

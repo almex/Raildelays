@@ -12,7 +12,6 @@
 	</parent>
 
 	<build>
-		<finalName>raildelays-batch</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

@@ -26,7 +26,7 @@ public class ExcelRowMapperProcessor implements
 	private static final int DELAY_THRESHOLD = 15;
 
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(ItemProcessor.class);
+			.getLogger(ExcelRowMapperProcessor.class);
 
 	private String stationA;
 
@@ -37,7 +37,7 @@ public class ExcelRowMapperProcessor implements
 		Validate.notNull(stationA, "Station A name is mandatory");
 		Validate.notNull(stationB, "Station B name is mandatory");
 
-		LOGGER.info("[Pxls] Processing for stationA={} and stationB={}...",
+		LOGGER.info("Processing for stationA={} and stationB={}...",
 				stationA, stationB);
 	}
 
@@ -79,7 +79,7 @@ public class ExcelRowMapperProcessor implements
 						"Arrival must not be equal to departure");
 			}
 
-			LOGGER.trace("[Pxls] departure={} arrival={}", departure, arrival);
+			LOGGER.debug("departure={} arrival={}", departure, arrival);
 
 			if (departure.getStation().equals(stationA)
 					&& arrival.getStation().equals(stationB)) {
@@ -94,7 +94,7 @@ public class ExcelRowMapperProcessor implements
 				ExcelRow excelRow = map(departure, arrival, sens);
 
 				result.add(excelRow);
-				LOGGER.trace("[Pxls] excelRow={} arrival={}", excelRow);
+				LOGGER.trace("excelRow={} arrival={}", excelRow);
 			}
 		}
 
@@ -116,7 +116,7 @@ public class ExcelRowMapperProcessor implements
 			}
 		}
 
-		LOGGER.trace("[Pxls] Extracted from left={}", result);
+		LOGGER.trace("Extracted from left={}", result);
 
 		return result;
 	}
@@ -135,7 +135,7 @@ public class ExcelRowMapperProcessor implements
 			}
 		}
 
-		LOGGER.trace("[Pxls] Extracted from rigth={}", result);
+		LOGGER.trace("Extracted from rigth={}", result);
 
 		return result;
 	}
@@ -145,7 +145,7 @@ public class ExcelRowMapperProcessor implements
 				.getDepartureTime());
 		Date effectiveArrivalTime = computeEffectiveTime(lineStopTo
 				.getArrivalTime());
-		ExcelRow result = new ExcelRowBuilder(lineStopFrom.getDate()) //
+		ExcelRow result = new ExcelRowBuilder(lineStopFrom.getDate(), sens) //
 				.departureStation(lineStopFrom.getStation()) //
 				.arrivalStation(lineStopTo.getStation()) //
 				.expectedDepartureTime(
@@ -156,7 +156,6 @@ public class ExcelRowMapperProcessor implements
 				.effectiveArrivalTime(effectiveArrivalTime) //
 				.effectiveTrain1(lineStopTo.getTrain()) //
 				.delay(lineStopTo.getArrivalTime().getDelay()) //
-				.sens(sens) //
 				.build();
 
 		return result;

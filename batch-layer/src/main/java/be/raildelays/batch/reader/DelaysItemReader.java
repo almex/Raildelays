@@ -26,7 +26,7 @@ import be.raildelays.service.RaildelaysService;
 public class DelaysItemReader implements ItemReader<List<LineStop>>, InitializingBean {
 
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(ItemReader.class);
+			.getLogger(DelaysItemReader.class);
 
 	@Resource
 	private RaildelaysService service;

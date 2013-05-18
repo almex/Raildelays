@@ -19,6 +19,7 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
+import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
 import be.raildelays.domain.xls.ExcelRow;
@@ -45,7 +46,7 @@ public class ExcelSheetItemWriterIT {
 	public void testTemplate() throws Exception {
 		List<ExcelRow> items = new ArrayList<>();
 		DateFormat formater = new SimpleDateFormat("HH:mm");
-		ExcelRow row = new ExcelRowBuilder(new Date()) //
+		ExcelRow row = new ExcelRowBuilder(new Date(), Sens.DEPARTURE) //
 				.departureStation(new Station("Liège-Guillemins")) //
 				.arrivalStation(new Station("Bruxelles-central")) //
 				.expectedDepartureTime(formater.parse("14:00")) //

@@ -25,7 +25,7 @@ import be.raildelays.parser.impl.RailtimeStreamParser;
 public class RailtimeItemReader implements ItemReader<Direction>, InitializingBean {
 
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(ItemReader.class);
+			.getLogger(RailtimeItemReader.class);
 
 	@Resource
 	private RequestStreamer streamer;

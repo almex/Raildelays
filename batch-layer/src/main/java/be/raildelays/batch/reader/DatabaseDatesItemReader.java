@@ -31,7 +31,7 @@ import be.raildelays.service.RaildelaysService;
 public class DatabaseDatesItemReader extends AbstractItemCountingItemStreamItemReader <Date> implements InitializingBean  {
 
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(ItemReader.class);
+			.getLogger(DatabaseDatesItemReader.class);
 
 	@Resource
 	private RaildelaysService service;

@@ -28,7 +28,7 @@ import be.raildelays.domain.railtime.Direction;
 public class CompositeRailtimeItemReader extends CompositeItemStream implements ItemReader<List<? extends Direction>>, InitializingBean {
 
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(ItemReader.class);
+			.getLogger(CompositeRailtimeItemReader.class);
 	
 	private RailtimeItemReader arrivalReader;
 
