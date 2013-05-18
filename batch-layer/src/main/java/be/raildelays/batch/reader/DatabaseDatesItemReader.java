@@ -73,7 +73,7 @@ public class DatabaseDatesItemReader extends AbstractItemCountingItemStreamItemR
 		Date result = null;
 		
 		if (getCurrentItemCount() < dates.size()) {
-			result = dates.get(getCurrentItemCount());
+			result = dates.get(getCurrentItemCount()-1);
 			
 			LOGGER.debug("Reading one more date={}", result);
 		}

@@ -9,63 +9,81 @@
 		</layout>
 	</appender>
 	
-	<appender name="railtime-data-reader" class="org.apache.log4j.FileAppender">
-		<param name="file" value="logs/railtime-data.log"/>		
+	<appender name="railtime-data-reader" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="Append" value="false"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/>
+		<param name="file" value="logs/railtime-data.log"/>	
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="[Reader]: %m%n" />
 		</layout>
 	</appender>	
 	
-	<appender name="railtime-data-parser" class="org.apache.log4j.FileAppender">
+	<appender name="railtime-data-parser" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="Append" value="false"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/>
 		<param name="file" value="logs/railtime-data.log"/>		
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="[Paser]: %m%n" />
 		</layout>
 	</appender>	
 	
-	<appender name="railtime-data-streamer" class="org.apache.log4j.FileAppender">
+	<appender name="railtime-data-streamer" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="Append" value="false"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/>
 		<param name="file" value="logs/railtime-data.log"/>		
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="[Streamer]: %m%n" />
 		</layout>
 	</appender>	
 	
-	<appender name="railtime-data" class="org.apache.log4j.FileAppender">
+	<appender name="railtime-data" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="Append" value="false"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/>
 		<param name="file" value="logs/railtime-data.log"/>		
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="[Data]: %m%n" />
 		</layout>
 	</appender>
 	
-	<appender name="output" class="org.apache.log4j.FileAppender">
+	<appender name="output" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="Append" value="false"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/>
 		<param name="file" value="logs/output.log"/>		
 		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%m%n" />
+			<param name="ConversionPattern" value="%d{DATE} %m%n" />
 		</layout>
 	</appender>	
 	
-	<appender name="springbatch" class="org.apache.log4j.FileAppender">
+	<appender name="springbatch" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="Append" value="false"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/>
 		<param name="file" value="logs/springbatch.log"/>		
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d{DATE} %-5p: %m%n" />
 		</layout>
 	</appender>
 	
-	<appender name="railtime-route-processor" class="org.apache.log4j.FileAppender">
+	<appender name="railtime-route-processor" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="Append" value="false"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/>
 		<param name="file" value="logs/railtime-processor.log"/>		
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="[Route]: %m%n" />
 		</layout>
 	</appender>
 	
-	<appender name="raildelays-xls-processor" class="org.apache.log4j.FileAppender">
+	<appender name="raildelays-xls-processor" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="Append" value="false"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/>
 		<param name="file" value="logs/raildelays-processor.log"/>		
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="[Xls]: %m%n" />
 		</layout>
 	</appender>
 	
-	<appender name="raildelays-filter-processor" class="org.apache.log4j.FileAppender">
+	<appender name="raildelays-filter-processor" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="Append" value="false"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/>
 		<param name="file" value="logs/raildelays-processor.log"/>		
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="[Filter]: %m%n" />
