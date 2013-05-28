@@ -131,8 +131,8 @@ public class ExcelRow {
 		public ExcelRowBuilder expectedArrivalTime(final Date expectedArrivalTime) { this.expectedArrivalTime = expectedArrivalTime; return this; }
 		public ExcelRowBuilder expectedTrain1(final Train expectedTrain1) { this.expectedTrain1 = expectedTrain1; return this; }
 		public ExcelRowBuilder expectedTrain2(final Train expectedTrain2) { this.expectedTrain2 = expectedTrain2; return this; }
-		public ExcelRowBuilder effectiveDepartureTime(final Date effectiveDepartureTime) { this.effectiveDepartureTime = effectiveDepartureTime; return this; }
-		public ExcelRowBuilder effectiveArrivalTime(final Date effectiveArrivalTime) { this.effectiveArrivalTime = effectiveArrivalTime; return this; }
+		public ExcelRowBuilder effectiveDepartureTime(final Date effectiveDepartureTime) { this.effectiveDepartureTime = (Date) (effectiveDepartureTime != null ? effectiveDepartureTime.clone() : null); return this; }
+		public ExcelRowBuilder effectiveArrivalTime(final Date effectiveArrivalTime) { this.effectiveArrivalTime = (Date) (effectiveArrivalTime != null ? effectiveArrivalTime.clone() : null); return this; }
 		public ExcelRowBuilder effectiveTrain1(final Train effectiveTrain1) { this.effectiveTrain1 = effectiveTrain1; return this; }
 		public ExcelRowBuilder effectiveTrain2(final Train effectiveTrain2) { this.effectiveTrain2 = effectiveTrain2; return this; }
 		public ExcelRowBuilder delay(final Long delay) { this.delay = delay; return this; }	

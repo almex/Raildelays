@@ -211,11 +211,11 @@ public class LineStop implements Serializable, Cloneable {
 	}
 
 	public TimestampDelay getArrivalTime() {
-		return arrivalTime != null ? arrivalTime/*.clone()*/ : null;
+		return arrivalTime;
 	}
 
 	public TimestampDelay getDepartureTime() {
-		return departureTime != null ? departureTime/*.clone()*/ : null;
+		return departureTime;
 	}
 
 	public Train getTrain() {

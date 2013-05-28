@@ -6,12 +6,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.validation.Validation;
-import javax.validation.ValidatorFactory;
-
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
@@ -62,7 +59,7 @@ public class ExcelRowMapperProcessorTest {
 				"stationB"), arrivalTime, departureTime, false, stop2);
 		arrivalTime = new TimestampDelay(f.parse("13:45"), 25L);
 		departureTime = null;
-		LineStop stop3 = new LineStop(today, new Train("466"), new Station(
+		new LineStop(today, new Train("466"), new Station(
 				"station3"), arrivalTime, departureTime, false, stopB);
 
 		fromA = new ArrayList<>();
