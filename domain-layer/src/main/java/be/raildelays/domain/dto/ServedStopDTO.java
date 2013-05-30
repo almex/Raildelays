@@ -1,6 +1,7 @@
 package be.raildelays.domain.dto;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.validation.constraints.NotNull;
@@ -36,6 +37,25 @@ public final class ServedStopDTO implements Serializable, Cloneable {
 		this.departureDelay = departureDelay;
 		this.arrivalTime = arrival;
 		this.arrivalDelay = arrivalDelay;
+	}
+
+	@Override
+	public String toString() {
+		SimpleDateFormat df = new SimpleDateFormat("HH:mm");
+		
+		return new StringBuilder("ServedStopDTO: ") //
+				.append("{ ") //
+				.append("stationName: " + stationName + ", ") //
+				.append("departureTime: ")
+				.append(df.format(departureTime)) //
+				.append(", ") //
+				.append("departureDelay: " + departureDelay + ", ") //
+				.append("arrivalTime: ")
+				.append(df.format(arrivalTime)) //
+				.append(", ") //
+				.append("arrivalDelay: " + arrivalDelay + ", ") //
+				.append("canceled: " + canceled + ", ") //
+				.append("} ").toString();
 	}
 
 	@Override

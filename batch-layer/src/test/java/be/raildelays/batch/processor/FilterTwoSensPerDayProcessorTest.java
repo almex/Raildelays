@@ -45,7 +45,7 @@ public class FilterTwoSensPerDayProcessorTest {
 				.expectedDepartureTime(f.parse("07:05")) //
 				.effectiveTrain1(new Train("466")) //
 				.effectiveDepartureTime(f.parse("07:03")) //
-				.effectiveDepartureTime(f.parse("07:10")) //
+				.effectiveArrivalTime(f.parse("07:10")) //
 				.delay(5L) //
 				.build());
 
@@ -57,7 +57,7 @@ public class FilterTwoSensPerDayProcessorTest {
 				.expectedDepartureTime(f.parse("08:05")) //
 				.effectiveTrain1(new Train("466")) //
 				.effectiveDepartureTime(f.parse("08:03")) //
-				.effectiveDepartureTime(f.parse("08:15")) //
+				.effectiveArrivalTime(f.parse("08:15")) //
 				.delay(10L) //
 				.build());
 
@@ -69,7 +69,7 @@ public class FilterTwoSensPerDayProcessorTest {
 				.expectedDepartureTime(f.parse("12:05")) //
 				.effectiveTrain1(new Train("466")) //
 				.effectiveDepartureTime(f.parse("12:03")) //
-				.effectiveDepartureTime(f.parse("12:20")) //
+				.effectiveArrivalTime(f.parse("12:20")) //
 				.delay(15L) //
 				.build());
 
@@ -81,7 +81,7 @@ public class FilterTwoSensPerDayProcessorTest {
 				.expectedDepartureTime(f.parse("15:05")) //
 				.effectiveTrain1(new Train("466")) //
 				.effectiveDepartureTime(f.parse("15:03")) //
-				.effectiveDepartureTime(f.parse("15:10")) //
+				.effectiveArrivalTime(f.parse("15:10")) //
 				.delay(5L) //
 				.build());
 
@@ -93,7 +93,7 @@ public class FilterTwoSensPerDayProcessorTest {
 				.expectedDepartureTime(f.parse("16:05")) //
 				.effectiveTrain1(new Train("466")) //
 				.effectiveDepartureTime(f.parse("16:03")) //
-				.effectiveDepartureTime(f.parse("16:10")) //
+				.effectiveArrivalTime(f.parse("16:10")) //
 				.delay(5L) //
 				.build());
 
@@ -129,6 +129,18 @@ public class FilterTwoSensPerDayProcessorTest {
 		
 		Assert.assertEquals(15, excelRow1.getDelay());
 		Assert.assertEquals(5, excelRow2.getDelay());
+	}
+	
+	@Test
+	public void testProcessTime() throws Exception {
+		SimpleDateFormat f = new SimpleDateFormat("HH:mm");
+		List<ExcelRow> excelRows = processor.process(list);
+
+		ExcelRow excelRow1 = excelRows.get(0);
+		ExcelRow excelRow2 = excelRows.get(1);
+		
+		Assert.assertEquals(f.parse("12:00"), excelRow1.getExpectedArrivalTime());
+		Assert.assertEquals("The first element with the max delay should be the one we keep", f.parse("15:10"), excelRow2.getEffectiveArrivalHour());
 	}
 
 }

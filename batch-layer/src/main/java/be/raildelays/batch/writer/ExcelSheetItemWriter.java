@@ -87,13 +87,13 @@ public class ExcelSheetItemWriter implements ItemStreamWriter<ExcelRow> {
 							excelRow.getLinkStation().getEnglishName());
 				}
 				row.getCell(30).setCellValue(
-						hh.format(excelRow.getExpectedDepartureHour()));
+						hh.format(excelRow.getExpectedDepartureTime()));
 				row.getCell(32).setCellValue(
-						mm.format(excelRow.getExpectedDepartureHour()));
+						mm.format(excelRow.getExpectedDepartureTime()));
 				row.getCell(33).setCellValue(
-						hh.format(excelRow.getExpectedArrivalHour()));
+						hh.format(excelRow.getExpectedArrivalTime()));
 				row.getCell(35).setCellValue(
-						mm.format(excelRow.getExpectedArrivalHour()));
+						mm.format(excelRow.getExpectedArrivalTime()));
 				row.getCell(36).setCellValue(
 						excelRow.getExpectedTrain1().getEnglishName());
 				if (excelRow.getExpectedTrain2() != null) {

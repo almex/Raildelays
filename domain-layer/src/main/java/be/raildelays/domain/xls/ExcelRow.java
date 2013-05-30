@@ -101,9 +101,9 @@ public class ExcelRow {
 
 	@Column(name = "SENS")
 	private Sens sens;
-	
+
 	public static class ExcelRowBuilder {
-		
+
 		private final Date date;
 		private Station arrivalStation;
 		private Station departureStation;
@@ -118,34 +118,87 @@ public class ExcelRow {
 		private Train effectiveTrain2;
 		private Long delay;
 		private final Sens sens;
-		
+
 		public ExcelRowBuilder(final Date date, final Sens sens) {
 			this.date = (Date) (date != null ? date.clone() : null);
 			this.sens = sens;
 		}
-		
-		public ExcelRowBuilder arrivalStation(final Station arrivalStation) { this.arrivalStation = arrivalStation; return this; }
-		public ExcelRowBuilder departureStation(final Station departureStation) { this.departureStation = departureStation; return this; }
-		public ExcelRowBuilder linkStation(final Station linkStation) { this.linkStation = linkStation; return this; }
-		public ExcelRowBuilder expectedDepartureTime(final Date expectedDepartureTime) { this.expectedDepartureTime = expectedDepartureTime; return this; }
-		public ExcelRowBuilder expectedArrivalTime(final Date expectedArrivalTime) { this.expectedArrivalTime = expectedArrivalTime; return this; }
-		public ExcelRowBuilder expectedTrain1(final Train expectedTrain1) { this.expectedTrain1 = expectedTrain1; return this; }
-		public ExcelRowBuilder expectedTrain2(final Train expectedTrain2) { this.expectedTrain2 = expectedTrain2; return this; }
-		public ExcelRowBuilder effectiveDepartureTime(final Date effectiveDepartureTime) { this.effectiveDepartureTime = (Date) (effectiveDepartureTime != null ? effectiveDepartureTime.clone() : null); return this; }
-		public ExcelRowBuilder effectiveArrivalTime(final Date effectiveArrivalTime) { this.effectiveArrivalTime = (Date) (effectiveArrivalTime != null ? effectiveArrivalTime.clone() : null); return this; }
-		public ExcelRowBuilder effectiveTrain1(final Train effectiveTrain1) { this.effectiveTrain1 = effectiveTrain1; return this; }
-		public ExcelRowBuilder effectiveTrain2(final Train effectiveTrain2) { this.effectiveTrain2 = effectiveTrain2; return this; }
-		public ExcelRowBuilder delay(final Long delay) { this.delay = delay; return this; }	
-		
+
+		public ExcelRowBuilder arrivalStation(final Station arrivalStation) {
+			this.arrivalStation = arrivalStation;
+			return this;
+		}
+
+		public ExcelRowBuilder departureStation(final Station departureStation) {
+			this.departureStation = departureStation;
+			return this;
+		}
+
+		public ExcelRowBuilder linkStation(final Station linkStation) {
+			this.linkStation = linkStation;
+			return this;
+		}
+
+		public ExcelRowBuilder expectedDepartureTime(
+				final Date expectedDepartureTime) {
+			this.expectedDepartureTime = expectedDepartureTime;
+			return this;
+		}
+
+		public ExcelRowBuilder expectedArrivalTime(
+				final Date expectedArrivalTime) {
+			this.expectedArrivalTime = expectedArrivalTime;
+			return this;
+		}
+
+		public ExcelRowBuilder expectedTrain1(final Train expectedTrain1) {
+			this.expectedTrain1 = expectedTrain1;
+			return this;
+		}
+
+		public ExcelRowBuilder expectedTrain2(final Train expectedTrain2) {
+			this.expectedTrain2 = expectedTrain2;
+			return this;
+		}
+
+		public ExcelRowBuilder effectiveDepartureTime(
+				final Date effectiveDepartureTime) {
+			this.effectiveDepartureTime = (Date) (effectiveDepartureTime != null ? effectiveDepartureTime
+					.clone() : null);
+			return this;
+		}
+
+		public ExcelRowBuilder effectiveArrivalTime(
+				final Date effectiveArrivalTime) {
+			this.effectiveArrivalTime = (Date) (effectiveArrivalTime != null ? effectiveArrivalTime
+					.clone() : null);
+			return this;
+		}
+
+		public ExcelRowBuilder effectiveTrain1(final Train effectiveTrain1) {
+			this.effectiveTrain1 = effectiveTrain1;
+			return this;
+		}
+
+		public ExcelRowBuilder effectiveTrain2(final Train effectiveTrain2) {
+			this.effectiveTrain2 = effectiveTrain2;
+			return this;
+		}
+
+		public ExcelRowBuilder delay(final Long delay) {
+			this.delay = delay;
+			return this;
+		}
+
 		public ExcelRow build() {
 			return new ExcelRow(this);
 		}
-		
+
 	}
 
 	private ExcelRow(final ExcelRowBuilder builder) {
-		this.date = builder.date; 
-		this.arrivalStation = builder.arrivalStation; 
+		this.date = builder.date;
+		this.arrivalStation = builder.arrivalStation;
 		this.departureStation = builder.departureStation;
 		this.linkStation = builder.linkStation;
 		this.expectedDepartureTime = builder.expectedDepartureTime;
@@ -192,20 +245,20 @@ public class ExcelRow {
 		this.linkStation = linkStation;
 	}
 
-	public Date getExpectedDepartureHour() {
+	public Date getExpectedDepartureTime() {
 		return expectedDepartureTime;
 	}
 
-	public void setExpectedDepartureHour(Date expectedDepartureHour) {
-		this.expectedDepartureTime = expectedDepartureHour;
+	public void setExpectedDepartureTime(Date expectedDepartureTime) {
+		this.expectedDepartureTime = expectedDepartureTime;
 	}
 
-	public Date getExpectedArrivalHour() {
+	public Date getExpectedArrivalTime() {
 		return expectedArrivalTime;
 	}
 
-	public void setExpectedArrivalHour(Date expectedArrivalHour) {
-		this.expectedArrivalTime = expectedArrivalHour;
+	public void setExpectedArrivalTime(Date expectedArrivalTime) {
+		this.expectedArrivalTime = expectedArrivalTime;
 	}
 
 	public Train getExpectedTrain1() {

@@ -30,9 +30,9 @@ public class CompositeRailtimeItemReader extends CompositeItemStream implements 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(CompositeRailtimeItemReader.class);
 	
-	private RailtimeItemReader arrivalReader;
-
 	private RailtimeItemReader departureReader;
+	
+	private RailtimeItemReader arrivalReader;
 
 	private FlatFileItemReader<String> fileReader;
 
@@ -59,9 +59,9 @@ public class CompositeRailtimeItemReader extends CompositeItemStream implements 
 			
 			departureReader.setTrainId(trainId);
 			arrivalReader.setTrainId(trainId);
-			
-			Direction arrivalDirection = arrivalReader.read();
+
 			Direction departureDirection = departureReader.read();
+			Direction arrivalDirection = arrivalReader.read();
 			
 			if (departureDirection != null && arrivalDirection != null) {
 				result.add(departureDirection); 

@@ -15,6 +15,10 @@ import be.raildelays.domain.dto.ServedStopDTO;
 import be.raildelays.domain.railtime.Direction;
 import be.raildelays.domain.railtime.Step;
 
+/**
+ * 
+ * @author Almex
+ */
 public class RouteLogMapperProcessor implements
 		ItemProcessor<List<Direction>, RouteLogDTO>, InitializingBean {
         
@@ -39,8 +43,8 @@ public class RouteLogMapperProcessor implements
 		LOGGER.debug("Processing {} direction(s)...", items.size());
 		
 		if (items.size() >= 2) {
-			Direction arrivalDirection = items.get(0);
-			Direction departureDirection = items.get(1);
+			Direction departureDirection = items.get(0);
+			Direction arrivalDirection = items.get(1);
 			
 			result = new RouteLogDTO(arrivalDirection.getTrain().getIdRailtime(), date);
 			
@@ -52,6 +56,7 @@ public class RouteLogMapperProcessor implements
 						departureStep.getTimestamp(), departureStep.getDelay(),
 						arrivalStep.getTimestamp(), arrivalStep.getDelay(), arrivalStep.isCanceled() || departureStep.isCanceled());
 				
+				LOGGER.trace("Processing done for stop={}", stop);
 				
 				result.addStop(stop);
 			}

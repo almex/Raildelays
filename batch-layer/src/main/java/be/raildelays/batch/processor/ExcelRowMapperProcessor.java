@@ -37,8 +37,8 @@ public class ExcelRowMapperProcessor implements
 		Validate.notNull(stationA, "Station A name is mandatory");
 		Validate.notNull(stationB, "Station B name is mandatory");
 
-		LOGGER.info("Processing for stationA={} and stationB={}...",
-				stationA, stationB);
+		LOGGER.info("Processing for stationA={} and stationB={}...", stationA,
+				stationB);
 	}
 
 	@Override
@@ -145,18 +145,47 @@ public class ExcelRowMapperProcessor implements
 				.getDepartureTime());
 		Date effectiveArrivalTime = computeEffectiveTime(lineStopTo
 				.getArrivalTime());
-		ExcelRow result = new ExcelRowBuilder(lineStopFrom.getDate(), sens) //
-				.departureStation(lineStopFrom.getStation()) //
-				.arrivalStation(lineStopTo.getStation()) //
-				.expectedDepartureTime(
-						lineStopFrom.getDepartureTime().getExpected()) //
-				.expectedArrivalTime(lineStopTo.getArrivalTime().getExpected()) //
-				.expectedTrain1(lineStopFrom.getTrain()) //
-				.effectiveDepartureTime(effectiveDepartureTime) //
-				.effectiveArrivalTime(effectiveArrivalTime) //
-				.effectiveTrain1(lineStopTo.getTrain()) //
-				.delay(lineStopTo.getArrivalTime().getDelay()) //
-				.build();
+
+		ExcelRow result = null;
+
+		switch (sens) {
+		case DEPARTURE:
+			result = new ExcelRowBuilder(lineStopFrom.getDate(), sens) //
+					.departureStation(lineStopFrom.getStation()) //
+					.arrivalStation(lineStopTo.getStation()) //
+					.expectedDepartureTime(
+							lineStopFrom.getDepartureTime().getExpected()) //
+					.expectedArrivalTime(
+							lineStopTo.getArrivalTime().getExpected()) //
+					.expectedTrain1(lineStopFrom.getTrain()) //
+					.effectiveDepartureTime(effectiveDepartureTime) //
+					.effectiveArrivalTime(effectiveArrivalTime) //
+					.effectiveTrain1(lineStopTo.getTrain()) //
+					.delay(lineStopTo.getArrivalTime().getDelay()) //
+					.build();
+
+			break;
+		case ARRIVAL:
+			result = new ExcelRowBuilder(lineStopFrom.getDate(), sens) //
+					.departureStation(lineStopFrom.getStation()) //
+					.arrivalStation(lineStopTo.getStation()) //
+					.expectedDepartureTime(
+							lineStopFrom.getDepartureTime().getExpected()) //
+					.expectedArrivalTime(
+							lineStopTo.getArrivalTime().getExpected()) //
+					.expectedTrain1(lineStopFrom.getTrain()) //
+					.effectiveDepartureTime(effectiveDepartureTime) //
+					.effectiveArrivalTime(effectiveArrivalTime) //
+					.effectiveTrain1(lineStopTo.getTrain()) //
+					.delay(lineStopTo.getArrivalTime().getDelay()) //
+					.build();
+
+			break;
+		default:
+			result = new ExcelRowBuilder(lineStopFrom.getDate(), sens).build();
+
+			break;
+		}
 
 		return result;
 	}
