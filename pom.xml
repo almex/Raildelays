@@ -50,7 +50,6 @@
 		<version.tagsoup>1.2.1</version.tagsoup>
 		<version.apache.poi>3.9</version.apache.poi>
 		<jdk.version>1.7</jdk.version>
-		<path.javafx>C:\Program Files\Oracle\JavaFX 2.0 SDK</path.javafx>
 	</properties>
 
 	<dependencyManagement>
@@ -208,14 +207,6 @@
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
 				<version>3.1</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.oracle</groupId>
-				<artifactId>javafx</artifactId>
-				<version>2.0</version>
-				<systemPath>${path.javafx}/rt/lib/jfxrt.jar</systemPath>
-				<scope>system</scope>
 			</dependency>
 
 			<!-- Validation -->
