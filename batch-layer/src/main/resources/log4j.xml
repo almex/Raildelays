@@ -96,7 +96,8 @@
 		</layout>
 	</appender>
 	 
-	<logger name="be.raildelays.batch.Bootstrap" level="info">
+	<logger name="be.raildelays.batch.Bootstrap">
+		<level value="info" />
 		<appender-ref ref="console" />
 	</logger>
 	

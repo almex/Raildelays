@@ -16,7 +16,7 @@
 		<module>parser-layer</module>
 		<module>service-layer</module>
 		<module>batch-layer</module>
-		<module>java-fx-layer</module>
+		<!--module>java-fx-layer</module-->
 	</modules>
 
 	<repositories>
