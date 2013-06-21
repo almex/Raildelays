@@ -635,8 +635,9 @@
          
             <properties>
                 <!-- groupId allow concurrent analyze -->
-                <jacoco.test.destFile>${java.io.tmpdir}/${project.groupId}/jacoco-test.exec</jacoco.test.destFile>
-                <jacoco.it.destFile>${java.io.tmpdir}/${project.groupId}/jacoco-it.exec</jacoco.it.destFile>
+                <!--jacoco.test.destFile>${java.io.tmpdir}/${project.groupId}/jacoco-test.exec</jacoco.test.destFile-->
+				<jacoco.test.destFile>../../target/${project.groupId}/jacoco-test.exec</jacoco.test.destFile>
+                <jacoco.it.destFile>../../target/${project.groupId}/jacoco-it.exec</jacoco.it.destFile>
                 <!-- The destination file for the code coverage report has to be set to the same value
                      in the parent pom and in each module pom. Then JaCoCo will add up information in
                      the same report, so that, it will give the cross-module code coverage. -->
