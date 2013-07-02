@@ -18,7 +18,7 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 /**
  * Test validation of Train bean.
  * 
- * @author Alexis SOUMAGNE
+ * @author Almex
  */
 @RunWith(BlockJUnit4ClassRunner.class)
 public class TrainIT {

@@ -25,30 +25,29 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
-		
+			
+		<!-- Validator implementation -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<scope>test</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>javax.el</groupId>
+			<artifactId>javax.el-api</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.web</groupId>
+			<artifactId>javax.el</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator-cdi</artifactId>
+			<optional>true</optional>
 		</dependency>
 
 	</dependencies>
-	
-	<profiles>
-		<profile>
-			<id>it</id>
-		
-			<dependencies>
-			
-				<dependency>
-					<groupId>org.hibernate</groupId>
-					<artifactId>hibernate-validator</artifactId>
-					<scope>test</scope>
-				</dependency>
-
-			</dependencies>
-		
-		</profile>
-	</profiles>
 
 </project>

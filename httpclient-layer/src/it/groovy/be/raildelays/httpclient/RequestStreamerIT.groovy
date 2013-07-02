@@ -8,7 +8,7 @@ import org.junit.Test
 
 import be.raildelays.httpclient.impl.RailtimeRequestStreamer
 
-class RailtimeRequestStreamerTest {
+class RequestStreamerIT {
 
 	/**
 	 * S.U.T.
