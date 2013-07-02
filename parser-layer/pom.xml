@@ -42,29 +42,14 @@
 			<groupId>org.ccil.cowan.tagsoup</groupId>
 			<artifactId>tagsoup</artifactId>
 		</dependency>
+			
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<scope>test</scope>
+		</dependency>
 
 		
 	</dependencies>
-
-	<build>
-		<plugins>
-		</plugins>
-	</build>
-
-	<profiles>
-		<profile>
-			<id>it</id>
-			
-			<dependencies>
-			
-				<dependency>
-					<groupId>org.hibernate</groupId>
-					<artifactId>hibernate-validator</artifactId>
-					<scope>test</scope>
-				</dependency>
-				
-			</dependencies>
-		</profile>
-	</profiles>
 
 </project>

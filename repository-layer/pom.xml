@@ -113,7 +113,7 @@
 
 	</dependencies>
 
-	<profiles>
+	<!--profiles>
 		<profile>
 			<id>hbm-export</id>
 			<properties>
@@ -150,11 +150,6 @@
 							</componentProperties>
 						</configuration>
 						<dependencies>
-							<!-- <dependency> -->
-							<!-- <groupId>org.hsqldb</groupId> -->
-							<!-- <artifactId>hsqldb</artifactId> -->
-							<!-- <version>${version.hsqldb}</version> -->
-							<!-- </dependency> -->
 							<dependency>
 								<groupId>org.apache.derby</groupId>
 								<artifactId>derby</artifactId>
@@ -253,6 +248,6 @@
 		</profile>
 
 
-	</profiles>
+	</profiles-->
 
 </project>
