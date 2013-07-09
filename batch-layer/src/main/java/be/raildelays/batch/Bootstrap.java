@@ -2,6 +2,7 @@ package be.raildelays.batch;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -15,6 +16,7 @@ import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,10 +61,17 @@ public class Bootstrap {
 
 		options.addOption("offline", false, "activate offline mode");
 		options.addOption("norecovery", false, "do not execute recovery");
+		options.addOption("date", false, "search delays for only on date passed as parameter");
 
 		CommandLine cmd = parser.parse(options, args);
 		boolean online = !cmd.hasOption("offline");
 		boolean recovery = !cmd.hasOption("norecovery");
+		String searchDate = cmd.getOptionValue("date", "");
+		
+		if (StringUtils.isNotEmpty(searchDate)) {
+			dates = Arrays.asList(DateUtils.parseDate(searchDate, new String[] {"dd/MM/yyyy", "dd-MM-yyyy", "yyyyMMdd"}));
+		}
+		
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(
 				contextPaths);
 

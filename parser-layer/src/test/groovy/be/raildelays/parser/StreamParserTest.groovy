@@ -1,8 +1,9 @@
 package be.raildelays.parser
 
-import org.apache.log4j.Logger
 import org.junit.Assert
 import org.junit.Test
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import be.raildelays.domain.railtime.Direction
 import be.raildelays.domain.railtime.Step
@@ -17,10 +18,9 @@ import be.raildelays.util.ParsingUtil
 class StreamParserTest
 {
 	
-	StreamParser parser;
+	def StreamParser parser	
 	
-	
-	Logger log = Logger.getLogger(StreamParserTest.class)
+	def Logger log = LoggerFactory.getLogger(StreamParserTest.class)
 	
 	/**
 	 * Test train 466 today.

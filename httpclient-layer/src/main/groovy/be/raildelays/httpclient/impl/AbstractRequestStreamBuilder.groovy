@@ -6,7 +6,9 @@ import static groovyx.net.http.Method.*
 
 import java.io.Reader
 
-import org.apache.log4j.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 
 abstract class AbstractRequestStreamBuilder {
 
@@ -14,7 +16,7 @@ abstract class AbstractRequestStreamBuilder {
 
 	def static final DEFAULT_LANGUAGE = 'en'
 
-	def static log = Logger.getLogger(AbstractRequestStreamBuilder.class)
+	def static Logger log = LoggerFactory.getLogger(AbstractRequestStreamBuilder.class)
 
 	/**
 	 * Do an HTTP GET to request a page.

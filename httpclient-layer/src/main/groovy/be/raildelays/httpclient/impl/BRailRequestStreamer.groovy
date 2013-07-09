@@ -5,13 +5,14 @@ import static be.raildelays.util.ParsingUtil.*
 import java.io.Reader
 import java.util.Date
 
-import org.apache.log4j.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import be.raildelays.httpclient.RequestStreamer
 
 class BRailRequestStreamer extends AbstractRequestStreamBuilder implements RequestStreamer {
 
-	def static log = Logger.getLogger(BRailRequestStreamer.class)
+	def static Logger log = LoggerFactory.getLogger(BRailRequestStreamer.class)
 
 	def static final DEFAULT_ROOT = 'http://hari.b-rail.be';
 

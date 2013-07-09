@@ -2,7 +2,8 @@ package be.raildelays.parser.impl
 
 import java.io.Reader
 
-import org.apache.log4j.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import be.raildelays.domain.railtime.Direction
 import be.raildelays.domain.railtime.Step
@@ -29,7 +30,7 @@ class RailtimeStreamParser implements StreamParser {
 		html = slurper.parse(reader)
 	}
 
-	Logger log = Logger.getLogger(RailtimeStreamParser.class)
+	def Logger log = LoggerFactory.getLogger(RailtimeStreamParser.class)
 
 	/**
 	 * {@inheritDoc}

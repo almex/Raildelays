@@ -5,13 +5,14 @@ import static be.raildelays.util.ParsingUtil.*
 import java.io.Reader
 import java.util.Date
 
-import org.apache.log4j.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import be.raildelays.httpclient.RequestStreamer
 
 class RailtimeRequestStreamer extends AbstractRequestStreamBuilder implements RequestStreamer {
 
-	def static log = Logger.getLogger(RailtimeRequestStreamer.class)
+	def static Logger log = LoggerFactory.getLogger(RailtimeRequestStreamer.class)
 
 	def static final ROOT = 'http://www.railtime.be';
 
