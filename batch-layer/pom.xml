@@ -27,19 +27,18 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptors>
+						<descriptor>src/main/resources/assemblies/assembly.xml</descriptor>
+					</descriptors>
+				</configuration>
 				<executions>
 					<execution>
-						<id>copy-dependencies</id>
+						<id>make-assembly</id>
 						<phase>package</phase>
-						<configuration>
-							<outputDirectory>${project.build.directory}/lib</outputDirectory>
-							<overwritereleases>false</overwritereleases>
-							<overwritesnapshots>false</overwritesnapshots>
-							<overwriteifnewer>true</overwriteifnewer>
-						</configuration>
 						<goals>
-							<goal>copy-dependencies</goal>
+							<goal>single</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -51,11 +50,11 @@
 					<workingDirectory>${project.build.directory}</workingDirectory>
 					<executable>java</executable>
 					<mainClass>be.raildelays.batch.Bootstrap</mainClass>
-					<classpathScope>compile</classpathScope>
+					<classpathScope>runtime</classpathScope>
 					<arguments>
 						<!--argument>-Djava.library.path=${project.build.directory}/lib</argument -->
 						<argument>-jar</argument>
-						<argument>${project.build.finalName}.jar</argument>
+						<argument>${project.build.finalName}.${project.packaging}</argument>
 						<!--argument>be.raildelays.batch.Bootstrap</argument -->
 					</arguments>
 				</configuration>
@@ -74,24 +73,29 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>be.raildelays</groupId>
+			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>raildelays-common</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>be.raildelays</groupId>
+			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>raildelays-domain</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>be.raildelays</groupId>
+			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>raildelays-service</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>be.raildelays</groupId>
+			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>raildelays-httpclient</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>be.raildelays</groupId>
+			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>raildelays-parser</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>raildelays-assembly-descriptor</artifactId>
+			<version>${project.parent.version}</version>
 		</dependency>
 
 		<dependency>
@@ -135,7 +139,7 @@
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>commons-cli</groupId>
 			<artifactId>commons-cli</artifactId>
@@ -156,5 +160,4 @@
 		</dependency>
 
 	</dependencies>
-
 </project>

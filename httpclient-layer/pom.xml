@@ -14,7 +14,7 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>be.raildelays</groupId>
+			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>raildelays-common</artifactId>
 		</dependency>
 

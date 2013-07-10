@@ -1,5 +1,7 @@
 package be.raildelays.batch.processor;
 
+import static org.hamcrest.number.OrderingComparison.greaterThanOrEqualTo;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -14,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
 import be.raildelays.domain.dto.RouteLogDTO;
+import be.raildelays.domain.dto.ServedStopDTO;
 import be.raildelays.domain.railtime.Direction;
 import be.raildelays.domain.railtime.Station;
 import be.raildelays.domain.railtime.Step;
@@ -51,7 +54,7 @@ public class RouteLogMapperProcessorTest {
 				new Step(1, "A", f.parse("12:20"), 10L, false), //
 				new Step(2, "2", f.parse("12:45"), 15L, false), //
 				new Step(3, "B", f.parse("12:55"), 20L, false), //
-				new Step(4, "3", f.parse("13:45"), 0L, false)));
+				new Step(4, "3", f.parse("13:45"), 0L, true)));
 		
 		Direction direction2 = new Direction(new Train("466"));
 		
@@ -63,7 +66,7 @@ public class RouteLogMapperProcessorTest {
 				new Step(1, "A", f.parse("12:25"), 10L, false), //
 				new Step(2, "2", f.parse("12:50"), 15L, false), //
 				new Step(3, "B", f.parse("13:00"), 20L, false), //
-				new Step(4, "3", f.parse("13:45"), 0L, false)));
+				new Step(4, "3", f.parse("13:45"), 0L, true)));
 
 		list = new ArrayList<>();
 		
@@ -81,18 +84,70 @@ public class RouteLogMapperProcessorTest {
 
 		Assert.assertEquals(5, routeLog.getStops().size());
 	}
+	
+	@Test
+	public void testDate() throws Exception {
+		RouteLogDTO routeLog = processor.process(list);
 
-//	@Test
-//	public void testProcessArrival() throws Exception {
-//		RouteLogDTO excelRows = processor.process(list);
-//
-//		Assert.assertEquals(1, excelRows.size());
-//		ExcelRow excelRow = excelRows.get(0);
-//		Assert.assertEquals(new Station("stationA"),
-//				excelRow.getDepartureStation());
-//		Assert.assertEquals(new Station("stationB"),
-//				excelRow.getArrivalStation());
-//		Assert.assertEquals(20, excelRow.getDelay());
-//	}
+		Assert.assertEquals(processor.getDate(), routeLog.getDate());
+	}
+	
+	@Test
+	public void testTrainId() throws Exception {
+		RouteLogDTO routeLog = processor.process(list);
+
+		Assert.assertEquals("466", routeLog.getTrainId());
+	}
+	
+	@Test
+	public void testArrivalTimeGreaterThanDepartureTime() throws Exception {
+		RouteLogDTO routeLog = processor.process(list);
+		
+		for (ServedStopDTO stop : routeLog.getStops()) {
+			Assert.assertThat(stop.getArrivalTime(), greaterThanOrEqualTo(stop.getDepartureTime()));
+		}
+	}
+	
+	@Test
+	public void testCanceled() throws Exception {
+		RouteLogDTO routeLog = processor.process(list);
+		ServedStopDTO stop = routeLog.getStops().get(4);
+		
+		Assert.assertTrue(stop.isCanceled());
+	}
+	
+	@Test
+	public void testEmpty() throws Exception {
+		RouteLogDTO routeLog = processor.process(new ArrayList<Direction>());
+		
+		Assert.assertNull("An empty list should return a null value as the end of the process", routeLog);
+	}
+	
+	@Test
+	public void testOrder() throws Exception {
+		RouteLogDTO routeLog = processor.process(list);
+		
+		for (int i = 0 ; i < routeLog.getStops().size(); i++) {
+			ServedStopDTO stop = routeLog.getStops().get(i);			
+			
+			switch (i) {
+			case 0:
+				Assert.assertEquals("1", stop.getStationName());
+				break;
+			case 1:
+				Assert.assertEquals("A", stop.getStationName());
+				break;
+			case 2:
+				Assert.assertEquals("2", stop.getStationName());
+				break;
+			case 3:
+				Assert.assertEquals("B", stop.getStationName());
+				break;
+			case 4:
+				Assert.assertEquals("3", stop.getStationName());
+				break;
+			}
+		}
+	}
 
 }
