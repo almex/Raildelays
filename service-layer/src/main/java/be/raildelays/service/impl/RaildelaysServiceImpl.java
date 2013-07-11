@@ -34,7 +34,7 @@ import be.raildelays.service.RaildelaysService;
  * We retrieve {@link LineStop} to check if they already exist before doing a
  * request.
  * 
- * @author Alexis SOUMAGNE.
+ * @author Almex.
  */
 @Service(value = "raildelaysService")
 @Transactional
