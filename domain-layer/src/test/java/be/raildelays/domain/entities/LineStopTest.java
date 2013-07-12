@@ -37,9 +37,9 @@ public class LineStopTest extends AbstractObjectTest  {
 		
 		DATA_POINT2 = DATA_POINT1;
 		
-		DATA_POINT2 = new LineStop(date, train, station, arrivalTime, departureTime, false);
+		DATA_POINT3 = new LineStop(date, train, station, arrivalTime, departureTime, false);
 		
-		DATA_POINT3 = new LineStop(new Date(), new Train("469"), new Station("Brussels (Bruxelles-central)"), arrivalTime, departureTime, false);		
+		DATA_POINT4 = new LineStop(new Date(), new Train("469"), new Station("Brussels (Bruxelles-central)"), arrivalTime, departureTime, false);		
 	}
 
 }

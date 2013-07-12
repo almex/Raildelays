@@ -81,3 +81,9 @@
 database
 
 .externalToolBuilders
+
+target
+
+data
+
+/batch-layer/*.xlsx

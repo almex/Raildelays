@@ -627,13 +627,24 @@
 						<artifactId>groovy-eclipse-compiler</artifactId>
 						<extensions>true</extensions>
 					</plugin>
-					<!--plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>build-helper-maven-plugin</artifactId> 
-						<executions> <execution> <id>add-source</id> <phase>generate-sources</phase> 
-						<goals> <goal>add-source</goal> </goals> <configuration> <sources> <source>src/main/groovy</source> 
-						</sources> </configuration> </execution> <execution> <id>add-test-source</id> 
-						<phase>generate-test-sources</phase> <goals> <goal>add-test-source</goal> 
-						</goals> <configuration> <sources> <source>src/test/groovy</source> <source>src/it/groovy</source> 
-						</sources> </configuration> </execution> </executions> </plugin -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>add-groovy-it-source</id>
+								<phase>generate-test-sources</phase>
+								<goals>
+									<goal>add-test-source</goal>
+								</goals>
+								<configuration>
+									<sources>
+										<source>src/it/groovy</source>
+									</sources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 				</plugins>
 			</build>
 		</profile>
@@ -815,13 +826,13 @@
 								<id>add-it-resource</id>
 								<phase>generate-resources</phase>
 								<goals>
-									<goal>add-test-resource</goal>
+									<goal>add-it-resource</goal>
 								</goals>
 								<configuration>
 									<resources>
 										<resource>
 											<directory>src/it/resources</directory>
-											<!--filtering>true</filtering -->
+											<filtering>true</filtering>
 										</resource>
 									</resources>
 								</configuration>

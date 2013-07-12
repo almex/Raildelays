@@ -37,7 +37,6 @@ import be.raildelays.service.RaildelaysService;
  * @author Almex.
  */
 @Service(value = "raildelaysService")
-@Transactional
 public class RaildelaysServiceImpl implements RaildelaysService {
 
 	@Resource
@@ -145,7 +144,7 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<LineStop> searchDelaysBetween(Date date, Station stationA,
 			Station stationB, int delayThreshold) {
 		List<LineStop> result = new ArrayList<LineStop>();
@@ -171,6 +170,7 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 	}
 
 	@Override
+    @Transactional(readOnly = true)
 	public List<Date> searchAllDates(Date from, Date to) {
 		List<Date> result = null;
 
@@ -184,6 +184,7 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 	}
 
 	@Override
+    @Transactional(readOnly = true)
 	public List<Date> searchAllDates(Date lastDate) {
 		List<Date> result = null;
 
