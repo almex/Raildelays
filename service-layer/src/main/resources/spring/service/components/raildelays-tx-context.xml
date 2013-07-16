@@ -13,7 +13,7 @@
         <property name="entityManagerFactory" ref="entityManagerFactory" />
     </bean>
     
-     <bean class="org.springframework.orm.hibernate4.HibernateExceptionTranslator"/>
+<!--      <bean class="org.springframework.orm.hibernate4.HibernateExceptionTranslator"/> -->
 
 	<!-- <bean id="transactionManager" -->
 	<!-- class="org.springframework.jdbc.datasource.DataSourceTransactionManager"> -->

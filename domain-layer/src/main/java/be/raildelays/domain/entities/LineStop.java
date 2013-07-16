@@ -37,7 +37,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Entity
 @Table(name = "LINE_STOP", uniqueConstraints = @UniqueConstraint(columnNames = {
 		"TRAIN_ID", "DATE", "STATION_ID" }))
-@NamedQueries({ @NamedQuery(name = "LineStop.findByTrain", query = "select o from LineStop o where o.train.railtimeId = ?1 and o.departureTime.expected >= ?2 and o.departureTime.expected <= ?3") })
+//@NamedQueries({ @NamedQuery(name = "LineStop.findByTrain", query = "select o from LineStop o where o.train.railtimeId = ?1 and o.departureTime.expected >= ?2 and o.departureTime.expected <= ?3") })
 public class LineStop implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 7142886242889314414L;
