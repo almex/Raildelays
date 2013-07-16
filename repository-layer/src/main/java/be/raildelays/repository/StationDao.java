@@ -19,7 +19,6 @@ public interface StationDao extends JpaRepository<Station, Long> {
 	 * @param language in which you want to do the search.
 	 * @return a {@link Station}
 	 */
-    @Query("select o from Station o where o.englishName = ?1")
 	public Station findByEnglishName(String englishName);
 	
 	

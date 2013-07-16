@@ -1,8 +1,6 @@
 package be.raildelays.domain.entities;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.junit.Before;
 import org.junit.experimental.theories.DataPoint;

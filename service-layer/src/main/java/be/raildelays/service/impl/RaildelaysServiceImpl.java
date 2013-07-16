@@ -225,7 +225,9 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 		Station result = stationDao.findByEnglishName(station.getEnglishName());
 
 		if (result == null) {
+			LOGGER.debug("<<<<<<[Saving Station]>>>>>>");
 			result = stationDao.save(new Station(station.getEnglishName()));
+			LOGGER.debug("Station: {}", result);
 		}
 
 		return result;

@@ -21,7 +21,8 @@ import be.raildelays.service.RaildelaysService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:/spring/service/raildelays-service-integration-context.xml" })
-@TransactionConfiguration(defaultRollback=true)
+@Transactional
+@TransactionConfiguration(defaultRollback = true)
 public class RaildelaysServiceIT {
 
 	/**
@@ -31,7 +32,6 @@ public class RaildelaysServiceIT {
 	RaildelaysService raildelaysService;
 
 	@Test
-	@Transactional
 	public void test466LineStop() throws ParseException {
 		Date today = new Date();
 		RouteLogDTO routeLog = new RouteLogDTO("466", today);
@@ -45,15 +45,14 @@ public class RaildelaysServiceIT {
 	}
 
 	@Test
-	@Transactional
 	public void testLinkedLineStop() throws ParseException {
 		Date today = new Date();
 		RouteLogDTO routeLog = new RouteLogDTO("466", today);
 		SimpleDateFormat formater = new SimpleDateFormat("HH:mm");
 		routeLog.addStop(new ServedStopDTO("Liège-Guillemins", formater
 				.parse("06:58"), 5, formater.parse("07:05"), 5, false));
-		routeLog.addStop(new ServedStopDTO("Leuven", formater
-				.parse("07:42"), 9, formater.parse("07:53"), 15, false));
+		routeLog.addStop(new ServedStopDTO("Leuven", formater.parse("07:42"),
+				9, formater.parse("07:53"), 15, false));
 		routeLog.addStop(new ServedStopDTO("Bruxelles-Central", formater
 				.parse("08:20"), 20, formater.parse("08:25"), 20, false));
 
@@ -61,20 +60,23 @@ public class RaildelaysServiceIT {
 	}
 
 	@Test
-	@Transactional
 	public void testSearchLineStop() throws ParseException {
 		Date today = new Date();
 		RouteLogDTO routeLog = new RouteLogDTO("466", today);
 		SimpleDateFormat formater = new SimpleDateFormat("HH:mm");
 		routeLog.addStop(new ServedStopDTO("Liège-Guillemins", formater
 				.parse("06:58"), 5, formater.parse("07:05"), 5, false));
-		routeLog.addStop(new ServedStopDTO("Leuven", formater
-				.parse("07:42"), 9, formater.parse("07:53"), 15, false));
+		routeLog.addStop(new ServedStopDTO("Leuven", formater.parse("07:42"),
+				9, formater.parse("07:53"), 15, false));
 		routeLog.addStop(new ServedStopDTO("Bruxelles-Central", formater
 				.parse("08:20"), 20, formater.parse("08:25"), 20, false));
 
 		Assert.assertEquals(3, raildelaysService.saveRouteLog(routeLog).size());
-		Assert.assertEquals(2, raildelaysService.searchDelaysBetween(today, new Station("Liège-Guillemins"), new Station("Bruxelles-Central"), 1).size());
+		Assert.assertEquals(
+				2,
+				raildelaysService.searchDelaysBetween(today,
+						new Station("Liège-Guillemins"),
+						new Station("Bruxelles-Central"), 1).size());
 	}
 
 }

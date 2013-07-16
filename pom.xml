@@ -826,7 +826,7 @@
 								<id>add-it-resource</id>
 								<phase>generate-resources</phase>
 								<goals>
-									<goal>add-it-resource</goal>
+									<goal>add-test-resource</goal>
 								</goals>
 								<configuration>
 									<resources>

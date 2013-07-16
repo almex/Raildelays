@@ -47,11 +47,11 @@ public final class ServedStopDTO implements Serializable, Cloneable {
 				.append("{ ") //
 				.append("stationName: " + stationName + ", ") //
 				.append("departureTime: ")
-				.append(df.format(departureTime)) //
+				.append(departureTime != null ? df.format(departureTime) : "N/A") //
 				.append(", ") //
 				.append("departureDelay: " + departureDelay + ", ") //
 				.append("arrivalTime: ")
-				.append(df.format(arrivalTime)) //
+				.append(arrivalTime != null ? df.format(arrivalTime) : "N/A") //
 				.append(", ") //
 				.append("arrivalDelay: " + arrivalDelay + ", ") //
 				.append("canceled: " + canceled + ", ") //

@@ -24,38 +24,46 @@ import be.raildelays.repository.RailtimeTrainDao;
 import be.raildelays.repository.TrainDao;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:spring/repository/raildelays-repository-integration-context.xml","classpath:spring/test/raildelays-tx-context.xml"})
-@TransactionConfiguration(defaultRollback=true)
+@ContextConfiguration(locations = {
+		"classpath:spring/repository/raildelays-repository-integration-context.xml",
+		"classpath:spring/test/raildelays-tx-context.xml" })
+@Transactional
+@TransactionConfiguration(defaultRollback = true)
 public class LineStopJpaDaoIT {
-	
+
 	@Resource
 	private LineStopDao lineStopDao;
-	
+
 	@Resource
 	private TrainDao trainDao;
-	
+
 	@Resource
 	private RailtimeTrainDao railtimeTrainDao;
-	
+
 	@Test
-	@Transactional
 	public void createTest() {
-		assertNotNull("Creation should return a result", lineStopDao.save(new LineStop(new Date(), new Train("466"), new Station("Liège-Guillemins"), new TimestampDelay(), new TimestampDelay(), false)));
+		assertNotNull("Creation should return a result",
+				lineStopDao.save(new LineStop(new Date(), new Train("466"),
+						new Station("Liège-Guillemins"), new TimestampDelay(),
+						new TimestampDelay(), false)));
 	}
-	
+
 	@Test
-	@Transactional
 	public void retrieveTest() {
-		//Assert.assertNull("No data should get back.", lineStopDao.retrieveLineStop("466", new java.sql.Date(new Date().getTime())));
+		// Assert.assertNull("No data should get back.",
+		// lineStopDao.retrieveLineStop("466", new java.sql.Date(new
+		// Date().getTime())));
 		Date date = new Date();
 		Train train = trainDao.saveAndFlush(new Train("466"));
-		LineStop expectedLineStop = lineStopDao.save(new LineStop(date, train, new Station("Liège-Guillemins"), new TimestampDelay(), new TimestampDelay(), false));
+		LineStop expectedLineStop = lineStopDao.save(new LineStop(date, train,
+				new Station("Liège-Guillemins"), new TimestampDelay(),
+				new TimestampDelay(), false));
 		List<LineStop> lineStops = lineStopDao.findByTrainAndDate(train, date);
-		
-		assertEquals("You should have a certain number of results.", 1, lineStops.size());
-		assertEquals("You should have the same result as expected.", expectedLineStop, lineStops.get(0));
-	}
-	
 
-	
+		assertEquals("You should have a certain number of results.", 1,
+				lineStops.size());
+		assertEquals("You should have the same result as expected.",
+				expectedLineStop, lineStops.get(0));
+	}
+
 }
