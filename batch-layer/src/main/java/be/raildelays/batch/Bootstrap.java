@@ -184,7 +184,7 @@ public class Bootstrap {
 		Date thursday = null;
 		Date friday = null;
 
-		for (int i = -8; i < 0; i++) {
+		for (int i = 0; i < 7; i++) {
 			date.add(Calendar.DAY_OF_MONTH, -1);
 
 			switch (date.get(Calendar.DAY_OF_WEEK)) {
