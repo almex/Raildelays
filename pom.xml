@@ -9,7 +9,6 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>assembly</module>
 		<module>common-layer</module>
 		<module>domain-layer</module>
 		<module>repository-layer</module>
@@ -18,6 +17,7 @@
 		<module>service-layer</module>
 		<module>batch-layer</module>
 		<!--module>java-fx-layer</module -->
+        <module>assembly</module>
 	</modules>
 
 	<prerequisites>
@@ -37,7 +37,7 @@
 		<version.hsqldb>2.2.9</version.hsqldb>
 		<version.derby>10.10.1.1</version.derby>
 		<version.slf4j>1.7.5</version.slf4j><!-- 1.7.5 -->
-		<version.log4j>2.0-beta7</version.log4j>
+		<version.log4j>2.0-beta8</version.log4j>
 		<version.groovy>2.1</version.groovy>
 		<version.groovy.all>2.1.5</version.groovy.all>
 		<version.groovy.eclipse.compiler>2.7.0-01</version.groovy.eclipse.compiler>
@@ -215,6 +215,11 @@
 				<artifactId>commons-lang3</artifactId>
 				<version>3.1</version>
 			</dependency>
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>3.2.1</version>
+            </dependency>
 
 			<!-- Validation -->
 			<dependency>

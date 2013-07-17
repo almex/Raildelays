@@ -33,19 +33,14 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>javax.el</groupId>
-			<artifactId>javax.el-api</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
 			<groupId>org.glassfish.web</groupId>
 			<artifactId>javax.el</artifactId>
-			<optional>true</optional>
+            <optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator-cdi</artifactId>
-			<optional>true</optional>
+            <optional>true</optional>
 		</dependency>
 
 	</dependencies>
