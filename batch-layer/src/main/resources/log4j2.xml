@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<appenders>
+		<Console name="console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%m%n" />
+		</Console>
+		<File name="railtime-data-reader" fileName="logs/railtime-data.log" append="false">
+			<PatternLayout pattern="[Reader]: %m%n" />
+		</File>
+        <File name="railtime-data-parser" fileName="logs/railtime-data.log" append="false">
+            <PatternLayout pattern="[Paser]: %m%n" />
+        </File>
+        <File name="railtime-data-streamer" fileName="logs/railtime-data.log" append="false">
+            <PatternLayout pattern="[Streamer]: %m%n" />
+        </File>
+        <File name="railtime-data" fileName="logs/railtime-data.log" append="false">
+            <PatternLayout pattern="[Data]: %m%n" />
+        </File>
+        <File name="output" fileName="logs/output.log" append="false">
+            <PatternLayout pattern="%d{DATE} %m%n" />
+        </File>
+        <File name="springbatch" fileName="logs/springbatch.log" append="false">
+            <PatternLayout pattern="%d{DATE} %-5p: %m%n" />
+        </File>
+        <File name="railtime-route-processor" fileName="logs/railtime-processor.log" append="false">
+            <PatternLayout pattern="[Route]: %m%n" />
+        </File>
+        <File name="raildelays-xls-processor" fileName="logs/railtime-processor.log" append="false">
+            <PatternLayout pattern="[Xls]: %m%n" />
+        </File>
+        <File name="raildelays-filter-processor" fileName="logs/railtime-processor.log" append="false">
+            <PatternLayout pattern="[Filter]: %m%n" />
+        </File>
+	</appenders>
+	<loggers>
+	
+		<logger name="be.raildelays.batch.Bootstrap" level="info">
+	        <appender-ref ref="console" />
+	    </logger>    
+	    <logger name="be.raildelays.batch.reader" level="trace">
+	        <appender-ref ref="railtime-data-reader" />
+	    </logger>    
+	    <logger name="be.raildelays.httpclient" level="trace">
+	        <appender-ref ref="railtime-data-streamer" />
+	    </logger>       
+	    <logger name="be.raildelays.parser" level="trace">
+	        <appender-ref ref="railtime-data-parser" />
+	    </logger>       
+	    <logger name="be.raildelays.repository" level="trace">
+	        <appender-ref ref="railtime-data" />
+	    </logger>    
+	    <logger name="be.raildelays.service" level="trace">
+	        <appender-ref ref="railtime-data" />
+	    </logger>    
+	    <logger name="be.raildelays.domain.railtime" level="trace">
+	        <appender-ref ref="railtime-data" />
+	    </logger>    
+	    <logger name="be.raildelays.batch.processor.RouteLogMapperProcessor" level="trace">
+	        <appender-ref ref="railtime-route-processor" />
+	    </logger>    
+	    <logger name="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor" level="trace">
+	        <appender-ref ref="raildelays-filter-processor" />
+	    </logger>    
+	    <logger name="be.raildelays.batch.processor.ExcelRowMapperProcessor" level="trace">
+	        <appender-ref ref="raildelays-xls-processor" />
+	    </logger>    
+	    <logger name="org.springframework.batch.item.file.FlatFileItemWriter" level="debug">
+	        <appender-ref ref="output" />
+	    </logger>    
+	    <logger name="org.springframework.batch" level="info">
+	        <appender-ref ref="springbatch" />
+	    </logger>
+	    
+		<root level="debug">
+			<appender-ref ref="console" />
+		</root>
+	</loggers>
+</configuration>

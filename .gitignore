@@ -87,3 +87,5 @@ target
 data
 
 /batch-layer/*.xlsx
+
+/batch-layer/logs

@@ -1,211 +1,184 @@
-<!-- <?xml version="1.0" encoding="UTF-8" ?> -->
-<!-- <!DOCTYPE log4j:configuration SYSTEM "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd"> -->
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd">
 
-<!-- <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/"> -->
-<!-- <appender name="console" class="org.apache.log4j.ConsoleAppender"> -->
-<!-- <param name="Target" value="System.out" /> -->
-<!-- <layout class="org.apache.log4j.PatternLayout"> -->
-<!-- <param name="ConversionPattern" value="%m%n" /> -->
-<!-- </layout> -->
-<!-- </appender> -->
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+	<appender name="console" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.out" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%m%n" />
+		</layout>
+	</appender>
+	
+	<appender name="null" class="org.apache.log4j.varia.NullAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%m%n" />
+		</layout>
+	</appender>
+	
+	<appender name="railtime-data-reader" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="Append" value="true"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/>
+		<param name="file" value="logs/railtime-data.log"/>	
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[Reader]: %m%n" />
+		</layout>
+	</appender>	
+	
+	<appender name="railtime-data-parser" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="Append" value="true"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/>
+		<param name="file" value="logs/railtime-data.log"/>		
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[Paser]: %m%n" />
+		</layout>
+	</appender>	
+	
+	<appender name="railtime-data-streamer" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="Append" value="true"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/>
+		<param name="file" value="logs/railtime-data.log"/>		
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[Streamer]: %m%n" />
+		</layout>
+	</appender>	
+	
+	<appender name="railtime-data" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="Append" value="true"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/>
+		<param name="file" value="logs/railtime-data.log"/>		
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[Data]: %m%n" />
+		</layout>
+	</appender>
+	
+	<appender name="output" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="Append" value="true"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/>
+		<param name="file" value="logs/output.log"/>		
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{DATE} %m%n" />
+		</layout>
+	</appender>	
+	
+	<appender name="springbatch" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="Append" value="true"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/>
+		<param name="file" value="logs/springbatch.log"/>		
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{DATE} %-5p: %m%n" />
+		</layout>
+	</appender>
+	
+	<appender name="railtime-route-processor" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="Append" value="true"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/>
+		<param name="file" value="logs/railtime-processor.log"/>		
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[Route]: %m%n" />
+		</layout>
+	</appender>
+	
+	<appender name="raildelays-xls-processor" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="Append" value="true"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/>
+		<param name="file" value="logs/raildelays-processor.log"/>		
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[Xls]: %m%n" />
+		</layout>
+	</appender>
+	
+	<appender name="raildelays-filter-processor" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="Append" value="true"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/>
+		<param name="file" value="logs/raildelays-processor.log"/>		
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[Filter]: %m%n" />
+		</layout>
+	</appender>
+	 
+	<logger name="be.raildelays.batch.Bootstrap">
+		<level value="info" />
+		<appender-ref ref="console" />
+	</logger>
+	
+	<logger name="be.raildelays.batch.reader">
+		<level value="trace" />
+		<appender-ref ref="railtime-data-reader" />
+	</logger>
+	
+	<logger name="be.raildelays.httpclient">
+		<level value="trace" />
+		<appender-ref ref="railtime-data-streamer" />
+	</logger>	
+	
+	<logger name="be.raildelays.parser">
+		<level value="trace" />
+		<appender-ref ref="railtime-data-parser" />
+	</logger>	
+	
+	<logger name="be.raildelays.repository">
+		<level value="trace" />
+		<appender-ref ref="railtime-data" />
+	</logger>
+	
+	<logger name="be.raildelays.service">
+		<level value="trace" />
+		<appender-ref ref="railtime-data" />
+	</logger>
+	
+	<logger name="be.raildelays.domain.railtime">
+		<level value="trace" />
+		<appender-ref ref="railtime-data" />
+	</logger>
+	
+	<logger name="be.raildelays.batch.processor.RouteLogMapperProcessor">
+		<level value="trace" />
+		<appender-ref ref="railtime-route-processor" />
+	</logger>
+	
+	<logger name="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor">
+		<level value="trace" />
+		<appender-ref ref="raildelays-filter-processor" />
+	</logger>
+	
+	<logger name="be.raildelays.batch.processor.ExcelRowMapperProcessor">
+		<level value="trace" />
+		<appender-ref ref="raildelays-xls-processor" />
+	</logger>
+	
+	<!-- logger name="org.springframework.batch.item.validator.ValidatingItemProcessor">
+		<level value="trace" />
+		<appender-ref ref="railtime-processor" />
+	</logger-->
+	
+	<logger name="org.springframework.batch.item.file.FlatFileItemWriter">
+		<level value="debug" />
+		<appender-ref ref="output" />
+	</logger>
+	
+	<logger name="org.springframework.batch">
+		<level value="info" />
+		<appender-ref ref="springbatch" />
+	</logger>
+	
+<!-- 	<logger name="org.springframework.transaction"> -->
+<!-- 		<level value="error" /> -->
+<!-- 		<appender-ref ref="error" /> -->
+<!-- 	</logger> -->
 
-<!-- <appender name="null" class="org.apache.log4j.varia.NullAppender"> -->
-<!-- <layout class="org.apache.log4j.PatternLayout"> -->
-<!-- <param name="ConversionPattern" value="%m%n" /> -->
-<!-- </layout> -->
-<!-- </appender> -->
+<!-- 	<logger name="org.hsqldb"> -->
+<!-- 		<level value="error" /> -->
+<!-- 		<appender-ref ref="error" /> -->
+<!-- 	</logger> -->
 
-<!-- <appender name="railtime-data-reader" class="org.apache.log4j.DailyRollingFileAppender"> -->
-<!-- <param name="Append" value="true"/> -->
-<!-- <param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/> -->
-<!-- <param name="file" value="logs/railtime-data.log"/> -->
-<!-- <layout class="org.apache.log4j.PatternLayout"> -->
-<!-- <param name="ConversionPattern" value="[Reader]: %m%n" /> -->
-<!-- </layout> -->
-<!-- </appender> -->
+<!-- 	<logger name="org.hibernate"> -->
+<!-- 		<level value="error" /> -->
+<!-- 		<appender-ref ref="error" /> -->
+<!-- 	</logger> -->
 
-<!-- <appender name="railtime-data-parser" class="org.apache.log4j.DailyRollingFileAppender"> -->
-<!-- <param name="Append" value="true"/> -->
-<!-- <param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/> -->
-<!-- <param name="file" value="logs/railtime-data.log"/> -->
-<!-- <layout class="org.apache.log4j.PatternLayout"> -->
-<!-- <param name="ConversionPattern" value="[Paser]: %m%n" /> -->
-<!-- </layout> -->
-<!-- </appender> -->
+	<root>
+		<level value="error" />
+		<appender-ref ref="null" />
+	</root>
 
-<!-- <appender name="railtime-data-streamer" class="org.apache.log4j.DailyRollingFileAppender"> -->
-<!-- <param name="Append" value="true"/> -->
-<!-- <param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/> -->
-<!-- <param name="file" value="logs/railtime-data.log"/> -->
-<!-- <layout class="org.apache.log4j.PatternLayout"> -->
-<!-- <param name="ConversionPattern" value="[Streamer]: %m%n" /> -->
-<!-- </layout> -->
-<!-- </appender> -->
-
-<!-- <appender name="railtime-data" class="org.apache.log4j.DailyRollingFileAppender"> -->
-<!-- <param name="Append" value="true"/> -->
-<!-- <param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/> -->
-<!-- <param name="file" value="logs/railtime-data.log"/> -->
-<!-- <layout class="org.apache.log4j.PatternLayout"> -->
-<!-- <param name="ConversionPattern" value="[Data]: %m%n" /> -->
-<!-- </layout> -->
-<!-- </appender> -->
-
-<!-- <appender name="output" class="org.apache.log4j.DailyRollingFileAppender"> -->
-<!-- <param name="Append" value="true"/> -->
-<!-- <param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/> -->
-<!-- <param name="file" value="logs/output.log"/> -->
-<!-- <layout class="org.apache.log4j.PatternLayout"> -->
-<!-- <param name="ConversionPattern" value="%d{DATE} %m%n" /> -->
-<!-- </layout> -->
-<!-- </appender> -->
-
-<!-- <appender name="springbatch" class="org.apache.log4j.DailyRollingFileAppender"> -->
-<!-- <param name="Append" value="true"/> -->
-<!-- <param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/> -->
-<!-- <param name="file" value="logs/springbatch.log"/> -->
-<!-- <layout class="org.apache.log4j.PatternLayout"> -->
-<!-- <param name="ConversionPattern" value="%d{DATE} %-5p: %m%n" /> -->
-<!-- </layout> -->
-<!-- </appender> -->
-
-<!-- <appender name="railtime-route-processor" class="org.apache.log4j.DailyRollingFileAppender"> -->
-<!-- <param name="Append" value="true"/> -->
-<!-- <param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/> -->
-<!-- <param name="file" value="logs/railtime-processor.log"/> -->
-<!-- <layout class="org.apache.log4j.PatternLayout"> -->
-<!-- <param name="ConversionPattern" value="[Route]: %m%n" /> -->
-<!-- </layout> -->
-<!-- </appender> -->
-
-<!-- <appender name="raildelays-xls-processor" class="org.apache.log4j.DailyRollingFileAppender"> -->
-<!-- <param name="Append" value="true"/> -->
-<!-- <param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/> -->
-<!-- <param name="file" value="logs/raildelays-processor.log"/> -->
-<!-- <layout class="org.apache.log4j.PatternLayout"> -->
-<!-- <param name="ConversionPattern" value="[Xls]: %m%n" /> -->
-<!-- </layout> -->
-<!-- </appender> -->
-
-<!-- <appender name="raildelays-filter-processor" class="org.apache.log4j.DailyRollingFileAppender"> -->
-<!-- <param name="Append" value="true"/> -->
-<!-- <param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/> -->
-<!-- <param name="file" value="logs/raildelays-processor.log"/> -->
-<!-- <layout class="org.apache.log4j.PatternLayout"> -->
-<!-- <param name="ConversionPattern" value="[Filter]: %m%n" /> -->
-<!-- </layout> -->
-<!-- </appender> -->
-
-<!-- <logger name="be.raildelays.batch.Bootstrap"> -->
-<!-- <level value="info" /> -->
-<!-- <appender-ref ref="console" /> -->
-<!-- </logger> -->
-
-<!-- <logger name="be.raildelays.batch.reader"> -->
-<!-- <level value="trace" /> -->
-<!-- <appender-ref ref="railtime-data-reader" /> -->
-<!-- </logger> -->
-
-<!-- <logger name="be.raildelays.httpclient"> -->
-<!-- <level value="trace" /> -->
-<!-- <appender-ref ref="railtime-data-streamer" /> -->
-<!-- </logger> -->
-
-<!-- <logger name="be.raildelays.parser"> -->
-<!-- <level value="trace" /> -->
-<!-- <appender-ref ref="railtime-data-parser" /> -->
-<!-- </logger> -->
-
-<!-- <logger name="be.raildelays.repository"> -->
-<!-- <level value="trace" /> -->
-<!-- <appender-ref ref="railtime-data" /> -->
-<!-- </logger> -->
-
-<!-- <logger name="be.raildelays.service"> -->
-<!-- <level value="trace" /> -->
-<!-- <appender-ref ref="railtime-data" /> -->
-<!-- </logger> -->
-
-<!-- <logger name="be.raildelays.domain.railtime"> -->
-<!-- <level value="trace" /> -->
-<!-- <appender-ref ref="railtime-data" /> -->
-<!-- </logger> -->
-
-<!-- <logger name="be.raildelays.batch.processor.RouteLogMapperProcessor"> -->
-<!-- <level value="trace" /> -->
-<!-- <appender-ref ref="railtime-route-processor" /> -->
-<!-- </logger> -->
-
-<!-- <logger name="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor"> -->
-<!-- <level value="trace" /> -->
-<!-- <appender-ref ref="raildelays-filter-processor" /> -->
-<!-- </logger> -->
-
-<!-- <logger name="be.raildelays.batch.processor.ExcelRowMapperProcessor"> -->
-<!-- <level value="trace" /> -->
-<!-- <appender-ref ref="raildelays-xls-processor" /> -->
-<!-- </logger> -->
-
-<!-- <!-- logger name="org.springframework.batch.item.validator.ValidatingItemProcessor"> -->
-<!-- <level value="trace" /> -->
-<!-- <appender-ref ref="railtime-processor" /> -->
-<!-- </logger -->
--->
-
-<!-- <logger name="org.springframework.batch.item.file.FlatFileItemWriter"> -->
-<!-- <level value="debug" /> -->
-<!-- <appender-ref ref="output" /> -->
-<!-- </logger> -->
-
-<!-- <logger name="org.springframework.batch"> -->
-<!-- <level value="info" /> -->
-<!-- <appender-ref ref="springbatch" /> -->
-<!-- </logger> -->
-
-<!-- <!-- <logger name="org.springframework.transaction"> -->
--->
-<!-- <!-- <level value="error" /> -->
--->
-<!-- <!-- <appender-ref ref="error" /> -->
--->
-<!-- <!-- </logger> -->
--->
-
-<!-- <!-- <logger name="org.hsqldb"> -->
--->
-<!-- <!-- <level value="error" /> -->
--->
-<!-- <!-- <appender-ref ref="error" /> -->
--->
-<!-- <!-- </logger> -->
--->
-
-<!-- <!-- <logger name="org.hibernate"> -->
--->
-<!-- <!-- <level value="error" /> -->
--->
-<!-- <!-- <appender-ref ref="error" /> -->
--->
-<!-- <!-- </logger> -->
--->
-
-<!-- <root> -->
-<!-- <level value="error" /> -->
-<!-- <appender-ref ref="null" /> -->
-<!-- </root> -->
-
-<!-- </log4j:configuration> -->
-<?xml version="1.0" encoding="UTF-8"?>
-<configuration>
-	<appenders>
-		<Console name="STDOUT" target="SYSTEM_OUT">
-			<PatternLayout pattern="%d %-5p [%t] %C{2} (%F:%L) - %m%n" />
-		</Console>
-	</appenders>
-	<loggers>
-		<logger name="org.apache.log4j.xml" level="info" />
-		<root level="debug">
-			<appender-ref ref="STDOUT" />
-		</root>
-	</loggers>
-</configuration>
+</log4j:configuration>
