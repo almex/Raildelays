@@ -1,6 +1,8 @@
 package be.raildelays.batch.writer;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,6 +42,9 @@ public class ExcelSheetItemWriterIT {
 	public void setUp() throws FileNotFoundException {
 		writer.open(MetaDataInstanceFactory.createStepExecution()
 				.getExecutionContext());
+		
+		writer.setInput(this.getClass().getResourceAsStream("template.xlsx"));
+		writer.setOutput(new FileOutputStream(new File("output.dat")));
 	}
 
 	@Test
