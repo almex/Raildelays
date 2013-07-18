@@ -15,12 +15,12 @@ import be.raildelays.util.ParsingUtil
 /**
  * Tests for the {@link StreamParser} class.
  */
-class StreamParserTest
+class StreamParserIT
 {
 	
 	def StreamParser parser	
 	
-	def Logger log = LoggerFactory.getLogger(StreamParserTest.class)
+	def Logger log = LoggerFactory.getLogger(StreamParserIT.class)
 	
 	/**
 	 * Test train 466 today.
