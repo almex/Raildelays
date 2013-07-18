@@ -405,8 +405,9 @@
 	<build>
 		<resources>
 			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
+				<directory>src/main/resources</directory>				
+				<!-- Removed to avoid issue with *.xlsx files in batch-layer -->
+				<!--<filtering>true</filtering>-->
 			</resource>
 		</resources>
 

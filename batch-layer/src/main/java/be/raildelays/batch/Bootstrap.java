@@ -43,6 +43,7 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.util.Assert;
 
 public class Bootstrap {
 
@@ -99,6 +100,12 @@ public class Bootstrap {
 					.getProperty("text.output.path");
 			String excelOutputPath = configuration
 					.getProperty("excel.output.path");
+			
+			Assert.notNull(departure, "You must add a 'departure' property into the ./conf/raildelays.properties");
+			Assert.notNull(arrival, "You must add a 'arrival' property into the ./conf/raildelays.properties");
+			Assert.notNull(excelInputTemplate, "You must add a 'excel.input.template' property into the ./conf/raildelays.properties");
+			Assert.notNull(textOutputPath, "You must add a 'text.output.path' property into the ./conf/raildelays.properties");
+			Assert.notNull(excelOutputPath, "You must add a 'excel.output.path' property into the ./conf/raildelays.properties");
 
 			LOGGER.info("jobNames={}", jobRegistry.getJobNames());
 
