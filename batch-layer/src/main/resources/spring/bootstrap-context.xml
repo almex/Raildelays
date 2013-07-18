@@ -12,6 +12,7 @@
 				<value>file:./conf/raildelays.properties</value>
 			</list>
 		</property>
+		<property name="fileEncoding" value="UTF-8" />
 	</bean>
 
 	<import
