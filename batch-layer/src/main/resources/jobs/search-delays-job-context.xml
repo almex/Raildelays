@@ -26,14 +26,6 @@
 			</batch:tasklet>
 		</batch:step>
 	</batch:job>
-	
-	<bean id="step" class="org.springframework.batch.core.step.tasklet.TaskletStep">
-	   <property name="tasklet" ref="tasklet" />
-	</bean>
-	
-	<bean id="tasklet" class="org.springframework.batch.core.step.item.ChunkOrientedTasklet">
-       <property name="" ref="tasklet" />
-    </bean>
 
 	<!-- Readers -->	
 	<bean id="compositeRaildelaysItemReader"
