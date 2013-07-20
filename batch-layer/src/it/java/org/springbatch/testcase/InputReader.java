@@ -15,7 +15,7 @@ public class InputReader<T> extends AbstractItemCountingItemStreamItemReader<T> 
 	protected T doRead() throws Exception {		
 		T result =null;
 		
-		if (getCurrentItemCount() < dataTable.length) {
+		if (getCurrentItemCount() <= dataTable.length) {
 			result = dataTable[getCurrentItemCount()-1];
 			
 			LOGGER.info("read: {}", result.toString());
@@ -27,7 +27,7 @@ public class InputReader<T> extends AbstractItemCountingItemStreamItemReader<T> 
 	protected T readPrevious() throws Exception {		
 		T result = null;
 		
-		if (getCurrentItemCount() > 0 && getCurrentItemCount() < dataTable.length) {
+		if (getCurrentItemCount() > 0 && getCurrentItemCount() <= dataTable.length) {
 			result = dataTable[getCurrentItemCount()-1];
 			
 			LOGGER.info("readPevious: {}", result.toString());
