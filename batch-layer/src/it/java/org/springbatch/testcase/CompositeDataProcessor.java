@@ -26,7 +26,7 @@ public class CompositeDataProcessor implements ItemProcessor<CompositeData, Outp
 		switch (item.compare()) {
 		case -1:
 			result = new OutputData(item.getData1(), Event.ADD);
-			LOGGER.info("Process: ADD   {}", item.getData1());
+			LOGGER.info("Process: ADD    {}", item.getData1());
 			break;
 		case 0:
 			result = new OutputData(item.getData1(), Event.MODIFY);

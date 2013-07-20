@@ -14,19 +14,19 @@ public class OutputWriter implements ItemWriter<OutputData> {
 	@Override
 	public void write(List<? extends OutputData> items) throws Exception {
 		
-		LOGGER.info("items.size():={}", items.size());
+		LOGGER.debug("items.size():={}", items.size());
 		
 		for (OutputData data : items) {
 			
 			switch (data.getEvent()) {
 			case ADD:				
-				LOGGER.info("{} (ADD)", data);				
+				LOGGER.info("write: {}", data);				
 				break;
 			case DELETE:				
-				LOGGER.debug("{} (DELETE)", data);				
+				LOGGER.debug("write: {}", data);				
 				break;
 			case MODIFY:				
-				LOGGER.info("{} (MODIFY)", data);				
+				LOGGER.info("write: {}", data);				
 				break;
 
 			default:
