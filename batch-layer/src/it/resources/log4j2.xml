@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<appenders>
+		<Console name="console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{DATE} %-5p %-15c{1}: %m%n" />
+		</Console>
+        <File name="file" fileName="traces.log" append="false">
+            <PatternLayout pattern="%m%n" />
+        </File>
+	</appenders>
+	<loggers>
+	    <logger name="org.springbatch" level="info">
+            <appender-ref ref="console" />
+            <appender-ref ref="file" />
+        </logger>
+		<root level="error">
+			<appender-ref ref="console" />
+		</root>
+	</loggers>
+</configuration>

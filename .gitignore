@@ -89,3 +89,5 @@ data
 /batch-layer/*.xlsx
 
 /batch-layer/logs
+
+/batch-layer/traces.log

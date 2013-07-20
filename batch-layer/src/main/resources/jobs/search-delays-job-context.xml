@@ -13,9 +13,9 @@
 	<context:annotation-config />
 	
 	<batch:job id="searchDelaysJob" restartable="true">		
-		<batch:step id="searchDelays">
-			<batch:tasklet transaction-manager="batchTransactionManager" allow-start-if-complete="true">
-				<batch:chunk reader="compositeRaildelaysItemReader" processor="chainedProcessorsForDelays" writer="flatFileItemWriter"
+		<batch:step id="searchDelays" >
+			<batch:tasklet  transaction-manager="batchTransactionManager" allow-start-if-complete="true">
+				<batch:chunk cache-capacity="" reader="compositeRaildelaysItemReader" processor="chainedProcessorsForDelays" writer="flatFileItemWriter"
 					commit-interval="10" skip-limit="100">					
 					<batch:skippable-exception-classes>
 						<batch:include class="org.springframework.batch.item.validator.ValidationException"/>
@@ -26,6 +26,14 @@
 			</batch:tasklet>
 		</batch:step>
 	</batch:job>
+	
+	<bean id="step" class="org.springframework.batch.core.step.tasklet.TaskletStep">
+	   <property name="tasklet" ref="tasklet" />
+	</bean>
+	
+	<bean id="tasklet" class="org.springframework.batch.core.step.item.ChunkOrientedTasklet">
+       <property name="" ref="tasklet" />
+    </bean>
 
 	<!-- Readers -->	
 	<bean id="compositeRaildelaysItemReader"

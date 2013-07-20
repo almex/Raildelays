@@ -8,30 +8,24 @@
 			<param name="ConversionPattern" value="%d{DATE} %-5p %-15c{1}: %m%n" />
 		</layout>
 	</appender>
-
-	<logger name="be.raildelays">
-		<level value="debug" />
-	</logger>
-
-	<logger name="org.springframework">
+    <appender name="file" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="Append" value="true"/>
+        <param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm"/>
+        <param name="file" value="traces.log"/> 
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="[Reader]: %m%n" />
+        </layout>
+    </appender>
+    
+	<logger name="org.springbatch">
 		<level value="info" />
-	</logger>
-	
-	<logger name="org.springframework.batch">
-		<level value="info" />
-	</logger>
-
-	<logger name="org.hsqldb">
-		<level value="info" />
-	</logger>
-
-	<logger name="org.hibernate">
-		<level value="info" />
+        <appender-ref ref="console" />
+        <appender-ref ref="file" />
 	</logger>
 
 
 	<root>
-		<priority value="info" />
+		<priority value="error" />
 		<appender-ref ref="console" />
 	</root>
 
