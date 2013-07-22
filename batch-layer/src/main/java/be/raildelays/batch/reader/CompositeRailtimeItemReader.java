@@ -33,39 +33,23 @@ public class CompositeRailtimeItemReader extends CompositeItemStream implements 
 	
 	private RailtimeItemReader arrivalReader;
 
-	private FlatFileItemReader<String> fileReader;
-
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(arrivalReader, "You must provide a arrivalReader");
 		Assert.notNull(departureReader, "You must provide a departureReader");
-		Assert.notNull(fileReader, "You must provide a fileReader");
-		register(fileReader);
 	}
 
 	public List<? extends Direction> read() throws Exception, UnexpectedInputException,
 			ParseException, NonTransientResourceException {	
-		List<Direction> result = null;
-		String trainId = fileReader.read();		
-		
-		LOGGER.info("trainId={}", trainId);
-		
-		if (trainId != null) {
-			// From this point we consider that we can continue to read next item.
-			// No matter if we can retrieve some Direction or not from Railtime.
-			// So we return a non null value to satisfy ItemReader contract.
-			result = new ArrayList<>(); 
-			
-			departureReader.setTrainId(trainId);
-			arrivalReader.setTrainId(trainId);
+		List<Direction> result = null;	 
 
-			Direction departureDirection = departureReader.read();
-			Direction arrivalDirection = arrivalReader.read();
-			
-			if (departureDirection != null && arrivalDirection != null) {
-				result.add(departureDirection); 
-				result.add(arrivalDirection);
-			}
+		Direction departureDirection = departureReader.read();
+		Direction arrivalDirection = arrivalReader.read();
+		
+		if (departureDirection != null && arrivalDirection != null) {			
+			result = new ArrayList<>();
+			result.add(departureDirection); 
+			result.add(arrivalDirection);
 		}
 		
 		return result;
@@ -77,10 +61,6 @@ public class CompositeRailtimeItemReader extends CompositeItemStream implements 
 
 	public void setDepartureReader(RailtimeItemReader departureReader) {
 		this.departureReader = departureReader;
-	}
-
-	public void setFileReader(FlatFileItemReader<String> fileReader) {
-		this.fileReader = fileReader;
 	}
 
 }

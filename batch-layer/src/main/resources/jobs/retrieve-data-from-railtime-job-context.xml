@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:batch="http://www.springframework.org/schema/batch"
-	xmlns:util="http://www.springframework.org/schema/util"
-	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
@@ -15,10 +13,12 @@
 	<batch:job id="retrieveDataFromRailtimeJob" restartable="true">
 		<batch:step id="retrieveDataFromRailtime">
 			<batch:tasklet transaction-manager="batchTransactionManager">
-				<batch:chunk reader="compositeRailtimeItemReader" processor="chainedProcessorsForRailtime"
-					writer="raildelaysServiceWriter" commit-interval="10" skip-limit="100">
+				<batch:chunk reader="compositeRailtimeItemReader"
+					processor="chainedProcessorsForRailtime" writer="raildelaysServiceWriter"
+					commit-interval="10" skip-limit="100">
 					<batch:skippable-exception-classes>
-						<batch:include class="org.springframework.batch.item.validator.ValidationException"/>
+						<batch:include
+							class="org.springframework.batch.item.validator.ValidationException" />
 					</batch:skippable-exception-classes>
 				</batch:chunk>
 				<batch:transaction-attributes
@@ -26,25 +26,15 @@
 			</batch:tasklet>
 		</batch:step>
 	</batch:job>
-	
-	<!-- Readers -->	
+
+	<!-- Readers -->
 	<bean id="compositeRailtimeItemReader" class="be.raildelays.batch.reader.CompositeRailtimeItemReader"
 		scope="step">
-		<property name="fileReader">	
-			<bean class="org.springframework.batch.item.file.FlatFileItemReader"
-				scope="step">
-				<property name="lineMapper">
-					<bean
-						class="org.springframework.batch.item.file.mapping.PassThroughLineMapper">
-					</bean>
-				</property>
-				<property name="resource" value="#{jobParameters['input.file.path']}" />
-			</bean>
-		</property>
 		<property name="departureReader">
 			<bean class="be.raildelays.batch.reader.RailtimeItemReader"
 				scope="step">
 				<property name="date" value="#{jobParameters['date']}" />
+				<property name="trainId" value="#{jobParameters['trainId']}" />
 				<property name="sens">
 					<util:constant static-field="be.raildelays.domain.Sens.DEPARTURE" />
 				</property>
@@ -54,35 +44,40 @@
 			<bean class="be.raildelays.batch.reader.RailtimeItemReader"
 				scope="step">
 				<property name="date" value="#{jobParameters['date']}" />
+				<property name="trainId" value="#{jobParameters['trainId']}" />
 				<property name="sens">
 					<util:constant static-field="be.raildelays.domain.Sens.ARRIVAL" />
 				</property>
 			</bean>
 		</property>
 	</bean>
-	
-	<!-- Processors -->	    
-    <bean id="chainedProcessorsForRailtime" class="org.springframework.batch.item.support.CompositeItemProcessor">
-        <property name="delegates">
-            <list>
-                <ref bean="routeLogMapperProcessor" />
-                <ref bean="validatorProcessor" />
-            </list>
-        </property>
-    </bean>
-    
-    <bean id="routeLogMapperProcessor" class="be.raildelays.batch.processor.RouteLogMapperProcessor" scope="step">
+
+	<!-- Processors -->
+	<bean id="chainedProcessorsForRailtime"
+		class="org.springframework.batch.item.support.CompositeItemProcessor">
+		<property name="delegates">
+			<list>
+				<ref bean="routeLogMapperProcessor" />
+				<ref bean="validatorProcessor" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="routeLogMapperProcessor" class="be.raildelays.batch.processor.RouteLogMapperProcessor"
+		scope="step">
 		<property name="date" value="#{jobParameters[date]}" />
 	</bean>
-	
-	<bean id="validatorProcessor" class="org.springframework.batch.item.validator.ValidatingItemProcessor">
-	    <property name="validator">
-	    	<bean class="org.springframework.batch.item.validator.SpringValidator">
-	    		<property name="validator">
-	    			<bean class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" />
-	    		</property>
-	    	</bean>
-	    </property>
+
+	<bean id="validatorProcessor"
+		class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+		<property name="validator">
+			<bean class="org.springframework.batch.item.validator.SpringValidator">
+				<property name="validator">
+					<bean
+						class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" />
+				</property>
+			</bean>
+		</property>
 	</bean>
 
 	<!-- Writers -->

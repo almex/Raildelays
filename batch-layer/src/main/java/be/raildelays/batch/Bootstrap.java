@@ -42,6 +42,15 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ParseException;
+import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.repeat.RepeatCallback;
+import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.batch.repeat.callback.NestedRepeatCallback;
+import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Assert;
 
@@ -55,22 +64,24 @@ public class Bootstrap {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		String[] contextPaths = new String[] { "/spring/bootstrap-context.xml" };
-		List<Date> dates = generateListOfDates();
-		CommandLineParser parser = new BasicParser();
-		Options options = new Options();
+		final String[] contextPaths = new String[] { "/spring/bootstrap-context.xml" };
+		final CommandLineParser parser = new BasicParser();
+		final Options options = new Options();
+		final List<Date> dates;
 
 		options.addOption("offline", false, "activate offline mode");
 		options.addOption("norecovery", false, "do not execute recovery");
 		options.addOption("date", false, "search delays for only on date passed as parameter");
 
-		CommandLine cmd = parser.parse(options, args);
-		boolean online = !cmd.hasOption("offline");
-		boolean recovery = !cmd.hasOption("norecovery");
-		String searchDate = cmd.getOptionValue("date", "");
+		final CommandLine cmd = parser.parse(options, args);
+		final boolean online = !cmd.hasOption("offline");
+		final boolean recovery = !cmd.hasOption("norecovery");
+		final String searchDate = cmd.getOptionValue("date", "");
 		
 		if (StringUtils.isNotEmpty(searchDate)) {
 			dates = Arrays.asList(DateUtils.parseDate(searchDate, new String[] {"dd/MM/yyyy", "dd-MM-yyyy", "yyyyMMdd"}));
+		} else {
+			dates = generateListOfDates();
 		}
 		
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(
@@ -81,24 +92,28 @@ public class Bootstrap {
 		try {
 			Properties configuration = ctx.getBean("configuration",
 					Properties.class);
-			JobRegistry jobRegistry = ctx.getBean(JobRegistry.class);
-			JobExplorer jobExplorer = ctx.getBean(JobExplorer.class);
-			JobOperator jobOperator = ctx.getBean(JobOperator.class);
-			JobRepository jobRepository = ctx.getBean(JobRepository.class);
-			JobLauncher jobLauncher = ctx.getBean(JobLauncher.class);
-			DefaultJobParametersConverter converter = new DefaultJobParametersConverter();
+			final JobRegistry jobRegistry = ctx.getBean(JobRegistry.class);
+			final JobExplorer jobExplorer = ctx.getBean(JobExplorer.class);
+			final JobOperator jobOperator = ctx.getBean(JobOperator.class);
+			final JobRepository jobRepository = ctx.getBean(JobRepository.class);
+			final JobLauncher jobLauncher = ctx.getBean(JobLauncher.class);
+			final FlatFileItemReader<String> trainListReader = ctx.getBean("trainList", FlatFileItemReader.class);
+			final DefaultJobParametersConverter converter = new DefaultJobParametersConverter();
+			
 			converter.setDateFormat(new SimpleDateFormat("dd/MM/yyyy"));
-			Job retrieveDataFromRailtimeJob = null;
-			Job searchDelaysJob = null;
-			Job searchDelaysXlsJob = null;
+			
+			final Job retrieveDataFromRailtimeJob = jobRegistry
+					.getJob("retrieveDataFromRailtimeJob");;
+			final Job searchDelaysJob = jobRegistry.getJob("searchDelaysJob");
+			final Job searchDelaysXlsJob = jobRegistry.getJob("searchDelaysXlsJob");
 
-			String departure = configuration.getProperty("departure");
-			String arrival = configuration.getProperty("arrival");
-			String excelInputTemplate = configuration
+			final String departure = configuration.getProperty("departure");
+			final String arrival = configuration.getProperty("arrival");
+			final String excelInputTemplate = configuration
 					.getProperty("excel.input.template");
-			String textOutputPath = configuration
+			final String textOutputPath = configuration
 					.getProperty("text.output.path");
-			String excelOutputPath = configuration
+			final String excelOutputPath = configuration
 					.getProperty("excel.output.path");
 			
 			Assert.notNull(departure, "You must add a 'departure' property into the ./conf/raildelays.properties");
@@ -109,38 +124,59 @@ public class Bootstrap {
 
 			LOGGER.info("jobNames={}", jobRegistry.getJobNames());
 
-			if (online) {
-				LOGGER.info("[ON-line mode activated]");
-				retrieveDataFromRailtimeJob = jobRegistry
-						.getJob("retrieveDataFromRailtimeJob");
-			} else {
-				LOGGER.info("[OFF-line mode activated]");
-			}
-
-			searchDelaysJob = jobRegistry.getJob("searchDelaysJob");
-			searchDelaysXlsJob = jobRegistry.getJob("searchDelaysXlsJob");
-
 			if (recovery) {
 				LOGGER.info("[Recovery activated]");
 				recover(jobRegistry, jobExplorer, jobRepository, jobOperator);
 			}
 
-			if (retrieveDataFromRailtimeJob != null) {
-				for (Date date : dates) {
-					Map<String, JobParameter> parameters = new HashMap<>();
+			if (online) {
+				LOGGER.info("[ON-line mode activated]");
+				
+				try {
+					trainListReader.open(new ExecutionContext());
+					RepeatTemplate template = new RepeatTemplate();
+					template.iterate(new RepeatCallback() {
 
-					parameters.put("input.file.path", new JobParameter(
-							"file:./conf/train.list"));
-					parameters.put("date", new JobParameter(date));
-					parameters.put("station.a.name",
-							new JobParameter(departure));
-					parameters.put("station.b.name", new JobParameter(arrival));
+					    public RepeatStatus doInIteration(RepeatContext context) throws UnexpectedInputException, ParseException, Exception {
+					    	RepeatStatus result = RepeatStatus.CONTINUABLE;
+					        String trainId = trainListReader.read();
+					        
+					        if (trainId != null) {
+								for (Date date : dates) {
+									Map<String, JobParameter> parameters = new HashMap<>();
 
-					JobParameters jobParameters = new JobParameters(parameters);
+									parameters.put("date", new JobParameter(
+											date));
+									parameters.put("trainId", new JobParameter(
+											trainId));
+									parameters.put("station.a.name",
+											new JobParameter(departure));
+									parameters.put("station.b.name",
+											new JobParameter(arrival));
 
-					startOrRestartJob(jobLauncher, retrieveDataFromRailtimeJob,
-							jobParameters, converter);
+									JobParameters jobParameters = new JobParameters(
+											parameters);
+
+									startOrRestartJob(jobLauncher,
+											retrieveDataFromRailtimeJob,
+											jobParameters, converter);
+								}
+							} else {
+								result = RepeatStatus.FINISHED;
+							}
+					        
+							return result;
+					    }
+
+					});
+				} catch (Exception e) {
+					// TODO: handle exception
 				}
+				finally {
+					trainListReader.close();
+				}
+			} else {
+				LOGGER.info("[OFF-line mode activated]");
 			}
 
 			if (searchDelaysJob != null) {

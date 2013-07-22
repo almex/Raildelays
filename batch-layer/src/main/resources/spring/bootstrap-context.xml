@@ -16,6 +16,16 @@
 		<property name="ignoreResourceNotFound" value="false" />
 	</bean>
 
+    <bean id="trainList" class="org.springframework.batch.item.file.FlatFileItemReader">
+        <property name="lineMapper">
+            <bean
+                class="org.springframework.batch.item.file.mapping.PassThroughLineMapper">
+            </bean>
+        </property>
+        <property name="encoding" value="ISO-8859-1" />
+        <property name="resource" value="file:./conf/train.list" />
+    </bean>
+
 	<import
 		resource="classpath:spring/batch/raildelays-batch-integration-context.xml" />
 

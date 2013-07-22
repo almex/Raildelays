@@ -43,9 +43,9 @@ public class RetrieveDataFromRailtimeJobIT extends AbstractContextIT {
 			} else {			
 				date = today.getTime();
 			}
-
-			parameters.put("input.file.path", new JobParameter("train-list.properties"));	
-			parameters.put("date", new JobParameter(date));	
+	
+			parameters.put("date", new JobParameter(date));		
+			parameters.put("trainId", new JobParameter("466"));	
 			parameters.put("station.a.name", new JobParameter("Liège-Guillemins"));	
 			parameters.put("station.b.name", new JobParameter("Brussels (Bruxelles)-Central"));	
 			parameters.put("output.file.path", new JobParameter("file:./output.dat"));	

@@ -32,7 +32,7 @@
 	<bean id="compositeInputReader" class="org.springbatch.testcase.CompositeInputReader"
 		scope="step">
 		<property name="reader1">
-			<bean class="org.springbatch.testcase.InputReader"  scope="step">
+			<bean class="org.springbatch.testcase.InputReader">
 				<property name="dataTable">
 					<array>
 						<bean class="org.springbatch.testcase.DataFromSource1">
