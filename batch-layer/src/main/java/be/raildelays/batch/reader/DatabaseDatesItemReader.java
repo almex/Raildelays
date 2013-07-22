@@ -63,7 +63,7 @@ public class DatabaseDatesItemReader extends AbstractItemCountingItemStreamItemR
 	protected Date doRead() throws Exception {
 		Date result = null;
 		
-		if (getCurrentItemCount() < dates.size()) {
+		if (getCurrentItemCount() <= dates.size()) {
 			result = dates.get(getCurrentItemCount()-1);
 			
 			LOGGER.debug("Reading one more date={}", result);
