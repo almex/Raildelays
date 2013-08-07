@@ -237,4 +237,11 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 		this.validator = validator;
 	}
 
+	@Override
+    @Transactional(readOnly = true)
+	public List<LineStop> searchNextTrain(Station fromA, Station toB, Date date) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

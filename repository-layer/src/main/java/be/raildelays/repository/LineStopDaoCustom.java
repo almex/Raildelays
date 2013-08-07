@@ -54,5 +54,16 @@ public interface LineStopDaoCustom {
 	 * @return a collection of {@link LineStop} belonging to arrival
 	 */
 	List<LineStop> findArrivalDelays(Date date, Station station, int delayThreshold);
+	
+	/**
+	 * Search a list of line stops that belong to a train for a certain day.
+	 * 
+	 * @param trainEnglishName
+	 *            train's id in Railtime format.
+	 * @param date
+	 *            day of the year for which you do the search
+	 * @return a list of line stop
+	 */
+	List<LineStop> findByFromAndToAndDate(Station from, Station to, Date date);
 
 }

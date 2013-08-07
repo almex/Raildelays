@@ -91,4 +91,20 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 				.getResultList();
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<LineStop> findByFromAndToAndDate(Station from, Station to,
+			Date date) {
+		return (List<LineStop>) entityManager
+				.createQuery(
+						"SELECT DISTINCT o " 
+								+ "FROM LineStop o "
+								+ "WHERE o.station = :from OR o.station = :to "
+								+ "ORDER BY o.date ASC")
+				.setParameter("from", from)
+				.setParameter("to", from)
+				.setParameter("after", date)
+				.getResultList();
+	}
+
 }

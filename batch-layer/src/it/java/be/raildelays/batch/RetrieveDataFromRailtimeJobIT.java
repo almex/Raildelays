@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobParameter;
@@ -29,6 +30,7 @@ public class RetrieveDataFromRailtimeJobIT extends AbstractContextIT {
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
+	@Ignore
 	public void testGrabLineStop() {		
 		BatchStatus batchStatus;
 		

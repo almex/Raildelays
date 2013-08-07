@@ -13,45 +13,73 @@ import be.raildelays.domain.entities.Station;
  * @author Almex
  */
 public interface RaildelaysService {
-	
+
 	/**
-	 * Save served stops of a certain train for a certain date.
-	 * Meaning that we have a scheduled time and delays this stop. 
+	 * Save served stops of a certain train for a certain date. Meaning that we
+	 * have a scheduled time and delays this stop.
 	 * 
-	 * @param train for which the timetable apply
-	 * @param date for which the timetable apply
-	 * @param lineStop linked with others to follow a direction
-	 * @return the persisted {@link LineStop} linked with others to follow a direction
+	 * @param train
+	 *            for which the timetable apply
+	 * @param date
+	 *            for which the timetable apply
+	 * @param lineStop
+	 *            linked with others to follow a direction
+	 * @return the persisted {@link LineStop} linked with others to follow a
+	 *         direction
 	 */
 	List<LineStop> saveRouteLog(final RouteLogDTO routeLog);
-	
+
 	/**
-	 * Retrieve all delays between a station A to a station B for a certain date. 
-	 * This search is done no matter the direction of your ride (e.g.: from A to B/from B to a).
+	 * Retrieve all delays between a station A to a station B for a certain
+	 * date. This search is done no matter the direction of your ride (e.g.:
+	 * from A to B/from B to a).
 	 * 
-	 * @param date for which delays are recorded
-	 * @param stationA a certain station which could be your departure or arrival station depending moment within the day
-	 * @param stationB a certain station which could be your departure or arrival station depending moment within the day
-	 * @param delayTreshold minimum delay (in minutes)
-	 * @return a list of {@link LineStop} linked each other following a direction
+	 * @param date
+	 *            for which delays are recorded
+	 * @param stationA
+	 *            a certain station which could be your departure or arrival
+	 *            station depending moment within the day
+	 * @param stationB
+	 *            a certain station which could be your departure or arrival
+	 *            station depending moment within the day
+	 * @param delayTreshold
+	 *            minimum delay (in minutes)
+	 * @return a list of {@link LineStop} linked each other following a
+	 *         direction
 	 */
-	List<LineStop> searchDelaysBetween(final Date date, final Station stationA, final Station stationB, final int delayTreshold);
-	
-	
+	List<LineStop> searchDelaysBetween(final Date date, final Station stationA,
+			final Station stationB, final int delayTreshold);
+
 	/**
 	 * Search all dates already stored within the database between two dates.
 	 * 
-	 * @param from all dates after from
-	 * @param to all dates before to
+	 * @param from
+	 *            all dates after from
+	 * @param to
+	 *            all dates before to
 	 * @return a list of unique {@link Date}
 	 */
 	List<Date> searchAllDates(Date from, Date to);
-	
+
 	/**
 	 * Search all dates already stored within the database until a last date.
 	 * 
-	 * @param lastDate all dates before to
+	 * @param lastDate
+	 *            all dates before to
 	 * @return a list of unique {@link Date}
 	 */
 	List<Date> searchAllDates(Date lastDate);
+
+	/**
+	 * Search next train to go from A to B for a certain date.
+	 * 
+	 * @param fromA
+	 *            station where you come from
+	 * @param toB
+	 *            station where you want to go
+	 * @param date from which we do a search (next train must be after that date)
+	 * @return a list of {@link LineStop} corresponding to the direction of the
+	 *         next train
+	 */
+	List<LineStop> searchNextTrain(Station fromA, Station toB, Date date);
 }
