@@ -30,15 +30,18 @@ public class Train implements Serializable {
 	private static final long serialVersionUID = -1527666012499664304L;
 
 	@Id
+	@Column(name = "ID")
 	@GeneratedValue(strategy = GenerationType.TABLE)
 	protected final Long id;
 
-	@Column(updatable = false, unique = true)
+	@Column(name = "ENGLISH_NAME", updatable = false, unique = true)
 	@NotNull
 	protected final String englishName;
 
+	@Column(name = "FRENCH_NAME")
 	protected final String frenchName;
 
+	@Column(name = "DUTCH_NAME")
 	protected final String dutchName;
 
 	/**

@@ -93,17 +93,17 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<LineStop> findByFromAndToAndDate(Station from, Station to,
-			Date date) {
+	public List<LineStop> findNextExpectedArrivalTime(Station station, Date date) {
 		return (List<LineStop>) entityManager
 				.createQuery(
 						"SELECT DISTINCT o " 
 								+ "FROM LineStop o "
-								+ "WHERE o.station = :from OR o.station = :to "
-								+ "ORDER BY o.date ASC")
-				.setParameter("from", from)
-				.setParameter("to", from)
-				.setParameter("after", date)
+								+ "WHERE o.station = :station "
+								+ "AND o.date = :date "
+								+ "AND o.arrivalTime.expected > :date "
+								+ "ORDER BY o.arrivalTime.expected ASC")
+				.setParameter("station", station)
+				.setParameter("date", date)
 				.getResultList();
 	}
 

@@ -91,3 +91,7 @@ data
 /batch-layer/logs
 
 /batch-layer/traces.log
+
+/batch-layer/*.log
+/batch-layer/*.log
+/batch-layer/*.log
