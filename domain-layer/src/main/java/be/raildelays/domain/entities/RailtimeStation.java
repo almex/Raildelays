@@ -17,7 +17,7 @@ public class RailtimeStation extends Station {
 
 	private static final long serialVersionUID = -8940001829880027858L;
 
-	@Column(unique=true)
+	@Column(name = "RAILTIME_ID", unique = true)
 	private final String railtimeId;
 	
 	@SuppressWarnings("unused")

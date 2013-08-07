@@ -17,7 +17,7 @@ public class BRailTrain extends Train {
 
 	private static final long serialVersionUID = 7844213206211119783L;
 
-	@Column(unique = true)
+	@Column(name = "BRAIL_ID", unique = true)
 	private final String bRailId;
 
 	@SuppressWarnings("unused")

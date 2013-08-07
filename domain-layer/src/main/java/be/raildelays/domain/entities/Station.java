@@ -31,15 +31,18 @@ public class Station implements Serializable, Cloneable {
 	private static final long serialVersionUID = -3436298381031779337L;
 
 	@Id
+	@Column(name = "ID")
 	@GeneratedValue(strategy = GenerationType.TABLE)
 	protected final Long id;
 
-	@Column(updatable = false, unique = true)
+	@Column(name = "ENGLISH_NAME", updatable = false, unique = true)
 	@NotNull
 	protected final String englishName;
 
+	@Column(name = "FRENCH_NAME")
 	protected final String frenchName;
 
+	@Column(name = "DUTCH_NAME")
 	protected final String dutchName;
 
 	/**

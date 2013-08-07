@@ -7,7 +7,6 @@ import java.util.Date;
 import javax.persistence.Embeddable;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -24,10 +23,8 @@ public class TimestampDelay implements Serializable {
 	private static final long serialVersionUID = -1026179811764044178L;
 
 	@Temporal(TemporalType.TIME)
-	@NotNull
 	protected final Date expected;
 
-	@NotNull
 	protected final Long delay; // in number of milliseconds
 
 	/**

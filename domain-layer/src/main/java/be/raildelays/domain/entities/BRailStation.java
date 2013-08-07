@@ -17,7 +17,7 @@ public class BRailStation extends Station {
 
 	private static final long serialVersionUID = -5603009982357954186L;
 	
-	@Column(unique=true)
+	@Column(name = "BRAIL_ID", unique = true)
 	private final String bRailId;
 	
 	@SuppressWarnings("unused")

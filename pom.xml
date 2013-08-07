@@ -14,6 +14,16 @@
 		<developerConnection>scm:ssh:https://github.com/almex/Raildelays.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
+	
+	<repositories>
+	   
+        <repository>
+            <id>excilys-release</id>
+            <name>Spring dbUnit Respository</name>
+            <url>http://repository.excilys.com/content/repositories/releases</url>
+            <layout>default</layout>
+        </repository>
+	</repositories>
 
 	<modules>
 		<module>common-layer</module>
@@ -50,8 +60,7 @@
 		<version.groovy.eclipse.compiler>2.7.0-01</version.groovy.eclipse.compiler>
 		<version.tagsoup>1.2.1</version.tagsoup>
 		<version.apache.poi>3.9</version.apache.poi>
-		<version.dbunit>2.4.7</version.dbunit>
-		<version.unitils>3.3</version.unitils>
+		<version.dbunit>2.4.9</version.dbunit>
 		<jdk.version>1.7</jdk.version>
 	</properties>
 
@@ -141,14 +150,14 @@
 				<version>1.3</version>
 			</dependency>
 			<dependency>
-			    <groupId>org.dbunit</groupId>
-			    <artifactId>dbunit</artifactId>
-			    <version>${version.dbunit}</version>
+				<groupId>org.dbunit</groupId>
+				<artifactId>dbunit</artifactId>
+				<version>${version.dbunit}</version>
 			</dependency>
 			<dependency>
-			    <groupId>org.unitils</groupId>
-			    <artifactId>unitils-dbunit</artifactId>
-			    <version>${version.unitils}</version>
+				<groupId>com.excilys.ebi.spring-dbunit</groupId>
+				<artifactId>spring-dbunit-test</artifactId>
+				<version>1.1.12</version>
 			</dependency>
 
 			<!-- Persistence -->
@@ -848,7 +857,7 @@
 					<plugin>
 						<artifactId>maven-release-plugin</artifactId>
 						<configuration>
-                            <autoVersionSubmodules>true</autoVersionSubmodules>
+							<autoVersionSubmodules>true</autoVersionSubmodules>
 							<goals>deploy assembly:single</goals>
 						</configuration>
 					</plugin>
