@@ -20,7 +20,7 @@ import be.raildelays.domain.entities.Station;
 import be.raildelays.service.RaildelaysService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:/spring/service/raildelays-service-integration-context.xml" })
+@ContextConfiguration(locations = { "classpath:/spring/service/raildelays-service-integration-test-context.xml" })
 @Transactional
 @TransactionConfiguration(defaultRollback = true)
 public class RaildelaysServiceIT {

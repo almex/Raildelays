@@ -49,7 +49,8 @@ public class SearchNextTrainProcessor implements
 	public List<ExcelRow> process(final List<ExcelRow> items) throws Exception {
 		List<ExcelRow> result = null;
 		
-		service.
+		//TODO On any canceled ExcelRow search for next train
+		//service.searchNextTrain(fromA, toB, date);
 		
 		return result;
 	}

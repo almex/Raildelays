@@ -12,13 +12,13 @@
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
 		p:dataSource-ref="dataSource" p:persistence-unit-name="raildelays-repository">
 		<property name="jpaVendorAdapter">
-<!-- 				<bean class="org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter"> -->
-<!-- 					<property name="databasePlatform" value="org.eclipse.persistence.platform.database.HSQLPlatform" /> -->
-<!-- 					<property name="showSql" value="true" /> -->
-<!-- 				</bean> -->
-            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"
-                p:database="HSQL" p:databasePlatform="org.hibernate.dialect.HSQLDialect"
-                p:showSql="true" p:generate-ddl="true" />                
+				<bean class="org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter">
+					<property name="databasePlatform" value="org.eclipse.persistence.platform.database.HSQLPlatform" />
+					<property name="showSql" value="true" />
+				</bean>
+<!--             <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" -->
+<!--                 p:database="HSQL" p:databasePlatform="org.hibernate.dialect.HSQLDialect" -->
+<!--                 p:showSql="true" p:generate-ddl="true" />                 -->
 <!--             <bean class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter" > -->
 <!--                 <property name="showSql" value="true" /> -->
 <!--                 <property name="database" value="HSQL" /> -->
