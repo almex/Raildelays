@@ -3,12 +3,10 @@ package be.raildelays.batch.service.impl;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
-
-import be.raildelays.batch.Bootstrap;
-import be.raildelays.batch.service.BatchStartAndRecoveryService;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
@@ -18,22 +16,26 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobExecutionNotRunningException;
+import org.springframework.batch.core.launch.JobInstanceAlreadyExistsException;
 import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.launch.JobParametersNotFoundException;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.NoSuchJobExecutionException;
 import org.springframework.batch.core.launch.NoSuchJobInstanceException;
-import org.springframework.batch.core.launch.support.SimpleJobOperator;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.stereotype.Service;
 
-@Service
-public class BatchStartAndRecoveryServiceImpl extends SimpleJobOperator
+import be.raildelays.batch.service.BatchStartAndRecoveryService;
+
+@Service("BatchStartAndRecoveryService")
+public class BatchStartAndRecoveryServiceImpl
 		implements BatchStartAndRecoveryService {
 
 	static final private Logger LOGGER = LoggerFactory
@@ -47,6 +49,9 @@ public class BatchStartAndRecoveryServiceImpl extends SimpleJobOperator
 
 	@Resource
 	private JobRepository jobRepository;
+
+	@Resource
+	private JobOperator jobOperator;
 
 	@Override
 	public void stopAllRunningJobs() {
@@ -165,6 +170,84 @@ public class BatchStartAndRecoveryServiceImpl extends SimpleJobOperator
 	public void restartAllStoppedJobs() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public List<Long> getExecutions(long instanceId)
+			throws NoSuchJobInstanceException {
+		return jobOperator.getExecutions(instanceId);
+	}
+
+	@Override
+	public List<Long> getJobInstances(String jobName, int start, int count)
+			throws NoSuchJobException {
+		return jobOperator.getJobInstances(jobName, start, count);
+	}
+
+	@Override
+	public Set<Long> getRunningExecutions(String jobName)
+			throws NoSuchJobException {
+		return jobOperator.getRunningExecutions(jobName);
+	}
+
+	@Override
+	public String getParameters(long executionId)
+			throws NoSuchJobExecutionException {
+		return jobOperator.getParameters(executionId);
+	}
+
+	@Override
+	public Long start(String jobName, String parameters)
+			throws NoSuchJobException, JobInstanceAlreadyExistsException,
+			JobParametersInvalidException {
+		return jobOperator.start(jobName, parameters);
+	}
+
+	@Override
+	public Long restart(long executionId)
+			throws JobInstanceAlreadyCompleteException,
+			NoSuchJobExecutionException, NoSuchJobException,
+			JobRestartException, JobParametersInvalidException {
+		return jobOperator.restart(executionId);
+	}
+
+	@Override
+	public Long startNextInstance(String jobName) throws NoSuchJobException,
+			JobParametersNotFoundException, JobRestartException,
+			JobExecutionAlreadyRunningException,
+			JobInstanceAlreadyCompleteException,
+			UnexpectedJobExecutionException, JobParametersInvalidException {
+		return jobOperator.startNextInstance(jobName);
+	}
+
+	@Override
+	public boolean stop(long executionId) throws NoSuchJobExecutionException,
+			JobExecutionNotRunningException {
+		return jobOperator.stop(executionId);
+	}
+
+	@Override
+	public String getSummary(long executionId)
+			throws NoSuchJobExecutionException {
+		return jobOperator.getSummary(executionId);
+	}
+
+	@Override
+	public Map<Long, String> getStepExecutionSummaries(long executionId)
+			throws NoSuchJobExecutionException {
+		return jobOperator.getStepExecutionSummaries(executionId);
+	}
+
+	@Override
+	public Set<String> getJobNames() {
+		return jobOperator.getJobNames();
+	}
+
+	@Override
+	public JobExecution abandon(long jobExecutionId)
+			throws NoSuchJobExecutionException,
+			JobExecutionAlreadyRunningException {
+		return jobOperator.abandon(jobExecutionId);
 	}
 
 }
