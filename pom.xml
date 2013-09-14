@@ -60,6 +60,7 @@
 		<version.groovy.eclipse.compiler>2.7.0-01</version.groovy.eclipse.compiler>
 		<version.tagsoup>1.2.1</version.tagsoup>
 		<version.apache.poi>3.9</version.apache.poi>
+        <version.commons.dbcp>1.4</version.commons.dbcp>
 		<version.dbunit>2.4.9</version.dbunit>
 		<jdk.version>1.7</jdk.version>
 	</properties>
@@ -196,6 +197,11 @@
 				<artifactId>spring-data-jpa</artifactId>
 				<version>${version.spring.data}</version>
 			</dependency>
+            <dependency>
+                <groupId>commons-dbcp</groupId>
+                <artifactId>commons-dbcp</artifactId>
+                <version>${version.commons.dbcp}</version>
+            </dependency>
 
 			<dependency>
 				<groupId>commons-pool</groupId>
