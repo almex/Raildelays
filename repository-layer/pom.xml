@@ -28,10 +28,10 @@
 			<artifactId>raildelays-domain</artifactId>
 		</dependency>
 
-		<!-- <dependency> -->
-		<!-- <groupId>org.hibernate</groupId> -->
-		<!-- <artifactId>hibernate-entitymanager</artifactId> -->
-		<!-- </dependency> -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+		</dependency>
 		<!-- <dependency> -->
 		<!-- <groupId>org.hibernate.javax.persistence</groupId> -->
 		<!-- <artifactId>hibernate-jpa-2.0-api</artifactId> -->
@@ -41,12 +41,11 @@
 		<!-- <artifactId>openjpa-all</artifactId> -->
 		<!-- <version>2.2.2</version> -->
 		<!-- </dependency> -->
-		<dependency>
-			<groupId>org.eclipse.persistence</groupId>
-			<artifactId>eclipselink</artifactId>
-			<version>2.5.0</version>
-			<scope>compile</scope>
-		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>org.eclipse.persistence</groupId> -->
+		<!-- <artifactId>eclipselink</artifactId> -->
+		<!-- <version>2.5.0</version> -->
+		<!-- </dependency> -->
 
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -140,7 +139,7 @@
 		<dependency>
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>
-			<version>1.2.2</version>
+			<version>1.4</version>
 		</dependency>
 
 	</dependencies>

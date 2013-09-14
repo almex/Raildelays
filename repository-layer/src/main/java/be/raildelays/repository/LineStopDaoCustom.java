@@ -1,5 +1,6 @@
 package be.raildelays.repository;
 
+import java.sql.Time;
 import java.util.Date;
 import java.util.List;
 

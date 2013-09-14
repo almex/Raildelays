@@ -30,10 +30,10 @@
 			<property name="javax.persistence.jdbc.user" value="" />
 			<property name="javax.persistence.jdbc.password" value="" />
 			<!-- OpenJPA specific -->
-<!-- 			<property name="openjpa.jdbc.DBDictionary" value="DERBY"/> -->
+			<property name="openjpa.jdbc.DBDictionary" value="DERBY"/>
 			<property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(ForeignKeys=true)"/>
 			<!-- Hibernate specific -->
-<!-- 			<property name="hibernate.dialect" value="org.hibernate.dialect.DerbyTenSevenDialect" /> -->
+			<property name="hibernate.dialect" value="org.hibernate.dialect.DerbyTenSevenDialect" />
 			<property name="hibernate.show_sql" value="true" />
 			<property name="hibernate.format_sql" value="true" />
 			<property name="hibernate.hbm2ddl.auto" value="update" />

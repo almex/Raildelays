@@ -37,7 +37,7 @@ import com.excilys.ebi.spring.dbunit.test.RollbackTransactionalDataSetTestExecut
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
 		TransactionalTestExecutionListener.class,
 		RollbackTransactionalDataSetTestExecutionListener.class })
-@DataSet(value = "classpath:FindNextExpectedArrivalTimeIT.xml", tearDownOperation  = DBOperation.DELETE_ALL)
+@DataSet(value = "classpath:FindNextExpectedArrivalTimeIT.xml", tearDownOperation = DBOperation.DELETE_ALL)
 public class FindNextExpectedArrivalTimeIT {
 
 	private static final Logger LOGGER = LoggerFactory
@@ -48,20 +48,19 @@ public class FindNextExpectedArrivalTimeIT {
 
 	@Test
 	public void testFindNextExpectedArrivalTime() throws ParseException {
-		Station station = new Station("Liège-Guillemins");
-		Date date = new SimpleDateFormat("yyyy-MM-dd hh:mm")
-				.parse("2000-01-01 16:01");
+		Station station = new Station("Bruxelles-Central");
+		Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+				.parse("2000-01-01 16:27:00");
 
 		LOGGER.info("size={}", lineStopDao.findAll().size());
 		for (LineStop lineStop : lineStopDao.findAll()) {
 			LOGGER.info(lineStop.toString());
 		}
-
 		List<LineStop> lineStops = lineStopDao.findNextExpectedArrivalTime(
 				station, date);
 
-		Assert.assertEquals(1, lineStops.size());
-		Assert.assertEquals("515", lineStops.get(0).getTrain());
+		Assert.assertEquals(2, lineStops.size());
+		Assert.assertEquals("1715", lineStops.get(0).getTrain().getEnglishName());
 	}
 
 }

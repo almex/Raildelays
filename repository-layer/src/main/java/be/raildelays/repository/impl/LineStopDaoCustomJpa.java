@@ -7,8 +7,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TemporalType;
 
-import org.apache.commons.lang3.time.DateUtils;
-
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.repository.LineStopDaoCustom;
@@ -102,7 +100,7 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 								+ "FROM LineStop o "
 								+ "WHERE o.station.englishName = :stationName "
 								+ "AND o.date = :date "
-								+ "AND o.arrivalTime.expected IS NOT NULL "
+								+ "AND o.arrivalTime IS NOT NULL "
 								+ "AND o.arrivalTime.expected > :time "
 								+ "ORDER BY o.arrivalTime.expected ASC")
 				.setParameter("stationName", station.getEnglishName())
