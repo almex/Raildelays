@@ -1,8 +1,15 @@
 package be.raildelays.batch.service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.launch.JobExecutionNotRunningException;
-import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.launch.JobParametersNotFoundException;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.NoSuchJobExecutionException;
 import org.springframework.batch.core.launch.NoSuchJobInstanceException;
@@ -11,7 +18,7 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 
 
-public interface BatchStartAndRecoveryService extends JobOperator {
+public interface BatchStartAndRecoveryService {
 
 		/**
 		 * Stop all running jobs (STARTING, STARTED, STOPPING)
@@ -41,5 +48,46 @@ public interface BatchStartAndRecoveryService extends JobOperator {
 		void restartAllFailedJobs() throws NoSuchJobException, JobInstanceAlreadyCompleteException, NoSuchJobExecutionException, JobRestartException, JobParametersInvalidException, NoSuchJobInstanceException;
 		
 		void restartAllStoppedJobs();
+
+		List<Long> getExecutions(long instanceId)
+				throws NoSuchJobInstanceException;
+
+		List<Long> getJobInstances(String jobName, int start, int count)
+				throws NoSuchJobException;
+
+		Set<Long> getRunningExecutions(String jobName)
+				throws NoSuchJobException;
+
+		String getParameters(long executionId)
+				throws NoSuchJobExecutionException;
+
+		JobExecution run(String jobName, JobParameters parameters)
+			throws JobExecutionAlreadyRunningException, JobRestartException,
+			JobInstanceAlreadyCompleteException, JobParametersInvalidException, NoSuchJobException;
+
+		Long restart(long executionId)
+				throws JobInstanceAlreadyCompleteException,
+				NoSuchJobExecutionException, NoSuchJobException,
+				JobRestartException, JobParametersInvalidException;
+
+		Long startNextInstance(String jobName) throws NoSuchJobException,
+				JobParametersNotFoundException, JobRestartException,
+				JobExecutionAlreadyRunningException,
+				JobInstanceAlreadyCompleteException,
+				UnexpectedJobExecutionException, JobParametersInvalidException;
+
+		boolean stop(long executionId) throws NoSuchJobExecutionException,
+				JobExecutionNotRunningException;
+
+		String getSummary(long executionId) throws NoSuchJobExecutionException;
+
+		Map<Long, String> getStepExecutionSummaries(long executionId)
+				throws NoSuchJobExecutionException;
+
+		Set<String> getJobNames();
+
+		JobExecution abandon(long jobExecutionId)
+				throws NoSuchJobExecutionException,
+				JobExecutionAlreadyRunningException;
 	
 }

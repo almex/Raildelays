@@ -45,16 +45,20 @@ public final class ServedStopDTO implements Serializable, Cloneable {
 		
 		return new StringBuilder("ServedStopDTO: ") //
 				.append("{ ") //
-				.append("stationName: " + stationName + ", ") //
+				.append("stationName: " + stationName) //
+				.append(", ") //
 				.append("arrivalTime: ")
 				.append(arrivalTime != null ? df.format(arrivalTime) : "N/A") //
+				.append(", ") //
 				.append("departureTime: ")
 				.append(departureTime != null ? df.format(departureTime) : "N/A") //
 				.append(", ") //
-				.append("arrivalDelay: " + arrivalDelay + ", ") //
+				.append("arrivalDelay: " + arrivalDelay) //
 				.append(", ") //
-				.append("departureDelay: " + departureDelay + ", ") //
-				.append("canceled: " + canceled + ", ") //
+				.append("departureDelay: " + departureDelay) //
+				.append(", ") //
+				.append("canceled: " + canceled) //
+				.append(", ") //
 				.append("} ").toString();
 	}
 

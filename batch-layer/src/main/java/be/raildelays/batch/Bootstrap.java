@@ -93,8 +93,8 @@ public class Bootstrap {
 			if (recovery) {
 				LOGGER.info("[Recovery activated]");
 				service.markInconsistentJobsAsFailed();
-				service.restartAllFailedJobs();
-				service.restartAllStoppedJobs();
+				//service.restartAllFailedJobs();
+				//service.restartAllStoppedJobs();
 			}
 
 			//-- Search all delays from Railtime
@@ -126,7 +126,7 @@ public class Bootstrap {
 									JobParameters jobParameters = new JobParameters(
 											parameters);
 
-									service.start("retrieveDataFromRailtimeJob", jobParameters.toString());
+									service.run("retrieveDataFromRailtimeJob", jobParameters);
 								}
 							} else {
 								result = RepeatStatus.FINISHED;
@@ -158,7 +158,7 @@ public class Bootstrap {
 
 				JobParameters jobParameters = new JobParameters(parameters);
 
-				service.start("searchDelaysJob", jobParameters.toString());
+				service.run("searchDelaysJob", jobParameters);
 			}
 			
 			//-- Generate Excel sheets
@@ -176,7 +176,7 @@ public class Bootstrap {
 				JobParameters jobParameters = new JobParameters(parameters);
 				
 
-				service.start("searchDelaysXlsJob", jobParameters.toString());
+				service.run("searchDelaysXlsJob", jobParameters);
 			}
 		} finally {
 			if (ctx != null) {

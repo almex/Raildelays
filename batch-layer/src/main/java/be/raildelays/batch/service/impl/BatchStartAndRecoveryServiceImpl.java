@@ -14,13 +14,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobExecutionNotRunningException;
-import org.springframework.batch.core.launch.JobInstanceAlreadyExistsException;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.JobParametersNotFoundException;
 import org.springframework.batch.core.launch.NoSuchJobException;
@@ -52,6 +53,9 @@ public class BatchStartAndRecoveryServiceImpl
 
 	@Resource
 	private JobOperator jobOperator;
+	
+	@Resource
+	private JobLauncher jobLauncher;
 
 	@Override
 	public void stopAllRunningJobs() {
@@ -197,11 +201,12 @@ public class BatchStartAndRecoveryServiceImpl
 	}
 
 	@Override
-	public Long start(String jobName, String parameters)
-			throws NoSuchJobException, JobInstanceAlreadyExistsException,
-			JobParametersInvalidException {
-		return jobOperator.start(jobName, parameters);
+	public JobExecution run(String jobName, JobParameters jobParameters)
+			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException, NoSuchJobException {
+		return jobLauncher.run(jobRegistry.getJob(jobName), jobParameters);
 	}
+	
+	
 
 	@Override
 	public Long restart(long executionId)
