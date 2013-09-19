@@ -102,20 +102,5 @@
 			</bean>
 		</property>
 	</bean>
-	
-	<bean id="excelSheetItemWriter" class="be.raildelays.batch.writer.ExcelSheetItemWriter" scope="step">
-		<property name="input">
-			<bean class="java.io.FileInputStream">
-				<constructor-arg index="0" type="java.lang.String"
-					value="#{jobParameters['excel.input.template']}" />
-			</bean>
-		</property>
-		<property name="output">
-			<bean class="java.io.FileOutputStream">
-				<constructor-arg index="0" type="java.lang.String"
-					value="#{jobParameters['excel.output.file']}" />
-			</bean>
-		</property>
-	</bean>
 
 </beans>
