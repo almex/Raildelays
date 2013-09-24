@@ -8,7 +8,7 @@
 			<PatternLayout pattern="[Reader]: %m%n" />
 		</File>
         <File name="railtime-data-parser" fileName="logs/railtime-data.log" append="false">
-            <PatternLayout pattern="[Paser]: %m%n" />
+            <PatternLayout pattern="[Parser]: %m%n" />
         </File>
         <File name="railtime-data-streamer" fileName="logs/railtime-data.log" append="false">
             <PatternLayout pattern="[Streamer]: %m%n" />
