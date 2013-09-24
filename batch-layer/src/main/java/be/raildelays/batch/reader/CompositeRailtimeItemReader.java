@@ -37,6 +37,8 @@ public class CompositeRailtimeItemReader extends CompositeItemStream implements 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(arrivalReader, "You must provide a arrivalReader");
 		Assert.notNull(departureReader, "You must provide a departureReader");
+		
+		LOGGER.debug("Reader initialized with arrivalReader={} and departureReader={}", arrivalReader, departureReader);
 	}
 
 	public List<? extends Direction> read() throws Exception, UnexpectedInputException,

@@ -73,6 +73,7 @@ public class Bootstrap {
 			Properties configuration = ctx.getBean("configuration",
 					Properties.class);
 			final BatchStartAndRecoveryService service = ctx.getBean("BatchStartAndRecoveryService", BatchStartAndRecoveryService.class);
+			@SuppressWarnings("unchecked")
 			final FlatFileItemReader<String> trainListReader = ctx.getBean("trainList", FlatFileItemReader.class);
 			final DefaultJobParametersConverter converter = new DefaultJobParametersConverter();
 			

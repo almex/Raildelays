@@ -12,7 +12,9 @@
 	<!-- Needed if we use a AutomaticJobRegistrar -->
 	<context:annotation-config />
 	
-	<batch:job id="searchDelaysJob" restartable="true">		
+	<import resource="parent-job-context.xml"/>
+	
+	<batch:job id="searchDelaysJob" parent="parentJob">		
 		<batch:step id="searchDelays" >
 			<batch:tasklet  transaction-manager="batchTransactionManager" allow-start-if-complete="true">
 				<batch:chunk cache-capacity="" reader="compositeRaildelaysItemReader" processor="chainedProcessorsForDelays" writer="flatFileItemWriter"

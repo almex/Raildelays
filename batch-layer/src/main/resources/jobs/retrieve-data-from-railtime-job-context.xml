@@ -10,7 +10,9 @@
 	<!-- Needed if w use a AutomaticJobRegistrar -->
 	<context:annotation-config />
 
-	<batch:job id="retrieveDataFromRailtimeJob" restartable="true">
+    <import resource="parent-job-context.xml"/>
+
+	<batch:job id="retrieveDataFromRailtimeJob" parent="parentJob">
 		<batch:step id="retrieveDataFromRailtime">
 			<batch:tasklet transaction-manager="batchTransactionManager">
 				<batch:chunk reader="compositeRailtimeItemReader"

@@ -10,9 +10,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import be.raildelays.domain.entities.RailtimeTrain;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.repository.RailtimeTrainDao;
 import be.raildelays.repository.StationDao;
 
 @RunWith(SpringJUnit4ClassRunner.class)
