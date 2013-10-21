@@ -2,8 +2,6 @@ package be.raildelays.batch.bean;
 
 import java.util.Date;
 
-import org.eclipse.persistence.internal.indirection.ProtectedValueHolder;
-
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.xls.ExcelRow;
 

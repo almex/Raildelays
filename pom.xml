@@ -14,15 +14,15 @@
 		<developerConnection>scm:ssh:https://github.com/almex/Raildelays.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
-	
+
 	<repositories>
-	   
-        <repository>
-            <id>excilys-release</id>
-            <name>Spring dbUnit Respository</name>
-            <url>http://repository.excilys.com/content/repositories/releases</url>
-            <layout>default</layout>
-        </repository>
+
+		<repository>
+			<id>excilys-release</id>
+			<name>Spring dbUnit Respository</name>
+			<url>http://repository.excilys.com/content/repositories/releases</url>
+			<layout>default</layout>
+		</repository>
 	</repositories>
 
 	<modules>
@@ -58,11 +58,12 @@
 		<version.groovy>2.1</version.groovy>
 		<version.groovy.all>2.1.5</version.groovy.all>
 		<version.groovy.eclipse.compiler>2.8.0-01</version.groovy.eclipse.compiler>
-        <version.groovy.eclipse.batch>2.1.5-03</version.groovy.eclipse.batch>
+		<version.groovy.eclipse.batch>2.1.5-03</version.groovy.eclipse.batch>
 		<version.tagsoup>1.2.1</version.tagsoup>
 		<version.apache.poi>3.9</version.apache.poi>
-        <version.commons.dbcp>1.4</version.commons.dbcp>
+		<version.commons.dbcp>1.4</version.commons.dbcp>
 		<version.dbunit>2.4.9</version.dbunit>
+		<version.jodatime>2.3</version.jodatime>
 		<jdk.version>1.7</jdk.version>
 	</properties>
 
@@ -198,11 +199,11 @@
 				<artifactId>spring-data-jpa</artifactId>
 				<version>${version.spring.data}</version>
 			</dependency>
-            <dependency>
-                <groupId>commons-dbcp</groupId>
-                <artifactId>commons-dbcp</artifactId>
-                <version>${version.commons.dbcp}</version>
-            </dependency>
+			<dependency>
+				<groupId>commons-dbcp</groupId>
+				<artifactId>commons-dbcp</artifactId>
+				<version>${version.commons.dbcp}</version>
+			</dependency>
 
 			<dependency>
 				<groupId>commons-pool</groupId>
@@ -221,11 +222,11 @@
 				<artifactId>groovy-all</artifactId>
 				<version>${version.groovy.all}</version>
 			</dependency>
-            <dependency>
-                <groupId>org.codehaus.groovy</groupId>
-                <artifactId>groovy-eclipse-batch</artifactId>
-                <version>${version.groovy.eclipse.batch}</version>
-            </dependency>
+			<dependency>
+				<groupId>org.codehaus.groovy</groupId>
+				<artifactId>groovy-eclipse-batch</artifactId>
+				<version>${version.groovy.eclipse.batch}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.ccil.cowan.tagsoup</groupId>
 				<artifactId>tagsoup</artifactId>
@@ -398,6 +399,13 @@
 				<artifactId>poi-ooxml</artifactId>
 				<version>${version.apache.poi}</version>
 			</dependency>
+
+			<dependency>
+				<groupId>joda-time</groupId>
+				<artifactId>joda-time</artifactId>
+				<version>${version.jodatime}</version>
+			</dependency>
+
 
 
 		</dependencies>
@@ -655,11 +663,11 @@
 			</activation>
 
 			<dependencies>
-                <dependency>
-                    <groupId>org.codehaus.groovy</groupId>
-                    <artifactId>groovy-all</artifactId>
-                    <version>${version.groovy.all}</version>
-                </dependency>
+				<dependency>
+					<groupId>org.codehaus.groovy</groupId>
+					<artifactId>groovy-all</artifactId>
+					<version>${version.groovy.all}</version>
+				</dependency>
 			</dependencies>
 
 			<build>
@@ -680,12 +688,12 @@
 								<artifactId>groovy-eclipse-compiler</artifactId>
 								<version>${version.groovy.eclipse.compiler}</version>
 							</dependency>
-                            <dependency>
-                                <groupId>org.codehaus.groovy</groupId>
-                                <artifactId>groovy-eclipse-batch</artifactId>
-                                <version>${version.groovy.eclipse.batch}</version>
-                            </dependency>
-							
+							<dependency>
+								<groupId>org.codehaus.groovy</groupId>
+								<artifactId>groovy-eclipse-batch</artifactId>
+								<version>${version.groovy.eclipse.batch}</version>
+							</dependency>
+
 						</dependencies>
 					</plugin>
 					<plugin>
