@@ -104,20 +104,20 @@ public class ExcelRow {
 
 	public static class ExcelRowBuilder {
 
-		private final Date date;
-		private Station arrivalStation;
-		private Station departureStation;
-		private Station linkStation;
-		private Date expectedDepartureTime;
-		private Date expectedArrivalTime;
-		private Train expectedTrain1;
-		private Train expectedTrain2;
-		private Date effectiveDepartureTime;
-		private Date effectiveArrivalTime;
-		private Train effectiveTrain1;
-		private Train effectiveTrain2;
-		private Long delay;
-		private final Sens sens;
+		protected final Date date;
+		protected Station arrivalStation;
+		protected Station departureStation;
+		protected Station linkStation;
+		protected Date expectedDepartureTime;
+		protected Date expectedArrivalTime;
+		protected Train expectedTrain1;
+		protected Train expectedTrain2;
+		protected Date effectiveDepartureTime;
+		protected Date effectiveArrivalTime;
+		protected Train effectiveTrain1;
+		protected Train effectiveTrain2;
+		protected Long delay;
+		protected final Sens sens;
 
 		public ExcelRowBuilder(final Date date, final Sens sens) {
 			this.date = (Date) (date != null ? date.clone() : null);
@@ -196,7 +196,7 @@ public class ExcelRow {
 
 	}
 
-	private ExcelRow(final ExcelRowBuilder builder) {
+	protected ExcelRow(final ExcelRowBuilder builder) {
 		this.date = builder.date;
 		this.arrivalStation = builder.arrivalStation;
 		this.departureStation = builder.departureStation;
@@ -366,7 +366,7 @@ public class ExcelRow {
 		return builder.toString();
 	}
 
-	private static String notNullToString(Station station) {
+	protected static String notNullToString(Station station) {
 		String result = "";
 
 		if (station != null) {
@@ -376,7 +376,7 @@ public class ExcelRow {
 		return result;
 	}
 
-	private static String notNullToString(Train train) {
+	protected static String notNullToString(Train train) {
 		String result = "";
 
 		if (train != null) {
@@ -386,7 +386,7 @@ public class ExcelRow {
 		return result;
 	}
 
-	private static String notNullToString(Object obj) {
+	protected static String notNullToString(Object obj) {
 		String result = "";
 
 		if (obj != null) {
