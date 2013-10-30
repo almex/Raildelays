@@ -42,8 +42,6 @@
 		</property>
 		<property name="delaysItemReader">
 			<bean class="be.raildelays.batch.reader.DelaysItemReader" scope="step">
-				<property name="stationA" value="#{jobParameters['station.a.name']}" />
-				<property name="stationB" value="#{jobParameters['station.b.name']}" />
 			</bean>
 		</property>
 	</bean>
@@ -87,9 +85,8 @@
 		<property name="stationB" value="#{jobParameters['station.b.name']}" />
 	</bean>
 
-	<bean id="searchNextTrainProcessor" class="be.raildelays.batch.processor.SearchNextTrainProcessor">
-		<property name="stationA" value="#{jobParameters['station.a.name']}" />
-		<property name="stationB" value="#{jobParameters['station.b.name']}" />
+	<bean id="searchNextTrainProcessor" class="be.raildelays.batch.processor.SearchNextTrainProcessor"
+		scope="step">
 	</bean>
 
 	<bean id="excelSheetItemWriter" class="be.raildelays.batch.writer.ExcelSheetItemWriter"

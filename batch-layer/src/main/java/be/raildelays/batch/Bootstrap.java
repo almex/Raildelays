@@ -127,7 +127,7 @@ public class Bootstrap {
 									JobParameters jobParameters = new JobParameters(
 											parameters);
 
-									service.run("retrieveDataFromRailtimeJob", jobParameters);
+									service.start("retrieveDataFromRailtimeJob", jobParameters);
 								}
 							} else {
 								result = RepeatStatus.FINISHED;
@@ -159,7 +159,7 @@ public class Bootstrap {
 
 				JobParameters jobParameters = new JobParameters(parameters);
 
-				service.run("searchDelaysJob", jobParameters);
+				service.start("searchDelaysJob", jobParameters);
 			}
 			
 			//-- Generate Excel sheets
@@ -177,7 +177,7 @@ public class Bootstrap {
 				JobParameters jobParameters = new JobParameters(parameters);
 				
 
-				service.run("searchDelaysXlsJob", jobParameters);
+				service.start("searchDelaysXlsJob", jobParameters);
 			}
 		} finally {
 			if (ctx != null) {
