@@ -16,7 +16,7 @@ import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.TimestampDelay;
 import be.raildelays.domain.xls.ExcelRow;
-import static be.raildelays.domain.xls.ExcelRow.ExcelRowBuilder;
+import static be.raildelays.domain.xls.ExcelRow.Builder;
 
 ;
 
@@ -54,7 +54,7 @@ public class ExcelRowMapperProcessor implements
 		return result;
 	}
 
-	private List<ExcelRow> extractSens(List<LineStop> items,
+	protected List<ExcelRow> extractSens(List<LineStop> items,
 			String stationAName, String stationBName) {
 		List<ExcelRow> result = new ArrayList<>();
 		Station stationA = new Station(stationAName);
@@ -101,7 +101,7 @@ public class ExcelRowMapperProcessor implements
 		return result;
 	}
 
-	private LineStop readPrevious(LineStop lineStop, Station stationA,
+	protected LineStop readPrevious(LineStop lineStop, Station stationA,
 			Station stationB) {
 		LineStop result = null;
 
@@ -121,7 +121,7 @@ public class ExcelRowMapperProcessor implements
 		return result;
 	}
 
-	private LineStop readNext(LineStop lineStop, Station stationA,
+	protected LineStop readNext(LineStop lineStop, Station stationA,
 			Station stationB) {
 		LineStop result = null;
 
@@ -140,7 +140,7 @@ public class ExcelRowMapperProcessor implements
 		return result;
 	}
 
-	private ExcelRow map(LineStop lineStopFrom, LineStop lineStopTo, Sens sens) {
+	protected ExcelRow map(LineStop lineStopFrom, LineStop lineStopTo, Sens sens) {
 		Date effectiveDepartureTime = computeEffectiveTime(lineStopFrom
 				.getDepartureTime());
 		Date effectiveArrivalTime = computeEffectiveTime(lineStopTo
@@ -150,7 +150,7 @@ public class ExcelRowMapperProcessor implements
 
 		switch (sens) {
 		case DEPARTURE:
-			result = new ExcelRowBuilder(lineStopFrom.getDate(), sens) //
+			result = new Builder(lineStopFrom.getDate(), sens) //
 					.departureStation(lineStopFrom.getStation()) //
 					.arrivalStation(lineStopTo.getStation()) //
 					.expectedDepartureTime(
@@ -166,7 +166,7 @@ public class ExcelRowMapperProcessor implements
 
 			break;
 		case ARRIVAL:
-			result = new ExcelRowBuilder(lineStopFrom.getDate(), sens) //
+			result = new Builder(lineStopFrom.getDate(), sens) //
 					.departureStation(lineStopFrom.getStation()) //
 					.arrivalStation(lineStopTo.getStation()) //
 					.expectedDepartureTime(
@@ -182,7 +182,7 @@ public class ExcelRowMapperProcessor implements
 
 			break;
 		default:
-			result = new ExcelRowBuilder(lineStopFrom.getDate(), sens).build();
+			result = new Builder(lineStopFrom.getDate(), sens).build();
 
 			break;
 		}
@@ -190,7 +190,7 @@ public class ExcelRowMapperProcessor implements
 		return result;
 	}
 
-	private static Date computeEffectiveTime(TimestampDelay timestampDelay) {
+	protected static Date computeEffectiveTime(TimestampDelay timestampDelay) {
 		Date result = null;
 
 		if (timestampDelay.getExpected() != null) {

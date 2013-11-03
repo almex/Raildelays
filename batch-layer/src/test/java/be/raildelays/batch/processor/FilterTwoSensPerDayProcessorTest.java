@@ -16,7 +16,7 @@ import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
 import be.raildelays.domain.xls.ExcelRow;
-import be.raildelays.domain.xls.ExcelRow.ExcelRowBuilder;
+import be.raildelays.domain.xls.ExcelRow.Builder;
 
 @RunWith(value = BlockJUnit4ClassRunner.class)
 public class FilterTwoSensPerDayProcessorTest {
@@ -37,7 +37,7 @@ public class FilterTwoSensPerDayProcessorTest {
 
 		list = new ArrayList<>();
 		
-		list.add(new ExcelRowBuilder(today, Sens.DEPARTURE) //
+		list.add(new Builder(today, Sens.DEPARTURE) //
 				.departureStation(stationA) //
 				.arrivalStation(stationB) //
 				.expectedTrain1(new Train("466")) //
@@ -49,7 +49,7 @@ public class FilterTwoSensPerDayProcessorTest {
 				.delay(5L) //
 				.build());
 
-		list.add(new ExcelRowBuilder(today, Sens.DEPARTURE) //
+		list.add(new Builder(today, Sens.DEPARTURE) //
 				.departureStation(stationA) //
 				.arrivalStation(stationB) //
 				.expectedTrain1(new Train("530")) //
@@ -61,7 +61,7 @@ public class FilterTwoSensPerDayProcessorTest {
 				.delay(10L) //
 				.build());
 
-		list.add(new ExcelRowBuilder(today, Sens.DEPARTURE) //
+		list.add(new Builder(today, Sens.DEPARTURE) //
 				.departureStation(stationA) //
 				.arrivalStation(stationB) //
 				.expectedTrain1(new Train("531")) //
@@ -73,7 +73,7 @@ public class FilterTwoSensPerDayProcessorTest {
 				.delay(15L) //
 				.build());
 
-		list.add(new ExcelRowBuilder(today, Sens.ARRIVAL) //
+		list.add(new Builder(today, Sens.ARRIVAL) //
 				.departureStation(stationB) //
 				.arrivalStation(stationA) //
 				.expectedTrain1(new Train("467")) //
@@ -85,7 +85,7 @@ public class FilterTwoSensPerDayProcessorTest {
 				.delay(5L) //
 				.build());
 
-		list.add(new ExcelRowBuilder(today, Sens.ARRIVAL) //
+		list.add(new Builder(today, Sens.ARRIVAL) //
 				.departureStation(stationB) //
 				.arrivalStation(stationA) //
 				.expectedTrain1(new Train("477")) //

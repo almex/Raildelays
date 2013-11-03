@@ -16,7 +16,9 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -42,6 +44,7 @@ public class ExcelRow {
 	@Temporal(TemporalType.DATE)
 	@Column(name = "DATE")
 	@NotNull
+	@Past
 	private Date date;
 
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -66,6 +69,7 @@ public class ExcelRow {
 	@Temporal(TemporalType.TIME)
 	@Column(name = "EXPECTED_ARRIVAL_TIME")
 	@NotNull
+	@Past
 	private Date expectedArrivalTime;
 
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -80,11 +84,13 @@ public class ExcelRow {
 	@Temporal(TemporalType.TIME)
 	@Column(name = "EFFECTIVE_DEPARTURE_TIME")
 	@NotNull
+	@Past
 	private Date effectiveDepartureTime;
 
 	@Temporal(TemporalType.TIME)
 	@Column(name = "EFFECTIVE_ARRIVAL_TIME")
 	@NotNull
+	@Past
 	private Date effectiveArrivalTime;
 
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -97,12 +103,14 @@ public class ExcelRow {
 	private Train effectiveTrain2;
 
 	@Column(name = "DELAY")
+	@Min(0)
 	private Long delay;
 
 	@Column(name = "SENS")
+	@NotNull
 	private Sens sens;
 
-	public static class ExcelRowBuilder {
+	public static class Builder {
 
 		protected final Date date;
 		protected Station arrivalStation;
@@ -119,73 +127,73 @@ public class ExcelRow {
 		protected Long delay;
 		protected final Sens sens;
 
-		public ExcelRowBuilder(final Date date, final Sens sens) {
+		public Builder(final Date date, final Sens sens) {
 			this.date = (Date) (date != null ? date.clone() : null);
 			this.sens = sens;
 		}
 
-		public ExcelRowBuilder arrivalStation(final Station arrivalStation) {
+		public Builder arrivalStation(final Station arrivalStation) {
 			this.arrivalStation = arrivalStation;
 			return this;
 		}
 
-		public ExcelRowBuilder departureStation(final Station departureStation) {
+		public Builder departureStation(final Station departureStation) {
 			this.departureStation = departureStation;
 			return this;
 		}
 
-		public ExcelRowBuilder linkStation(final Station linkStation) {
+		public Builder linkStation(final Station linkStation) {
 			this.linkStation = linkStation;
 			return this;
 		}
 
-		public ExcelRowBuilder expectedDepartureTime(
+		public Builder expectedDepartureTime(
 				final Date expectedDepartureTime) {
 			this.expectedDepartureTime = expectedDepartureTime;
 			return this;
 		}
 
-		public ExcelRowBuilder expectedArrivalTime(
+		public Builder expectedArrivalTime(
 				final Date expectedArrivalTime) {
 			this.expectedArrivalTime = expectedArrivalTime;
 			return this;
 		}
 
-		public ExcelRowBuilder expectedTrain1(final Train expectedTrain1) {
+		public Builder expectedTrain1(final Train expectedTrain1) {
 			this.expectedTrain1 = expectedTrain1;
 			return this;
 		}
 
-		public ExcelRowBuilder expectedTrain2(final Train expectedTrain2) {
+		public Builder expectedTrain2(final Train expectedTrain2) {
 			this.expectedTrain2 = expectedTrain2;
 			return this;
 		}
 
-		public ExcelRowBuilder effectiveDepartureTime(
+		public Builder effectiveDepartureTime(
 				final Date effectiveDepartureTime) {
 			this.effectiveDepartureTime = (Date) (effectiveDepartureTime != null ? effectiveDepartureTime
 					.clone() : null);
 			return this;
 		}
 
-		public ExcelRowBuilder effectiveArrivalTime(
+		public Builder effectiveArrivalTime(
 				final Date effectiveArrivalTime) {
 			this.effectiveArrivalTime = (Date) (effectiveArrivalTime != null ? effectiveArrivalTime
 					.clone() : null);
 			return this;
 		}
 
-		public ExcelRowBuilder effectiveTrain1(final Train effectiveTrain1) {
+		public Builder effectiveTrain1(final Train effectiveTrain1) {
 			this.effectiveTrain1 = effectiveTrain1;
 			return this;
 		}
 
-		public ExcelRowBuilder effectiveTrain2(final Train effectiveTrain2) {
+		public Builder effectiveTrain2(final Train effectiveTrain2) {
 			this.effectiveTrain2 = effectiveTrain2;
 			return this;
 		}
 
-		public ExcelRowBuilder delay(final Long delay) {
+		public Builder delay(final Long delay) {
 			this.delay = delay;
 			return this;
 		}
@@ -196,7 +204,7 @@ public class ExcelRow {
 
 	}
 
-	protected ExcelRow(final ExcelRowBuilder builder) {
+	protected ExcelRow(final Builder builder) {
 		this.date = builder.date;
 		this.arrivalStation = builder.arrivalStation;
 		this.departureStation = builder.departureStation;

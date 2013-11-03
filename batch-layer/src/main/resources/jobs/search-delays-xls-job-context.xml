@@ -51,9 +51,9 @@
 		class="org.springframework.batch.item.support.CompositeItemProcessor">
 		<property name="delegates">
 			<list>
-				<!-- <ref bean="searchNextTrainProcessor"/> -->
 				<ref bean="excelRowMapperProcessor" />
 				<ref bean="validatorProcessor" />
+                <!-- <ref bean="searchNextTrainProcessor"/> -->
 				<ref bean="filterTwoSensPerDayProcessor" />
 				<!-- ref bean="dispatchProcessor" / -->
 			</list>

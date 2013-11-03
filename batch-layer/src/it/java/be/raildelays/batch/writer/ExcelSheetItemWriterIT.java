@@ -20,7 +20,7 @@ import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
 import be.raildelays.domain.xls.ExcelRow;
-import be.raildelays.domain.xls.ExcelRow.ExcelRowBuilder;
+import be.raildelays.domain.xls.ExcelRow.Builder;
 
 ;
 
@@ -46,7 +46,7 @@ public class ExcelSheetItemWriterIT {
 		List<ExcelRow> excelRows = new ArrayList<>();
 		List<List<ExcelRow>> items = new ArrayList<>();
 		DateFormat formater = new SimpleDateFormat("HH:mm");
-		ExcelRow row = new ExcelRowBuilder(new Date(), Sens.DEPARTURE) //
+		ExcelRow row = new Builder(new Date(), Sens.DEPARTURE) //
 				.departureStation(new Station("Liège-Guillemins")) //
 				.arrivalStation(new Station("Bruxelles-central")) //
 				.expectedDepartureTime(formater.parse("14:00")) //

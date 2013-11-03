@@ -34,16 +34,31 @@ public class SearchNextTrainProcessor implements
 
 	@Override
 	public BatchExcelRow process(final BatchExcelRow item) throws Exception {
-		BatchExcelRow result = null;	// By default we skip a canceled train	 
+		BatchExcelRow result = item;	// By default we skip a canceled train	 
 		List<LineStop> candidates = new ArrayList<>();		
 		
 		if (item.isCanceled()) {
 			candidates = service.searchNextTrain(item.getDepartureStation(),
 					item.getArrivalStation(), item.getDate());
+			
+			LOGGER.trace("candidates={}", candidates);
 		}
 
 		LineStop fastestTrain = searchFastestTrain(item, candidates);
-
+		
+		if (fastestTrain != null) {
+			result = new BatchExcelRow.Builder(fastestTrain.getDate(), item.getSens()) //
+					.arrivalStation(item.getArrivalStation()) //
+					.departureStation(item.getDepartureStation()) //
+					.expectedTrain1(item.getExpectedTrain1()) //
+					.expectedTrain2(item.getEffectiveTrain2()) //
+					.effectiveTrain1(fastestTrain.getTrain()) //
+					.effectiveArrivalTime(fastestTrain.getArrivalTime().getExpected())
+					.effectiveDepartureTime(fastestTrain.getDepartureTime().getExpected()) //
+					.delay(fastestTrain.getArrivalTime().getDelay()) //
+					.build();
+		}
+		
 		return result;
 	}
 
@@ -74,9 +89,7 @@ public class SearchNextTrainProcessor implements
 	public static long compareTimeAndDelay(TimestampDelay timeA, Date timeB, Long delay) {
 		long deltaTime = timeB.getTime() - timeA.getExpected().getTime();
 		long deltaDelay = (delay - timeA.getDelay()) * 1000 * 60;
-		
-		
-		
+
 		/*
 		 * 16:25 (+5") faster than 16:15 (+30")
 		 *  
@@ -88,6 +101,10 @@ public class SearchNextTrainProcessor implements
 		 * 10" < 25" (faster)
 		 */
 		return deltaTime - deltaDelay;
+	}
+
+	public void setService(RaildelaysService service) {
+		this.service = service;
 	}
 
 }
