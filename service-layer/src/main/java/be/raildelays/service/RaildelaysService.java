@@ -73,13 +73,11 @@ public interface RaildelaysService {
 	/**
 	 * Search next train to go from A to B for a certain date.
 	 * 
-	 * @param fromA
-	 *            station where you come from
-	 * @param toB
+	 * @param station
 	 *            station where you want to go
 	 * @param date from which we do a search (next train must be after that date)
 	 * @return a list of {@link LineStop} corresponding to the direction of the
 	 *         next train
 	 */
-	List<LineStop> searchNextTrain(Station fromA, Station toB, Date date);
+	List<LineStop> searchNextTrain(Station station, Date date);
 }

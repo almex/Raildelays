@@ -239,9 +239,8 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 
 	@Override
     @Transactional(readOnly = true)
-	public List<LineStop> searchNextTrain(Station fromA, Station toB, Date date) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<LineStop> searchNextTrain(Station station, Date date) {
+		return lineStopDao.findNextExpectedArrivalTime(station, date);
 	}
 
 }

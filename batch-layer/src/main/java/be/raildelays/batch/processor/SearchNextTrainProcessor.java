@@ -38,8 +38,7 @@ public class SearchNextTrainProcessor implements
 		List<LineStop> candidates = new ArrayList<>();		
 		
 		if (item.isCanceled()) {
-			candidates = service.searchNextTrain(item.getDepartureStation(),
-					item.getArrivalStation(), item.getDate());
+			candidates = service.searchNextTrain(item.getArrivalStation(), item.getDate());
 			
 			LOGGER.trace("candidates={}", candidates);
 		}

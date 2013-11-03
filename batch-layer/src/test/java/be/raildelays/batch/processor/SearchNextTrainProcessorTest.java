@@ -79,7 +79,6 @@ public class SearchNextTrainProcessorTest {
 		EasyMock.expect(
 				raildelaysServiceMock.searchNextTrain(
 						EasyMock.anyObject(Station.class),
-						EasyMock.anyObject(Station.class),
 						EasyMock.anyObject(Date.class))).andReturn(nextLineStops);
 		EasyMock.replay(raildelaysServiceMock);
 
