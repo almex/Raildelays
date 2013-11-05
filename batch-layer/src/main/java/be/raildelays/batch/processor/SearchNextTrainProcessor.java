@@ -6,6 +6,10 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
@@ -13,11 +17,17 @@ import org.springframework.beans.factory.InitializingBean;
 
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.domain.entities.LineStop;
+import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.TimestampDelay;
 import be.raildelays.service.RaildelaysService;
 
-;
-
+/**
+ * Search next train which allow you to arrive earlier to your destination.
+ * This processor take into account delays from your departure station and
+ * cancellation.
+ * 
+ * @author Almex
+ */
 public class SearchNextTrainProcessor implements
 		ItemProcessor<BatchExcelRow, BatchExcelRow>, InitializingBean {
 
@@ -34,49 +44,79 @@ public class SearchNextTrainProcessor implements
 
 	@Override
 	public BatchExcelRow process(final BatchExcelRow item) throws Exception {
-		BatchExcelRow result = item;	// By default we skip a canceled train	 
-		List<LineStop> candidates = new ArrayList<>();		
+		BatchExcelRow result = item; // By default we return the item itself
+		List<LineStop> candidates = new ArrayList<>();
+		LocalDate date = new LocalDate(item.getDate());
+		LocalTime time = new LocalTime(item.getExpectedArrivalTime());
+		DateTime dateTime = date.toDateTime(time);
 		
-		if (item.isCanceled()) {
-			candidates = service.searchNextTrain(item.getArrivalStation(), item.getDate());
-			
-			LOGGER.trace("candidates={}", candidates);
-		}
+		candidates = service.searchNextTrain(item.getArrivalStation(), dateTime.toDate());
+
+		LOGGER.trace("candidates={}", candidates);
 
 		LineStop fastestTrain = searchFastestTrain(item, candidates);
-		
+
 		if (fastestTrain != null) {
-			result = new BatchExcelRow.Builder(fastestTrain.getDate(), item.getSens()) //
-					.arrivalStation(item.getArrivalStation()) //
-					.departureStation(item.getDepartureStation()) //
-					.expectedTrain1(item.getExpectedTrain1()) //
-					.expectedTrain2(item.getEffectiveTrain2()) //
-					.effectiveTrain1(fastestTrain.getTrain()) //
-					.effectiveArrivalTime(fastestTrain.getArrivalTime().getExpected())
-					.effectiveDepartureTime(fastestTrain.getDepartureTime().getExpected()) //
-					.delay(fastestTrain.getArrivalTime().getDelay()) //
-					.build();
+			result = map(item, fastestTrain);
 		}
-		
+
 		return result;
 	}
 
-	private LineStop searchFastestTrain(BatchExcelRow item, List<LineStop> candidates) {
-		LineStop fastestTrain = null;
+	private BatchExcelRow map(final BatchExcelRow item, LineStop fastestTrain) {		
+		return new BatchExcelRow.Builder(fastestTrain.getDate(),
+				item.getSens())
+				.arrivalStation(item.getArrivalStation())
+				.departureStation(item.getDepartureStation())
+				.expectedTrain1(item.getExpectedTrain1())
+				.expectedTrain2(item.getEffectiveTrain2())
+				.effectiveTrain1(fastestTrain.getTrain())
+				.effectiveArrivalTime(fastestTrain.getArrivalTime().getExpected())
+				.effectiveDepartureTime(fastestTrain.getDepartureTime().getExpected())
+				.delay(fastestTrain.getArrivalTime().getDelay())
+				.build();
+	}
 
-		for (LineStop candidate : candidates) {			
-			//TODO take into account canceled candidates recursively via getNext()
-			if (candidate.isCanceled()) {
+	private LineStop searchFastestTrain(BatchExcelRow item,
+			List<LineStop> candidates) {
+		LineStop fastestTrain = null;		
+
+		/*
+		 * The only delay that we can take into account is the one from the 
+		 * departure station. When you have to decide to take another train 
+		 * you don't know the effective arrival time.
+		 */
+		
+		for (LineStop candidate : candidates) {
+			LineStop departureLineStop = searchDepartureLineStop(candidate, item.getDepartureStation());
+			LineStop arrivalLineStop = candidate;
+			
+			// We don't process null values
+			if (departureLineStop == null || arrivalLineStop == null) {
+				break;
+			}
+			
+			// FIXME We must go recursively into getNext() to search any other 
+			// cancellation.
+			if (departureLineStop.isCanceled()) {
 				continue;
 			}
 
-			// Do not take into account train which leaves before the one you want to take
-			if (compareTimeAndDelay(candidate.getDepartureTime(), item.getExpectedDepartureTime(), item.getDelay()) > 0) {
-				continue; // candidate leaves after item
+			if (item.isCanceled()) {
+				fastestTrain = candidate;
+				break; // candidate arrives before item
 			}
 			
-			//FIXME we must recursively search into getNext() to retrieve expected arrivalTime to stationB and using delay from stationA
-			if (compareTimeAndDelay(candidate.getArrivalTime(), item.getExpectedArrivalTime(), item.getDelay()) < 0) {
+			// Do not take into account train which leaves after the expected
+			// one.
+			if (compareTimeAndDelay(departureLineStop.getDepartureTime(),
+					item.getExpectedDepartureTime(), item.getDelay()) > 0) {
+				continue; // candidate leaves after item
+			}
+
+			// expected arrivalTime to destination and using delay from departure
+			if (compareTimeAndDelay(arrivalLineStop.getArrivalTime(),
+					item.getExpectedArrivalTime(), item.getDelay()) < 0) {
 				fastestTrain = candidate;
 				break; // candidate arrives before item
 			}
@@ -85,21 +125,27 @@ public class SearchNextTrainProcessor implements
 		return fastestTrain;
 	}
 	
-	public static long compareTimeAndDelay(TimestampDelay timeA, Date timeB, Long delay) {
-		long deltaTime = timeB.getTime() - timeA.getExpected().getTime();
-		long deltaDelay = (delay - timeA.getDelay()) * 1000 * 60;
+	private LineStop searchDepartureLineStop(LineStop lineStop, Station departureStation) {		
+		LineStop result = null;
 
-		/*
-		 * 16:25 (+5") faster than 16:15 (+30")
-		 *  
-		 * because: 
-		 * 16:25 - 16:15 = 10" 
-		 * and 
-		 * 30" - 5" = 25" 
-		 * => 
-		 * 10" < 25" (faster)
-		 */
-		return deltaTime - deltaDelay;
+		if (lineStop != null) {
+			if (lineStop.getStation().equals(departureStation)) {
+				result = lineStop;
+			} else if (lineStop.getPrevious() != null) {
+				result = searchDepartureLineStop(lineStop.getPrevious(), departureStation);
+			}
+		}
+		
+		return result;
+	}
+
+	public static long compareTimeAndDelay(TimestampDelay timeA, Date timeB,
+			Long delay) {
+		LocalTime localTimeA = new LocalTime(timeA.getExpected());
+		LocalTime localTimeB = new LocalTime(timeB.getTime()).plusMinutes(delay.intValue());		
+		Duration duration = new Duration(localTimeB.toDateTimeToday(), localTimeA.toDateTimeToday());
+		
+		return duration.getMillis();
 	}
 
 	public void setService(RaildelaysService service) {

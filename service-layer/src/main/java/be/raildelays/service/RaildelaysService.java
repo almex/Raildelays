@@ -75,7 +75,8 @@ public interface RaildelaysService {
 	 * 
 	 * @param station
 	 *            station where you want to go
-	 * @param date from which we do a search (next train must be after that date)
+	 * @param date from which we do a search (format taken into account dd/MM/yyyy hh:mm)
+	 * 			e.g.: next train must be the same day (dd/MM/yyyy) but after that time (hh:mm).
 	 * @return a list of {@link LineStop} corresponding to the direction of the
 	 *         next train
 	 */

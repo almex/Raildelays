@@ -140,7 +140,7 @@ public class FilterTwoSensPerDayProcessorTest {
 		ExcelRow excelRow2 = excelRows.get(1);
 		
 		Assert.assertEquals(f.parse("12:00"), excelRow1.getExpectedArrivalTime());
-		Assert.assertEquals("The first element with the max delay should be the one we keep", f.parse("15:10"), excelRow2.getEffectiveArrivalHour());
+		Assert.assertEquals("The first element with the max delay should be the one we keep", f.parse("15:10"), excelRow2.getEffectiveArrivalTime());
 	}
 
 }

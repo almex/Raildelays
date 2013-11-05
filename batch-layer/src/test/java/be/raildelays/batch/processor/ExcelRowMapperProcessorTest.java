@@ -88,8 +88,8 @@ public class ExcelRowMapperProcessorTest {
 		Assert.assertEquals(new Train("466"), excelRow.getEffectiveTrain1());
 		Assert.assertEquals(formater.parse("12:25"), excelRow.getExpectedDepartureTime());
 		Assert.assertEquals(formater.parse("12:55"), excelRow.getExpectedArrivalTime());
-		Assert.assertEquals(formater.parse("12:35"), excelRow.getEffectiveDepartureHour());
-		Assert.assertEquals(formater.parse("13:15"), excelRow.getEffectiveArrivalHour());
+		Assert.assertEquals(formater.parse("12:35"), excelRow.getEffectiveDepartureTime());
+		Assert.assertEquals(formater.parse("13:15"), excelRow.getEffectiveArrivalTime());
 		Assert.assertEquals(20, excelRow.getDelay());
 	}
 

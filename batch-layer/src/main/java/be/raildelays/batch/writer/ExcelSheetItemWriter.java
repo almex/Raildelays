@@ -172,13 +172,13 @@ public class ExcelSheetItemWriter extends
 					excelRow.getExpectedTrain2().getEnglishName());
 		}
 		row.getCell(42).setCellValue(
-				hh.format(excelRow.getEffectiveDepartureHour()));
+				hh.format(excelRow.getEffectiveDepartureTime()));
 		row.getCell(44).setCellValue(
-				mm.format(excelRow.getEffectiveDepartureHour()));
+				mm.format(excelRow.getEffectiveDepartureTime()));
 		row.getCell(45).setCellValue(
-				hh.format(excelRow.getEffectiveArrivalHour()));
+				hh.format(excelRow.getEffectiveArrivalTime()));
 		row.getCell(47).setCellValue(
-				mm.format(excelRow.getEffectiveArrivalHour()));
+				mm.format(excelRow.getEffectiveArrivalTime()));
 		row.getCell(48).setCellValue(
 				excelRow.getEffectiveTrain1().getEnglishName());
 		if (excelRow.getExpectedTrain2() != null) {

@@ -285,20 +285,20 @@ public class ExcelRow {
 		this.expectedTrain2 = expectedTrain2;
 	}
 
-	public Date getEffectiveDepartureHour() {
+	public Date getEffectiveDepartureTime() {
 		return effectiveDepartureTime;
 	}
 
-	public void setEffectiveDepartureHour(Date effectiveDepartureHour) {
-		this.effectiveDepartureTime = effectiveDepartureHour;
+	public void setEffectiveDepartureTime(Date effectiveDepartureTime) {
+		this.effectiveDepartureTime = effectiveDepartureTime;
 	}
 
-	public Date getEffectiveArrivalHour() {
+	public Date getEffectiveArrivalTime() {
 		return effectiveArrivalTime;
 	}
 
-	public void setEffectiveArrivalHour(Date effectiveArrivalHour) {
-		this.effectiveArrivalTime = effectiveArrivalHour;
+	public void setEffectiveArrivalTime(Date effectiveArrivalTime) {
+		this.effectiveArrivalTime = effectiveArrivalTime;
 	}
 
 	public Train getEffectiveTrain1() {
