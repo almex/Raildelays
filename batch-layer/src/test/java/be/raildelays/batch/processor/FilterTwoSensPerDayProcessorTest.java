@@ -12,16 +12,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
+import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.batch.bean.BatchExcelRow.Builder;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
 import be.raildelays.domain.xls.ExcelRow;
-import be.raildelays.domain.xls.ExcelRow.Builder;
 
 @RunWith(value = BlockJUnit4ClassRunner.class)
 public class FilterTwoSensPerDayProcessorTest {
 
-	private List<ExcelRow> list;
+	private List<BatchExcelRow> list;
 
 	/**
 	 * S.U.T.
@@ -104,14 +105,14 @@ public class FilterTwoSensPerDayProcessorTest {
 
 	@Test
 	public void testProcessReturnTwo() throws Exception {
-		List<ExcelRow> excelRows = processor.process(list);
+		List<BatchExcelRow> excelRows = processor.process(list);
 
 		Assert.assertEquals(2, excelRows.size());
 	}
 	
 	@Test
 	public void testProcessOrder() throws Exception {
-		List<ExcelRow> excelRows = processor.process(list);
+		List<BatchExcelRow> excelRows = processor.process(list);
 
 		ExcelRow excelRow1 = excelRows.get(0);
 		ExcelRow excelRow2 = excelRows.get(1);
@@ -122,7 +123,7 @@ public class FilterTwoSensPerDayProcessorTest {
 	
 	@Test
 	public void testProcessMaxDelaysPerSens() throws Exception {
-		List<ExcelRow> excelRows = processor.process(list);
+		List<BatchExcelRow> excelRows = processor.process(list);
 
 		ExcelRow excelRow1 = excelRows.get(0);
 		ExcelRow excelRow2 = excelRows.get(1);
@@ -134,7 +135,7 @@ public class FilterTwoSensPerDayProcessorTest {
 	@Test
 	public void testProcessTime() throws Exception {
 		SimpleDateFormat f = new SimpleDateFormat("HH:mm");
-		List<ExcelRow> excelRows = processor.process(list);
+		List<BatchExcelRow> excelRows = processor.process(list);
 
 		ExcelRow excelRow1 = excelRows.get(0);
 		ExcelRow excelRow2 = excelRows.get(1);

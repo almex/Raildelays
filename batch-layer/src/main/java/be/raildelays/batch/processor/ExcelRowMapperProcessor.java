@@ -11,17 +11,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
 
+import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.batch.bean.BatchExcelRow.Builder;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.TimestampDelay;
-import be.raildelays.domain.xls.ExcelRow;
-import static be.raildelays.domain.xls.ExcelRow.Builder;
 
 ;
 
 public class ExcelRowMapperProcessor implements
-		ItemProcessor<List<LineStop>, List<ExcelRow>>, InitializingBean {
+		ItemProcessor<List<LineStop>, List<BatchExcelRow>>, InitializingBean {
 
 	private static final int DELAY_THRESHOLD = 15;
 
@@ -42,9 +42,9 @@ public class ExcelRowMapperProcessor implements
 	}
 
 	@Override
-	public List<ExcelRow> process(final List<LineStop> items) throws Exception {
-		List<ExcelRow> result = null;
-		List<ExcelRow> temp = extractSens(items, stationA, stationB);
+	public List<BatchExcelRow> process(final List<LineStop> items) throws Exception {
+		List<BatchExcelRow> result = null;
+		List<BatchExcelRow> temp = extractSens(items, stationA, stationB);
 
 		if (temp.size() > 0) { // We remove empty list (a null returned value do
 								// not pass-through the Writer)
@@ -54,9 +54,9 @@ public class ExcelRowMapperProcessor implements
 		return result;
 	}
 
-	protected List<ExcelRow> extractSens(List<LineStop> items,
+	protected List<BatchExcelRow> extractSens(List<LineStop> items,
 			String stationAName, String stationBName) {
-		List<ExcelRow> result = new ArrayList<>();
+		List<BatchExcelRow> result = new ArrayList<>();
 		Station stationA = new Station(stationAName);
 		Station stationB = new Station(stationBName);
 		Sens sens = null;
@@ -91,7 +91,7 @@ public class ExcelRowMapperProcessor implements
 
 			// We filters row a minimum delay of 15 minutes
 			if (arrival.getArrivalTime().getDelay() >= DELAY_THRESHOLD) {
-				ExcelRow excelRow = map(departure, arrival, sens);
+				BatchExcelRow excelRow = map(departure, arrival, sens);
 
 				result.add(excelRow);
 				LOGGER.trace("excelRow={} arrival={}", excelRow);
@@ -140,13 +140,13 @@ public class ExcelRowMapperProcessor implements
 		return result;
 	}
 
-	protected ExcelRow map(LineStop lineStopFrom, LineStop lineStopTo, Sens sens) {
+	protected BatchExcelRow map(LineStop lineStopFrom, LineStop lineStopTo, Sens sens) {
 		Date effectiveDepartureTime = computeEffectiveTime(lineStopFrom
 				.getDepartureTime());
 		Date effectiveArrivalTime = computeEffectiveTime(lineStopTo
 				.getArrivalTime());
 
-		ExcelRow result = null;
+		BatchExcelRow result = null;
 
 		switch (sens) {
 		case DEPARTURE:

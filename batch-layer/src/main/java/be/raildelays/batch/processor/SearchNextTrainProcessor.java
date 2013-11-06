@@ -63,7 +63,16 @@ public class SearchNextTrainProcessor implements
 		return result;
 	}
 
-	private BatchExcelRow map(final BatchExcelRow item, LineStop fastestTrain) {		
+	private BatchExcelRow map(final BatchExcelRow item, LineStop fastestTrain) {	
+		LocalDate date = new LocalDate(item.getDate());
+		DateTime effectiveArrivalTime = date.toDateTime(new LocalTime(fastestTrain
+				.getArrivalTime().getExpected()).plusMinutes(fastestTrain
+				.getArrivalTime().getDelay().intValue()));		
+		DateTime effectiveDepartureTime = date.toDateTime(new LocalTime(fastestTrain
+				.getDepartureTime().getExpected()).plusMinutes(fastestTrain
+				.getDepartureTime().getDelay().intValue()));
+		Duration delay = new Duration(new DateTime(item.getExpectedArrivalTime()), effectiveArrivalTime);
+		
 		return new BatchExcelRow.Builder(fastestTrain.getDate(),
 				item.getSens())
 				.arrivalStation(item.getArrivalStation())
@@ -71,9 +80,11 @@ public class SearchNextTrainProcessor implements
 				.expectedTrain1(item.getExpectedTrain1())
 				.expectedTrain2(item.getEffectiveTrain2())
 				.effectiveTrain1(fastestTrain.getTrain())
-				.effectiveArrivalTime(fastestTrain.getArrivalTime().getExpected())
-				.effectiveDepartureTime(fastestTrain.getDepartureTime().getExpected())
-				.delay(fastestTrain.getArrivalTime().getDelay())
+				.expectedDepartureTime(item.getExpectedDepartureTime())
+				.expectedArrivalTime(item.getExpectedArrivalTime())
+				.effectiveArrivalTime(effectiveArrivalTime.toDate())
+				.effectiveDepartureTime(effectiveDepartureTime.toDate())
+				.delay(delay.getMillis() / 1000)
 				.build();
 	}
 
