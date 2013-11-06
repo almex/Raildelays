@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
+import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.TimestampDelay;
@@ -77,7 +78,7 @@ public class ExcelRowMapperProcessorTest {
 	@Test
 	@Ignore
 	public void testProcessFromA() throws Exception {
-		List<ExcelRow> excelRows = processor.process(fromA);
+		List<BatchExcelRow> excelRows = processor.process(fromA);
 		SimpleDateFormat formater = new SimpleDateFormat("HH:mm");
 
 		Assert.assertEquals(1, excelRows.size());	
@@ -95,7 +96,7 @@ public class ExcelRowMapperProcessorTest {
 
 	@Test
 	public void testProcessFromB() throws Exception {
-		List<ExcelRow> excelRows = processor.process(fromB);
+		List<BatchExcelRow> excelRows = processor.process(fromB);
 
 		Assert.assertEquals(1, excelRows.size());
 		ExcelRow excelRow = excelRows.get(0);

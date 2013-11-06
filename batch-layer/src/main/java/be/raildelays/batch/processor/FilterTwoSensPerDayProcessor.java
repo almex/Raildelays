@@ -9,11 +9,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
 
+import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.domain.Sens;
-import be.raildelays.domain.xls.ExcelRow;
 
 public class FilterTwoSensPerDayProcessor implements
-		ItemProcessor<List<ExcelRow>, List<ExcelRow>>, InitializingBean {
+		ItemProcessor<List<BatchExcelRow>, List<BatchExcelRow>>, InitializingBean {
         
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(FilterTwoSensPerDayProcessor.class);
@@ -32,11 +32,11 @@ public class FilterTwoSensPerDayProcessor implements
 	}
 
 	@Override
-	public List<ExcelRow> process(final List<ExcelRow> items) throws Exception {
-		List<ExcelRow> result = null;
+	public List<BatchExcelRow> process(final List<BatchExcelRow> items) throws Exception {
+		List<BatchExcelRow> result = null;
 			
-		ExcelRow fromAtoB = extractMaxDelay(items, Sens.DEPARTURE);
-		ExcelRow fromBtoA = extractMaxDelay(items, Sens.ARRIVAL);
+		BatchExcelRow fromAtoB = extractMaxDelay(items, Sens.DEPARTURE);
+		BatchExcelRow fromBtoA = extractMaxDelay(items, Sens.ARRIVAL);
 
 		LOGGER.debug("From A to B : {}", fromAtoB);
 		LOGGER.debug("From B to A : {}", fromBtoA);
@@ -57,11 +57,11 @@ public class FilterTwoSensPerDayProcessor implements
 		return result;
 	}
 
-	private ExcelRow extractMaxDelay(List<ExcelRow> items, Sens sens) {
-		ExcelRow result = null;
+	private BatchExcelRow extractMaxDelay(List<BatchExcelRow> items, Sens sens) {
+		BatchExcelRow result = null;
 		long maxDelay = -1;
 
-		for (ExcelRow excelRow : items) {
+		for (BatchExcelRow excelRow : items) {
 			if (excelRow.getSens().equals(sens)
 					&& excelRow.getDelay() > maxDelay) {
 				maxDelay = excelRow.getDelay();

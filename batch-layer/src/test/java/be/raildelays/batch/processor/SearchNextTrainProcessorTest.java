@@ -66,10 +66,10 @@ public class SearchNextTrainProcessorTest {
 				.arrivalStation(ARRIVAL_STATION) //
 				.expectedTrain1(new Train("y")) //
 				.expectedDepartureTime(F.parse("16:30")) //
-				.expectedArrivalTime(F.parse("17:30")) //
+				.expectedArrivalTime(F.parse("17:00")) //
 				.effectiveTrain1(new Train("y")) //
 				.effectiveDepartureTime(F.parse("16:30")) //
-				.effectiveArrivalTime(F.parse("17:30")) //
+				.effectiveArrivalTime(F.parse("17:00")) //
 				.canceled(false) //
 				.delay(0L) //
 				.build();
@@ -140,6 +140,7 @@ public class SearchNextTrainProcessorTest {
 
 		Assert.assertNotNull(result);
 		Assert.assertEquals(new Train("0"), result.getEffectiveTrain1());
+		Assert.assertEquals(90, result.getDelay());
 
 		EasyMock.verify(raildelaysServiceMock);
 	}
@@ -170,6 +171,7 @@ public class SearchNextTrainProcessorTest {
 
 		Assert.assertNotNull(result);
 		Assert.assertEquals(new Train("0"), result.getEffectiveTrain1());
+		Assert.assertEquals(60, result.getDelay());
 
 		EasyMock.verify(raildelaysServiceMock);
 	}
@@ -196,6 +198,7 @@ public class SearchNextTrainProcessorTest {
 
 		Assert.assertNotNull(result);
 		Assert.assertEquals(new Train("y"), result.getEffectiveTrain1());
+		Assert.assertEquals(0, result.getDelay());
 
 		EasyMock.verify(raildelaysServiceMock);
 	}
