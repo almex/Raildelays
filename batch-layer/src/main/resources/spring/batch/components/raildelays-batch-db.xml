@@ -5,22 +5,24 @@
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
 
 
-    <bean id="batchDataSource" class="org.apache.commons.dbcp.BasicDataSource"
-        destroy-method="close">
-        <property name="driverClassName" value="org.apache.derby.jdbc.EmbeddedDriver" />
-        <property name="username" value="" />
-        <property name="password" value="" />
-        <property name="url" value="jdbc:derby:data/batch;create=true" />
-    </bean>
-        
+	<bean id="batchDataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="org.apache.derby.jdbc.EmbeddedDriver" />
+		<property name="username" value="" />
+		<property name="password" value="" />
+		<property name="url" value="jdbc:derby:data/batch;create=true" />
+	</bean>
+
 	<batch:job-repository id="jobRepository"
 		data-source="batchDataSource" transaction-manager="batchTransactionManager"
 		isolation-level-for-create="DEFAULT" table-prefix="BATCH_"
 		max-varchar-length="1000" />
 
-    <bean id="jobExplorer"
-        class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean"
-        p:dataSource-ref="batchDataSource" p:tablePrefix="BATCH_" />
+	<bean id="jobExplorer"
+		class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean">
+		<property name="dataSource" ref="batchDataSource" />
+		<property name="tablePrefix" value="BATCH_" />
+	</bean>
 
 	<bean id="batchDatabaseLoader" class="be.raildelays.repository.LoadDatabase"
 		init-method="startUp">

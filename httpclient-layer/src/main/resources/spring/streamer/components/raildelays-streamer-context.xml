@@ -18,11 +18,11 @@
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="properties">
 			<props>
-				<prop key="proxy.host">srvpxy.nbb</prop>
-				<prop key="proxy.port">8080</prop>
-				<prop key="proxy.username">soumagn</prop>
-				<prop key="proxy.password">Je suis papa.</prop>
-				<prop key="user-agent">Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; custom; .NET CLR 1.1.4322; InfoPath.1; .NET CLR 2.0.50727; InfoPath.2; custom; custom)</prop>
+				<prop key="proxy.host"></prop>
+				<prop key="proxy.port"></prop>
+				<prop key="proxy.username"></prop>
+				<prop key="proxy.password"></prop>
+				<prop key="user-agent"></prop>
 			</props>
 		</property>
 

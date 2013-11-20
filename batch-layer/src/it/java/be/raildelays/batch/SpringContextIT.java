@@ -3,12 +3,13 @@ package be.raildelays.batch;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.springframework.test.annotation.DirtiesContext;
+import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@DirtiesContext // Because of issue [SPR-8849] (https://jira.springsource.org/browse/SPR-8849)
 @ContextConfiguration(locations = {
-		"classpath:spring/service/raildelays-batch-integration-context.xml"})
+		"classpath:spring/batch/raildelays-batch-integration-context.xml"})
+@RunWith(SpringJUnit4ClassRunner.class)
 public class SpringContextIT {
 
 	@Test
