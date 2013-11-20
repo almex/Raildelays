@@ -9,5 +9,7 @@
     <context:annotation-config />
 
     <context:component-scan base-package="be.raildelays.batch.service.impl" />
-
+        
+    <bean id="jobRegistry"
+        class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
 </beans>

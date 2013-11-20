@@ -10,6 +10,8 @@ import org.springframework.batch.core.launch.JobExecutionNotRunningException;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.NoSuchJobExecutionException;
 
+import be.raildelays.batch.service.BatchStartAndRecoveryService;
+
 /**
  * This class listens to events from the Operating System requesting the Batch
  * to shutdown. For example when the user hits CTRL-C or the system is shutting
@@ -22,7 +24,7 @@ public class ProcessShutdownListener implements JobExecutionListener {
 			.getLogger(ProcessShutdownListener.class);
 
 	@Resource
-	private JobOperator jobOperator;
+	private BatchStartAndRecoveryService jobOperator;
 
 	@Override
 	public void afterJob(JobExecution jobExecution) { /* do nothing. */
@@ -53,7 +55,7 @@ public class ProcessShutdownListener implements JobExecutionListener {
 		});
 	}
 
-	public void setJobOperator(JobOperator jobOperator) {
+	public void setJobOperator(BatchStartAndRecoveryService jobOperator) {
 		this.jobOperator = jobOperator;
 	}
 

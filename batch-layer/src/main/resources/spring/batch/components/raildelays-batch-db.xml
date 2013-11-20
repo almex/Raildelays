@@ -1,29 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
 
-<!-- 	<bean id="batchDataSource" factory-bean="batchDatabaseLoader" -->
-<!-- 		factory-method="getDataSource" /> -->
 
-	<bean id="batchDataSource"
-		class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" >
-		<property name="driverClassName" value="org.apache.derby.jdbc.EmbeddedDriver" />
-		<property name="username" value="" />
-		<property name="password" value="" />
-		<property name="url" value="jdbc:derby:data/batch;create=true" />
-	</bean>
-		
+    <bean id="batchDataSource" class="org.apache.commons.dbcp.BasicDataSource"
+        destroy-method="close">
+        <property name="driverClassName" value="org.apache.derby.jdbc.EmbeddedDriver" />
+        <property name="username" value="" />
+        <property name="password" value="" />
+        <property name="url" value="jdbc:derby:data/batch;create=true" />
+    </bean>
+        
+	<batch:job-repository id="jobRepository"
+		data-source="batchDataSource" transaction-manager="batchTransactionManager"
+		isolation-level-for-create="DEFAULT" table-prefix="BATCH_"
+		max-varchar-length="1000" />
+
+    <bean id="jobExplorer"
+        class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean"
+        p:dataSource-ref="batchDataSource" p:tablePrefix="BATCH_" />
+
 	<bean id="batchDatabaseLoader" class="be.raildelays.repository.LoadDatabase"
 		init-method="startUp">
 		<property name="dataSource" ref="batchDataSource" />
 		<property name="initScriptPath" value="spring-batch-schema-derby.ddl" />
 	</bean>
-	
-	<alias name="transactionManager" alias="batchTransactionManager"/>
-	
-	<bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
-		<property name="transactionManager" ref="batchTransactionManager"/>
+
+	<alias name="transactionManager" alias="batchTransactionManager" />
+
+	<bean id="transactionTemplate"
+		class="org.springframework.transaction.support.TransactionTemplate">
+		<property name="transactionManager" ref="batchTransactionManager" />
 	</bean>
 
 </beans>

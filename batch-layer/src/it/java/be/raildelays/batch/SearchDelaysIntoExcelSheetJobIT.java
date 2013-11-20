@@ -13,7 +13,6 @@ import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -49,8 +48,8 @@ public class SearchDelaysIntoExcelSheetJobIT extends AbstractContextIT {
 			parameters.put("date", new JobParameter(date));	
 			parameters.put("station.a.name", new JobParameter("Liège-Guillemins"));	
 			parameters.put("station.b.name", new JobParameter("Brussels (Bruxelles)-Central"));	
-			parameters.put("excel.output.file", new JobParameter("file:./output.xlsx"));
-			parameters.put("excel.input.template", new JobParameter("template.xlsx"));
+			parameters.put("excel.output.file", new JobParameter("./target/output.xlsx"));
+			parameters.put("excel.input.template", new JobParameter("./target/test-classes/template.xlsx"));
 			
 			batchStatus = jobLauncherTestUtils.launchJob(new JobParameters(parameters)).getStatus();
 			

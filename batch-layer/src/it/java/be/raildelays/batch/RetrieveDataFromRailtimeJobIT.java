@@ -50,7 +50,7 @@ public class RetrieveDataFromRailtimeJobIT extends AbstractContextIT {
 			parameters.put("trainId", new JobParameter("466"));	
 			parameters.put("station.a.name", new JobParameter("Liège-Guillemins"));	
 			parameters.put("station.b.name", new JobParameter("Brussels (Bruxelles)-Central"));	
-			parameters.put("output.file.path", new JobParameter("file:./output.dat"));	
+			parameters.put("output.file.path", new JobParameter("file:./target/output.dat"));	
 			
 			batchStatus = jobLauncherTestUtils.launchJob(new JobParameters(parameters)).getStatus();
 			

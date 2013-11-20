@@ -6,7 +6,6 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
 	<import resource="classpath:spring/batch/components/raildelays-batch-db-test.xml" />
-	<import resource="classpath:spring/batch/components/raildelays-batch-context.xml" />
 	<import resource="classpath:spring/batch/components/raildelays-batch-launcher-test.xml" />
     <import resource="classpath:spring/batch/components/raildelays-batch-services.xml" />
 		
