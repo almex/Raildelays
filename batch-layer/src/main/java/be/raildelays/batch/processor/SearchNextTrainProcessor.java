@@ -131,13 +131,13 @@ public class SearchNextTrainProcessor implements
 			// Do not take into account train which leaves after the expected
 			// one.
 			if (compareTimeAndDelay(departureLineStop.getDepartureTime(),
-					item.getExpectedDepartureTime(), item.getDelay()) > 0) {
+					item.getEffectiveDepartureTime()) >= 0) {
 				continue; // candidate leaves after item
 			}
 
 			// expected arrivalTime to destination and using delay from departure
-			if (compareTimeAndDelay(arrivalLineStop.getArrivalTime(),
-					item.getExpectedArrivalTime(), item.getDelay()) < 0) {
+			if (compareTime(arrivalLineStop.getArrivalTime(),
+					item.getEffectiveArrivalTime()) < 0) {
 				fastestTrain = candidate;
 				break; // candidate arrives before item
 			}
@@ -159,11 +159,18 @@ public class SearchNextTrainProcessor implements
 		
 		return result;
 	}
+	
+	public static long compareTime(TimestampDelay departureA, Date departureB) {
+		LocalTime localTimeA = new LocalTime(departureA.getExpected());
+		LocalTime localTimeB = new LocalTime(departureB.getTime());		
+		Duration duration = new Duration(localTimeB.toDateTimeToday(), localTimeA.toDateTimeToday());
+		
+		return duration.getMillis();
+	}
 
-	public static long compareTimeAndDelay(TimestampDelay timeA, Date timeB,
-			Long delay) {
-		LocalTime localTimeA = new LocalTime(timeA.getExpected());
-		LocalTime localTimeB = new LocalTime(timeB.getTime()).plusMinutes(delay.intValue());		
+	public static long compareTimeAndDelay(TimestampDelay departureA, Date departureB) {
+		LocalTime localTimeA = new LocalTime(departureA.getExpected()).plusMinutes(departureA.getDelay().intValue());
+		LocalTime localTimeB = new LocalTime(departureB.getTime());		
 		Duration duration = new Duration(localTimeB.toDateTimeToday(), localTimeA.toDateTimeToday());
 		
 		return duration.getMillis();

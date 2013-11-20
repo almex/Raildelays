@@ -148,7 +148,7 @@ public class SearchNextTrainProcessorTest {
 	/*
 	 *        16:30  17:00  17:30  18:00  18:30  19:00
 	 *          |------|------|------|------|------|           
-	 *      y   >>>>>>>>>>>>>>|------>>>>>>>>>>>>>>|
+	 *      y   >>>>>>>>>>>>>>>>>>|------>>>>>>>>>>|
 	 *     (0                 |------|)
 	 *      1          |--------------------|
 	 *     
@@ -157,7 +157,7 @@ public class SearchNextTrainProcessorTest {
 	@Test
 	public void testTrainIsDelayAndNextAreNot() throws Exception {
 		
-		item.setEffectiveDepartureTime(F.parse("17:30"));
+		item.setEffectiveDepartureTime(F.parse("17:45"));
 		item.setEffectiveArrivalTime(F.parse("19:00"));
 		item.setDelay(120);
 
@@ -199,6 +199,36 @@ public class SearchNextTrainProcessorTest {
 		Assert.assertNotNull(result);
 		Assert.assertEquals(new Train("y"), result.getEffectiveTrain1());
 		Assert.assertEquals(0, result.getDelay());
+
+		EasyMock.verify(raildelaysServiceMock);
+	}
+	
+	/*
+	 *        16:30  17:00  17:30  18:00  18:30  19:00
+	 *          |------|------|------|------|------|           
+	 *     (y   |------>>>>>>>>>>>>>>>>>>>>>|)
+	 *      0                 |------|
+	 *      1          |--------------------|
+	 *     
+	 *     y should be chosen
+	 */
+	@Test
+	public void testTrainWithArrivalDelay() throws Exception {
+		
+		item.setEffectiveArrivalTime(F.parse("18:30"));
+		item.setDelay(90);
+		
+		EasyMock.expect(
+				raildelaysServiceMock.searchNextTrain(
+						EasyMock.anyObject(Station.class),
+						EasyMock.anyObject(Date.class))).andReturn(nextLineStops);
+		EasyMock.replay(raildelaysServiceMock);
+
+		BatchExcelRow result = processor.process(item);
+
+		Assert.assertNotNull(result);
+		Assert.assertEquals(new Train("y"), result.getEffectiveTrain1());
+		Assert.assertEquals(90, result.getDelay());
 
 		EasyMock.verify(raildelaysServiceMock);
 	}
