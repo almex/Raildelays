@@ -42,6 +42,8 @@
 		</property>
 		<property name="delaysItemReader">
 			<bean class="be.raildelays.batch.reader.DelaysItemReader" scope="step">
+                <property name="stationA" value="#{jobParameters['station.a.name']}" />
+                <property name="stationB" value="#{jobParameters['station.b.name']}" /> 
 			</bean>
 		</property>
 	</bean>

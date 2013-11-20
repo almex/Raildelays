@@ -1,6 +1,9 @@
 package be.raildelays.parser
 
+import java.nio.charset.Charset;
+
 import org.junit.Assert
+import org.junit.Ignore
 import org.junit.Test
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -26,6 +29,7 @@ class StreamParserIT
 	 * Test train 466 today.
 	 */
 	@Test
+	@Ignore
     void testParseDelayFrom466() {	
 		RequestStreamer streamer = new RailtimeRequestStreamer();	
 		Date date = new Date();
@@ -38,7 +42,7 @@ class StreamParserIT
 	
 	@Test
     void testParseDelayFromSample1() {		
-		Reader reader = new InputStreamReader(this.getClass().getResourceAsStream("/Sample1.html"));
+		Reader reader = new InputStreamReader(this.getClass().getResourceAsStream("/Sample1.html"), "UTF-8");
 		parser = new RailtimeStreamParser(reader);
 		Object object = parser.parseDelay("477", ParsingUtil.parseDate("13/01/2012"));
 		Assert.assertNotNull("This method should return a result", object);
@@ -48,7 +52,7 @@ class StreamParserIT
 		Assert.assertEquals("Step1 should from station", "Gouvy", steps[0].getStation().getName());
 		Assert.assertEquals("Step12 should have a delay of", 0, steps[0].getDelay());
 		Assert.assertEquals("Step12 should have timestamp of", ParsingUtil.parseTimestamp("13/01/201205:07"), steps[0].getTimestamp());
-		//Assert.assertEquals("Step12 should from station", "Liège-Guillemins", steps[12].getStation().getName());
+		Assert.assertEquals("Step12 should from station", "Liège-Guillemins", steps[12].getStation().getName());
 		Assert.assertEquals("Step12 should have a delay of", 0, steps[12].getDelay());
 		Assert.assertEquals("Step12 should have timestamp of", ParsingUtil.parseTimestamp("13/01/201206:34"), steps[12].getTimestamp());
 		Assert.assertTrue("Step15 should be canceled", steps[13].isCanceled());
@@ -58,11 +62,9 @@ class StreamParserIT
 		
 	}
 	
-	
-	
 	@Test
 	void testParseDelayFromSample2() {
-		Reader reader = new InputStreamReader(this.getClass().getResourceAsStream("/Sample2.html"));
+		Reader reader = new InputStreamReader(this.getClass().getResourceAsStream("/Sample2.html"), "UTF-8");
 		parser = new RailtimeStreamParser(reader);
 		Object object = parser.parseDelay("466", ParsingUtil.parseDate("11/01/2012"));
 		Assert.assertNotNull("This method should return a result", object);
@@ -80,5 +82,31 @@ class StreamParserIT
 		Assert.assertEquals("Step12 should have timestamp of", ParsingUtil.parseTimestamp("11/01/201216:33"), steps[2].getTimestamp());
 		Assert.assertTrue("Step15 should be canceled", steps[4].isCanceled());
 		Assert.assertTrue("Step15 should be canceled", steps[5].isCanceled());
+	}
+	
+	@Test
+	void testParseDelayFrom1hDelayDeparture() {
+		Reader reader = new InputStreamReader(this.getClass().getResourceAsStream("/1h delay departure.html"), "UTF-8");
+		parser = new RailtimeStreamParser(reader);
+		Object object = parser.parseDelay("516", ParsingUtil.parseDate("12/11/2013"));
+
+		Direction direction = (Direction)object;
+		Step[] steps = (Step[])direction.getSteps().toArray();
+		
+		Assert.assertEquals("Liège-Guillemins", steps[7].getStation().getName());
+		Assert.assertEquals(64L, steps[7].getDelay());
+	}
+	
+	@Test
+	void testParseDelayFrom1hDelayArrival() {
+		Reader reader = new InputStreamReader(this.getClass().getResourceAsStream("/1h delay arrival.html"), "UTF-8");
+		parser = new RailtimeStreamParser(reader);
+		Object object = parser.parseDelay("516", ParsingUtil.parseDate("12/11/2013"));
+
+		Direction direction = (Direction)object;
+		Step[] steps = (Step[])direction.getSteps().toArray();
+		
+		Assert.assertEquals("Liège-Guillemins", steps[7].getStation().getName());
+		Assert.assertEquals(64L, steps[7].getDelay());
 	}
 }

@@ -1,6 +1,7 @@
 package be.raildelays.parser.impl
 
 import java.io.Reader
+import java.text.SimpleDateFormat
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -78,11 +79,21 @@ class RailtimeStreamParser implements StreamParser {
 	}
 
 	def String extractDelay(String value) {
-		return value.toString().replaceAll("'", "")
+		return value.toString().replaceAll("[^0-9:]", "")
 	}
 
 	def parseDelay(String value) {
 		Long delay = stringToLong(extractDelay(value))
+		
+		if (delay == null) {
+			List<String> tokens = value.tokenize(':');
+			
+			if (tokens.size() == 2) {
+				delay = stringToLong(extractDelay(tokens.get(1)));
+				delay += stringToLong(extractDelay(tokens.get(0))) * 60;
+			}
+		}
+		
 		return delay != null ? delay : 0
 	}
 }

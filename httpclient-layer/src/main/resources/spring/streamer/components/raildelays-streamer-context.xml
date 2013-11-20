@@ -1,12 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
-				
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
 	<!-- Streamer -->
-	<bean id="streamer" class="be.raildelays.httpclient.impl.RailtimeRequestStreamer" />
-	
+	<bean id="streamer" class="be.raildelays.httpclient.impl.RailtimeRequestStreamer">
+		<property name="proxyHost" value="${proxy.host}" />
+		<property name="proxyPort" value="${proxy.port}" />
+		<property name="username" value="${proxy.username}" />
+		<property name="password" value="${proxy.password}" />
+		<property name="userAgent" value="${user-agent}" />
+	</bean>
+
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="properties">
+			<props>
+				<prop key="proxy.host">srvpxy.nbb</prop>
+				<prop key="proxy.port">8080</prop>
+				<prop key="proxy.username">soumagn</prop>
+				<prop key="proxy.password">Je suis papa.</prop>
+				<prop key="user-agent">Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; custom; .NET CLR 1.1.4322; InfoPath.1; .NET CLR 2.0.50727; InfoPath.2; custom; custom)</prop>
+			</props>
+		</property>
+
+	</bean>
+
 </beans>

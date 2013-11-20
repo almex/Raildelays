@@ -1,22 +1,55 @@
 package be.raildelays.httpclient.impl
 
 import groovyx.net.http.HTTPBuilder
+import groovyx.net.http.AuthConfig
 import static groovyx.net.http.ContentType.*
 import static groovyx.net.http.Method.*
 
 import java.io.Reader
 
+import org.apache.http.auth.AuthScope
+import org.apache.http.auth.UsernamePasswordCredentials
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 
 abstract class AbstractRequestStreamBuilder {
 
-	def static final USER_AGENT = 'Mozilla/5.0 Ubuntu/8.10 Firefox/3.0.4'
+	def static final USER_AGENT = 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; custom; .NET CLR 1.1.4322; InfoPath.1; .NET CLR 2.0.50727; InfoPath.2; custom; custom)'
 
 	def static final DEFAULT_LANGUAGE = 'en'
 
 	def static Logger log = LoggerFactory.getLogger(AbstractRequestStreamBuilder.class)
+
+	private String proxyHost;
+
+	private Integer proxyPort;
+
+	private String username;
+
+	private String password;
+
+	private String userAgent = USER_AGENT;
+	
+	public void setProxyHost(String proxyHost) {
+		this.proxyHost = proxyHost;
+	}
+	
+	public void setProxyPort(Integer proxyPort) {
+		this.proxyPort = proxyPort;
+	}
+	
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+	public void setUserAgent(String userAgent) {
+		this.userAgent = userAgent;
+	}
 
 	/**
 	 * Do an HTTP GET to request a page.
@@ -26,25 +59,39 @@ abstract class AbstractRequestStreamBuilder {
 	 * @param parameters of your request
 	 * @return return a {@link Reader}
 	 */
-	protected Reader httpGet(root, path, parameters) {
+	protected Reader httpGet(String root, String path, Map parameters) {
 		def final httpClient = new HTTPBuilder( root )
+		def localUserAgent = userAgent
 		
+		if (proxyHost && proxyPort) {
+			httpClient.setProxy(proxyHost, proxyPort, "http");
+
+			if (username && password) {
+				httpClient.client.getCredentialsProvider().setCredentials(
+						new AuthScope(proxyHost, proxyPort),
+						new UsernamePasswordCredentials(username, password)
+						);
+			}
+		}
+
 		// perform a GET request, expecting plain/text response data
 		httpClient.request( GET, TEXT ) {
 			uri.path = path
 			uri.query = parameters
-		
-			headers.'User-Agent' = USER_AGENT
-			
+
+			headers.'User-Agent' = localUserAgent
+
+
+
 			log.debug("URI="+uri);
-				
+
 			// handler for any failure status code:
 			response.failure = { resp ->
 				log.error("Unexpected error: ${resp.statusLine.statusCode} : ${resp.statusLine.reasonPhrase}")
 			}
 		}
 	}
-	
+
 	/**
 	 * Do an HTTP GET to request a page.
 	 * Return the result as a stream to be parsed.
