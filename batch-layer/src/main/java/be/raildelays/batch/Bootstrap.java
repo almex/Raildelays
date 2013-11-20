@@ -66,6 +66,8 @@ public class Bootstrap {
 		
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(
 				contextPaths);
+		
+		ctx.registerShutdownHook(); // Register close of this Spring context to shutdown of the JVM
 
 		ctx.start();
 

@@ -28,6 +28,9 @@
         <File name="raildelays-xls-processor" fileName="logs/railtime-processor.log" append="false">
             <PatternLayout pattern="[Xls]: %m%n" />
         </File>
+        <File name="raildelays-next-processor" fileName="logs/railtime-processor.log" append="false">
+            <PatternLayout pattern="[Next]: %m%n" />
+        </File>
         <File name="raildelays-filter-processor" fileName="logs/railtime-processor.log" append="false">
             <PatternLayout pattern="[Filter]: %m%n" />
         </File>
@@ -63,7 +66,10 @@
 	    </logger>    
 	    <logger name="be.raildelays.batch.processor.ExcelRowMapperProcessor" level="trace">
 	        <appender-ref ref="raildelays-xls-processor" />
-	    </logger>    
+	    </logger>     
+        <logger name="be.raildelays.batch.processor.SearchNextTrainProcessor" level="trace">
+            <appender-ref ref="raildelays-next-processor" />
+        </logger>  
 	    <logger name="org.springframework.batch.item.file.FlatFileItemWriter" level="debug">
 	        <appender-ref ref="output" />
 	    </logger>    

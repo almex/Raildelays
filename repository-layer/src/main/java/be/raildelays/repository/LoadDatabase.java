@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
@@ -31,12 +33,14 @@ public class LoadDatabase implements InitializingBean {
 		Assert.notNull(dataSource);
 	}
 
+	@PostConstruct
 	public void startUp() throws InstantiationException,
 			IllegalAccessException, ClassNotFoundException, SQLException {
 
 			initDatabase(dataSource.getConnection());
 	}
 
+	@PreDestroy
 	public void shutdown() throws SQLException {
 		LOGGER.debug("Shutting down database...");
 		Connection connection = null;
