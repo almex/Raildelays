@@ -43,8 +43,7 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 						"SELECT o FROM LineStop o "
 								+ "WHERE o.station.englishName = :stationName "
 								+ "AND o.date = :date "
-								+ "AND o.arrivalTime.delay IS NOT NULL "
-								+ "AND o.arrivalTime.delay >= :delayThreshold ")
+								+ "AND (o.arrivalTime.delay >= :delayThreshold OR o.canceled = true)")
 				.setParameter("delayThreshold", Long.valueOf(delayThreshold))
 				.setParameter("date", date, TemporalType.DATE)
 				.setParameter("stationName", station.getEnglishName())

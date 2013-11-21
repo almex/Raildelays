@@ -95,3 +95,5 @@ data
 /batch-layer/*.log
 /batch-layer/*.log
 /batch-layer/*.log
+
+/repository-layer/logs
