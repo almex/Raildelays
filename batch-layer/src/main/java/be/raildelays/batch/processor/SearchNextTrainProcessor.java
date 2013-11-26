@@ -59,6 +59,8 @@ public class SearchNextTrainProcessor implements
 		LocalDate date = new LocalDate(item.getDate());
 		LocalTime time = new LocalTime(item.getExpectedArrivalTime());
 		DateTime dateTime = date.toDateTime(time);
+
+		LOGGER.debug("item={}", item);
 		
 		candidates = service.searchNextTrain(item.getArrivalStation(), dateTime.toDate());
 
@@ -68,6 +70,7 @@ public class SearchNextTrainProcessor implements
 
 		if (fastestTrain != null) {
 			result = map(item, searchDepartureLineStop(fastestTrain, item.getDepartureStation()), fastestTrain);
+			LOGGER.info("Found faster train={}", result);
 		}
 
 		return result;

@@ -42,10 +42,14 @@ public class LineStopJpaDaoIT {
 
 	@Test
 	public void createTest() {
-		assertNotNull("Creation should return a result",
-				lineStopDao.save(new LineStop(new Date(), new Train("466"),
-						new Station("Liège-Guillemins"), new TimestampDelay(),
-						new TimestampDelay(), false)));
+		assertNotNull(
+				"Creation should return a result",
+				lineStopDao.save(new LineStop.Builder().date(new Date())
+						.train(new Train("466"))
+						.station(new Station("Liège-Guillemins"))
+						.arrivalTime(new TimestampDelay())
+						.departureTime(new TimestampDelay()).canceled(false)
+						.build()));
 	}
 
 	@Test
@@ -55,9 +59,12 @@ public class LineStopJpaDaoIT {
 		// Date().getTime())));
 		Date date = new Date();
 		Train train = trainDao.saveAndFlush(new Train("466"));
-		LineStop expectedLineStop = lineStopDao.save(new LineStop(date, train,
-				new Station("Liège-Guillemins"), new TimestampDelay(),
-				new TimestampDelay(), false));
+		LineStop expectedLineStop = lineStopDao.save(new LineStop.Builder().date(date)
+				.train(train)
+				.station(new Station("Liège-Guillemins"))
+				.arrivalTime(new TimestampDelay())
+				.departureTime(new TimestampDelay()).canceled(false)
+				.build());
 		List<LineStop> lineStops = lineStopDao.findByTrainAndDate(train, date);
 
 		assertEquals("You should have a certain number of results.", 1,
@@ -65,5 +72,4 @@ public class LineStopJpaDaoIT {
 		assertEquals("You should have the same result as expected.",
 				expectedLineStop, lineStops.get(0));
 	}
-
 }

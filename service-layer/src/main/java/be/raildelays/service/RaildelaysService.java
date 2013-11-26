@@ -6,6 +6,7 @@ import java.util.List;
 import be.raildelays.domain.dto.RouteLogDTO;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
+import be.raildelays.domain.entities.Train;
 
 /**
  * Service used to collect data from Railtime and persist them.
@@ -81,4 +82,12 @@ public interface RaildelaysService {
 	 *         next train
 	 */
 	List<LineStop> searchNextTrain(Station station, Date date);
+	
+	/**
+	 * Search scheduling for a train line.
+	 * 
+	 * @param train for wich this line belongs
+	 * @return a {@link LineStop} which does not contain effective time
+	 */
+	LineStop searchScheduledLine(Train train);
 }

@@ -21,6 +21,7 @@ import be.raildelays.domain.entities.RailtimeTrain;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.TimestampDelay;
 import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.entities.LineStop.Builder;
 import be.raildelays.repository.LineStopDao;
 import be.raildelays.repository.RailtimeTrainDao;
 import be.raildelays.repository.StationDao;
@@ -93,8 +94,7 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 	private LineStop saveServedStop(final Date date, final String trainId,
 			final ServedStopDTO stop, final LineStop previous) {
 
-		LOGGER.debug(
-				"Saving timetable for train={}, date={} and stop={}...",
+		LOGGER.debug("Saving timetable for train={}, date={} and stop={}...",
 				new Object[] { trainId, date, stop });
 
 		// -- Validate our inputs
@@ -112,9 +112,15 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 				stop.getArrivalDelay());
 		TimestampDelay departureTime = new TimestampDelay(
 				stop.getDepartureTime(), stop.getDepartureDelay());
-		LineStop lineStop = new LineStop(date, persistedTrain,
-				persistedStation, arrivalTime, departureTime,
-				stop.isCanceled(), previous);
+		LineStop lineStop = new LineStop.Builder() //
+				.date(date) //
+				.station(persistedStation) //
+				.train(persistedTrain) //
+				.arrivalTime(arrivalTime) //
+				.departureTime(departureTime) //
+				.canceled(stop.isCanceled()) //
+				.addPrevious(previous) //
+				.build();
 
 		// -- Validate our output
 		validator.validate(lineStop);
@@ -126,8 +132,8 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 		LineStop result = null;
 		Train train = saveOrRetrieveTrain(lineStop.getTrain());
 		Station station = saveOrRetrieveStation(lineStop.getStation());
-		LineStop persistedLineStop = lineStopDao.findByTrainAndDateAndStation(train,
-				lineStop.getDate(), station);
+		LineStop persistedLineStop = lineStopDao.findByTrainAndDateAndStation(
+				train, lineStop.getDate(), station);
 
 		if (persistedLineStop != null) {
 			LOGGER.debug("We update a LineStop={}.", persistedLineStop);
@@ -170,7 +176,7 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 	}
 
 	@Override
-    @Transactional(readOnly = true)
+	@Transactional(readOnly = true)
 	public List<Date> searchAllDates(Date from, Date to) {
 		List<Date> result = null;
 
@@ -184,7 +190,7 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 	}
 
 	@Override
-    @Transactional(readOnly = true)
+	@Transactional(readOnly = true)
 	public List<Date> searchAllDates(Date lastDate) {
 		List<Date> result = null;
 
@@ -238,9 +244,49 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 	}
 
 	@Override
-    @Transactional(readOnly = true)
+	@Transactional(readOnly = true)
 	public List<LineStop> searchNextTrain(Station station, Date date) {
 		return lineStopDao.findNextExpectedArrivalTime(station, date);
+	}
+
+	@Override
+	public LineStop searchScheduledLine(Train train) {
+		LineStop result = null;
+
+		LineStop scheduledLineStop = null;
+
+		if (scheduledLineStop != null) {
+			result = removeEffectiveInformartion(scheduledLineStop);
+		}
+
+		return result;
+	}
+
+	static private LineStop removeEffectiveInformartion(LineStop lineStop) {
+		Builder result = new LineStop.Builder(lineStop) //
+				.arrivalTime(removeDelay(lineStop.getArrivalTime())) //
+				.departureTime(removeDelay(lineStop.getDepartureTime()));
+
+		if (lineStop.getNext() != null) {
+			result.addNext(removeEffectiveInformartion(lineStop.getNext()));
+		}
+
+		if (lineStop.getPrevious() != null) {
+			result.addPrevious(removeEffectiveInformartion(lineStop
+					.getPrevious()));
+		}
+
+		return result.build();
+	}
+
+	static private TimestampDelay removeDelay(TimestampDelay timestamp) {
+		TimestampDelay result = null;
+
+		if (timestamp != null) {
+			result = new TimestampDelay(timestamp.getExpected(), 0L);
+		}
+
+		return result;
 	}
 
 }
