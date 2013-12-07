@@ -9,6 +9,7 @@ import javax.persistence.TemporalType;
 
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
+import be.raildelays.domain.entities.Train;
 import be.raildelays.repository.LineStopDaoCustom;
 
 public class LineStopDaoCustomJpa implements LineStopDaoCustom {
@@ -107,5 +108,21 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 				.setParameter("time", date, TemporalType.TIME)
 				.getResultList();
 	}
+
+    @Override
+    public LineStop findFistScheduledLine(Train train, Station station) {
+        return (LineStop) entityManager
+                .createQuery(
+                        "SELECT FIRST(o) "
+                                + "FROM LineStop o "
+                                + "WHERE o.train.englishName = :trainName "
+                                + "AND o.station.englishName = :stationName"
+                                + "AND o.arrivalTime IS NOT NULL "
+                                + "AND o.departureTime IS NOT NULL "
+                                + "ORDER BY o.arrivalTime.expected ASC")
+                .setParameter("trainName", train.getEnglishName())
+                .setParameter("stationName", station.getEnglishName())
+                .getSingleResult();
+    }
 
 }

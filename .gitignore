@@ -97,3 +97,7 @@ data
 /batch-layer/*.log
 
 /repository-layer/logs
+
+.idea
+
+*.iml

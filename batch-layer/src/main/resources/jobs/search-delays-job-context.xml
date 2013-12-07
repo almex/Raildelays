@@ -2,12 +2,10 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:batch="http://www.springframework.org/schema/batch"
-	xmlns:util="http://www.springframework.org/schema/util"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
 	<!-- Needed if we use a AutomaticJobRegistrar -->
 	<context:annotation-config />
@@ -18,9 +16,12 @@
 		<batch:step id="searchDelays" >
 			<batch:tasklet  transaction-manager="batchTransactionManager" allow-start-if-complete="true">
 				<batch:chunk cache-capacity="" reader="compositeRaildelaysItemReader" processor="chainedProcessorsForDelays" writer="flatFileItemWriter"
-					commit-interval="10" skip-limit="100">					
+					commit-interval="1" skip-limit="100">
 					<batch:skippable-exception-classes>
-						<batch:include class="org.springframework.batch.item.validator.ValidationException"/>
+						<batch:include
+                                class="org.springframework.batch.item.validator.ValidationException"/>
+                        <batch:include
+                                class="be.raildelays.batch.exception.ArrivalDepartureEqualsException" />
 					</batch:skippable-exception-classes>
 				</batch:chunk>
 				<batch:transaction-attributes

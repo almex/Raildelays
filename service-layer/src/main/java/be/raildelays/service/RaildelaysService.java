@@ -86,8 +86,9 @@ public interface RaildelaysService {
 	/**
 	 * Search scheduling for a train line.
 	 * 
-	 * @param train for wich this line belongs
+	 * @param train for which this line belongs
+     * @param station to determine from which stop the returned result begins
 	 * @return a {@link LineStop} which does not contain effective time
 	 */
-	LineStop searchScheduledLine(Train train);
+	LineStop searchScheduledLine(Train train, Station station);
 }

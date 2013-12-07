@@ -58,7 +58,6 @@ public final class ServedStopDTO implements Serializable, Cloneable {
 				.append("departureDelay: " + departureDelay) //
 				.append(", ") //
 				.append("canceled: " + canceled) //
-				.append(", ") //
 				.append("} ").toString();
 	}
 

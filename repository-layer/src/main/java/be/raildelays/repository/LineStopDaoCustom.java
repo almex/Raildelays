@@ -5,6 +5,7 @@ import java.util.List;
 
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
+import be.raildelays.domain.entities.Train;
 
 public interface LineStopDaoCustom {
 
@@ -41,11 +42,9 @@ public interface LineStopDaoCustom {
 	 * 
 	 * @param date
 	 *            date for which you do the search
-	 * @param departure
+	 * @param station
 	 *            departure station
-	 * @param arrival
-	 *            arrival station
-	 * @param delayTreshold
+	 * @param delayThreshold
 	 *            minimum delay (in minutes)
 	 * @return a collection of {@link LineStop} belonging to departure
 	 */
@@ -58,11 +57,9 @@ public interface LineStopDaoCustom {
 	 * 
 	 * @param date
 	 *            date for which you do the search
-	 * @param departure
-	 *            departure station
-	 * @param arrival
+	 * @param station
 	 *            arrival station
-	 * @param delayTreshold
+	 * @param delayThreshold
 	 *            minimum delay (in minutes)
 	 * @return a collection of {@link LineStop} belonging to arrival
 	 */
@@ -83,5 +80,14 @@ public interface LineStopDaoCustom {
 	 *         time
 	 */
 	List<LineStop> findNextExpectedArrivalTime(Station station, Date date);
+
+    /**
+     *
+     *
+     * @param train
+     * @param station
+     * @return
+     */
+    LineStop findFistScheduledLine(Train train, Station station);
 
 }

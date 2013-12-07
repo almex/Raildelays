@@ -343,7 +343,7 @@ public class ExcelRow {
 		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 		SimpleDateFormat tf = new SimpleDateFormat("HH:mm");
 
-		builder.append(df.format(date));
+		builder.append(date != null ? df.format(date) : "N/A");
 		builder.append(" ");
 		builder.append(notNullToString(departureStation));
 		builder.append(" ");
@@ -359,9 +359,9 @@ public class ExcelRow {
 		builder.append(" ");
 		builder.append(notNullToString(expectedTrain2));
 		builder.append(" ");
-		builder.append(tf.format(effectiveDepartureTime));
+		builder.append(effectiveDepartureTime != null ? tf.format(effectiveDepartureTime) : "N/A");
 		builder.append(" ");
-		builder.append(tf.format(effectiveArrivalTime));
+		builder.append(effectiveArrivalTime != null ? tf.format(effectiveArrivalTime) : "N/A");
 		builder.append(" ");
 		builder.append(notNullToString(effectiveTrain1));
 		builder.append(" ");

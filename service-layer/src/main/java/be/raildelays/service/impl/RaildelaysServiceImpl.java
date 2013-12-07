@@ -250,10 +250,10 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 	}
 
 	@Override
-	public LineStop searchScheduledLine(Train train) {
+	public LineStop searchScheduledLine(Train train, Station station) {
 		LineStop result = null;
 
-		LineStop scheduledLineStop = null;
+		LineStop scheduledLineStop = lineStopDao.findFistScheduledLine(train, station);
 
 		if (scheduledLineStop != null) {
 			result = removeEffectiveInformartion(scheduledLineStop);

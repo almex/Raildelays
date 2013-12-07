@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import be.raildelays.batch.exception.ArrivalDepartureEqualsException;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
@@ -17,8 +18,6 @@ import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.TimestampDelay;
-
-;
 
 public class ExcelRowMapperProcessor implements
 		ItemProcessor<List<LineStop>, List<BatchExcelRow>>, InitializingBean {
@@ -55,7 +54,7 @@ public class ExcelRowMapperProcessor implements
 	}
 
 	protected List<BatchExcelRow> extractSens(List<LineStop> items,
-			String stationAName, String stationBName) {
+			String stationAName, String stationBName) throws ArrivalDepartureEqualsException {
 		List<BatchExcelRow> result = new ArrayList<>();
 		Station stationA = new Station(stationAName);
 		Station stationB = new Station(stationBName);
@@ -75,9 +74,9 @@ public class ExcelRowMapperProcessor implements
 			}
 
 			if (arrival == departure) {
-				throw new IllegalStateException(
-						"Arrival must not be equal to departure");
-			}
+                throw new ArrivalDepartureEqualsException(
+                        "Arrival must not be equal to departure");
+            }
 
 			LOGGER.debug("departure={} arrival={}", departure, arrival);
 

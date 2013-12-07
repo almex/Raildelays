@@ -3,9 +3,9 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
 	xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
 	<!-- Needed if w use a AutomaticJobRegistrar -->
 	<context:annotation-config />
@@ -17,7 +17,10 @@
 			<batch:tasklet transaction-manager="batchTransactionManager">
 				<batch:chunk reader="compositeRailtimeItemReader"
 					processor="chainedProcessorsForRailtime" writer="raildelaysServiceWriter"
-					commit-interval="10" skip-limit="100">
+					commit-interval="1" skip-limit="10" retry-limit="3">
+                    <batch:retryable-exception-classes>
+                        <batch:include class="java.io.IOException" />
+                    </batch:retryable-exception-classes>
 					<batch:skippable-exception-classes>
 						<batch:include
 							class="org.springframework.batch.item.validator.ValidationException" />
@@ -60,6 +63,7 @@
 		<property name="delegates">
 			<list>
 				<ref bean="routeLogMapperProcessor" />
+                <ref bean="aggregateExpectedTimeProcessor" />
 				<ref bean="validatorProcessor" />
 			</list>
 		</property>
@@ -69,6 +73,11 @@
 		scope="step">
 		<property name="date" value="#{jobParameters[date]}" />
 	</bean>
+
+    <bean id="aggregateExpectedTimeProcessor" class="be.raildelays.batch.processor.AggregateExpectedTimeProcessor"
+          scope="step">
+    </bean>
+
 
 	<bean id="validatorProcessor"
 		class="org.springframework.batch.item.validator.ValidatingItemProcessor">
