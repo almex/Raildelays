@@ -28,6 +28,9 @@
 				</batch:chunk>
 				<batch:transaction-attributes
 					isolation="DEFAULT" propagation="REQUIRED" />
+                <batch:listeners>
+                    <batch:listener ref="skippedItemsListener" />
+                </batch:listeners>
 			</batch:tasklet>
 		</batch:step>
 	</batch:job>

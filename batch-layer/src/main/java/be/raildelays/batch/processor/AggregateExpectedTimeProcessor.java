@@ -34,7 +34,7 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<RouteLogDTO
 
         LOGGER.debug("RouteLogDTO before processing={}", item);
 
-        for (ServedStopDTO stop : result.getStops())  {
+        for (ServedStopDTO stop : item.getStops())  {
             if (stop.getArrivalTime() == null || stop.getDepartureTime() == null) {
                 LOGGER.info("It lacks one expected time from this stop={}", stop);
 
@@ -42,11 +42,9 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<RouteLogDTO
 
                 //-- If we cannot retrieve one of the expected time then this item is corrupted we must filter it.
                 if (line == null) {
-                    result = null;
-
                     LOGGER.debug("We must filter this {}", item);
 
-                    break;
+                    return null;
                 }
 
                 result.addStop(new ServedStopDTO(stop.getStationName(),

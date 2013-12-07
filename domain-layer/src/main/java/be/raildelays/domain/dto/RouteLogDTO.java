@@ -43,19 +43,28 @@ public final class RouteLogDTO implements Serializable {
 	}
 
 	public List<ServedStopDTO> getStops() {
-		return stops != null ? Collections.unmodifiableList(stops) : null;
+		return stops != null ? Collections.unmodifiableList(stops) : new ArrayList<ServedStopDTO>();
 	}
 
     @Override
     public String toString() {
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 
-        return new StringBuilder("RouteLogDTO: ") //
+        StringBuilder result =  new StringBuilder("RouteLogDTO: ") //
                 .append("{ ") //
                 .append("trainId: " + trainId) //
                 .append(", ") //
-                .append("date: ")
+                .append("date: ") //
                 .append(date != null ? df.format(date) : "N/A") //
-                .append("} ").toString();
+                .append(", ") //
+                .append("stops: [");
+
+        for (ServedStopDTO stop : getStops()) {
+           result.append(stop.toString());
+        }
+
+        result.append("]} ");
+
+        return result.toString();
     }
 }

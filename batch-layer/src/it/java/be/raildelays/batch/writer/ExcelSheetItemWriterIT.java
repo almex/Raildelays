@@ -22,8 +22,6 @@ import be.raildelays.domain.entities.Train;
 import be.raildelays.domain.xls.ExcelRow;
 import be.raildelays.domain.xls.ExcelRow.Builder;
 
-;
-
 @RunWith(BlockJUnit4ClassRunner.class)
 public class ExcelSheetItemWriterIT {
 
