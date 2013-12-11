@@ -54,6 +54,7 @@
         <property name="delegates">
             <list>
                 <ref bean="excelRowMapperProcessor" />
+                <ref bean="aggregateExpectedTimeProcessor" />
                 <ref bean="validatorProcessor" />
                 <ref bean="filterTwoSensPerDayProcessor" />
                 <!-- ref bean="dispatchProcessor" /-->
@@ -65,6 +66,10 @@
 		<property name="stationA" value="#{jobParameters['station.a.name']}" />
 		<property name="stationB" value="#{jobParameters['station.b.name']}" />
 	</bean>
+	
+	<bean id="aggregateExpectedTimeProcessor" class="be.raildelays.batch.processor.AggregateExpectedTimeProcessor"
+          scope="step">
+    </bean>
 	
 	<bean id="validatorProcessor" class="org.springframework.batch.item.validator.ValidatingItemProcessor">
 	    <property name="validator">
