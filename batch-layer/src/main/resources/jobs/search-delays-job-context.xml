@@ -53,8 +53,8 @@
     <bean id="chainedProcessorsForDelays" class="org.springframework.batch.item.support.CompositeItemProcessor">
         <property name="delegates">
             <list>
-                <ref bean="excelRowMapperProcessor" />
                 <ref bean="aggregateExpectedTimeProcessor" />
+                <ref bean="excelRowMapperProcessor" />
                 <ref bean="validatorProcessor" />
                 <ref bean="filterTwoSensPerDayProcessor" />
                 <!-- ref bean="dispatchProcessor" /-->

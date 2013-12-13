@@ -47,8 +47,10 @@
 		<version.spring>3.2.4.RELEASE</version.spring>
 		<version.spring.batch>2.2.3.RELEASE</version.spring.batch>
 		<version.spring.data>1.3.2.RELEASE</version.spring.data>
+		<version.spring.data.rest>1.0.0.RELEASE</version.spring.data.rest>
 		<version.hibernate>4.2.5.Final</version.hibernate>
 		<version.hibernate.validator>5.0.1.Final</version.hibernate.validator>
+		<version.spring.boot>0.5.0.M1</version.spring.boot>
 		<version.validation.api>1.1.0.Final</version.validation.api>
 		<version.javax.el-api>2.2.4</version.javax.el-api>
 		<version.hsqldb>2.3.0</version.hsqldb>
@@ -317,6 +319,11 @@
 				<version>${version.spring}</version>
 			</dependency>
 			<dependency>
+			    <groupId>org.springframework.data</groupId>
+			    <artifactId>spring-data-rest-webmvc</artifactId>
+			    <version>${version.spring.data.rest}</version>
+			</dependency>
+			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-beans</artifactId>
 				<version>${version.spring}</version>
@@ -355,6 +362,12 @@
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-test</artifactId>
 				<version>${version.spring}</version>
+			</dependency>
+			<dependencies>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-web</artifactId>
+				<version>${version.spring.boot}</version>
 			</dependency>
 
 			<!-- Batch -->
