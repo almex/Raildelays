@@ -67,8 +67,8 @@
 		<version.dbunit>2.4.9</version.dbunit>
 		<version.jodatime>2.3</version.jodatime>
 		<jdk.version>1.7</jdk.version>
-        <forkCount>0</forkCount>
-        <reuseForks>false</reuseForks>
+        <forkCount>1</forkCount>
+        <reuseForks>true</reuseForks>
 	</properties>
 
 	<dependencyManagement>
@@ -766,6 +766,17 @@
 				<plugins>
 					<plugin>
 						<artifactId>maven-surefire-plugin</artifactId>
+                        <!-- To support unit tests tracking with Sonar -->
+                        <configuration>
+                            <forkCount>${forkCount}</forkCount>
+                            <reuseForks>${reuseForks}</reuseForks>
+                            <properties>
+                                <property>
+                                    <name>listener</name>
+                                    <value>org.sonar.java.jacoco.JUnitListener</value>
+                                </property>
+                            </properties>
+                        </configuration>
 						<executions>
 							<execution>
 								<id>default-test</id>
@@ -777,20 +788,9 @@
 									<skip>false</skip>
 									<argLine>${coverage.test.argLine} -Xmx256m -Xms128m
 										-XX:MaxPermSize=128m -XX:PermSize=64m</argLine>
-                                    <forkCount>${forkCount}</forkCount>
-                                    <reuseForks>${reuseForks}</reuseForks>
 								</configuration>
 							</execution>
 						</executions>
-						<!-- To support unit tests tracking with Sonar -->
-						<configuration>
-							<properties>
-								<property>
-									<name>listener</name>
-									<value>org.sonar.java.jacoco.JUnitListener</value>
-								</property>
-							</properties>
-						</configuration>
 					</plugin>
 
 					<plugin>
