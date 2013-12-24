@@ -29,18 +29,20 @@
 			<property name="javax.persistence.jdbc.url" value="jdbc:derby:data/raildelays;create=true" />
 			<property name="javax.persistence.jdbc.user" value="" />
 			<property name="javax.persistence.jdbc.password" value="" />
+            <property name="javax.persistence.schema-generation.database.action" value="create" />
+            <property name="javax.persistence.schema-generation.create-source" value="metadata" />
 			<!-- OpenJPA specific -->
-			<property name="openjpa.jdbc.DBDictionary" value="DERBY"/>
-			<property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(ForeignKeys=true)"/>
-			<!-- Hibernate specific -->
-			<property name="hibernate.dialect" value="org.hibernate.dialect.DerbyTenSevenDialect" />
-			<property name="hibernate.show_sql" value="true" />
-			<property name="hibernate.format_sql" value="true" />
-			<property name="hibernate.hbm2ddl.auto" value="update" />
-			<!-- Eclipse-link specific -->
-			<property name="eclipselink.ddl-generation" value="create-tables" />
-            <property name="eclipselink.ddl-generation.output-mode" value="database" />
-            <property name="eclipselink.weaving" value="false"/>
+			<!--<property name="openjpa.jdbc.DBDictionary" value="DERBY"/>-->
+			<!--<property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(ForeignKeys=true)"/>-->
+			<!--&lt;!&ndash; Hibernate specific &ndash;&gt;-->
+			<!--<property name="hibernate.dialect" value="org.hibernate.dialect.DerbyTenSevenDialect" />-->
+			<!--<property name="hibernate.show_sql" value="true" />-->
+			<!--<property name="hibernate.format_sql" value="true" />-->
+			<!--<property name="hibernate.hbm2ddl.auto" value="update" />-->
+			<!--&lt;!&ndash; Eclipse-link specific &ndash;&gt;-->
+			<!--<property name="eclipselink.ddl-generation" value="create-tables" />-->
+            <!--<property name="eclipselink.ddl-generation.output-mode" value="database" />-->
+            <!--<property name="eclipselink.weaving" value="false"/>-->
 		</properties>
 
 	</persistence-unit>

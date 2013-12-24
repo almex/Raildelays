@@ -13,13 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.repository.StationDao;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {
-		"classpath:spring/repository/raildelays-repository-integration-test-context.xml",
-		"classpath:spring/test/raildelays-tx-context.xml" })
-@Transactional
-@TransactionConfiguration(defaultRollback = true)
-public class StationJpaDaoIT {
+public class StationJpaDaoIT extends AbstractIT {
 
 	@Resource
 	private StationDao stationDao;

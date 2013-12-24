@@ -71,7 +71,7 @@
 	        <appender-ref ref="springbatch" />
 	    </logger>
 	    
-		<root level="error">
+		<root level="debug">
 			<appender-ref ref="console" />
 		</root>
 	</loggers>

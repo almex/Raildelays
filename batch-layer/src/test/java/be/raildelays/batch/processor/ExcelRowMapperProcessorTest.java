@@ -43,7 +43,7 @@ public class ExcelRowMapperProcessorTest {
 		TimestampDelay arrivalTime;
 		TimestampDelay departureTime;
 
-		arrivalTime = new TimestampDelay(f.parse("12:00"), 5L);
+		/*arrivalTime = new TimestampDelay(f.parse("12:00"), 5L);
 		departureTime = new TimestampDelay(f.parse("12:05"), 5L);
 		LineStop stop1 = new LineStop.Builder().date(today)
 				.train(new Train("466")).station(new Station("station1"))
@@ -72,22 +72,52 @@ public class ExcelRowMapperProcessorTest {
 		new LineStop.Builder().date(today).train(new Train("466"))
 				.station(new Station("station3")).arrivalTime(arrivalTime)
 				.departureTime(departureTime).canceled(false)
-				.addPrevious(stopB).build();
+				.addPrevious(stopB).build();*/
+        arrivalTime = new TimestampDelay(f.parse("12:00"), 5L);
+		departureTime = new TimestampDelay(f.parse("12:05"), 5L);
+        LineStop.Builder builder = new LineStop.Builder().date(today)
+				.train(new Train("466")).station(new Station("station1"))
+				.arrivalTime(arrivalTime).departureTime(departureTime)
+				.canceled(false);
+		arrivalTime = new TimestampDelay(f.parse("12:20"), 10L);
+		departureTime = new TimestampDelay(f.parse("12:25"), 10L);
+        builder.addNext(new LineStop.Builder().date(today)
+                .train(new Train("466")).station(new Station("stationA"))
+                .arrivalTime(arrivalTime).departureTime(departureTime)
+                .canceled(false));
+		arrivalTime = new TimestampDelay(f.parse("12:45"), 15L);
+		departureTime = new TimestampDelay(f.parse("12:50"), 15L);
+        builder.addNext(new LineStop.Builder().date(today)
+				.train(new Train("466")).station(new Station("station2"))
+				.arrivalTime(arrivalTime).departureTime(departureTime)
+				.canceled(false));
+		arrivalTime = new TimestampDelay(f.parse("12:55"), 20L);
+		departureTime = new TimestampDelay(f.parse("13:00"), 20L);
+        builder.addNext(new LineStop.Builder().date(today)
+				.train(new Train("466")).station(new Station("stationB"))
+				.arrivalTime(arrivalTime).departureTime(departureTime)
+				.canceled(false));
+		arrivalTime = new TimestampDelay(f.parse("13:45"), 25L);
+		departureTime = null;
+        builder.addNext(new LineStop.Builder().date(today).train(new Train("466"))
+                .station(new Station("station3")).arrivalTime(arrivalTime)
+                .departureTime(departureTime)
+                .canceled(false));
 
+        LineStop lineStop = builder.build();
+        
 		fromA = new ArrayList<>();
-		fromA.add(stopA);
+		fromA.add(lineStop.getNext());  // stationA
 
 		fromB = new ArrayList<>();
-		fromB.add(stopB);
+		fromB.add(lineStop.getNext().getNext().getNext()); // stationB
 
-		fromA.add(stopA);
 		processor = new ExcelRowMapperProcessor();
 		processor.setStationA("stationA");
 		processor.setStationB("stationB");
 	}
 
 	@Test
-	@Ignore
 	public void testProcessFromA() throws Exception {
 		List<BatchExcelRow> excelRows = processor.process(fromA);
 		SimpleDateFormat formater = new SimpleDateFormat("HH:mm");

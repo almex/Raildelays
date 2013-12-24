@@ -351,9 +351,9 @@ public class ExcelRow {
 		builder.append(" ");
 		builder.append(notNullToString(linkStation));
 		builder.append(" ");
-		builder.append(tf.format(expectedDepartureTime));
+		builder.append(expectedDepartureTime != null ? tf.format(expectedDepartureTime) : "N/A");
 		builder.append(" ");
-		builder.append(tf.format(expectedArrivalTime));
+		builder.append(expectedArrivalTime != null ? tf.format(expectedArrivalTime) : "N/A");
 		builder.append(" ");
 		builder.append(notNullToString(expectedTrain1));
 		builder.append(" ");

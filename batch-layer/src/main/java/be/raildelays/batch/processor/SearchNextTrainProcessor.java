@@ -164,19 +164,39 @@ public class SearchNextTrainProcessor implements
 	}
 	
 	public static long compareTime(TimestampDelay departureA, Date departureB) {
-		LocalTime localTimeA = new LocalTime(departureA.getExpected());
-		LocalTime localTimeB = new LocalTime(departureB.getTime());		
-		Duration duration = new Duration(localTimeB.toDateTimeToday(), localTimeA.toDateTimeToday());
-		
-		return duration.getMillis();
+        long result = 0;
+
+        if (departureA == null && departureB != null) {
+            result = -1;
+        } else if (departureA != null && departureB == null) {
+            result = 1;
+        } else {
+            LocalTime localTimeA = new LocalTime(departureA.getExpected());
+            LocalTime localTimeB = new LocalTime(departureB.getTime());
+            Duration duration = new Duration(localTimeB.toDateTimeToday(), localTimeA.toDateTimeToday());
+
+            result = duration.getMillis();
+        }
+
+        return result;
 	}
 
 	public static long compareTimeAndDelay(TimestampDelay departureA, Date departureB) {
-		LocalTime localTimeA = new LocalTime(departureA.getExpected()).plusMinutes(departureA.getDelay().intValue());
-		LocalTime localTimeB = new LocalTime(departureB.getTime());		
-		Duration duration = new Duration(localTimeB.toDateTimeToday(), localTimeA.toDateTimeToday());
-		
-		return duration.getMillis();
+        long result = 0;
+
+        if (departureA == null && departureB != null) {
+            result = -1;
+        } else if (departureA != null && departureB == null) {
+            result = 1;
+        } else {
+            LocalTime localTimeA = new LocalTime(departureA.getExpected()).plusMinutes(departureA.getDelay().intValue());
+            LocalTime localTimeB = new LocalTime(departureB.getTime());
+            Duration duration = new Duration(localTimeB.toDateTimeToday(), localTimeA.toDateTimeToday());
+
+            result = duration.getMillis();
+        }
+
+        return result;
 	}
 
 	public void setService(RaildelaysService service) {

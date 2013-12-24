@@ -27,6 +27,7 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<List<LineSt
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(AggregateExpectedTimeProcessor.class);
+
     @Resource
     private RaildelaysService service;
 
@@ -45,10 +46,8 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<List<LineSt
         return result;
     }
 
-    public LineStop process(LineStop item) throws Exception {
+    public LineStop.Builder fetchScheduling(LineStop item) throws Exception {
         LineStop.Builder result = new LineStop.Builder(item);
-
-        result = new LineStop.Builder(item);
 
         if (item.getArrivalTime() == null || item.getArrivalTime().getExpected() == null ||
                 item.getDepartureTime() == null || item.getDepartureTime().getExpected() == null) {
@@ -67,16 +66,31 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<List<LineSt
                     .arrivalTime(new TimestampDelay(line.getArrivalTime().getExpected(), 0L));
         }
 
-        if (item.getNext() != null) {
-            result.addNext(process(item.getNext()));
+        return result;
+    }
+
+    public LineStop process(LineStop item) throws Exception {
+        LineStop result = null;
+        LineStop.Builder builder = fetchScheduling(item);
+
+        //-- Modify backward
+        LineStop previous = item.getPrevious();
+        while (previous != null) {
+            builder.addPrevious(fetchScheduling(previous));
+            previous = previous.getPrevious();
         }
 
-        if (item.getPrevious() != null) {
-            result.addPrevious(process(item.getPrevious()));
+        //-- Modify forward
+        LineStop next = item.getNext();
+        while (next != null) {
+            builder.addNext(fetchScheduling(next));
+            next = next.getNext();
         }
+
+        result = builder.build();
 
         LOGGER.debug("LineStop after processing={}", result);
 
-        return result.build();
+        return result;
     }
 }

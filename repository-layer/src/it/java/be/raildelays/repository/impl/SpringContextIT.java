@@ -6,10 +6,7 @@ import org.junit.Test;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
-@ContextConfiguration(locations = {
-		"classpath:spring/repository/components/raildelays-db-context.xml",
-		"classpath:spring/repository/components/raildelays-dao-context.xml" })
-public class SpringContextIT extends AbstractJUnit4SpringContextTests {
+public class SpringContextIT extends AbstractIT {
 
 	@Test
 	public void testLoading() {

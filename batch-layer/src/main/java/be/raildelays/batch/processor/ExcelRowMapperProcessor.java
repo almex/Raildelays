@@ -88,13 +88,10 @@ public class ExcelRowMapperProcessor implements
 				sens = Sens.ARRIVAL;
 			}
 
-			// We filters row a minimum delay of 15 minutes
-			if (arrival.getArrivalTime().getDelay() >= DELAY_THRESHOLD) {
-				BatchExcelRow excelRow = map(departure, arrival, sens);
+            BatchExcelRow excelRow = map(departure, arrival, sens);
 
-				result.add(excelRow);
-				LOGGER.trace("excelRow={} arrival={}", excelRow);
-			}
+            result.add(excelRow);
+            LOGGER.trace("excelRow={}", excelRow);
 		}
 
 		return result;

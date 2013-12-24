@@ -13,11 +13,8 @@
 	<batch:job id="parentJob" abstract="true">
 		<batch:listeners merge="true">
 		  <!--<batch:listener ref="processShutdownListener" />-->
-            <batch:listener ref="skippedItemsListener" />
 		</batch:listeners>
 	</batch:job>
 
 	<bean id="processShutdownListener" class="be.raildelays.batch.listener.ProcessShutdownListener" />
-
-    <bean id="skippedItemsListener" class="be.raildelays.batch.listener.LogSkippedItemListener" />
 </beans>

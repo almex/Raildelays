@@ -28,17 +28,8 @@ import com.excilys.ebi.spring.dbunit.config.DBOperation;
 import com.excilys.ebi.spring.dbunit.test.DataSet;
 import com.excilys.ebi.spring.dbunit.test.RollbackTransactionalDataSetTestExecutionListener;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {
-		"classpath:spring/repository/raildelays-repository-integration-test-context.xml",
-		"classpath:spring/test/raildelays-tx-context.xml" })
-@TransactionConfiguration
-@Transactional
-@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
-		TransactionalTestExecutionListener.class,
-		RollbackTransactionalDataSetTestExecutionListener.class })
 @DataSet(value = "classpath:FindNextExpectedArrivalTimeIT.xml", tearDownOperation = DBOperation.DELETE_ALL)
-public class FindNextExpectedArrivalTimeIT {
+public class FindNextExpectedArrivalTimeIT extends AbstractIT {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(FindNextExpectedArrivalTimeIT.class);

@@ -23,13 +23,7 @@ import be.raildelays.repository.LineStopDao;
 import be.raildelays.repository.RailtimeTrainDao;
 import be.raildelays.repository.TrainDao;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {
-		"classpath:spring/repository/raildelays-repository-integration-test-context.xml",
-		"classpath:spring/test/raildelays-tx-context.xml" })
-@Transactional
-@TransactionConfiguration(defaultRollback = true)
-public class LineStopJpaDaoIT {
+public class LineStopJpaDaoIT extends AbstractIT {
 
 	@Resource
 	private LineStopDao lineStopDao;

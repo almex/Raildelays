@@ -35,7 +35,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Entity
 @Table(name = "LINE_STOP", uniqueConstraints = @UniqueConstraint(columnNames = {
 		"TRAIN_ID", "DATE", "STATION_ID" }))
-//@NamedQueries({ @NamedQuery(name = "LineStop.findByTrain", query = "select o from LineStop o where o.train.railtimeId = ?1 and o.departureTime.expected >= ?2 and o.departureTime.expected <= ?3") })
 public class LineStop implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 7142886242889314414L;
@@ -48,38 +47,38 @@ public class LineStop implements Serializable, Cloneable {
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "TRAIN_ID")
 	@NotNull
-	protected final Train train;
+	protected Train train;
 
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "STATION_ID")
 	@NotNull
-	protected final Station station;
+	protected Station station;
 
 	@Column(name = "CANCELED")
-	protected final boolean canceled;
+	protected boolean canceled;
 
 	@Temporal(TemporalType.DATE)
 	@Column(name = "DATE")
 	@NotNull
-	protected final Date date;
+	protected Date date;
 
 	@Embedded
 	@AttributeOverrides({
 			@AttributeOverride(column = @Column(name = "ARRIVAL_TIME_EXPECTED"), name = "expected"),
 			@AttributeOverride(column = @Column(name = "ARRIVAL_TIME_DELAY"), name = "delay") })
-	protected final TimestampDelay arrivalTime;
+	protected TimestampDelay arrivalTime;
 
-	@Embedded
+    @Embedded
 	@AttributeOverrides({
 			@AttributeOverride(column = @Column(name = "DEPARTURE_TIME_EXPECTED"), name = "expected"),
 			@AttributeOverride(column = @Column(name = "DEPARTURE_TIME_DELAY"), name = "delay") })
-	protected final TimestampDelay departureTime;
+	protected TimestampDelay departureTime;
 
-	@OneToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER, optional = true)
+    @OneToOne(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "PREVIOUS_ID")
 	protected LineStop previous;
 
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional = true)
+	@OneToOne(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "NEXT_ID")
 	protected LineStop next;
 	
@@ -91,6 +90,8 @@ public class LineStop implements Serializable, Cloneable {
 		this.arrivalTime = null;
 		this.departureTime = null;
 		this.canceled = false;
+        this.previous = null;
+        this.next = null;
 	}
 	
 	private LineStop(LineStop lineStop) {		
@@ -113,29 +114,6 @@ public class LineStop implements Serializable, Cloneable {
 		this.canceled = builder.canceled;
 	}
 
-//	public LineStop(final Date date, final Train train, final Station station,
-//			final TimestampDelay arrivalTime, final TimestampDelay departureTime,
-//			final boolean canceled, final LineStop previous) {
-//		this.id = null;
-//		this.train = train;
-//		this.station = station;
-//		this.arrivalTime = arrivalTime;
-//		this.departureTime = departureTime;
-//		this.canceled = canceled;
-//		this.date = (Date) (date != null ? date.clone() : null);
-//		if (previous != null) {
-//			previous.next = this;
-//		}
-//		this.previous = previous;
-//		this.next = null;
-//	}
-//
-//	public LineStop(final Date date, final Train train, final Station station,
-//			final TimestampDelay arrivalTime, final TimestampDelay departureTime,
-//			final boolean canceled) {
-//		this(date, train, station, arrivalTime, departureTime, canceled, null);
-//	}
-
 	@Override
 	public String toString() {
 		return new StringBuilder("LineStop: ")
@@ -154,6 +132,8 @@ public class LineStop implements Serializable, Cloneable {
 				.append("arrivalTime: {").append(arrivalTime).append("}, ") //
 				.append("departureTime: {").append(departureTime).append("}, ") //
 				.append("canceled: " + canceled + " ") //
+                .append("next: " + (next != null ? next.getId() : "N/A") + " ") //
+                .append("previous: " + (previous != null ? previous.getId() : "N/A") + " ") //
 				.append("} ").toString();
 	}
 
@@ -220,6 +200,11 @@ public class LineStop implements Serializable, Cloneable {
 				.append(date) //
 				.toHashCode();
 	}
+
+    @Override
+    public LineStop clone() {
+        return new Builder(this).build();
+    }
 	
 	public static class Builder {
 		private Long id;
@@ -231,9 +216,11 @@ public class LineStop implements Serializable, Cloneable {
 		private TimestampDelay departureTime;
 		private Builder previous;
 		private Builder next;
+
+        private LineStop singleton;
 		
 		public Builder() {
-			
+            singleton = null;
 		}
 		
 		public Builder(LineStop lineStop) {
@@ -247,9 +234,9 @@ public class LineStop implements Serializable, Cloneable {
 			
 			//-- Copy backward
 			LineStop previousLineStop = lineStop.previous;
-			Builder previousBuilder = this;
+			Builder backwardBuilder = this;
 			while (previousLineStop != null) {
-				previousBuilder.previous = new Builder()
+				backwardBuilder.previous = new Builder()
 								.id(previousLineStop.id)
 								.date(previousLineStop.date)
 								.train(previousLineStop.train)
@@ -257,17 +244,17 @@ public class LineStop implements Serializable, Cloneable {
 								.arrivalTime(previousLineStop.arrivalTime)
 								.departureTime(previousLineStop.departureTime)
 								.canceled(previousLineStop.canceled)
-								.addNext(previousBuilder);
+								.addNext(backwardBuilder);
 				
-				previousBuilder = previousBuilder.previous;
+				backwardBuilder = backwardBuilder.previous;
 				previousLineStop = previousLineStop.previous;
 			}
 			
 			//-- Copy forward
 			LineStop nextLineStop = lineStop.next;
-			Builder nextBuilder = this;
+			Builder forwardBuilder = this;
 			while (nextLineStop != null) {
-				nextBuilder.next = new Builder()
+				forwardBuilder.next = new Builder()
 								.id(nextLineStop.id)
 								.date(nextLineStop.date)
 								.train(nextLineStop.train)
@@ -275,9 +262,9 @@ public class LineStop implements Serializable, Cloneable {
 								.arrivalTime(nextLineStop.arrivalTime)
 								.departureTime(nextLineStop.departureTime)
 								.canceled(nextLineStop.canceled)
-								.addPrevious(nextBuilder);
+								.addPrevious(forwardBuilder);
 				
-				nextBuilder = nextBuilder.next;
+				forwardBuilder = forwardBuilder.next;
 				nextLineStop = nextLineStop.next;
 			}
 		}
@@ -327,7 +314,7 @@ public class LineStop implements Serializable, Cloneable {
 		
 		public Builder addNext(Builder next) {
 			if (next != null) {
-				tail(this, next);
+				head(this, next);
 			}
 			
 			return this;
@@ -335,7 +322,7 @@ public class LineStop implements Serializable, Cloneable {
 		
 		public Builder addNext(LineStop next) {
 			if (next != null) {
-				tail(this, new Builder(next));
+				head(this, new Builder(next));
 			}
 			
 			return this;
@@ -345,18 +332,19 @@ public class LineStop implements Serializable, Cloneable {
 			return next;
 		}
 		
-		private static void tail(Builder node, Builder tail) {
+		private static void head(Builder node, Builder head) {
 			if (node.next == null) {
-				node.next = tail;
-				tail.previous = node;
+				node.next = head;
+				head.previous = node;
+                head.next = null;
 			} else {
-				tail(node.next, tail);
+				head(node.next, head);
 			}
 		}
 		
 		public Builder addPrevious(Builder previous) {
 			if  (previous != null) {
-				head(this , previous);
+				tail(this, previous);
 			}
 			
 			return this;
@@ -364,7 +352,7 @@ public class LineStop implements Serializable, Cloneable {
 		
 		public Builder addPrevious(LineStop previous) {
 			if (previous != null) {
-				head(this, new Builder(previous));
+				tail(this, new Builder(previous));
 			}
 			
 			return this;
@@ -374,43 +362,55 @@ public class LineStop implements Serializable, Cloneable {
 			return previous;
 		}
 		
-		private static void head(Builder node, Builder head) {			
+		private static void tail(Builder node, Builder tail) {
 			if (node.previous == null) {
-				node.previous = head;
-				head.next = node;
+				node.previous = tail;
+				tail.next = node;
+                tail.previous = null;
 			} else {
-				head(node.previous, head);
+				tail(node.previous, tail);
 			}
 		}
 		
 		public LineStop build() {
-			LineStop result = new LineStop(this);
-			
-			//-- Copy backward
-			LineStop previousLineStop = result;
-			Builder previousBuilder = this.previous;
-			while (previousBuilder != null) {
-				previousLineStop.previous = new LineStop(previousBuilder);
-				previousLineStop.previous.next = previousLineStop;
-				
-				previousBuilder = previousBuilder.previous;
-				previousLineStop = previousLineStop.previous;
-			}
-			
-			//-- Copy forward
-			LineStop nextLineStop = result;
-			Builder nextBuilder = this.next;
-			while (nextBuilder != null) {
-				nextLineStop.next = new LineStop(nextBuilder);
-				nextLineStop.next.previous = nextLineStop;
-				
-				nextBuilder = nextBuilder.next;
-				nextLineStop = nextLineStop.next;
-			}
-			
-			return result; 
+			LineStop result = null;
+
+            if (singleton == null) {
+                result = singleton = new LineStop(this);
+
+                //-- Copy backward
+                LineStop backwardLineStop = result;
+                Builder previousBuilder = this.previous;
+                while (previousBuilder != null) {
+                    backwardLineStop.previous = new LineStop(previousBuilder);
+                    backwardLineStop.previous.next = backwardLineStop;
+
+                    previousBuilder = previousBuilder.previous;
+                    backwardLineStop = backwardLineStop.previous;
+                }
+
+                //-- Copy forward
+                LineStop forwardLineStop = result;
+                Builder nextBuilder = this.next;
+                while (nextBuilder != null) {
+                    forwardLineStop.next = new LineStop(nextBuilder);
+                    forwardLineStop.next.previous = forwardLineStop;
+
+                    nextBuilder = nextBuilder.next;
+                    forwardLineStop = forwardLineStop.next;
+                }
+            } else {
+                result = singleton;
+            }
+
+            return result;
 		}
-	}
+
+        @Override
+        public String toString() {
+            return build().toString();
+        }
+    }
 
 	public Long getId() {
 		return id;
@@ -440,23 +440,6 @@ public class LineStop implements Serializable, Cloneable {
 		return canceled;
 	}
 
-	@Override
-	protected LineStop clone() {
-		LineStop result = new LineStop(this);
-		
-		if (this.next != null) {
-			result.next = this.next.clone();
-			result.next.previous = result;
-		}
-		
-		if (this.previous != null) {
-			result.previous = this.previous.clone();
-			result.previous.next = result;
-		}
-		
-		return result;
-	}
-
 	public LineStop getPrevious() {
 		return previous;
 	}
@@ -464,5 +447,43 @@ public class LineStop implements Serializable, Cloneable {
 	public LineStop getNext() {
 		return next;
 	}
+
+    public void setPrevious(LineStop previous) {
+        if (previous != null) {
+            previous.next = this;
+        }
+        this.previous = previous;
+    }
+
+    public void setNext(LineStop next) {
+        if (next != null) {
+            next.previous = this;
+        }
+        this.next = next;
+    }
+
+    public void setTrain(Train train) {
+        this.train = train;
+    }
+
+    public void setStation(Station station) {
+        this.station = station;
+    }
+
+    public void setCanceled(boolean canceled) {
+        this.canceled = canceled;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public void setArrivalTime(TimestampDelay arrivalTime) {
+        this.arrivalTime = arrivalTime;
+    }
+
+    public void setDepartureTime(TimestampDelay departureTime) {
+        this.departureTime = departureTime;
+    }
 
 }

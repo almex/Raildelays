@@ -21,7 +21,6 @@ import be.raildelays.domain.entities.RailtimeTrain;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.TimestampDelay;
 import be.raildelays.domain.entities.Train;
-import be.raildelays.domain.entities.LineStop.Builder;
 import be.raildelays.repository.LineStopDao;
 import be.raildelays.repository.RailtimeTrainDao;
 import be.raildelays.repository.StationDao;
@@ -29,264 +28,294 @@ import be.raildelays.repository.TrainDao;
 import be.raildelays.service.RaildelaysService;
 
 /**
- * 
  * We match Train by Railtime id.<br/>
  * We match Station by English name.<br/>
  * We retrieve {@link LineStop} to check if they already exist before doing a
  * request.
- * 
+ *
  * @author Almex.
  */
 @Service(value = "raildelaysService")
 public class RaildelaysServiceImpl implements RaildelaysService {
 
-	@Resource
-	private LineStopDao lineStopDao;
+    @Resource
+    private LineStopDao lineStopDao;
 
-	@Resource
-	private RailtimeTrainDao railtimeTrainDao;
+    @Resource
+    private RailtimeTrainDao railtimeTrainDao;
 
-	@Resource
-	private TrainDao trainDao;
+    @Resource
+    private TrainDao trainDao;
 
-	@Resource
-	private StationDao stationDao;
+    @Resource
+    private StationDao stationDao;
 
-	@Resource
-	private Mapper mapper;
+    @Resource
+    private Mapper mapper;
 
-	@Resource
-	private Validator validator;
+    @Resource
+    private Validator validator;
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(RaildelaysServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(RaildelaysServiceImpl.class);
 
-	@Override
-	@Transactional
-	public List<LineStop> saveRouteLog(final RouteLogDTO routeLog) {
-		LOGGER.debug("Saving route log for train={} and date={}...",
-				routeLog.getTrainId(), routeLog.getDate());
+    @Override
+    @Transactional
+    public List<LineStop> saveRouteLog(final RouteLogDTO routeLog) {
+        LOGGER.debug("Saving route log for train={} and date={}...",
+                routeLog.getTrainId(), routeLog.getDate());
 
-		// -- Validate our inputs
-		validator.validate(routeLog);
+        // -- Validate our inputs
+        validator.validate(routeLog);
 
-		return persist(routeLog.getDate(), routeLog.getTrainId(),
-				routeLog.getStops());
-	}
+        return persist(routeLog.getDate(), routeLog.getTrainId(),
+                routeLog.getStops());
+    }
 
-	private List<LineStop> persist(final Date date, final String trainId,
-			List<? extends ServedStopDTO> stops) {
-		List<LineStop> result = new ArrayList<>();
-		LineStop previous = null;
+    private List<LineStop> persist(final Date date, final String trainId,
+                                   List<? extends ServedStopDTO> stops) {
+        List<LineStop> result = new ArrayList<>();
+        LineStop previous = null;
 
-		for (ServedStopDTO stop : stops) {
-			LineStop current = saveServedStop(date, trainId, stop, previous);
+        for (ServedStopDTO stop : stops) {
+            LineStop current = saveServedStop(date, trainId, stop, previous);
 
-			result.add(current);
+            result.add(current);
 
-			// -- We are making the link to keep trace of direction
-			previous = current;
-		}
+            // -- We are making the link to keep trace of direction
+            previous = current;
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	private LineStop saveServedStop(final Date date, final String trainId,
-			final ServedStopDTO stop, final LineStop previous) {
+    private LineStop saveServedStop(final Date date, final String trainId,
+                                    final ServedStopDTO stop, final LineStop previous) {
 
-		LOGGER.debug("Saving timetable for train={}, date={} and stop={}...",
-				new Object[] { trainId, date, stop });
+        LOGGER.debug("Saving timetable for train={}, date={} and stop={}...",
+                new Object[]{trainId, date, stop});
 
-		// -- Validate our inputs
-		Assert.notNull(date, "You should provide a date for this served stop");
-		Assert.hasText(trainId,
-				"You should provide a train id for this served stop");
-		validator.validate(stop);
+        // -- Validate our inputs
+        Assert.notNull(date, "You should provide a date for this served stop");
+        Assert.hasText(trainId,
+                "You should provide a train id for this served stop");
+        validator.validate(stop);
 
-		// -- Retrieve persisted version of sub-entities to avoid duplicate key
-		RailtimeTrain persistedTrain = saveOrRetrieveRailtimeTrain(new RailtimeTrain(
-				trainId, trainId));
-		Station persistedStation = saveOrRetrieveStation(new Station(
-				stop.getStationName()));
-		TimestampDelay arrivalTime = new TimestampDelay(stop.getArrivalTime(),
-				stop.getArrivalDelay());
-		TimestampDelay departureTime = new TimestampDelay(
-				stop.getDepartureTime(), stop.getDepartureDelay());
-		LineStop lineStop = new LineStop.Builder() //
-				.date(date) //
-				.station(persistedStation) //
-				.train(persistedTrain) //
-				.arrivalTime(arrivalTime) //
-				.departureTime(departureTime) //
-				.canceled(stop.isCanceled()) //
-				.addPrevious(previous) //
-				.build();
+        // -- Retrieve persisted version of sub-entities to avoid duplicate key
+        RailtimeTrain persistedTrain = saveOrRetrieveRailtimeTrain(new RailtimeTrain(
+                trainId, trainId));
+        Station persistedStation = saveOrRetrieveStation(new Station(
+                stop.getStationName()));
+        TimestampDelay arrivalTime = new TimestampDelay(stop.getArrivalTime(),
+                stop.getArrivalDelay());
+        TimestampDelay departureTime = new TimestampDelay(
+                stop.getDepartureTime(), stop.getDepartureDelay());
+        LineStop lineStop = new LineStop.Builder() //
+                .date(date) //
+                .station(persistedStation) //
+                .train(persistedTrain) //
+                .arrivalTime(arrivalTime) //
+                .departureTime(departureTime) //
+                .canceled(stop.isCanceled()) //
+                .addPrevious(previous) //
+                .build();
 
-		// -- Validate our output
-		validator.validate(lineStop);
+        // -- Validate our output
+        validator.validate(lineStop);
 
-		return lineStopDao.save(createOrUpdate(lineStop));
-	}
+        return createOrUpdate(lineStop);
+    }
 
-	private LineStop createOrUpdate(LineStop lineStop) {
-		LineStop result = null;
-		Train train = saveOrRetrieveTrain(lineStop.getTrain());
-		Station station = saveOrRetrieveStation(lineStop.getStation());
-		LineStop persistedLineStop = lineStopDao.findByTrainAndDateAndStation(
-				train, lineStop.getDate(), station);
+    private LineStop createOrUpdate(LineStop lineStop) {
+        Train train = saveOrRetrieveTrain(lineStop.getTrain());
+        Station station = saveOrRetrieveStation(lineStop.getStation());
+        LineStop persistedLineStop = lineStopDao.findByTrainAndDateAndStation(
+                train, lineStop.getDate(), station);
 
-		if (persistedLineStop != null) {
-			LOGGER.debug("We update a LineStop={}.", persistedLineStop);
+        if (persistedLineStop != null) {
+            persistedLineStop.setDepartureTime(lineStop.getDepartureTime());
+            persistedLineStop.setArrivalTime(lineStop.getArrivalTime());
+            persistedLineStop.setCanceled(lineStop.isCanceled());
+            persistedLineStop.setDate(lineStop.getDate());
+            persistedLineStop.setStation(station);
+            persistedLineStop.setTrain(train);
 
-			mapper.map(lineStop, persistedLineStop);
-			result = persistedLineStop;
-		} else {
-			LOGGER.debug("We create a new LineStop.");
+            LOGGER.debug("We update a LineStop={}.", persistedLineStop);
+        } else {
+            persistedLineStop = lineStop.clone();
+            persistedLineStop.setStation(station);
+            persistedLineStop.setTrain(train);
 
-			result = lineStop;
-		}
+            LOGGER.debug("We create a new LineStop={}.", persistedLineStop);
+        }
 
-		return result;
-	}
+        //-- Update previous reference key
+        if (lineStop.getPrevious() != null && lineStop.getPrevious().getId() != null) {
+            LineStop previous = lineStopDao.findOne(lineStop.getPrevious().getId());
 
-	@Override
-	@Transactional(readOnly = true)
-	public List<LineStop> searchDelaysBetween(Date date, Station stationA,
-			Station stationB, int delayThreshold) {
-		List<LineStop> result = new ArrayList<LineStop>();
+            previous.setNext(persistedLineStop);
 
-		LOGGER.info(
-				"Searching line stops for date={} stationA={} stationB={} delayThreshold={}",
-				new Object[] { date, stationA, stationB, delayThreshold });
+            LOGGER.debug("We go to previous LineStop={}.", previous);
+        }
 
-		result.addAll(lineStopDao.findArrivalDelays(date, stationA,
-				delayThreshold));
+        //-- Update next reference key
+        if (lineStop.getNext() != null && lineStop.getNext().getId() != null) {
+            LineStop next = lineStopDao.findOne(lineStop.getNext().getId());
 
-		LOGGER.debug("Retrieved {} line stops from station A", result.size());
+            next.setPrevious(persistedLineStop);
 
-		result.addAll(lineStopDao.findArrivalDelays(date, stationB,
-				delayThreshold));
+            LOGGER.debug("We go to next LineStop={}.", next);
+        }
 
-		LOGGER.debug("Retrieved {} line stops from station A and station B",
-				result.size());
+        return lineStopDao.saveAndFlush(persistedLineStop);
+    }
 
-		LOGGER.trace("Retrieved line stops =", result.toString());
+    @Override
+    @Transactional(readOnly = true)
+    public List<LineStop> searchDelaysBetween(Date date, Station stationA,
+                                              Station stationB, int delayThreshold) {
+        List<LineStop> result = new ArrayList<LineStop>();
 
-		return result;
-	}
+        LOGGER.info(
+                "Searching line stops for date={} stationA={} stationB={} delayThreshold={}",
+                new Object[]{date, stationA, stationB, delayThreshold});
 
-	@Override
-	@Transactional(readOnly = true)
-	public List<Date> searchAllDates(Date from, Date to) {
-		List<Date> result = null;
+        result.addAll(lineStopDao.findArrivalDelays(date, stationA,
+                delayThreshold));
 
-		if (from == null && to == null) {
-			result = lineStopDao.findAllUniqueDates();
-		} else {
-			result = lineStopDao.findAllUniqueDates(from, to);
-		}
+        LOGGER.debug("Retrieved {} line stops from station A", result.size());
 
-		return result;
-	}
+        result.addAll(lineStopDao.findArrivalDelays(date, stationB,
+                delayThreshold));
 
-	@Override
-	@Transactional(readOnly = true)
-	public List<Date> searchAllDates(Date lastDate) {
-		List<Date> result = null;
+        LOGGER.debug("Retrieved {} line stops from station A and station B",
+                result.size());
 
-		if (lastDate == null) {
-			result = lineStopDao.findAllUniqueDates();
-		} else {
-			result = lineStopDao.findAllUniqueDates(lastDate);
-		}
+        LOGGER.trace("Retrieved line stops =", result.toString());
 
-		return result;
-	}
+        return result;
+    }
 
-	private RailtimeTrain saveOrRetrieveRailtimeTrain(RailtimeTrain train) {
-		RailtimeTrain result = null;
-		RailtimeTrain persistedTrain = railtimeTrainDao.findByRailtimeId(train
-				.getRailtimeId());
+    @Override
+    @Transactional(readOnly = true)
+    public List<Date> searchAllDates(Date from, Date to) {
+        List<Date> result = null;
 
-		if (persistedTrain == null) {
-			result = railtimeTrainDao.save(train);
-		} else {
-			result = persistedTrain;
-		}
+        if (from == null && to == null) {
+            result = lineStopDao.findAllUniqueDates();
+        } else {
+            result = lineStopDao.findAllUniqueDates(from, to);
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	private Train saveOrRetrieveTrain(Train train) {
-		Train result = trainDao.findByEnglishName(train.getEnglishName());
+    @Override
+    @Transactional(readOnly = true)
+    public List<Date> searchAllDates(Date lastDate) {
+        List<Date> result = null;
 
-		if (result == null) {
-			result = trainDao.save(train);
-		}
+        if (lastDate == null) {
+            result = lineStopDao.findAllUniqueDates();
+        } else {
+            result = lineStopDao.findAllUniqueDates(lastDate);
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	private Station saveOrRetrieveStation(Station station) {
-		Station result = stationDao.findByEnglishName(station.getEnglishName());
+    private RailtimeTrain saveOrRetrieveRailtimeTrain(RailtimeTrain train) {
+        RailtimeTrain result = null;
+        RailtimeTrain persistedTrain = railtimeTrainDao.findByRailtimeId(train
+                .getRailtimeId());
 
-		if (result == null) {
-			LOGGER.debug("<<<<<<[Saving Station]>>>>>>");
-			result = stationDao.save(new Station(station.getEnglishName()));
-			LOGGER.debug("Station: {}", result);
-		}
+        if (persistedTrain == null) {
+            result = railtimeTrainDao.save(train);
+        } else {
+            result = persistedTrain;
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	public void setValidator(Validator validator) {
-		this.validator = validator;
-	}
+    private Train saveOrRetrieveTrain(Train train) {
+        Train result = trainDao.findByEnglishName(train.getEnglishName());
 
-	@Override
-	@Transactional(readOnly = true)
-	public List<LineStop> searchNextTrain(Station station, Date date) {
-		return lineStopDao.findNextExpectedArrivalTime(station, date);
-	}
+        if (result == null) {
+            result = trainDao.save(train);
+        }
 
-	@Override
-	public LineStop searchScheduledLine(Train train, Station station) {
-		LineStop result = null;
+        return result;
+    }
 
-		LineStop scheduledLineStop = lineStopDao.findFistScheduledLine(train, station);
+    private Station saveOrRetrieveStation(Station station) {
+        Station result = stationDao.findByEnglishName(station.getEnglishName());
 
-		if (scheduledLineStop != null) {
-			result = removeEffectiveInformartion(scheduledLineStop);
-		}
+        if (result == null) {
+            LOGGER.debug("<<<<<<[Saving Station]>>>>>>");
+            result = stationDao.save(new Station(station.getEnglishName()));
+            LOGGER.debug("Station: {}", result);
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	static private LineStop removeEffectiveInformartion(LineStop lineStop) {
-		Builder result = new LineStop.Builder(lineStop) //
-				.arrivalTime(removeDelay(lineStop.getArrivalTime())) //
-				.departureTime(removeDelay(lineStop.getDepartureTime()));
+    public void setValidator(Validator validator) {
+        this.validator = validator;
+    }
 
-		if (lineStop.getNext() != null) {
-			result.addNext(removeEffectiveInformartion(lineStop.getNext()));
-		}
+    @Override
+    @Transactional(readOnly = true)
+    public List<LineStop> searchNextTrain(Station station, Date date) {
+        return lineStopDao.findNextExpectedArrivalTime(station, date);
+    }
 
-		if (lineStop.getPrevious() != null) {
-			result.addPrevious(removeEffectiveInformartion(lineStop
-					.getPrevious()));
-		}
+    @Override
+    public LineStop searchScheduledLine(Train train, Station station) {
+        LineStop result = null;
 
-		return result.build();
-	}
+        LineStop scheduledLineStop = lineStopDao.findFistScheduledLine(train, station);
 
-	static private TimestampDelay removeDelay(TimestampDelay timestamp) {
-		TimestampDelay result = null;
+        if (scheduledLineStop != null) {
+            result = removeEffectiveInformation(scheduledLineStop);
+        }
 
-		if (timestamp != null) {
-			result = new TimestampDelay(timestamp.getExpected(), 0L);
-		}
+        return result;
+    }
 
-		return result;
-	}
+    static private LineStop removeEffectiveInformation(LineStop lineStop) {
+        LineStop result = lineStop;
+
+        result.setArrivalTime(removeDelay(lineStop.getArrivalTime()));
+        result.setDepartureTime(removeDelay(lineStop.getDepartureTime()));
+
+        //-- Modify backward
+        LineStop previous = lineStop.getPrevious();
+        while (previous != null) {
+            previous.setArrivalTime(removeDelay(lineStop.getArrivalTime()));
+            previous.setDepartureTime(removeDelay(lineStop.getDepartureTime()));
+            previous = previous.getPrevious();
+        }
+
+        //-- Modify forward
+        LineStop next = lineStop.getNext();
+        while (next != null) {
+            next.setArrivalTime(removeDelay(lineStop.getArrivalTime()));
+            next.setDepartureTime(removeDelay(lineStop.getDepartureTime()));
+            next = next.getNext();
+        }
+
+        return result;
+    }
+
+    static private TimestampDelay removeDelay(TimestampDelay timestamp) {
+        TimestampDelay result = null;
+
+        if (timestamp != null) {
+            result = new TimestampDelay(timestamp.getExpected(), 0L);
+        }
+
+        return result;
+    }
 
 }

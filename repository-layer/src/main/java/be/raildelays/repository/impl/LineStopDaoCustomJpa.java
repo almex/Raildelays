@@ -113,16 +113,16 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
     public LineStop findFistScheduledLine(Train train, Station station) {
         return (LineStop) entityManager
                 .createQuery(
-                        "SELECT FIRST(o) "
+                        "SELECT o "
                                 + "FROM LineStop o "
                                 + "WHERE o.train.englishName = :trainName "
-                                + "AND o.station.englishName = :stationName"
+                                + "AND o.station.englishName = :stationName "
                                 + "AND o.arrivalTime IS NOT NULL "
                                 + "AND o.departureTime IS NOT NULL "
                                 + "ORDER BY o.arrivalTime.expected ASC")
                 .setParameter("trainName", train.getEnglishName())
                 .setParameter("stationName", station.getEnglishName())
-                .getSingleResult();
+                .setMaxResults(1).setFirstResult(0).getSingleResult();
     }
 
 }

@@ -32,7 +32,7 @@ public class ExcelSheetItemWriterIT {
 		writer = new ExcelSheetItemWriter();
 		
 		writer.setInput(new ClassPathResource("template.xlsx").getFile().getAbsolutePath());
-		writer.setOutput(new FileSystemResource(new File("./target/output.xlsx")).getPath());
+		writer.setOutput(new FileSystemResource(new File("output.xlsx")).getPath());
 		
 		writer.afterPropertiesSet();
 		writer.open(MetaDataInstanceFactory.createStepExecution()

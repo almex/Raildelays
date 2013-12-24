@@ -27,6 +27,9 @@
 				<batch:transaction-attributes
 					isolation="DEFAULT" propagation="REQUIRED" />
 			</batch:tasklet>
+            <batch:listeners>
+                <batch:listener ref="skippedItemsListener" />
+            </batch:listeners>
 		</batch:step>
 	</batch:job>
 
@@ -110,5 +113,7 @@
 			</bean>
 		</property>
 	</bean>
+
+    <bean id="skippedItemsListener" class="be.raildelays.batch.listener.LogSkippedItemListener" />
 
 </beans>
