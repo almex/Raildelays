@@ -1,14 +1,6 @@
 package be.raildelays.batch.writer;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Locale;
-
+import be.raildelays.domain.xls.ExcelRow;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
@@ -21,7 +13,10 @@ import org.springframework.batch.item.support.AbstractItemStreamItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
-import be.raildelays.domain.xls.ExcelRow;
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Locale;
 
 public class ExcelSheetItemWriter extends
 		AbstractItemStreamItemWriter<List<ExcelRow>> implements
@@ -108,11 +103,6 @@ public class ExcelSheetItemWriter extends
 				writeRow(templateRow, excelRow);
 
 				currentItemCount++;
-
-				if (currentItemCount >= MAX_ROW_PER_SHEET) {
-					closeExcelFile();
-					createNewExcelFile();
-				}
 			}
 		}
 

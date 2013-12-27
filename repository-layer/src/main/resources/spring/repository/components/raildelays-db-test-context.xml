@@ -1,32 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
-	xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<jdbc:embedded-database id="dataSource" type="HSQL" >
-	</jdbc:embedded-database>
+    <jdbc:embedded-database id="dataSource" type="HSQL">
+    </jdbc:embedded-database>
 
-	<bean id="entityManagerFactory"
-		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
-		p:dataSource-ref="dataSource" p:persistence-unit-name="raildelays-repository">
-		<property name="jpaVendorAdapter">
-				<!--<bean class="org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter">
-					<property name="databasePlatform" value="org.eclipse.persistence.platform.database.HSQLPlatform" />
-					<property name="showSql" value="true" />
-				</bean>-->
-             <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"
+    <bean id="entityManagerFactory"
+          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
+          p:dataSource-ref="dataSource" p:persistence-unit-name="raildelays-repository">
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter">
+                <property name="databasePlatform" value="org.eclipse.persistence.platform.database.HSQLPlatform"/>
+                <property name="showSql" value="true"/>
+            </bean>
+            <!-- <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"
                  p:database="HSQL" p:databasePlatform="org.hibernate.dialect.HSQLDialect"
-                 p:showSql="true" p:generate-ddl="true" />
-<!--             <bean class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter" > -->
-<!--                 <property name="showSql" value="true" /> -->
-<!--                 <property name="database" value="HSQL" /> -->
-<!--                 <property name="databasePlatform" value="org.apache.openjpa.jdbc.sql.HSQLDictionary" /> -->
-<!--                 <property name="generateDdl" value="true" /> -->
-<!--             </bean> -->
-		</property>
-	</bean>
+                 p:showSql="true" p:generate-ddl="true" />-->
+            <!--             <bean class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter" > -->
+            <!--                 <property name="showSql" value="true" /> -->
+            <!--                 <property name="database" value="HSQL" /> -->
+            <!--                 <property name="databasePlatform" value="org.apache.openjpa.jdbc.sql.HSQLDictionary" /> -->
+            <!--                 <property name="generateDdl" value="true" /> -->
+            <!--             </bean> -->
+        </property>
+        <!-- We must disable weaving to be able to execute tests with Surefire -->
+        <property name="jpaPropertyMap">
+            <map>
+                <entry key="eclipselink.weaving" value="false"/>
+            </map>
+        </property>
+        <!--<property name="loadTimeWeaver">
+            <bean class="org.springframework.instrument.classloading.ReflectiveLoadTimeWeaver"/>
+        </property>-->
+    </bean>
 
 </beans>

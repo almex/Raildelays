@@ -6,7 +6,7 @@
 		transaction-type="RESOURCE_LOCAL"  >
 
 		<!-- Hibernate -->
-<!-- 		<provider>org.hibernate.ejb.HibernatePersistence</provider> -->
+        <!--<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
 
         <!-- Apache OpenJPA -->
 <!--         <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>	 -->
@@ -29,10 +29,13 @@
 			<property name="javax.persistence.jdbc.url" value="jdbc:derby:data/raildelays;create=true" />
 			<property name="javax.persistence.jdbc.user" value="" />
 			<property name="javax.persistence.jdbc.password" value="" />
-            <!--<property name="javax.persistence.schema-generation.database.action" value="create" />
-            <property name="javax.persistence.schema-generation.create-source" value="metadata" />-->
+            <property name="javax.persistence.schema-generation.database.action" value="create"/>
+            <property name="javax.persistence.schema-generation.create-source" value="metadata"/>
+            <!--<property name="javax.persistence.schema-generation.scripts.action" value="create" />-->
+            <!--<property name="javax.persistence.schema-generation.create-database-schemas" value="true" />-->
 
-			<!-- OpenJPA specific -->
+
+            <!-- OpenJPA specific -->
 			<!--<property name="openjpa.jdbc.DBDictionary" value="DERBY"/>-->
 			<!--<property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(ForeignKeys=true)"/>-->
 			<!--&lt;!&ndash; Hibernate specific &ndash;&gt;-->

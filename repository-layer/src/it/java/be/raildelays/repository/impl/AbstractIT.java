@@ -2,7 +2,6 @@ package be.raildelays.repository.impl;
 
 import com.excilys.ebi.spring.dbunit.test.RollbackTransactionalDataSetTestExecutionListener;
 import org.junit.runner.RunWith;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -25,6 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
         TransactionalTestExecutionListener.class,
         RollbackTransactionalDataSetTestExecutionListener.class })
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD, hierarchyMode = DirtiesContext.HierarchyMode.EXHAUSTIVE) //Cannot any other solution when loading an in-memory database with Spring
+//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD, hierarchyMode = DirtiesContext.HierarchyMode.EXHAUSTIVE) //Cannot any other solution when loading an in-memory database with Spring
 public abstract class AbstractIT {
 }
