@@ -101,3 +101,9 @@ data
 .idea
 
 *.iml
+
+/logs
+
+*.log
+
+output.xlsx

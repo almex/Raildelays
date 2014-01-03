@@ -23,7 +23,26 @@
             <url>http://repository.excilys.com/content/repositories/releases</url>
             <layout>default</layout>
         </repository>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>http://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
     </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>http://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 
     <modules>
         <module>common-layer</module>
@@ -33,7 +52,7 @@
         <module>parser-layer</module>
         <module>service-layer</module>
         <module>batch-layer</module>
-        <!--module>java-fx-layer</module -->
+        <module>admin-presentation</module>
         <module>assembly</module>
     </modules>
 
@@ -47,15 +66,17 @@
         <version.spring>4.0.0.RELEASE</version.spring>
         <version.spring.batch>2.2.3.RELEASE</version.spring.batch>
         <version.spring.data>1.4.3.RELEASE</version.spring.data>
-        <version.spring.data.rest>1.0.0.RELEASE</version.spring.data.rest>
+        <version.spring.data.rest>2.0.0.M1</version.spring.data.rest>
+        <version.spring.data.commons>1.6.3.RELEASE</version.spring.data.commons>
         <version.hibernate>4.3.0.Final</version.hibernate>
         <version.hibernate.validator>5.0.1.Final</version.hibernate.validator>
-        <version.spring.boot>0.5.0.M1</version.spring.boot>
+        <version.spring.boot>0.5.0.M7</version.spring.boot>
         <version.validation.api>1.1.0.Final</version.validation.api>
         <version.javax.el-api>2.2.4</version.javax.el-api>
         <version.hsqldb>2.3.1</version.hsqldb>
         <version.derby>10.10.1.1</version.derby>
         <version.slf4j>1.7.5</version.slf4j>
+        <version.servlet>3.1.0</version.servlet>
         <!-- 1.7.5 -->
         <version.log4j>2.0-beta9</version.log4j>
         <version.groovy>2.1</version.groovy>
@@ -109,6 +130,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>raildelays-batch</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>admin-presentation</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -205,14 +231,26 @@
                 <version>${version.derby}</version>
             </dependency>
             <dependency>
+                <groupId>commons-dbcp</groupId>
+                <artifactId>commons-dbcp</artifactId>
+                <version>${version.commons.dbcp}</version>
+            </dependency>
+
+            <!-- Spring Data -->
+            <dependency>
                 <groupId>org.springframework.data</groupId>
                 <artifactId>spring-data-jpa</artifactId>
                 <version>${version.spring.data}</version>
             </dependency>
             <dependency>
-                <groupId>commons-dbcp</groupId>
-                <artifactId>commons-dbcp</artifactId>
-                <version>${version.commons.dbcp}</version>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-rest-webmvc</artifactId>
+                <version>${version.spring.data.rest}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-commons</artifactId>
+                <version>${version.spring.data.commons}</version>
             </dependency>
 
             <dependency>
@@ -313,21 +351,6 @@
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
-                <artifactId>spring-web</artifactId>
-                <version>${version.spring}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-webmvc</artifactId>
-                <version>${version.spring}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.data</groupId>
-                <artifactId>spring-data-rest-webmvc</artifactId>
-                <version>${version.spring.data.rest}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
                 <artifactId>spring-beans</artifactId>
                 <version>${version.spring}</version>
             </dependency>
@@ -366,6 +389,19 @@
                 <artifactId>spring-test</artifactId>
                 <version>${version.spring}</version>
             </dependency>
+
+            <!-- Spring Boot -->
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter</artifactId>
+                <version>${version.spring.boot}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-tomcat</artifactId>
+                <version>${version.spring.boot}</version>
+            </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
@@ -399,6 +435,23 @@
                 <version>${version.spring.batch}</version>
             </dependency>
 
+            <!-- Web -->
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>${version.servlet}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-webmvc</artifactId>
+                <version>${version.spring}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+                <version>${version.spring}</version>
+            </dependency>
+
             <!-- Scheduling -->
             <dependency>
                 <groupId>org.quartz-scheduler</groupId>
@@ -407,8 +460,6 @@
             </dependency>
 
             <!-- Java Excel sheet API -->
-            <!--dependency> <groupId>net.sourceforge.jexcelapi</groupId> <artifactId>jxl</artifactId>
-                <version>2.6.12</version> </dependency -->
             <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi</artifactId>
@@ -545,6 +596,11 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>2.4</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
                     <version>2.8</version>
                 </plugin>
@@ -612,6 +668,17 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
                     <version>2.4</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.tomcat.maven</groupId>
+                    <artifactId>tomcat7-maven-plugin</artifactId>
+                    <version>2.2</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${version.spring.boot}</version>
                 </plugin>
 
                 <!--This plugin's configuration is used to store Eclipse m2e settings
