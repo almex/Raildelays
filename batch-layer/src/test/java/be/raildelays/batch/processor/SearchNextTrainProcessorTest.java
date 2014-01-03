@@ -1,18 +1,5 @@
 package be.raildelays.batch.processor;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
-import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.BlockJUnit4ClassRunner;
-
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.LineStop;
@@ -20,6 +7,18 @@ import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.TimestampDelay;
 import be.raildelays.domain.entities.Train;
 import be.raildelays.service.RaildelaysService;
+import org.easymock.EasyMock;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.BlockJUnit4ClassRunner;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 @RunWith(value = BlockJUnit4ClassRunner.class)
 public class SearchNextTrainProcessorTest {
@@ -110,10 +109,10 @@ public class SearchNextTrainProcessorTest {
 	}
 
 	/*
-	 *        16:30   17:00  17:30  18:00  18:30  19:00
+     *        16:30   17:00  17:30  18:00  18:30  19:00
 	 *          |------|------|------|------|------|           
-	 *      y   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-	 *     (0                 |------>>>>>>>|)
+	 *      y   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+	 *     (0                 |------>>>>>>>|       )
 	 *      1          |--------------------|
 	 *     
 	 *     0 should be chosen because :
@@ -148,7 +147,42 @@ public class SearchNextTrainProcessorTest {
 		EasyMock.verify(raildelaysServiceMock);
 	}
 
-	/*
+    /*
+     *        16:30   17:00  17:30  18:00  18:30  19:00
+	 *          |------|------|------|------|------|
+	 *      y   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+	 *      0   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+	 *     (1          |--------------------|       )
+	 *
+	 *     1 should be chosen
+	 */
+    @Test
+    public void testTrainIsMultipleCanceling() throws Exception {
+        stop0 = new LineStop.Builder(stop0)
+                .canceled(true)
+                .build();
+
+        nextLineStops = Arrays.asList(new LineStop[]{stop0, stop1});
+
+        item.setCanceled(true);
+
+        EasyMock.expect(
+                raildelaysServiceMock.searchNextTrain(
+                        EasyMock.anyObject(Station.class),
+                        EasyMock.anyObject(Date.class))).andReturn(
+                nextLineStops);
+        EasyMock.replay(raildelaysServiceMock);
+
+        BatchExcelRow result = processor.process(item);
+
+        Assert.assertNotNull(result);
+        Assert.assertEquals(new Train("1"), result.getEffectiveTrain1());
+        Assert.assertEquals(90, result.getDelay());
+
+        EasyMock.verify(raildelaysServiceMock);
+    }
+
+    /*
 	 *        16:30  17:00  17:30  18:00  18:30  19:00
 	 *          |------|------|------|------|------|           
 	 *      y   >>>>>>>>>>>>>>>>>>|------>>>>>>>>>>|

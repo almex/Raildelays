@@ -1,16 +1,11 @@
 package be.raildelays.batch.processor;
 
 import be.raildelays.domain.entities.LineStop;
-import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.TimestampDelay;
-import be.raildelays.domain.entities.Train;
 import be.raildelays.service.RaildelaysService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
-
-import be.raildelays.domain.dto.RouteLogDTO;
-import be.raildelays.domain.dto.ServedStopDTO;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -47,23 +42,25 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<List<LineSt
     }
 
     public LineStop.Builder fetchScheduling(LineStop item) throws Exception {
-        LineStop.Builder result = new LineStop.Builder(item);
+        LineStop.Builder result = new LineStop.Builder(item, false, false);
 
         if (item.getArrivalTime() == null || item.getArrivalTime().getExpected() == null ||
                 item.getDepartureTime() == null || item.getDepartureTime().getExpected() == null) {
             LOGGER.info("It lacks one expected time from this stop={}", item);
 
-            LineStop line = service.searchScheduledLine(item.getTrain(), item.getStation());
+            LineStop candidate = service.searchScheduledLine(item.getTrain(), item.getStation());
 
             //-- If we cannot retrieve one of the expected time then this item is corrupted we must filter it.
-            if (line == null) {
+            if (candidate == null) {
                 LOGGER.debug("We must filter this {}", item);
 
                 return null;
             }
 
-            result.departureTime(new TimestampDelay(line.getDepartureTime().getExpected(), 0L)) //
-                    .arrivalTime(new TimestampDelay(line.getArrivalTime().getExpected(), 0L));
+            LOGGER.debug("We use this candidate to fill-in expected time={}", candidate);
+
+            result.departureTime(new TimestampDelay(candidate.getDepartureTime().getExpected(), 0L)) //
+                    .arrivalTime(new TimestampDelay(candidate.getArrivalTime().getExpected(), 0L));
         }
 
         return result;
@@ -92,5 +89,9 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<List<LineSt
         LOGGER.debug("LineStop after processing={}", result);
 
         return result;
+    }
+
+    public void setService(RaildelaysService service) {
+        this.service = service;
     }
 }

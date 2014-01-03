@@ -1,11 +1,10 @@
 package be.raildelays.batch.processor;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import javax.annotation.Resource;
-
+import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.domain.entities.LineStop;
+import be.raildelays.domain.entities.Station;
+import be.raildelays.domain.entities.TimestampDelay;
+import be.raildelays.service.RaildelaysService;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.LocalDate;
@@ -15,11 +14,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
 
-import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.domain.entities.LineStop;
-import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.TimestampDelay;
-import be.raildelays.service.RaildelaysService;
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Search next train which allow you to arrive earlier to your destination.
@@ -112,37 +110,40 @@ public class SearchNextTrainProcessor implements
 		 */
 		
 		for (LineStop candidate : candidates) {
-			LineStop departureLineStop = searchDepartureLineStop(candidate, item.getDepartureStation());
-			LineStop arrivalLineStop = candidate;
-			
-			// We don't process null values
-			if (departureLineStop == null || arrivalLineStop == null) {
-				break;
-			}
+            LineStop candidateDeparture = searchDepartureLineStop(candidate, item.getDepartureStation());
+            LineStop candidateArrival = candidate;
+
+            // We don't process null values
+            if (candidateDeparture == null || candidateArrival == null) {
+                LOGGER.trace("Filtering null: candidateDeparture={} candidateArrival={}", candidateDeparture, candidateArrival);
+                continue;
+            }
 			
 			// FIXME We must go recursively into getNext() to search any other 
 			// cancellation.
-			if (departureLineStop.isCanceled()) {
-				continue;
+            if (candidateDeparture.isCanceled() || candidateArrival.isCanceled()) {
+                LOGGER.trace("Filtering canceling: candidateDeparture={} candidateArrival={}", candidateDeparture, candidateArrival);
+                continue;
 			}
 
 			if (item.isCanceled()) {
-				fastestTrain = candidate;
-				break; // candidate arrives before item
+                fastestTrain = candidateArrival;
+                break; // candidate arrives before item
 			}
 			
 			// Do not take into account train which leaves after the expected
 			// one.
-			if (compareTimeAndDelay(departureLineStop.getDepartureTime(),
-					item.getEffectiveDepartureTime()) >= 0) {
-				continue; // candidate leaves after item
+            if (compareTimeAndDelay(candidateDeparture.getDepartureTime(),
+                    item.getEffectiveDepartureTime()) >= 0) {
+                LOGGER.trace("Filtering candidate leaving after item: candidateDeparture={} candidateArrival={}", candidateDeparture, candidateArrival);
+                continue; // candidate leaves after item
 			}
 
 			// expected arrivalTime to destination and using delay from departure
-			if (compareTime(arrivalLineStop.getArrivalTime(),
-					item.getEffectiveArrivalTime()) < 0) {
-				fastestTrain = candidate;
-				break; // candidate arrives before item
+            if (compareTime(candidateArrival.getArrivalTime(),
+                    item.getEffectiveArrivalTime()) < 0) {
+                fastestTrain = candidateArrival;
+                break; // candidate arrives before item
 			}
 		}
 
@@ -173,6 +174,9 @@ public class SearchNextTrainProcessor implements
         } else {
             LocalTime localTimeA = new LocalTime(departureA.getExpected());
             LocalTime localTimeB = new LocalTime(departureB.getTime());
+
+            LOGGER.trace("compareTime: start={} - end={}", localTimeB, localTimeA);
+
             Duration duration = new Duration(localTimeB.toDateTimeToday(), localTimeA.toDateTimeToday());
 
             result = duration.getMillis();
@@ -191,6 +195,9 @@ public class SearchNextTrainProcessor implements
         } else {
             LocalTime localTimeA = new LocalTime(departureA.getExpected()).plusMinutes(departureA.getDelay().intValue());
             LocalTime localTimeB = new LocalTime(departureB.getTime());
+
+            LOGGER.trace("compareTimeAndDelay: start={} - end={}", localTimeB, localTimeA);
+
             Duration duration = new Duration(localTimeB.toDateTimeToday(), localTimeA.toDateTimeToday());
 
             result = duration.getMillis();

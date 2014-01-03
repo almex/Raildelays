@@ -60,8 +60,8 @@
                 <ref bean="aggregateExpectedTimeProcessor"/>
                 <ref bean="excelRowMapperProcessor"/>
                 <ref bean="validatorProcessor"/>
-                <ref bean="filterTwoSensPerDayProcessor"/>
                 <ref bean="searchNextTrainProcessor"/>
+                <ref bean="filterTwoSensPerDayProcessor"/>
                 <ref bean="validatorProcessor"/>
             </list>
         </property>

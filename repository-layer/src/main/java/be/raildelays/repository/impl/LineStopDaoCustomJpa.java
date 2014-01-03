@@ -1,16 +1,15 @@
 package be.raildelays.repository.impl;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TemporalType;
-
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
 import be.raildelays.repository.LineStopDaoCustom;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TemporalType;
+import java.util.Date;
+import java.util.List;
 
 public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 
@@ -117,8 +116,9 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
                                 + "FROM LineStop o "
                                 + "WHERE o.train.englishName = :trainName "
                                 + "AND o.station.englishName = :stationName "
-                                + "AND o.arrivalTime IS NOT NULL "
-                                + "AND o.departureTime IS NOT NULL "
+                                + "AND o.arrivalTime.expected IS NOT NULL "
+                                + "AND o.departureTime.expected IS NOT NULL "
+                                + "AND o.canceled = false "
                                 + "ORDER BY o.arrivalTime.expected ASC")
                 .setParameter("trainName", train.getEnglishName())
                 .setParameter("stationName", station.getEnglishName())
