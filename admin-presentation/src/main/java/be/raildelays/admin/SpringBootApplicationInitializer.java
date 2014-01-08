@@ -22,7 +22,7 @@ public class SpringBootApplicationInitializer {
         TomcatEmbeddedServletContainerFactory containerFactory = new TomcatEmbeddedServletContainerFactory(8080);
 
         //containerFactory.addInitializers(new ServletApplicationInitializer());
-        containerFactory.setContextPath("/");
+        containerFactory.setContextPath("/admin-presentation");
 
         return containerFactory;
     }

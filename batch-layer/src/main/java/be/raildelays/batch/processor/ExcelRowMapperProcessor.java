@@ -1,10 +1,12 @@
 package be.raildelays.batch.processor;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
+import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.batch.bean.BatchExcelRow.Builder;
 import be.raildelays.batch.exception.ArrivalDepartureEqualsException;
+import be.raildelays.domain.Sens;
+import be.raildelays.domain.entities.LineStop;
+import be.raildelays.domain.entities.Station;
+import be.raildelays.domain.entities.TimestampDelay;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
@@ -12,12 +14,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
 
-import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.batch.bean.BatchExcelRow.Builder;
-import be.raildelays.domain.Sens;
-import be.raildelays.domain.entities.LineStop;
-import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.TimestampDelay;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class ExcelRowMapperProcessor implements
 		ItemProcessor<List<LineStop>, List<BatchExcelRow>>, InitializingBean {
@@ -90,9 +89,16 @@ public class ExcelRowMapperProcessor implements
 
             BatchExcelRow excelRow = map(departure, arrival, sens);
 
-            result.add(excelRow);
-            LOGGER.trace("excelRow={}", excelRow);
-		}
+            /*
+             * It's possible that we have processed the same ExcelRow by following the path from departureStation and
+             * another one from arrivalStation.
+             */
+            if (!result.contains(excelRow)) {
+                result.add(excelRow);
+
+                LOGGER.trace("excelRow={}", excelRow);
+            }
+        }
 
 		return result;
 	}

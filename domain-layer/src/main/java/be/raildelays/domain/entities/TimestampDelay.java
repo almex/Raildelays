@@ -1,15 +1,14 @@
 package be.raildelays.domain.entities;
 
-import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.Embeddable;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Immutable object that express an arrival or departure delay.
@@ -65,17 +64,13 @@ public class TimestampDelay implements Serializable {
 
 		if (obj == this) {
 			result = true;
-		} else {
-			if (obj instanceof TimestampDelay) {
-				TimestampDelay delay = (TimestampDelay) obj;
+        } else if (obj instanceof TimestampDelay) {
+            TimestampDelay target = (TimestampDelay) obj;
 
-				result = new EqualsBuilder() //
-						.append(expected, delay.expected) //
-						.append(delay, delay.delay) //
-						.isEquals();
-			} else {
-				result = false;
-			}
+            result = new EqualsBuilder() //
+                    .append(this.expected, target.expected) //
+                    .append(this.delay, target.delay) //
+                    .isEquals();
 		}
 
 		return result;

@@ -133,15 +133,13 @@ public class SearchNextTrainProcessor implements
 			
 			// Do not take into account train which leaves after the expected
 			// one.
-            if (compareTimeAndDelay(candidateDeparture.getDepartureTime(),
-                    item.getEffectiveDepartureTime()) >= 0) {
+            if (compareTimeAndDelay(item.getEffectiveDepartureTime(), candidateDeparture.getDepartureTime()) >= 0) {
                 LOGGER.trace("Filtering candidate leaving after item: candidateDeparture={} candidateArrival={}", candidateDeparture, candidateArrival);
                 continue; // candidate leaves after item
 			}
 
 			// expected arrivalTime to destination and using delay from departure
-            if (compareTime(candidateArrival.getArrivalTime(),
-                    item.getEffectiveArrivalTime()) < 0) {
+            if (compareTime(item.getEffectiveArrivalTime(), candidateArrival.getArrivalTime()) < 0) {
                 fastestTrain = candidateArrival;
                 break; // candidate arrives before item
 			}
@@ -163,21 +161,21 @@ public class SearchNextTrainProcessor implements
 		
 		return result;
 	}
-	
-	public static long compareTime(TimestampDelay departureA, Date departureB) {
+
+    public static long compareTime(Date departureA, TimestampDelay departureB) {
         long result = 0;
 
         if (departureA == null && departureB != null) {
-            result = -1;
-        } else if (departureA != null && departureB == null) {
             result = 1;
+        } else if (departureA != null && departureB == null) {
+            result = -1;
         } else {
-            LocalTime localTimeA = new LocalTime(departureA.getExpected());
-            LocalTime localTimeB = new LocalTime(departureB.getTime());
+            LocalTime start = new LocalTime(departureA.getTime());
+            LocalTime end = new LocalTime(departureB.getExpected());
 
-            LOGGER.trace("compareTime: start={} - end={}", localTimeB, localTimeA);
+            LOGGER.trace("compareTime: start={} - end={}", start, end);
 
-            Duration duration = new Duration(localTimeB.toDateTimeToday(), localTimeA.toDateTimeToday());
+            Duration duration = new Duration(start.toDateTimeToday(), end.toDateTimeToday());
 
             result = duration.getMillis();
         }
@@ -185,20 +183,20 @@ public class SearchNextTrainProcessor implements
         return result;
 	}
 
-	public static long compareTimeAndDelay(TimestampDelay departureA, Date departureB) {
+    public static long compareTimeAndDelay(Date departureA, TimestampDelay departureB) {
         long result = 0;
 
         if (departureA == null && departureB != null) {
-            result = -1;
-        } else if (departureA != null && departureB == null) {
             result = 1;
+        } else if (departureA != null && departureB == null) {
+            result = -1;
         } else {
-            LocalTime localTimeA = new LocalTime(departureA.getExpected()).plusMinutes(departureA.getDelay().intValue());
-            LocalTime localTimeB = new LocalTime(departureB.getTime());
+            LocalTime start = new LocalTime(departureA.getTime());
+            LocalTime end = new LocalTime(departureB.getExpected()).plusMinutes(departureB.getDelay().intValue());
 
-            LOGGER.trace("compareTimeAndDelay: start={} - end={}", localTimeB, localTimeA);
+            LOGGER.trace("compareTimeAndDelay: start={} - end={}", start, end);
 
-            Duration duration = new Duration(localTimeB.toDateTimeToday(), localTimeA.toDateTimeToday());
+            Duration duration = new Duration(start.toDateTimeToday(), end.toDateTimeToday());
 
             result = duration.getMillis();
         }
