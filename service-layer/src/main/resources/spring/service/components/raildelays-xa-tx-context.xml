@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!-- Configure a Spring JTA TX mgr with Atomikos-provided tx mgr impl and user tx impl -->
+    <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
+        <property name="transactionManager">
+            <bean class="com.atomikos.icatch.jta.UserTransactionManager"
+                  init-method="init" destroy-method="close"/>
+        </property>
+        <property name="userTransaction">
+            <bean class="com.atomikos.icatch.jta.UserTransactionImp">
+                <property name="transactionTimeout" value="300"/>
+            </bean>
+        </property>
+    </bean>
+
+</beans>

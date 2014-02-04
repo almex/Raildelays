@@ -28,20 +28,49 @@
             <artifactId>raildelays-domain</artifactId>
         </dependency>
 
-        <!--<dependency>
+        <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
-        </dependency>-->
+        </dependency>
         <!--<dependency>-->
         <!-- <groupId>org.apache.openjpa</groupId> -->
         <!-- <artifactId>openjpa-all</artifactId> -->
         <!-- <version>2.2.2</version> -->
         <!-- </dependency> -->
-        <dependency>
+        <!--<dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>eclipselink</artifactId>
             <version>2.5.1</version>
+        </dependency>-->
+
+        <!-- JTA transaction manager -->
+        <dependency>
+            <groupId>com.atomikos</groupId>
+            <artifactId>transactions-jdbc</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.atomikos</groupId>
+            <artifactId>transactions-hibernate3</artifactId>
+            <version>${version.atomikos}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>hibernate</artifactId>
+                    <groupId>org.hibernate</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- eclipselink doesn't work without jta-data-source for transaction-type="JTA" -->
+        <dependency>
+            <groupId>org.apache.xbean</groupId>
+            <artifactId>xbean-spring</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>spring</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
 
         <dependency>
             <groupId>org.springframework</groupId>

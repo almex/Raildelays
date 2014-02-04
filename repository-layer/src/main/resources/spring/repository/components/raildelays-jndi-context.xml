@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="jndi"
+          class="org.apache.xbean.spring.jndi.SpringInitialContextFactory"
+          factory-method="makeInitialContext">
+        <property name="entries">
+            <map>
+                <entry key="java:comp/env/jdbc/raildelays" value-ref="dataSource"/>
+            </map>
+        </property>
+    </bean>
+
+</beans>

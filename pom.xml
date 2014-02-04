@@ -63,12 +63,14 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
-        <version.spring>4.0.0.RELEASE</version.spring>
+        <version.spring>4.0.1.RELEASE</version.spring>
         <version.spring.batch>2.2.3.RELEASE</version.spring.batch>
-        <version.spring.data>1.4.3.RELEASE</version.spring.data>
+        <version.spring.data>1.5.0.M1</version.spring.data>
         <version.spring.data.rest>2.0.0.M1</version.spring.data.rest>
         <version.spring.data.commons>1.6.3.RELEASE</version.spring.data.commons>
-        <version.hibernate>4.3.0.Final</version.hibernate>
+        <version.spring.mock>2.0.8</version.spring.mock>
+        <version.xbean.spring>3.16</version.xbean.spring>
+        <version.hibernate>4.3.1.Final</version.hibernate>
         <version.hibernate.validator>5.0.1.Final</version.hibernate.validator>
         <version.spring.boot>0.5.0.M7</version.spring.boot>
         <version.validation.api>1.1.0.Final</version.validation.api>
@@ -77,6 +79,7 @@
         <version.derby>10.10.1.1</version.derby>
         <version.slf4j>1.7.5</version.slf4j>
         <version.servlet>3.1.0</version.servlet>
+        <version.atomikos>3.9.2</version.atomikos>
         <!-- 1.7.5 -->
         <version.log4j>2.0-beta9</version.log4j>
         <version.groovy>2.1</version.groovy>
@@ -84,7 +87,7 @@
         <version.groovy.eclipse.compiler>2.8.0-01</version.groovy.eclipse.compiler>
         <version.groovy.eclipse.batch>2.1.8-01</version.groovy.eclipse.batch>
         <version.tagsoup>1.2.1</version.tagsoup>
-        <version.apache.poi>3.9</version.apache.poi>
+        <version.apache.poi>3.10-beta2</version.apache.poi>
         <version.commons.dbcp>1.4</version.commons.dbcp>
         <version.dbunit>2.4.9</version.dbunit>
         <version.jodatime>2.3</version.jodatime>
@@ -198,6 +201,11 @@
                 <artifactId>easymock</artifactId>
                 <version>3.2</version>
             </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-mock</artifactId>
+                <version>${version.spring.mock}}</version>
+            </dependency>
 
             <!-- Persistence -->
             <dependency>
@@ -234,6 +242,16 @@
                 <groupId>commons-dbcp</groupId>
                 <artifactId>commons-dbcp</artifactId>
                 <version>${version.commons.dbcp}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.atomikos</groupId>
+                <artifactId>transactions-jdbc</artifactId>
+                <version>${version.atomikos}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.atomikos</groupId>
+                <artifactId>transactions-hibernate3</artifactId>
+                <version>${version.atomikos}</version>
             </dependency>
 
             <!-- Spring Data -->
@@ -388,6 +406,11 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-test</artifactId>
                 <version>${version.spring}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.xbean</groupId>
+                <artifactId>xbean-spring</artifactId>
+                <version>${version.xbean.spring}</version>
             </dependency>
 
             <!-- Spring Boot -->

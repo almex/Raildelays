@@ -46,7 +46,7 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<List<LineSt
 
         if (item.getArrivalTime() == null || item.getArrivalTime().getExpected() == null ||
                 item.getDepartureTime() == null || item.getDepartureTime().getExpected() == null) {
-            LOGGER.info("It lacks one expected time from this stop={}", item);
+            LOGGER.info("It lacks one expected time from this train={} departureTime={} arrivalTime={}", item.getTrain().getEnglishName(), item.getDepartureTime(), item.getArrivalTime());
 
             LineStop candidate = service.searchScheduledLine(item.getTrain(), item.getStation());
 
@@ -57,10 +57,14 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<List<LineSt
                 return null;
             }
 
-            LOGGER.debug("We use this candidate to fill-in expected time={}", candidate);
+            final TimestampDelay departureTime = new TimestampDelay(candidate.getDepartureTime().getExpected(), 0L);
+            final TimestampDelay arrivalTime = new TimestampDelay(candidate.getArrivalTime().getExpected(), 0L);
 
-            result.departureTime(new TimestampDelay(candidate.getDepartureTime().getExpected(), 0L)) //
-                    .arrivalTime(new TimestampDelay(candidate.getArrivalTime().getExpected(), 0L));
+            LOGGER.debug("We use this candidate to fill-in expected train={} departureTime={} arrivalTime={}", candidate.getTrain().getEnglishName(), departureTime, arrivalTime);
+
+
+            result.departureTime(departureTime) //
+                    .arrivalTime(arrivalTime);
         }
 
         return result;

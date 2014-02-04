@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+    <bean id="batchDataSource"
+          class="com.atomikos.jdbc.AtomikosDataSourceBean">
+        <property name="uniqueResourceName" value="batch"/>
+        <property name="xaDataSource">
+            <!-- Use auto-created embedded Derby DB with JDBC 4.0 XA DataSource: -->
+            <bean class="org.apache.derby.jdbc.EmbeddedXADataSource40">
+                <property name="databaseName" value="data/batch"/>
+                <property name="createDatabase" value="create"/>
+                <!--<property name="url" value="jdbc:derby:data/batch;create=true" />-->
+            </bean>
+        </property>
+        <property name="poolSize" value="1"/>
+        <property name="borrowConnectionTimeout" value="60"/>
+    </bean>
+
+    <alias name="transactionManager" alias="batchTransactionManager"/>
+
+</beans>

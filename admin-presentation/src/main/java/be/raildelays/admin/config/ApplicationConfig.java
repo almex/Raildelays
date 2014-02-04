@@ -15,7 +15,7 @@ public class ApplicationConfig {
     PersistenceAnnotationBeanPostProcessor getPersistenceAnnotationBeanPostProcessor() {
         PersistenceAnnotationBeanPostProcessor bean = new PersistenceAnnotationBeanPostProcessor();
 
-        bean.setDefaultPersistenceUnitName("raildelays-repository");
+        bean.setDefaultPersistenceUnitName("raildelays-repository-jta");
 
         return bean;
     }

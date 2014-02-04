@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="dataSource"
+          class="com.atomikos.jdbc.AtomikosDataSourceBean">
+        <property name="uniqueResourceName" value="raildelays-repository-jta"/>
+        <property name="xaDataSource">
+            <!-- Use auto-created embedded Derby DB with JDBC 4.0 XA DataSource: -->
+            <bean class="org.apache.derby.jdbc.EmbeddedXADataSource40">
+                <property name="databaseName" value="data/raildelays"/>
+                <property name="createDatabase" value="create"/>
+                <!--<property name="url" value="jdbc:derby:data/raildelays;create=true"/>-->
+            </bean>
+        </property>
+        <property name="minPoolSize" value="1"/>
+        <property name="maxPoolSize" value="5"/>
+        <property name="borrowConnectionTimeout" value="10000"/>
+    </bean>
+
+    <bean id="entityManagerFactory"
+          class="org.springframework.orm.jpa.LocalEntityManagerFactoryBean">
+        <property name="persistenceUnitName" value="raildelays-repository-jta"/>
+        <!--<property name="persistenceXmlLocation" value="META-INF/xa-persistence.xml" />-->
+        <!--<property name="dataSource" ref="dataSource" />-->
+        <!--<property name="jpaVendorAdapter">-->
+        <!--<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />-->
+        <!--</property>-->
+        <!--<property name="jpaProperties">
+            <props>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.format_sql">true</prop>
+                <prop key="hibernate.dialect">org.hibernate.dialect.DerbyTenSevenDialect</prop>
+                <prop key="hibernate.jdbc.batch_size">1</prop>
+                <prop key="hibernate.current_session_context_class">jta</prop>
+                &lt;!&ndash;<prop key="hibernate.transaction.manager_lookup_class">com.atomikos.icatch.jta.hibernate3.TransactionManagerLookup</prop>&ndash;&gt;
+            </props>
+        </property>-->
+    </bean>
+
+    <!--<jdbc:initialize-database data-source="dataSource" ignore-failures="ALL">-->
+    <!--<jdbc:script location="data/raildelays-schema.ddl"/>-->
+    <!--</jdbc:initialize-database>-->
+
+</beans>
