@@ -31,7 +31,7 @@
             <property name="javax.persistence.jdbc.password" value=""/>
             <property name="javax.persistence.schema-generation.database.action" value="create"/>
             <property name="javax.persistence.schema-generation.create-database-schemas" value="true"/>
-            <!--<property name="javax.persistence.schema-generation.create-source" value="metadata"/>-->
+            <property name="javax.persistence.schema-generation.create-source" value="metadata"/>
             <!--<property name="javax.persistence.schema-generation.scripts.action" value="create" />-->
             <!--<property name="javax.persistence.schema-generation.scripts.create-target" value="data/raildelays-schema.ddl" />-->
 
@@ -69,8 +69,10 @@
         <properties>
             <!-- JPA Standard -->
             <property name="javax.persistence.target-database" value="DERBY"/>
-            <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:derby:data/raildelays;create=true"/>
+            <!--<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:derby:data/raildelays;create=true"/>-->
+            <property name="javax.persistence.jdbc.driver" value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:log4jdbc:derby:data/raildelays;create=true"/>
             <property name="javax.persistence.jdbc.user" value=""/>
             <property name="javax.persistence.jdbc.password" value=""/>
             <!--<property name="javax.persistence.schema-generation.database.action" value="create"/>-->
@@ -87,7 +89,7 @@
             <!--<property name="hibernate.dialect" value="org.hibernate.dialect.DerbyTenSevenDialect" />-->
             <!--<property name="hibernate.show_sql" value="true" />-->
             <!--<property name="hibernate.format_sql" value="true" />-->
-            <!--<property name="hibernate.hbm2ddl.auto" value="update" />-->
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
             <!--<property name="hibernate.transaction.factory_class" value="com.atomikos.icatch.jta.hibernate3.AtomikosJTATransactionFactory" />-->
             <property name="hibernate.transaction.jta.platform" value="be.raildelays.jta.AtomikosJtaPlatform"/>
             <!-- Eclipse-link specific -->

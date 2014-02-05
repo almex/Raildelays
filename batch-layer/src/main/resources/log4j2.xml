@@ -37,6 +37,9 @@
         <File name="raildelays-filter-processor" fileName="logs/railtime-processor.log" append="false">
             <PatternLayout pattern="[Filter]: %m%n" />
         </File>
+        <File name="jdbc" fileName="logs/jdbc.log" append="false">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %level - %m%n%ex%n"/>
+        </File>
         <File name="skipped-items" fileName="logs/skipped-items.log" append="false">
             <PatternLayout pattern="%d{DATE} %-5p: %m%n" />
         </File>
@@ -87,6 +90,10 @@
 	    </logger>
         <logger name="be.raildelays.batch.listener.LogSkippedItemListener" level="info">
             <appender-ref ref="skipped-items" />
+        </logger>
+        <logger name="log4jdbc.log4j2" level="info" additivity="false">
+            <MarkerFilter marker="LOG4JDBC_OTHER" onMatch="DENY" onMismatch="NEUTRAL"/>
+            <appender-ref ref="jdbc"/>
         </logger>
 
 		<root level="error">

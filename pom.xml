@@ -77,11 +77,11 @@
         <version.javax.el-api>2.2.4</version.javax.el-api>
         <version.hsqldb>2.3.1</version.hsqldb>
         <version.derby>10.10.1.1</version.derby>
-        <version.slf4j>1.7.5</version.slf4j>
         <version.servlet>3.1.0</version.servlet>
         <version.atomikos>3.9.2</version.atomikos>
-        <!-- 1.7.5 -->
         <version.log4j>2.0-beta9</version.log4j>
+        <version.slf4j>1.7.5</version.slf4j>
+        <version.log4jdbc>1.16</version.log4jdbc>
         <version.groovy>2.1</version.groovy>
         <version.groovy.all>2.1.5</version.groovy.all>
         <version.groovy.eclipse.compiler>2.8.0-01</version.groovy.eclipse.compiler>
@@ -152,8 +152,6 @@
                 <artifactId>slf4j-api</artifactId>
                 <version>${version.slf4j}</version>
             </dependency>
-            <!--dependency> <groupId>org.slf4j</groupId> <artifactId>slf4j-log4j12</artifactId>
-                <version>${version.slf4j}</version> </dependency -->
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-core</artifactId>
@@ -173,6 +171,11 @@
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-slf4j-impl</artifactId>
                 <version>${version.log4j}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bgee.log4jdbc-log4j2</groupId>
+                <artifactId>log4jdbc-log4j2-jdbc4.1</artifactId>
+                <version>${version.log4jdbc}</version>
             </dependency>
 
             <!-- Testing -->
@@ -509,8 +512,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
-        <!--dependency> <groupId>org.slf4j</groupId> <artifactId>slf4j-log4j12</artifactId>
-            </dependency -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
