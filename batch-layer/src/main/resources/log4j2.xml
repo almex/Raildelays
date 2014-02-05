@@ -92,11 +92,13 @@
             <appender-ref ref="skipped-items" />
         </logger>
         <logger name="log4jdbc.log4j2" level="info" additivity="false">
-            <MarkerFilter marker="LOG4JDBC_OTHER" onMatch="DENY" onMismatch="NEUTRAL"/>
+            <MarkerFilter marker="LOG4JDBC_AUDIT" onMatch="ACCEPT" onMismatch="DENY"/>
+            <MarkerFilter marker="LOG4JDBC_RESULTSETTABLE" onMatch="ACCEPT" onMismatch="DENY"/>
             <appender-ref ref="jdbc"/>
         </logger>
 
-		<root level="error">
+
+        <root level="error">
 			<appender-ref ref="console" />
 		</root>
 	</loggers>
