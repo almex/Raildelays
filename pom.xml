@@ -71,6 +71,8 @@
         <version.spring.mock>2.0.8</version.spring.mock>
         <version.xbean.spring>3.16</version.xbean.spring>
         <version.hibernate>4.3.1.Final</version.hibernate>
+        <version.eclipselink>2.5.1</version.eclipselink>
+        <version.openjpa>2.2.2</version.openjpa>
         <version.hibernate.validator>5.0.1.Final</version.hibernate.validator>
         <version.spring.boot>0.5.0.M7</version.spring.boot>
         <version.validation.api>1.1.0.Final</version.validation.api>
@@ -79,7 +81,7 @@
         <version.derby>10.10.1.1</version.derby>
         <version.servlet>3.1.0</version.servlet>
         <version.atomikos>3.9.2</version.atomikos>
-        <version.log4j>2.0-beta9</version.log4j>
+        <version.log4j>2.0-rc1</version.log4j>
         <version.slf4j>1.7.5</version.slf4j>
         <version.log4jdbc>1.16</version.log4jdbc>
         <version.groovy>2.1</version.groovy>
@@ -225,6 +227,21 @@
                 <groupId>org.hibernate.javax.persistence</groupId>
                 <artifactId>hibernate-jpa-2.1-api</artifactId>
                 <version>1.0.0.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.openjpa</groupId>
+                <artifactId>openjpa-all</artifactId>
+                <version>${version.openjpa}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.persistence</groupId>
+                <artifactId>eclipselink</artifactId>
+                <version>${version.eclipselink}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.persistence</groupId>
+                <artifactId>javax.persistence</artifactId>
+                <version>2.1.0</version>
             </dependency>
             <dependency>
                 <groupId>org.hsqldb</groupId>

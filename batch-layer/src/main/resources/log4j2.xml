@@ -4,44 +4,44 @@
 		<Console name="console" target="SYSTEM_OUT">
 			<PatternLayout pattern="%m%n" />
 		</Console>
-		<File name="railtime-data-reader" fileName="logs/railtime-data.log" append="false">
-			<PatternLayout pattern="[Reader]: %m%n" />
+        <File name="railtime-data-reader" fileName="logs/railtime-data.log" append="true">
+        <PatternLayout pattern="[Reader]: %m%n" />
 		</File>
-        <File name="railtime-data-parser" fileName="logs/railtime-data.log" append="false">
-            <PatternLayout pattern="[Parser]: %m%n" />
+        <File name="railtime-data-parser" fileName="logs/railtime-data.log" append="true">
+        <PatternLayout pattern="[Parser]: %m%n" />
         </File>
-        <File name="railtime-data-streamer" fileName="logs/railtime-data.log" append="false">
-            <PatternLayout pattern="[Streamer]: %m%n" />
+        <File name="railtime-data-streamer" fileName="logs/railtime-data.log" append="true">
+        <PatternLayout pattern="[Streamer]: %m%n" />
         </File>
-        <File name="railtime-data" fileName="logs/railtime-data.log" append="false">
-            <PatternLayout pattern="[Data]: %m%n" />
+        <File name="railtime-data" fileName="logs/railtime-data.log" append="true">
+        <PatternLayout pattern="[Data]: %m%n" />
         </File>
-        <File name="output" fileName="logs/output.log" append="false">
-            <PatternLayout pattern="%d{DATE} %m%n" />
+        <File name="output" fileName="logs/output.log" append="true">
+        <PatternLayout pattern="%d{DATE} %m%n" />
         </File>
-        <File name="springbatch" fileName="logs/springbatch.log" append="false">
-            <PatternLayout pattern="%d{DATE} %-5p: %m%n" />
+        <File name="springbatch" fileName="logs/springbatch.log" append="true">
+        <PatternLayout pattern="%d{DATE} %-5p: %m%n" />
         </File>
-        <File name="railtime-route-processor" fileName="logs/railtime-processor.log" append="false">
-            <PatternLayout pattern="[Route]: %m%n" />
+        <File name="railtime-route-processor" fileName="logs/railtime-processor.log" append="true">
+        <PatternLayout pattern="[Route]: %m%n" />
         </File>
-        <File name="raildelays-xls-processor" fileName="logs/railtime-processor.log" append="false">
-            <PatternLayout pattern="[Xls]: %m%n" />
+        <File name="raildelays-xls-processor" fileName="logs/railtime-processor.log" append="true">
+        <PatternLayout pattern="[Xls]: %m%n" />
         </File>
-        <File name="raildelays-next-processor" fileName="logs/railtime-processor.log" append="false">
-            <PatternLayout pattern="[Next]: %m%n" />
+        <File name="raildelays-next-processor" fileName="logs/railtime-processor.log" append="true">
+        <PatternLayout pattern="[Next]: %m%n" />
         </File>
-        <File name="raildelays-aggregate-processor" fileName="logs/railtime-processor.log" append="false">
-            <PatternLayout pattern="[Aggregate]: %m%n" />
+        <File name="raildelays-aggregate-processor" fileName="logs/railtime-processor.log" append="true">
+        <PatternLayout pattern="[Aggregate]: %m%n" />
         </File>
-        <File name="raildelays-filter-processor" fileName="logs/railtime-processor.log" append="false">
-            <PatternLayout pattern="[Filter]: %m%n" />
+        <File name="raildelays-filter-processor" fileName="logs/railtime-processor.log" append="true">
+        <PatternLayout pattern="[Filter]: %m%n" />
         </File>
-        <File name="jdbc" fileName="logs/jdbc.log" append="false">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %level - %m%n%ex%n"/>
+        <File name="jdbc" fileName="logs/jdbc.log" append="true">
+        <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %level - %m%n%ex%n"/>
         </File>
-        <File name="skipped-items" fileName="logs/skipped-items.log" append="false">
-            <PatternLayout pattern="%d{DATE} %-5p: %m%n" />
+        <File name="skipped-items" fileName="logs/skipped-items.log" append="true">
+        <PatternLayout pattern="%d{DATE} %-5p: %m%n" />
         </File>
 	</appenders>
 	<loggers>
@@ -92,8 +92,8 @@
             <appender-ref ref="skipped-items" />
         </logger>
         <logger name="log4jdbc.log4j2" level="info" additivity="false">
-            <MarkerFilter marker="LOG4JDBC_AUDIT" onMatch="ACCEPT" onMismatch="DENY"/>
-            <MarkerFilter marker="LOG4JDBC_RESULTSETTABLE" onMatch="ACCEPT" onMismatch="DENY"/>
+            <MarkerFilter marker="LOG4JDBC_AUDIT" onMatch="ACCEPT" onMismatch="NEUTRAL"/>
+            <MarkerFilter marker="LOG4JDBC_RESULTSETTABLE" onMatch="ACCEPT" onMismatch="NEUTRAL"/>
             <appender-ref ref="jdbc"/>
         </logger>
 
