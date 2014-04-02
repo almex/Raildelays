@@ -46,13 +46,13 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<List<LineSt
 
         if (item.getArrivalTime() == null || item.getArrivalTime().getExpected() == null ||
                 item.getDepartureTime() == null || item.getDepartureTime().getExpected() == null) {
-            LOGGER.info("It lacks one expected time from this train={} departureTime={} arrivalTime={}", item.getTrain().getEnglishName(), item.getDepartureTime(), item.getArrivalTime());
+            LOGGER.info("It lacks one expected time from this train={} station={} departureTime={} arrivalTime={}", item.getTrain().getEnglishName(), item.getStation().getEnglishName(), item.getDepartureTime(), item.getArrivalTime());
 
             LineStop candidate = service.searchScheduledLine(item.getTrain(), item.getStation());
 
             //-- If we cannot retrieve one of the expected time then this item is corrupted we must filter it.
             if (candidate == null) {
-                LOGGER.debug("We must filter this {}", item);
+                LOGGER.warn("We must filter this {}", item);
 
                 return null;
             }
@@ -60,7 +60,7 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<List<LineSt
             final TimestampDelay departureTime = new TimestampDelay(candidate.getDepartureTime().getExpected(), 0L);
             final TimestampDelay arrivalTime = new TimestampDelay(candidate.getArrivalTime().getExpected(), 0L);
 
-            LOGGER.debug("We use this candidate to fill-in expected train={} departureTime={} arrivalTime={}", candidate.getTrain().getEnglishName(), departureTime, arrivalTime);
+            LOGGER.debug("We use this candidate to fill-in expected train={} station={} departureTime={} arrivalTime={}", candidate.getTrain().getEnglishName(), candidate.getStation().getEnglishName(), departureTime, arrivalTime);
 
 
             result.departureTime(departureTime) //

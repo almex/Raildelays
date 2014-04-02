@@ -65,12 +65,12 @@
         <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
         <version.spring>4.0.1.RELEASE</version.spring>
         <version.spring.batch>2.2.3.RELEASE</version.spring.batch>
-        <version.spring.data>1.5.0.M1</version.spring.data>
-        <version.spring.data.rest>2.0.0.M1</version.spring.data.rest>
+        <version.spring.data>1.5.1.RELEASE</version.spring.data>
+        <version.spring.data.rest>2.0.1.RELEASE</version.spring.data.rest>
         <version.spring.data.commons>1.6.3.RELEASE</version.spring.data.commons>
         <version.spring.mock>2.0.8</version.spring.mock>
         <version.xbean.spring>3.16</version.xbean.spring>
-        <version.hibernate>4.3.1.Final</version.hibernate>
+        <version.hibernate>4.3.4.Final</version.hibernate>
         <version.eclipselink>2.5.1</version.eclipselink>
         <version.openjpa>2.2.2</version.openjpa>
         <version.hibernate.validator>5.0.1.Final</version.hibernate.validator>
@@ -89,7 +89,7 @@
         <version.groovy.eclipse.compiler>2.8.0-01</version.groovy.eclipse.compiler>
         <version.groovy.eclipse.batch>2.1.8-01</version.groovy.eclipse.batch>
         <version.tagsoup>1.2.1</version.tagsoup>
-        <version.apache.poi>3.10-beta2</version.apache.poi>
+        <version.apache.poi>3.10-FINAL</version.apache.poi>
         <version.commons.dbcp>1.4</version.commons.dbcp>
         <version.dbunit>2.4.9</version.dbunit>
         <version.jodatime>2.3</version.jodatime>
