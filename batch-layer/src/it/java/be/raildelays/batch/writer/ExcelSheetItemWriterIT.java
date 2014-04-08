@@ -50,7 +50,7 @@ public class ExcelSheetItemWriterIT {
 
         items = new ArrayList<>();
         DateFormat formatter = new SimpleDateFormat("HH:mm");
-        Iterator<Calendar> it = DateUtils.iterator(new Date(), DateUtils.RANGE_MONTH_MONDAY);
+        Iterator<Calendar> it = DateUtils.iterator(new SimpleDateFormat("dd/MM/yyyy").parse("01/01/2000"), DateUtils.RANGE_MONTH_MONDAY);
 
         for (int i = 0; i < 40 && it.hasNext(); i++) {
             List<ExcelRow> excelRows = new ArrayList<>();

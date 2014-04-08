@@ -77,7 +77,7 @@
         <version.spring.boot>0.5.0.M7</version.spring.boot>
         <version.validation.api>1.1.0.Final</version.validation.api>
         <version.javax.el-api>2.2.4</version.javax.el-api>
-        <version.hsqldb>2.3.1</version.hsqldb>
+        <version.hsqldb>2.3.2</version.hsqldb>
         <version.derby>10.10.1.1</version.derby>
         <version.servlet>3.1.0</version.servlet>
         <version.atomikos>3.9.2</version.atomikos>

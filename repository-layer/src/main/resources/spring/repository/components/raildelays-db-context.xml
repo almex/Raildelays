@@ -3,9 +3,16 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+    <!--<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">-->
+    <!--<property name="driverClassName" value="org.apache.derby.jdbc.EmbeddedDriver"/>-->
+    <!--<property name="url" value="jdbc:derby:data/raildelays;create=true"/>-->
+    <!--</bean>-->
+
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="org.apache.derby.jdbc.EmbeddedDriver"/>
-        <property name="url" value="jdbc:derby:data/raildelays;create=true"/>
+        <property name="driverClassName" value="org.hsqldb.jdbc.JDBCDriver"/>
+        <property name="username" value="sa"/>
+        <property name="password" value=""/>
+        <property name="url" value="jdbc:hsqldb:file:data/raildelays"/>
     </bean>
 
     <bean id="loggedDataSource" class="net.sf.log4jdbc.sql.jdbcapi.DataSourceSpy">
@@ -19,7 +26,7 @@
 
     <bean id="entityManagerFactory"
           class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-        <property name="dataSource" ref="loggedDataSource"/>
+        <property name="dataSource" ref="dataSource"/>
         <property name="persistenceUnitName" value="raildelays-repository"/>
         <property name="jpaVendorAdapter">
             <bean class="org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter">
@@ -44,6 +51,8 @@
                 <!-- We must disable weaving to be able to execute tests with Surefire -->
                 <entry key="eclipselink.weaving" value="false"/>
                 <entry key="hibernate.hbm2ddl.auto" value="update"/>
+                <entry key="eclipselink.ddl-generation" value="create-or-extend-tables"/>
+                <entry key="eclipselink.ddl-generation.output-mode" value="database"/>
                 <!--<entry key="javax.persistence.schema-generation.database.action" value="none"/>-->
                 <!--<entry key="javax.persistence.schema-generation.create-database-schemas" value="false"/>-->
                 <!--<entry key="javax.persistence.schema-generation.create-source" value="metadata"/>-->

@@ -97,7 +97,7 @@
         <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
-            <scope>test</scope>
+            <!--<scope>test</scope>-->
         </dependency>
         <dependency>
             <groupId>org.dbunit</groupId>
@@ -136,14 +136,14 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>derby</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>derbytools</artifactId>
-        </dependency>
+        <!--<dependency>-->
+        <!--<groupId>org.apache.derby</groupId>-->
+        <!--<artifactId>derby</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+        <!--<groupId>org.apache.derby</groupId>-->
+        <!--<artifactId>derbytools</artifactId>-->
+        <!--</dependency>-->
         <!-- Validator implementation -->
         <dependency>
             <groupId>org.hibernate</groupId>
