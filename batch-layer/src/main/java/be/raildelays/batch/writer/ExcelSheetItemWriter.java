@@ -6,11 +6,12 @@ import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.poi.POIXMLDocument;
+import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
@@ -26,15 +27,15 @@ import java.util.Locale;
 
 public class ExcelSheetItemWriter extends AbstractItemStreamItemWriter<List<ExcelRow>> implements InitializingBean {
 
-    private String input;
+    private String templatePath;
 
-    private String output;
+    private String outputDirectory;
 
     private OutputStream outputStream;
 
-    private OPCPackage inputStream;
+    private Closeable inputStream;
 
-    private XSSFWorkbook workbook;
+    protected Workbook workbook;
 
     private static final int FIRST_ROW_INDEX = 21;
 
@@ -44,25 +45,32 @@ public class ExcelSheetItemWriter extends AbstractItemStreamItemWriter<List<Exce
 
     private boolean recoveryMode = false;
 
-    private static final String EXCEL_FILE_EXTENSION = ".xlsx";
+    enum Format {
+        OLE2(".xls"), OOXML(".xlsx");
+
+        private String fileExtension;
+
+        Format(String fileExtension) {
+            this.fileExtension = fileExtension;
+        }
+
+        public String getFileExtension() {
+            return fileExtension;
+        }
+    }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExcelSheetItemWriter.class);
 
-    private class Container {
+    protected class WorkbookSearch {
 
-        private XSSFWorkbook workbook;
+        private Workbook workbook;
 
-        public Container(OPCPackage inputStream) {
-            try {
-                this.workbook = new XSSFWorkbook(inputStream);
-            } catch (IOException e) {
-                LOGGER.error("Error when opening an Excel workbook", e);
-                throw new IllegalStateException("Cannot initialize the Container", e);
-            }
+        public WorkbookSearch(Workbook workbook) {
+            this.workbook = workbook;
         }
 
-        public boolean contains(ExcelRow excelRow) {
-            boolean result = false;
+        public int indexOf(ExcelRow excelRow) {
+            int result = -1;
             Sheet sheet = workbook.getSheetAt(0);
 
             int lastRowNum = sheet.getLastRowNum();
@@ -71,63 +79,88 @@ public class ExcelSheetItemWriter extends AbstractItemStreamItemWriter<List<Exce
                 Row row = sheet.getRow(i);
 
                 if (compare(row, excelRow) == 0) {
-                    result = true;
-                    setCurrentRowIndex(i);
+                    result = i;
                     break;
                 }
             }
 
             return result;
         }
+    }
 
-        public XSSFWorkbook getWorkbook() {
-            return workbook;
+    protected abstract class WorkbookAction<T> {
+        protected abstract T doWithHSSFWorkbook(HSSFWorkbook workbook);
+
+        protected abstract T doWithXSSFWorkbook(XSSFWorkbook workbook);
+
+        protected Workbook internalWorkbook;
+
+        public WorkbookAction() {
+            this.internalWorkbook = workbook;
+        }
+
+        public WorkbookAction(Workbook workbook) {
+            this.internalWorkbook = workbook;
+        }
+
+        public T execute() throws InvalidFormatException {
+            if (internalWorkbook instanceof HSSFWorkbook) {
+                return doWithHSSFWorkbook((HSSFWorkbook) internalWorkbook);
+            } else if (internalWorkbook instanceof XSSFWorkbook) {
+                return doWithXSSFWorkbook((XSSFWorkbook) internalWorkbook);
+            } else {
+                throw new InvalidFormatException("Format not supported!");
+            }
         }
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Validate.notNull(input,
-                "You must provide an input before using this bean");
-        Validate.notNull(output,
-                "You must provide an output before using this bean");
+        Validate.notNull(templatePath,
+                "You must provide an templatePath before using this bean");
+        Validate.notNull(outputDirectory,
+                "You must provide an outputDirectory before using this bean");
         recoveryMode = false;
     }
 
     @Override
-    public void write(List<? extends List<ExcelRow>> items) {
-        if (workbook == null) {
-            //-- We initialize the workbook reference based on the first processed item
-            if (!items.isEmpty() && !items.get(0).isEmpty()) {
-                ExcelRow firstItem = items.get(0).get(0);
+    public void write(List<? extends List<ExcelRow>> items) throws InvalidFormatException {
+        try {
+            if (workbook == null) {
+                //-- We initialize the workbook reference based on the first processed item
+                if (!items.isEmpty() && !items.get(0).isEmpty()) {
+                    ExcelRow firstItem = items.get(0).get(0);
 
-                if (!checkExistingWorkbooks(firstItem)) {
-                    createNewExcelFile(firstItem);
+                    if (!isExistingWorkbooks(firstItem)) {
+                        createNewWorkbook(getFileName(firstItem));
+                    }
                 }
             }
-        }
 
-        Sheet sheet = getFirstSheet();
+            Sheet sheet = getCurrentSheet();
 
-        for (List<ExcelRow> item : items) {
-            for (ExcelRow excelRow : item) {
-                if (currentItemCount == MAX_ROW_PER_SHEET) {
-                    closeCurrentExcelFile();
-                    createNewExcelFile(excelRow);
-                    sheet = getFirstSheet();
+            for (List<ExcelRow> item : items) {
+                for (ExcelRow excelRow : item) {
+                    if (currentItemCount == MAX_ROW_PER_SHEET) {
+                        closeWorkbook();
+                        createNewWorkbook(getFileName(excelRow));
+                        sheet = getCurrentSheet();
+                    }
+
+                    writeRow(sheet.getRow(incrementRowIndex()), excelRow);
                 }
-
-                writeRow(sheet.getRow(getCurrentRowIndex()), excelRow);
             }
+        } catch(IOException e) {
+            LOGGER.error("We were not able to write in the Excel file", e);
         }
     }
 
     @Override
     public void close() throws ItemStreamException {
-        closeCurrentExcelFile();
+        closeWorkbook();
     }
 
-    private void writeRow(Row row, ExcelRow excelRow) {
+    private void writeRow(Row row, ExcelRow excelRow) throws InvalidFormatException {
         SimpleDateFormat hh = new SimpleDateFormat("HH");
         SimpleDateFormat mm = new SimpleDateFormat("mm");
         String departureStation = getStationName(excelRow.getDepartureStation());
@@ -169,17 +202,33 @@ public class ExcelSheetItemWriter extends AbstractItemStreamItemWriter<List<Exce
                     excelRow.getEffectiveTrain2().getEnglishName());
         }
 
-        XSSFFormulaEvaluator evaluator = new XSSFFormulaEvaluator(workbook);
+        FormulaEvaluator evaluator = new WorkbookAction<FormulaEvaluator>() {
+
+            @Override
+            protected FormulaEvaluator doWithHSSFWorkbook(HSSFWorkbook workbook) {
+                return new HSSFFormulaEvaluator(workbook);
+            }
+
+            @Override
+            protected FormulaEvaluator doWithXSSFWorkbook(XSSFWorkbook workbook) {
+                return new XSSFFormulaEvaluator(workbook);
+            }
+        }.execute();
+
         evaluator.evaluateFormulaCell(row.getCell(56));
         evaluator.evaluateFormulaCell(row.getCell(55));
         evaluator.evaluateFormulaCell(row.getCell(54));
         evaluator.evaluateFormulaCell(row.getCell(53));
     }
 
-    private void createNewExcelFile(ExcelRow firstItem) throws ItemStreamException {
+    private void createNewWorkbook(String fileName) throws ItemStreamException {
         try {
-            String fileName = "retard_sncb " + DateFormatUtils.format(firstItem.getDate(), "yyyyMMdd") + EXCEL_FILE_EXTENSION;
-            File outputFile = new File(output + File.separator + fileName);
+            final InputStream internalInputStream = new FileInputStream(templatePath);
+
+            this.workbook = WorkbookFactory.create(internalInputStream);
+            this.inputStream = extractCloseable(workbook, internalInputStream);
+
+            File outputFile = new File(outputDirectory + File.separator + fileName);
 
             currentItemCount = 0;
 
@@ -193,93 +242,109 @@ public class ExcelSheetItemWriter extends AbstractItemStreamItemWriter<List<Exce
 
             LOGGER.debug("Output file '{}' created:{}", outputFile.getAbsolutePath(), created);
 
-            inputStream = OPCPackage.open(new File(input));
-            workbook = new XSSFWorkbook(inputStream);
-
-            outputStream = new FileOutputStream(outputFile);
+            this.outputStream = new FileOutputStream(outputFile);
         } catch (IOException | InvalidFormatException e) {
             throw new ItemStreamException("I/O when opening Excel template", e);
         }
     }
 
-    private boolean checkExistingWorkbooks(ExcelRow firstItem) {
+    private boolean isExistingWorkbooks(ExcelRow firstItem) {
         Validate.notNull(firstItem, "You must provide the first ExcelRow of this Excel sheet prior to check " +
                 "if a file already exists.");
 
-        // By comparing on new Container(null) value we are retrieving the first workbook containing the first free row.
+        // By comparing on new WorkbookSearch(null) fileExtension we are retrieving the first workbook containing the first free row.
         recoveryMode = retrieveFirstRowContaining(firstItem) || retrieveFirstRowContaining(null);
 
         return recoveryMode;
     }
 
     private boolean retrieveFirstRowContaining(ExcelRow content) {
-        File directory = new File(output);
+        File directory = new File(outputDirectory);
         this.workbook = null;
 
-        Validate.isTrue(directory.isDirectory(), "The output '" + output + "' parameter must be a directory path and nothing else.");
+        Validate.isTrue(directory.isDirectory(), "The outputDirectory '" + outputDirectory + "' parameter must be a directory path and nothing else.");
 
         for (File file : directory.listFiles(new FileFilter() {
             @Override
             public boolean accept(File pathname) {
-                return pathname.getName().endsWith(EXCEL_FILE_EXTENSION);
+                return pathname.getName().endsWith(Format.OLE2.getFileExtension()) || pathname.getName().endsWith(Format.OOXML.getFileExtension());
             }
         })) {
             try {
-                OPCPackage inputStream = OPCPackage.open(file);
+                final InputStream currentInputStream = new FileInputStream(file);
+                final Workbook currentWorkbook = WorkbookFactory.create(currentInputStream);
 
                 try {
-                    Container container = new Container(inputStream);
+                    WorkbookSearch container = new WorkbookSearch(currentWorkbook);
 
-                    if (container.contains(content)) {
-                        this.workbook = container.getWorkbook();
-                        this.inputStream = inputStream;
+                    int currentRowIndex = container.indexOf(content);
+                    if (currentRowIndex != -1) {
+                        this.workbook = currentWorkbook;
+                        this.outputStream = new FileOutputStream(file);
+                        this.inputStream = extractCloseable(currentWorkbook, currentInputStream);
+
+                        setCurrentRowIndex(currentRowIndex);
                         break;
                     }
                 } finally {
                     if (this.workbook == null) {
-                        inputStream.revert(); //-- Must be done in order to free the file not used.
+                        try {
+                            extractCloseable(currentWorkbook, currentInputStream).close();
+                        } catch (IOException e) {
+                            LOGGER.warn("Error when closing Excel InputStream during consultation.", e);
+                        }
                     }
                 }
             } catch (InvalidFormatException e) {
-                LOGGER.error("Error when opening an Excel workbook '{}'", file.getAbsolutePath(), e);
+                LOGGER.error("Excel format not supported for this workbook!", e);
+            } catch (IOException e) {
+                LOGGER.error("Error when opening an Excel workbook", e);
             }
         }
 
         return this.workbook != null;
     }
 
-    private void closeCurrentExcelFile() throws ItemStreamException {
+    private Closeable extractCloseable(final Workbook workbook, final Closeable closeable) throws InvalidFormatException {
+        return new WorkbookAction<Closeable>(workbook) {
+
+            @Override
+            protected Closeable doWithHSSFWorkbook(HSSFWorkbook workbook) {
+                return closeable;
+            }
+
+            @Override
+            protected Closeable doWithXSSFWorkbook(XSSFWorkbook workbook) {
+                return workbook.getPackage();
+            }
+        }.execute();
+    }
+
+    private void closeWorkbook() throws ItemStreamException {
 
         try {
-            if (outputStream != null && workbook != null && inputStream != null) {
-                if (recoveryMode) {
-                    inputStream.close();
-                } else {
-                    workbook.write(outputStream);
-                }
+            if (outputStream != null && workbook != null) {
+                workbook.write(outputStream);
                 workbook = null;
             }
         } catch (IOException e) {
-            throw new ItemStreamException("I/O error when writing Excel output file", e);
+            throw new ItemStreamException("I/O error when writing Excel outputDirectory file", e);
         } finally {
             try {
                 if (outputStream != null) {
                     outputStream.close();
                 }
             } catch (IOException e) {
-                LOGGER.error("I/O error when closing Excel output file", e);
+                LOGGER.error("I/O error when closing Excel outputDirectory file", e);
             }
 
             try {
                 if (inputStream != null) {
-                    if (!recoveryMode) {
-                        inputStream.revert();
-                    }
+                    inputStream.close();
                 }
-            } catch (IllegalStateException e) {
-                LOGGER.warn("Excel template stream already close!");
+            } catch (IOException e) {
+                LOGGER.error("I/O error when closing Excel templatePath file", e);
             }
-
         }
 
 
@@ -300,8 +365,8 @@ public class ExcelSheetItemWriter extends AbstractItemStreamItemWriter<List<Exce
         if (dateCell != null && stationFromCell != null && stationToCell != null) {
             result = new CompareToBuilder()
                     .append(dateCell.getDateCellValue(), excelRow == null ? null : excelRow.getDate())
-                    .append(stationFromCell.getStringCellValue(), excelRow == null ? null : getStationName(excelRow.getDepartureStation()))
-                    .append(stationToCell.getStringCellValue(), excelRow == null ? null : getStationName(excelRow.getArrivalStation()))
+                    .append(stationFromCell.getStringCellValue(), excelRow == null ? "" : getStationName(excelRow.getDepartureStation()))
+                    .append(stationToCell.getStringCellValue(), excelRow == null ? "" : getStationName(excelRow.getArrivalStation()))
                     .toComparison();
         } else if (excelRow != null) {
             result = 1;
@@ -324,24 +389,63 @@ public class ExcelSheetItemWriter extends AbstractItemStreamItemWriter<List<Exce
         return result;
     }
 
-    public void setInput(String input) {
-        this.input = input;
+    public void setTemplatePath(String templatePath) {
+        this.templatePath = templatePath;
     }
 
-    public void setOutput(String output) {
-        this.output = output;
+    public void setOutputDirectory(String outputDirectory) {
+        this.outputDirectory = outputDirectory;
     }
 
-    private int getCurrentRowIndex() {
-        return FIRST_ROW_INDEX + currentItemCount++;
+    protected final int getCurrentItemCount() {
+        return currentItemCount;
     }
 
-    private void setCurrentRowIndex(int rowIndex) {
-        currentItemCount = rowIndex - FIRST_ROW_INDEX;
+    private final void setCurrentItemCount(int currentItemCount) {
+        this.currentItemCount = currentItemCount;
     }
 
-    private Sheet getFirstSheet() {
+    protected final int incrementItemCount() {
+        return currentItemCount++;
+    }
+
+    protected int getCurrentRowIndex() {
+        return FIRST_ROW_INDEX + getCurrentItemCount();
+    }
+
+    protected int incrementRowIndex() {
+        return FIRST_ROW_INDEX + incrementItemCount();
+    }
+
+    protected void setCurrentRowIndex(int rowIndex) {
+        setCurrentItemCount(rowIndex - FIRST_ROW_INDEX);
+    }
+
+    protected Sheet getCurrentSheet() {
         return workbook != null ? workbook.getSheetAt(0) : null;
+    }
+
+    private String getFileName(ExcelRow firstItem) throws InvalidFormatException, IOException {
+        String fileExtension = Format.OOXML.getFileExtension();
+        InputStream inputStream = null;
+
+        try {
+            inputStream = new PushbackInputStream(new FileInputStream(templatePath), 8);
+
+            if (POIFSFileSystem.hasPOIFSHeader(inputStream)) {
+                fileExtension = Format.OLE2.getFileExtension();
+            } else if (!POIXMLDocument.hasOOXMLHeader(inputStream)) {
+                throw new InvalidFormatException("Your template is neither an OLE2 format, nor an OOXML format");
+            }
+
+            return "retard_sncb " + DateFormatUtils.format(firstItem.getDate(), "yyyyMMdd") + fileExtension;
+        } catch (FileNotFoundException e) {
+            throw new IllegalArgumentException("We were not able to determine the template format", e);
+        } finally {
+            if (inputStream != null) {
+                inputStream.close();
+            }
+        }
     }
 
 

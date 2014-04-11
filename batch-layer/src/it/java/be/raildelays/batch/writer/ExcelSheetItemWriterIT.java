@@ -25,7 +25,9 @@ public class ExcelSheetItemWriterIT {
 
     private static final String CURRENT_PATH = "." + File.separator + "target" + File.separator;
 
-    private static final String EXCEL_FILE_EXTENSION = ".xlsx";
+    private static final String OPEN_XML_FILE_EXTENSION = ".xlsx";
+
+    private static final String EXCEL_FILE_EXTENSION = ".xls";
 
     private List<List<ExcelRow>> items = new ArrayList<>();
 
@@ -41,8 +43,8 @@ public class ExcelSheetItemWriterIT {
 
         writer = new ExcelSheetItemWriter();
 
-        writer.setInput(new ClassPathResource("template.xlsx").getFile().getAbsolutePath());
-        writer.setOutput(CURRENT_PATH);
+        writer.setTemplatePath(new ClassPathResource("template.xls").getFile().getAbsolutePath());
+        writer.setOutputDirectory(CURRENT_PATH);
 
         writer.afterPropertiesSet();
         writer.open(MetaDataInstanceFactory.createStepExecution()
@@ -102,7 +104,6 @@ public class ExcelSheetItemWriterIT {
     }
 
     @Test
-    @Ignore
     public void testRestart() throws Exception {
         writer.write(items.subList(0, 10));
         writer.close();
@@ -127,7 +128,7 @@ public class ExcelSheetItemWriterIT {
         File[] result = directory.listFiles(new FileFilter() {
             @Override
             public boolean accept(File pathname) {
-                return pathname.getName().endsWith(EXCEL_FILE_EXTENSION);
+                return pathname.getName().endsWith(EXCEL_FILE_EXTENSION) || pathname.getName().endsWith(OPEN_XML_FILE_EXTENSION);
             }
         });
 
