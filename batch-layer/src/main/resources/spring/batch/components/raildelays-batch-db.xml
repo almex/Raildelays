@@ -34,7 +34,8 @@
 
 	<bean id="batchDatabaseLoader" class="be.raildelays.repository.LoadDatabase">
 		<property name="dataSource" ref="batchDataSource" />
-		<property name="initScriptPath" value="spring-batch-schema-derby.ddl" />
+		<!--<property name="initScriptPath" value="spring-batch-schema-derby.ddl" />-->
+        <property name="initScriptPath" value="org/springframework/batch/core/schema-hsqldb.sql" />
 	</bean>
 
 	<alias name="transactionManager" alias="batchTransactionManager" />
