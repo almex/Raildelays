@@ -21,6 +21,11 @@
             <filtered>true</filtered>
         </file>
         <file>
+            <source>${project.build.directory}/classes/run.sh</source>
+            <outputDirectory/>
+            <filtered>true</filtered>
+        </file>
+        <file>
             <source>${project.build.directory}/classes/startServer.bat</source>
             <outputDirectory/>
             <filtered>true</filtered>
@@ -35,7 +40,8 @@
             </includes>
             <excludes>
                 <exclude>assemblies/**</exclude>
-                <exclude>./run.bat</exclude>
+                <exclude>./run.bat</exclude>                
+                <exclude>./run.sh</exclude>
                 <exclude>./startServer.bat</exclude>
             </excludes>
             <filtered>false</filtered>

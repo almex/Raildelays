@@ -10,6 +10,9 @@
 	<!-- Needed if we use a AutomaticJobRegistrar -->
 	<context:annotation-config />
 	
+	<context:property-placeholder location="classpath:application.properties" order="1" ignore-unresolvable="true" />
+	
+	
 	<batch:job id="parentJob" abstract="true">
 		<batch:listeners merge="true">
 		  <!--<batch:listener ref="processShutdownListener" />-->

@@ -1,35 +1,13 @@
 package be.raildelays.batch.service.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.annotation.Resource;
-
+import be.raildelays.batch.service.BatchStartAndRecoveryService;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersInvalidException;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.explore.JobExplorer;
-import org.springframework.batch.core.launch.JobExecutionNotRunningException;
-import org.springframework.batch.core.launch.JobInstanceAlreadyExistsException;
-import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.launch.NoSuchJobException;
-import org.springframework.batch.core.launch.NoSuchJobExecutionException;
-import org.springframework.batch.core.launch.NoSuchJobInstanceException;
+import org.springframework.batch.core.launch.*;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
@@ -37,7 +15,8 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import be.raildelays.batch.service.BatchStartAndRecoveryService;
+import javax.annotation.Resource;
+import java.util.*;
 
 @Service("BatchStartAndRecoveryService")
 public class BatchStartAndRecoveryServiceImpl
@@ -224,17 +203,17 @@ public class BatchStartAndRecoveryServiceImpl
 	}	
 
 	@Override
-	public JobExecution start(String jobName, JobParameters jobParameters) throws JobInstanceAlreadyExistsException, NoSuchJobException, JobParametersInvalidException {
+	public JobExecution start(String jobName, JobParameters jobParameters) throws JobInstanceAlreadyExistsException, NoSuchJobException, JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 		return start(jobName, jobParameters, false);
 	}
-	public JobExecution start(String jobName, JobParameters jobParameters, boolean newInstance) throws JobInstanceAlreadyExistsException, NoSuchJobException, JobParametersInvalidException {
+	public JobExecution start(String jobName, JobParameters jobParameters, boolean newInstance) throws JobInstanceAlreadyExistsException, NoSuchJobException, JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 		LOGGER.info("Checking status of job with name=" + jobName);
 
-		if (jobRepository.isJobInstanceExists(jobName, jobParameters)) {
-			throw new JobInstanceAlreadyExistsException(String.format(
-					"Cannot start a job instance that already exists with name=%s and parameters=%s", jobName,
-					jobParameters));
-		}
+//		if (jobRepository.isJobInstanceExists(jobName, jobParameters)) {
+//			throw new JobInstanceAlreadyExistsException(String.format(
+//					"Cannot start a job instance that already exists with name=%s and parameters=%s", jobName,
+//					jobParameters));
+//		}   //-- Useless in our case. We would like to restart it
 
 		Job job = jobRegistry.getJob(jobName);
 		JobParameters effectiveJobParameters = jobParameters;
@@ -247,21 +226,8 @@ public class BatchStartAndRecoveryServiceImpl
 		}
 
 		LOGGER.info(String.format("Attempting to launch job with name=%s and parameters=%s", jobName, effectiveJobParameters.getParameters()));
-		try {
-			return jobLauncher.run(job, effectiveJobParameters);
-		}
-		catch (JobExecutionAlreadyRunningException e) {
-			throw new UnexpectedJobExecutionException(String.format(ILLEGAL_STATE_MSG, "job execution already running",
-					jobName, effectiveJobParameters.getParameters()), e);
-		}
-		catch (JobRestartException e) {
-			throw new UnexpectedJobExecutionException(String.format(ILLEGAL_STATE_MSG, "job not restartable", jobName,
-					effectiveJobParameters.getParameters()), e);
-		}
-		catch (JobInstanceAlreadyCompleteException e) {
-			throw new UnexpectedJobExecutionException(String.format(ILLEGAL_STATE_MSG, "job already complete", jobName,
-					effectiveJobParameters.getParameters()), e);
-		}
+
+        return jobLauncher.run(job, effectiveJobParameters);
 	}
 
 	@Override
@@ -292,7 +258,7 @@ public class BatchStartAndRecoveryServiceImpl
 
 	@Override
 	public JobExecution startNewInstance(String jobName, JobParameters jobParameters) throws NoSuchJobException,
-			JobParametersInvalidException, JobInstanceAlreadyExistsException {
+            JobParametersInvalidException, JobInstanceAlreadyExistsException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 		return start(jobName, jobParameters, true);
 	}
 

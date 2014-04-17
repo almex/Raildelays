@@ -38,12 +38,12 @@ public interface BatchStartAndRecoveryService {
 
     void restartAllStoppedJobs();
 
-    JobExecution start(String jobName, JobParameters jobParameters) throws JobInstanceAlreadyExistsException, NoSuchJobException, JobParametersInvalidException;
+    JobExecution start(String jobName, JobParameters jobParameters) throws JobInstanceAlreadyExistsException, NoSuchJobException, JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException;
 
     JobExecution restart(Long jobExecutionId)
             throws JobExecutionAlreadyRunningException, NoSuchJobExecutionException, NoSuchJobException, JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException;
 
-    JobExecution startNewInstance(String jobName, JobParameters jobParameters) throws JobInstanceAlreadyExistsException, NoSuchJobException, JobParametersInvalidException;
+    JobExecution startNewInstance(String jobName, JobParameters jobParameters) throws JobInstanceAlreadyExistsException, NoSuchJobException, JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException;
 
     JobExecution stop(Long jobExecutionId) throws NoSuchJobExecutionException,
             JobExecutionNotRunningException;

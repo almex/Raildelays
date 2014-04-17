@@ -7,19 +7,12 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
-import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.repeat.RepeatCallback;
-import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Assert;
 
@@ -28,8 +21,9 @@ import java.util.*;
 
 public class Bootstrap {
 
-    static final private Logger LOGGER = LoggerFactory
-            .getLogger(Bootstrap.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Bootstrap.class);
+
+    private static final String LOGGER_CONFIG_PATH = "./conf/log4j2.xml";
 
     /**
      * @param args
@@ -56,19 +50,22 @@ public class Bootstrap {
             dates = generateListOfDates();
         }
 
-        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext(
                 contextPaths);
+//        ConfigurationFactory.ConfigurationSource source = new ConfigurationFactory.ConfigurationSource(new FileInputStream(LOGGER_CONFIG_PATH));
+//        LoggerContext loggerContext = Configurator.initialize(null, source);
+        PropertyConfigurator.configure(LOGGER_CONFIG_PATH);
 
-        ctx.registerShutdownHook(); // Register close of this Spring context to shutdown of the JVM
+        //-- Initialize contexts
+        applicationContext.registerShutdownHook(); // Register close of this Spring context to shutdown of the JVM
+        applicationContext.start();
+//        loggerContext.start();
 
-        ctx.start();
+        final BatchStartAndRecoveryService service = applicationContext.getBean("BatchStartAndRecoveryService", BatchStartAndRecoveryService.class);
 
         try {
-            Properties configuration = ctx.getBean("configuration",
+            Properties configuration = applicationContext.getBean("configuration",
                     Properties.class);
-            final BatchStartAndRecoveryService service = ctx.getBean("BatchStartAndRecoveryService", BatchStartAndRecoveryService.class);
-            @SuppressWarnings("unchecked")
-            final FlatFileItemReader<String> trainListReader = ctx.getBean("trainList", FlatFileItemReader.class);
             final DefaultJobParametersConverter converter = new DefaultJobParametersConverter();
 
             converter.setDateFormat(new SimpleDateFormat("dd/MM/yyyy"));
@@ -84,100 +81,56 @@ public class Bootstrap {
 
             Assert.notNull(departure, "You must add a 'departure' property into the ./conf/raildelays.properties");
             Assert.notNull(arrival, "You must add a 'arrival' property into the ./conf/raildelays.properties");
+            Assert.notNull(excelInputTemplate, "You must add a 'excel.input.template' property into the ./conf/raildelays.properties");
+            Assert.notNull(textOutputPath, "You must add a 'text.output.path' property into the ./conf/raildelays.properties");
+            Assert.notNull(excelOutputPath, "You must add a 'excel.output.path' property into the ./conf/raildelays.properties");
 
             if (recovery) {
                 LOGGER.info("[Recovery activated]");
                 service.markInconsistentJobsAsFailed();
-                //service.restartAllFailedJobs();
-                //service.restartAllStoppedJobs();
             }
 
-            //-- Search all delays from Railtime
+            //-- Launch one Job per date
             if (online) {
                 LOGGER.info("[ON-line mode activated]");
 
-                try {
-                    trainListReader.open(new ExecutionContext());
-                    RepeatTemplate template = new RepeatTemplate();
-                    template.iterate(new RepeatCallback() {
+                for (Date date : dates) {
+                    Map<String, JobParameter> parameters = new HashMap<>();
 
-                        public RepeatStatus doInIteration(RepeatContext context) throws UnexpectedInputException, ParseException, Exception {
-                            RepeatStatus result = RepeatStatus.CONTINUABLE;
-                            String trainId = trainListReader.read();
+                    parameters.put("date", new JobParameter(
+                            date));
+                    parameters.put("station.a.name",
+                            new JobParameter(departure));
+                    parameters.put("station.b.name",
+                            new JobParameter(arrival));
+                    parameters.put("excel.input.template", new JobParameter(
+                            excelInputTemplate));
+                    parameters.put("excel.output.file", new JobParameter(
+                            excelOutputPath));
+                    parameters.put("output.file.path", new JobParameter(
+                            textOutputPath));
 
-                            if (trainId != null) {
-                                for (Date date : dates) {
-                                    Map<String, JobParameter> parameters = new HashMap<>();
+                    JobParameters jobParameters = new JobParameters(
+                            parameters);
 
-                                    parameters.put("date", new JobParameter(
-                                            date));
-                                    parameters.put("trainId", new JobParameter(
-                                            trainId));
-                                    parameters.put("station.a.name",
-                                            new JobParameter(departure));
-                                    parameters.put("station.b.name",
-                                            new JobParameter(arrival));
-
-                                    JobParameters jobParameters = new JobParameters(
-                                            parameters);
-
-                                    service.start("retrieveDataFromRailtimeJob", jobParameters);
-                                }
-                            } else {
-                                result = RepeatStatus.FINISHED;
-                            }
-
-                            return result;
-                        }
-
-                    });
-                } catch (Exception e) {
-                    LOGGER.error("Error during start of retrieveDataFromRailtimeJob we will attempt to restart all failed jobs: {}", e);
-                    service.restartAllFailedJobs();
-                } finally {
-                    trainListReader.close();
+                    service.start("mainJob", jobParameters);
                 }
             } else {
                 LOGGER.info("[OFF-line mode activated]");
             }
-
-            //-- Generate simple flat file
-            if (StringUtils.isNotEmpty(textOutputPath)) {
-                Map<String, JobParameter> parameters = new HashMap<>();
-
-                parameters.put("date", new JobParameter(new Date()));
-                parameters.put("station.a.name", new JobParameter(departure));
-                parameters.put("station.b.name", new JobParameter(arrival));
-                parameters.put("output.file.path", new JobParameter(
-                        textOutputPath));
-
-                JobParameters jobParameters = new JobParameters(parameters);
-
-                service.start("searchDelaysJob", jobParameters);
-            }
-
-            //-- Generate Excel sheets
-            if (StringUtils.isNotEmpty(excelOutputPath)) {
-                Map<String, JobParameter> parameters = new HashMap<>();
-
-                parameters.put("date", new JobParameter(new Date()));
-                parameters.put("station.a.name", new JobParameter(departure));
-                parameters.put("station.b.name", new JobParameter(arrival));
-                parameters.put("excel.input.template", new JobParameter(
-                        excelInputTemplate));
-                parameters.put("excel.output.file", new JobParameter(
-                        excelOutputPath));
-
-                JobParameters jobParameters = new JobParameters(parameters);
-
-
-                service.start("searchDelaysXlsJob", jobParameters);
-            }
         } finally {
-            if (ctx != null) {
-                ctx.stop();
-                ctx.close();
+            if (service != null) {
+                service.stopAllRunningJobs();
             }
+
+            if (applicationContext != null) {
+                applicationContext.stop();
+                applicationContext.close();
+            }
+
+//            if (loggerContext != null) {
+//                loggerContext.stop();
+//            }
         }
 
         System.exit(0);

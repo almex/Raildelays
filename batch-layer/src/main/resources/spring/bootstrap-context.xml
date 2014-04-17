@@ -1,32 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
+	
+	<context:property-placeholder location="classpath:application.properties" order="1" ignore-unresolvable="true" />
 
 	<bean id="configuration"
 		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
 		<property name="locations">
 			<list>
-				<value>file:./conf/raildelays.properties</value>
+				<value>${file.configuration.uri}</value>
 			</list>
 		</property>
 		<property name="fileEncoding" value="ISO8859-1" />
 		<property name="ignoreResourceNotFound" value="false" />
 	</bean>
 
-    <bean id="trainList" class="org.springframework.batch.item.file.FlatFileItemReader">
-        <property name="lineMapper">
-            <bean
-                class="org.springframework.batch.item.file.mapping.PassThroughLineMapper">
-            </bean>
-        </property>
-        <property name="encoding" value="ISO-8859-1" />
-        <property name="resource" value="file:./conf/train.list" />
-    </bean>
-
-	<import
-		resource="classpath:spring/batch/raildelays-batch-integration-context.xml" />
+	<import resource="classpath:spring/batch/raildelays-batch-integration-context.xml" />
 
 </beans>
