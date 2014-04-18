@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <entry key="LoggerContextFactory">be.raildelays.batch.Log4j2ConfigurationFactory</entry>
+    <entry key="Log4jAPIVersion">2.0.0</entry>
+</properties>

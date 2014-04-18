@@ -8,6 +8,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.core.config.ConfigurationFactory;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobParameter;
@@ -16,6 +18,8 @@ import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Assert;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -24,6 +28,10 @@ public class Bootstrap {
     private static final Logger LOGGER = LoggerFactory.getLogger(Bootstrap.class);
 
     private static final String LOGGER_CONFIG_PATH = "./conf/log4j2.xml";
+
+    static {
+        Log4j2ConfigurationFactory.getInstance().getConfiguration(null);
+    }
 
     /**
      * @param args
@@ -54,7 +62,6 @@ public class Bootstrap {
                 contextPaths);
 //        ConfigurationFactory.ConfigurationSource source = new ConfigurationFactory.ConfigurationSource(new FileInputStream(LOGGER_CONFIG_PATH));
 //        LoggerContext loggerContext = Configurator.initialize(null, source);
-        PropertyConfigurator.configure(LOGGER_CONFIG_PATH);
 
         //-- Initialize contexts
         applicationContext.registerShutdownHook(); // Register close of this Spring context to shutdown of the JVM
@@ -91,32 +98,26 @@ public class Bootstrap {
             }
 
             //-- Launch one Job per date
-            if (online) {
-                LOGGER.info("[ON-line mode activated]");
+            for (Date date : dates) {
+                Map<String, JobParameter> parameters = new HashMap<>();
 
-                for (Date date : dates) {
-                    Map<String, JobParameter> parameters = new HashMap<>();
+                parameters.put("date", new JobParameter(
+                        date));
+                parameters.put("station.a.name",
+                        new JobParameter(departure));
+                parameters.put("station.b.name",
+                        new JobParameter(arrival));
+                parameters.put("excel.input.template", new JobParameter(
+                        excelInputTemplate));
+                parameters.put("excel.output.file", new JobParameter(
+                        excelOutputPath));
+                parameters.put("output.file.path", new JobParameter(
+                        textOutputPath));
 
-                    parameters.put("date", new JobParameter(
-                            date));
-                    parameters.put("station.a.name",
-                            new JobParameter(departure));
-                    parameters.put("station.b.name",
-                            new JobParameter(arrival));
-                    parameters.put("excel.input.template", new JobParameter(
-                            excelInputTemplate));
-                    parameters.put("excel.output.file", new JobParameter(
-                            excelOutputPath));
-                    parameters.put("output.file.path", new JobParameter(
-                            textOutputPath));
+                JobParameters jobParameters = new JobParameters(
+                        parameters);
 
-                    JobParameters jobParameters = new JobParameters(
-                            parameters);
-
-                    service.start("mainJob", jobParameters);
-                }
-            } else {
-                LOGGER.info("[OFF-line mode activated]");
+                service.start("mainJob", jobParameters);
             }
         } finally {
             if (service != null) {

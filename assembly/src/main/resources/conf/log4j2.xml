@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration monitorInterval="30">
+	<appenders>
+		<Console name="console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%m%n" />
+		</Console>
+        <File name="railtime-data-reader" fileName="logs/railtime-data.log" append="true">
+        <PatternLayout pattern="[Reader]: %m%n" />
+		</File>
+        <File name="railtime-data-parser" fileName="logs/railtime-data.log" append="true">
+        <PatternLayout pattern="[Parser]: %m%n" />
+        </File>
+        <File name="railtime-data-streamer" fileName="logs/railtime-data.log" append="true">
+        <PatternLayout pattern="[Streamer]: %m%n" />
+        </File>
+        <File name="railtime-data" fileName="logs/railtime-data.log" append="true">
+        <PatternLayout pattern="[Data]: %m%n" />
+        </File>
+        <File name="output" fileName="logs/output.log" append="true">
+        <PatternLayout pattern="%d{DATE} %m%n" />
+        </File>
+        <File name="springbatch" fileName="logs/springbatch.log" append="true">
+        <PatternLayout pattern="%d{DATE} %-5p: %m%n" />
+        </File>
+        <File name="railtime-route-processor" fileName="logs/railtime-processor.log" append="true">
+        <PatternLayout pattern="[Route]: %m%n" />
+        </File>
+        <File name="raildelays-xls-processor" fileName="logs/railtime-processor.log" append="true">
+        <PatternLayout pattern="[Xls]: %m%n" />
+        </File>
+        <File name="raildelays-next-processor" fileName="logs/railtime-processor.log" append="true">
+        <PatternLayout pattern="[Next]: %m%n" />
+        </File>
+        <File name="raildelays-aggregate-processor" fileName="logs/railtime-processor.log" append="true">
+        <PatternLayout pattern="[Aggregate]: %m%n" />
+        </File>
+        <File name="raildelays-filter-processor" fileName="logs/railtime-processor.log" append="true">
+        <PatternLayout pattern="[Filter]: %m%n" />
+        </File>
+        <File name="jdbc" fileName="logs/jdbc.log" append="true">
+        <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %level - %m%n%ex%n"/>
+        </File>
+        <File name="skipped-items" fileName="logs/skipped-items.log" append="true">
+        <PatternLayout pattern="%d{DATE} %-5p: %m%n" />
+        </File>
+	</appenders>
+	<loggers>
+	
+		<logger name="be.raildelays.batch.Bootstrap" level="info" additivity="false">
+	        <appender-ref ref="console" />
+	    </logger>    
+	    <logger name="be.raildelays.batch.reader" level="info" additivity="false">
+	        <appender-ref ref="railtime-data-reader" />
+	    </logger>    
+	    <logger name="be.raildelays.httpclient" level="info" additivity="false">
+	        <appender-ref ref="railtime-data-streamer" />
+	    </logger>       
+	    <logger name="be.raildelays.parser" level="info" additivity="false">
+	        <appender-ref ref="railtime-data-parser" />
+	    </logger>
+	    <logger name="be.raildelays.repository" level="info" additivity="false">
+	        <appender-ref ref="railtime-data" />
+	    </logger>
+	    <logger name="be.raildelays.service" level="info" additivity="false">
+	        <appender-ref ref="railtime-data" />
+	    </logger>
+	    <logger name="be.raildelays.domain.railtime" level="info" additivity="false">
+	        <appender-ref ref="railtime-data" />
+	    </logger>
+	    <logger name="be.raildelays.batch.processor.RouteLogMapperProcessor" level="info" additivity="false">
+	        <appender-ref ref="railtime-route-processor" />
+	    </logger>
+	    <logger name="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor" level="info" additivity="false">
+	        <appender-ref ref="raildelays-filter-processor" />
+	    </logger>
+	    <logger name="be.raildelays.batch.processor.ExcelRowMapperProcessor" level="info" additivity="false">
+	        <appender-ref ref="raildelays-xls-processor" />
+	    </logger>
+        <logger name="be.raildelays.batch.processor.SearchNextTrainProcessor" level="info" additivity="false">
+            <appender-ref ref="raildelays-next-processor" />
+        </logger>
+        <logger name="be.raildelays.batch.processor.AggregateExpectedTimeProcessor" level="info" additivity="false">
+            <appender-ref ref="raildelays-aggregate-processor" />
+        </logger>
+	    <logger name="org.springframework.batch.item.file.FlatFileItemWriter" level="info" additivity="false">
+	        <appender-ref ref="output" />
+	    </logger>
+	    <logger name="org.springframework.batch" level="info" additivity="false">
+	        <appender-ref ref="springbatch" />
+	    </logger>
+        <logger name="be.raildelays.batch.listener.LogSkippedItemListener" level="info" additivity="false">
+            <appender-ref ref="skipped-items" />
+        </logger>
+        <logger name="log4jdbc.log4j2" level="info" additivity="false">
+            <MarkerFilter marker="LOG4JDBC_AUDIT" onMatch="ACCEPT" onMismatch="NEUTRAL"/>
+            <MarkerFilter marker="LOG4JDBC_RESULTSETTABLE" onMatch="ACCEPT" onMismatch="NEUTRAL"/>
+            <appender-ref ref="jdbc"/>
+        </logger>
+
+
+        <root level="warn">
+			<appender-ref ref="console" />
+		</root>
+	</loggers>
+</configuration>
