@@ -2,6 +2,7 @@ package be.raildelays.batch.reader;
 
 import java.util.Date;
 import java.util.List;
+import java.util.ArrayList;
 
 import javax.annotation.Resource;
 
@@ -46,17 +47,16 @@ public class DelaysItemReader implements ItemReader<List<LineStop>>, Initializin
 
 	public List<LineStop> read() throws Exception, UnexpectedInputException,
 			ParseException, NonTransientResourceException {
-		List<LineStop> result = null;
+		List<LineStop> result = new ArrayList<>();
 		
 		LOGGER.debug("Searching delays for date={}", date);
-		
-		result = service.searchDelaysBetween(date, new Station(stationA), new Station(stationB), 15);
-		
-		if (result.isEmpty()) {
-			result = null; // To apply the ItemReader contract
-		}
 
-		return result;
+        if (date != null) {
+            result = service.searchDelaysBetween(date, new Station(stationA), new Station(stationB), 15);
+            date = null; //-- for next read we need a new date
+        }
+
+		return result.isEmpty() ? null : result; //-- To apply the ItemReader contract
 	}
 
 	public void setStationA(String stationA) {

@@ -24,10 +24,10 @@
 
         <properties>
             <!-- JPA Standard -->
-            <property name="javax.persistence.target-database" value="DERBY"/>
-            <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:derby:data/raildelays;create=true"/>
-            <property name="javax.persistence.jdbc.user" value=""/>
+            <property name="javax.persistence.target-database" value="HSQL"/>
+            <property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbc.JDBCDriver"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:file:data/raildelays"/>
+            <property name="javax.persistence.jdbc.user" value="sa"/>
             <property name="javax.persistence.jdbc.password" value=""/>
             <property name="javax.persistence.schema-generation.database.action" value="create"/>
             <property name="javax.persistence.schema-generation.create-database-schemas" value="true"/>

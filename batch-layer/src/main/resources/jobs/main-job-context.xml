@@ -40,7 +40,7 @@
         </batch:step>
         <batch:step id="searchDelays" next="searchDelaysXls">
             <batch:tasklet transaction-manager="batchTransactionManager" allow-start-if-complete="true">
-                <batch:chunk reader="compositeRaildelaysItemReader"
+                <batch:chunk reader="delaysItemReader"
                              processor="chainedProcessorsForDelays"
                              writer="flatFileItemWriter"
                              commit-interval="4" skip-limit="10">
@@ -53,14 +53,14 @@
                 </batch:chunk>
                 <batch:transaction-attributes
                         isolation="DEFAULT" propagation="REQUIRED"/>
-                <batch:listeners>
-                    <batch:listener ref="skippedItemsListener"/>
-                </batch:listeners>
             </batch:tasklet>
+            <batch:listeners>
+                <batch:listener ref="skippedItemsListener"/>
+            </batch:listeners>
         </batch:step>
         <batch:step id="searchDelaysXls">
             <batch:tasklet transaction-manager="batchTransactionManager" allow-start-if-complete="true">
-                <batch:chunk reader="compositeRaildelaysItemReader"
+                <batch:chunk reader="delaysItemReader"
                              processor="chainedProcessorsForDelays"
                              writer="excelSheetItemWriter"
                              commit-interval="4" skip-limit="10">
@@ -73,10 +73,10 @@
                 </batch:chunk>
                 <batch:transaction-attributes
                         isolation="DEFAULT" propagation="REQUIRED"/>
-                <batch:listeners>
-                    <batch:listener ref="skippedItemsListener"/>
-                </batch:listeners>
             </batch:tasklet>
+            <batch:listeners>
+                <batch:listener ref="skippedItemsListener"/>
+            </batch:listeners>
         </batch:step>
     </batch:job>
 
@@ -127,22 +127,11 @@
         </property>
     </bean>
 
-    <bean id="compositeRaildelaysItemReader"
-          class="be.raildelays.batch.reader.CompositeRaildelaysItemReader"
+    <bean id="delaysItemReader" class="be.raildelays.batch.reader.DelaysItemReader"
           scope="step">
-        <property name="datesItemReader">
-            <bean class="be.raildelays.batch.reader.DatabaseDatesItemReader"
-                  scope="step">
-                <property name="lastDate" value="#{jobParameters['date']}"/>
-            </bean>
-        </property>
-        <property name="delaysItemReader">
-            <bean class="be.raildelays.batch.reader.DelaysItemReader"
-                  scope="step">
-                <property name="stationA" value="#{jobParameters['station.a.name']}"/>
-                <property name="stationB" value="#{jobParameters['station.b.name']}"/>
-            </bean>
-        </property>
+        <property name="stationA" value="#{jobParameters['station.a.name']}"/>
+        <property name="stationB" value="#{jobParameters['station.b.name']}"/>
+        <property name="date" value="#{jobParameters['date']}" />
     </bean>
 
     <!-- ================================================================================================== -->
@@ -167,6 +156,7 @@
                 <ref bean="validatorProcessor"/>
                 <ref bean="searchNextTrainProcessor"/>
                 <ref bean="filterTwoSensPerDayProcessor"/>
+                <ref bean="filterSmallDelaysProcessor"/>
                 <ref bean="validatorProcessor"/>
             </list>
         </property>
@@ -204,6 +194,11 @@
           scope="step">
         <property name="stationA" value="#{jobParameters['station.a.name']}"/>
         <property name="stationB" value="#{jobParameters['station.b.name']}"/>
+    </bean>
+
+    <bean id="filterSmallDelaysProcessor" class="be.raildelays.batch.processor.FilterSmallDelaysProcessor"
+          scope="step">
+        <property name="threshold" value="15"/>
     </bean>
 
     <!-- ================================================================================================== -->

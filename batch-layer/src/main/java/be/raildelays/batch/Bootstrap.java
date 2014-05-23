@@ -183,6 +183,8 @@ public class Bootstrap {
         result.add(thursday);
         result.add(friday);
 
+        Collections.sort(result); //-- To order outcomes
+
         return result;
     }
 

@@ -70,7 +70,7 @@
         <version.spring.data.commons>1.6.3.RELEASE</version.spring.data.commons>
         <version.spring.mock>2.0.8</version.spring.mock>
         <version.xbean.spring>3.16</version.xbean.spring>
-        <version.hibernate>4.3.4.Final</version.hibernate>
+        <version.hibernate>4.3.5.Final</version.hibernate>
         <version.eclipselink>2.5.1</version.eclipselink>
         <version.openjpa>2.2.2</version.openjpa>
         <version.hibernate.validator>5.0.1.Final</version.hibernate.validator>
@@ -84,8 +84,8 @@
         <version.log4j>2.0-rc1</version.log4j>
         <version.slf4j>1.7.5</version.slf4j>
         <version.log4jdbc>1.16</version.log4jdbc>
-        <version.groovy>2.3.0-beta-2</version.groovy>
-        <version.groovy.all>2.3.0-beta-2</version.groovy.all>
+        <version.groovy>2.3.0</version.groovy>
+        <version.groovy.all>2.3.0</version.groovy.all>
         <version.groovy.eclipse.compiler>2.8.0-01</version.groovy.eclipse.compiler>
         <version.groovy.eclipse.batch>2.1.8-01</version.groovy.eclipse.batch>
         <version.tagsoup>1.2.1</version.tagsoup>

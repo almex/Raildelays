@@ -13,16 +13,16 @@
         <property name="dataSource" ref="dataSource"/>
         <property name="persistenceUnitName" value="raildelays-repository"/>
         <property name="jpaVendorAdapter">
-            <bean class="org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter">
+            <!--bean class="org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter">
                 <property name="databasePlatform" value="org.eclipse.persistence.platform.database.HSQLPlatform"/>
                 <property name="showSql" value="true"/>
-            </bean>
-            <!--<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+            </bean-->
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
                 <property name="database" value="HSQL"/>
                 <property name="showSql" value="true"/>
                 <property name="databasePlatform" value="org.hibernate.dialect.HSQLDialect"/>
                 <property name="generateDdl" value="true"/>
-            </bean>-->
+            </bean>
             <!--<bean class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter">
                 <property name="showSql" value="true"/>
                 <property name="database" value="HSQL"/>
@@ -35,9 +35,9 @@
                 <!-- We must disable weaving to be able to execute tests with Surefire -->
                 <entry key="eclipselink.weaving" value="false"/>
                 <entry key="hibernate.hbm2ddl.auto" value="update"/>
-                <!--<entry key="javax.persistence.schema-generation.database.action" value="none"/>-->
-                <!--<entry key="javax.persistence.schema-generation.create-database-schemas" value="false"/>-->
-                <!--<entry key="javax.persistence.schema-generation.create-source" value="metadata"/>-->
+                <entry key="javax.persistence.schema-generation.database.action" value="none"/>
+                <entry key="javax.persistence.schema-generation.create-database-schemas" value="false"/>
+                <entry key="javax.persistence.schema-generation.create-source" value="metadata"/>
             </map>
         </property>
     </bean>
