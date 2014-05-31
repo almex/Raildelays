@@ -1,5 +1,6 @@
 package be.raildelays.domain.entities;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -17,7 +18,7 @@ import java.util.Date;
  * @see Embeddable
  */
 @Embeddable
-public class TimestampDelay implements Serializable {
+public class TimestampDelay implements Serializable, Comparable<TimestampDelay> {
 
 	private static final long serialVersionUID = -1026179811764044178L;
 
@@ -91,4 +92,12 @@ public class TimestampDelay implements Serializable {
 	public final Long getDelay() {
 		return delay;
 	}
+
+    @Override
+    public int compareTo(TimestampDelay timestampDelay) {
+        return new CompareToBuilder()
+                .append(expected, timestampDelay != null ? timestampDelay.getExpected() : null)
+                .append(delay, timestampDelay != null ? timestampDelay.getDelay() : null)
+                .toComparison();
+    }
 }

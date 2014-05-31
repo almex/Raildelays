@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import be.raildelays.domain.railtime.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,15 +18,11 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 
 import be.raildelays.domain.dto.RouteLogDTO;
 import be.raildelays.domain.dto.ServedStopDTO;
-import be.raildelays.domain.railtime.Direction;
-import be.raildelays.domain.railtime.Station;
-import be.raildelays.domain.railtime.Step;
-import be.raildelays.domain.railtime.Train;
 
 @RunWith(value = BlockJUnit4ClassRunner.class)
 public class RouteLogMapperProcessorTest {
 
-	private List<Direction> list;
+	private TwoDirections directions;
 
 	/**
 	 * S.U.T.
@@ -57,7 +54,7 @@ public class RouteLogMapperProcessorTest {
 				new Step(4, "3", f.parse("13:45"), 0L, true)));
 		
 		Direction direction2 = new Direction(new Train("466"));
-		
+
 		direction1.setFrom(stationA);
 		direction1.setTo(stationB);
 		direction2.setLibelle("From A to B");
@@ -68,10 +65,7 @@ public class RouteLogMapperProcessorTest {
 				new Step(3, "B", f.parse("13:00"), 20L, false), //
 				new Step(4, "3", f.parse("13:45"), 0L, true)));
 
-		list = new ArrayList<>();
-		
-		list.add(direction1);
-		list.add(direction2);
+        directions = new TwoDirections(direction1, direction2);
 		
 		processor = new RouteLogMapperProcessor();
 		
@@ -80,28 +74,28 @@ public class RouteLogMapperProcessorTest {
 
 	@Test
 	public void testNumberOfStops() throws Exception {
-		RouteLogDTO routeLog = processor.process(list);
+		RouteLogDTO routeLog = processor.process(directions);
 
 		Assert.assertEquals(5, routeLog.getStops().size());
 	}
 	
 	@Test
 	public void testDate() throws Exception {
-		RouteLogDTO routeLog = processor.process(list);
+		RouteLogDTO routeLog = processor.process(directions);
 
 		Assert.assertEquals(processor.getDate(), routeLog.getDate());
 	}
 	
 	@Test
 	public void testTrainId() throws Exception {
-		RouteLogDTO routeLog = processor.process(list);
+		RouteLogDTO routeLog = processor.process(directions);
 
 		Assert.assertEquals("466", routeLog.getTrainId());
 	}
 	
 	@Test
 	public void testArrivalTimeGreaterThanDepartureTime() throws Exception {
-		RouteLogDTO routeLog = processor.process(list);
+		RouteLogDTO routeLog = processor.process(directions);
 		
 		for (ServedStopDTO stop : routeLog.getStops()) {
 			Assert.assertThat(stop.getArrivalTime(), greaterThanOrEqualTo(stop.getDepartureTime()));
@@ -110,7 +104,7 @@ public class RouteLogMapperProcessorTest {
 	
 	@Test
 	public void testCanceled() throws Exception {
-		RouteLogDTO routeLog = processor.process(list);
+		RouteLogDTO routeLog = processor.process(directions);
 		ServedStopDTO stop = routeLog.getStops().get(4);
 		
 		Assert.assertTrue(stop.isCanceled());
@@ -118,14 +112,14 @@ public class RouteLogMapperProcessorTest {
 	
 	@Test
 	public void testEmpty() throws Exception {
-		RouteLogDTO routeLog = processor.process(new ArrayList<Direction>());
+		RouteLogDTO routeLog = processor.process(new TwoDirections(null, null));
 		
-		Assert.assertNull("An empty list should return a null value as the end of the process", routeLog);
+		Assert.assertNull("An empty direction should return a null value as the end of the process", routeLog);
 	}
 	
 	@Test
 	public void testOrder() throws Exception {
-		RouteLogDTO routeLog = processor.process(list);
+		RouteLogDTO routeLog = processor.process(directions);
 		
 		for (int i = 0 ; i < routeLog.getStops().size(); i++) {
 			ServedStopDTO stop = routeLog.getStops().get(i);			

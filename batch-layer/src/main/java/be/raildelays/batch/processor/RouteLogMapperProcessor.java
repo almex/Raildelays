@@ -4,6 +4,7 @@ import be.raildelays.domain.dto.RouteLogDTO;
 import be.raildelays.domain.dto.ServedStopDTO;
 import be.raildelays.domain.railtime.Direction;
 import be.raildelays.domain.railtime.Step;
+import be.raildelays.domain.railtime.TwoDirections;
 import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,7 @@ import java.util.List;
  * @author Almex
  */
 public class RouteLogMapperProcessor implements
-        ItemProcessor<List<Direction>, RouteLogDTO>, InitializingBean {
+        ItemProcessor<TwoDirections, RouteLogDTO>, InitializingBean {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(RouteLogMapperProcessor.class);
@@ -37,15 +38,13 @@ public class RouteLogMapperProcessor implements
     }
 
     @Override
-    public RouteLogDTO process(final List<Direction> items) throws Exception {
+    public RouteLogDTO process(final TwoDirections item) throws Exception {
         RouteLogDTO result = null;
 
-        LOGGER.debug("Processing {} direction(s)...", items.size());
+        Direction departureDirection = item.getDeparture();
+        Direction arrivalDirection = item.getArrival();
 
-        if (items.size() >= 2) {
-            Direction departureDirection = items.get(0);
-            Direction arrivalDirection = items.get(1);
-
+        if (departureDirection != null && arrivalDirection != null) {
             result = new RouteLogDTO(arrivalDirection.getTrain().getIdRailtime(), date);
 
             for (Step arrivalStep : arrivalDirection.getSteps()) {

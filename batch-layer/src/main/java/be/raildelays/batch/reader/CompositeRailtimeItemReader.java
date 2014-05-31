@@ -3,6 +3,7 @@ package be.raildelays.batch.reader;
 import java.util.ArrayList;
 import java.util.List;
 
+import be.raildelays.domain.railtime.TwoDirections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.step.item.Chunk;
@@ -24,7 +25,7 @@ import be.raildelays.domain.railtime.Direction;
  * 
  * @author Almex
  */
-public class CompositeRailtimeItemReader extends CompositeItemStream implements ItemReader<List<? extends Direction>>, InitializingBean {
+public class CompositeRailtimeItemReader extends CompositeItemStream implements ItemReader<TwoDirections>, InitializingBean {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(CompositeRailtimeItemReader.class);
@@ -41,17 +42,15 @@ public class CompositeRailtimeItemReader extends CompositeItemStream implements 
 		LOGGER.debug("Reader initialized with arrivalReader={} and departureReader={}", arrivalReader, departureReader);
 	}
 
-	public List<? extends Direction> read() throws Exception, UnexpectedInputException,
-			ParseException, NonTransientResourceException {	
-		List<Direction> result = null;	 
+	public TwoDirections read() throws Exception, UnexpectedInputException,
+			ParseException, NonTransientResourceException {
+        TwoDirections result = null;
 
 		Direction departureDirection = departureReader.read();
 		Direction arrivalDirection = arrivalReader.read();
 		
-		if (departureDirection != null && arrivalDirection != null) {			
-			result = new ArrayList<>();
-			result.add(departureDirection); 
-			result.add(arrivalDirection);
+		if (departureDirection != null && arrivalDirection != null) {
+            result = new TwoDirections(departureDirection, arrivalDirection);
 		}
 		
 		return result;

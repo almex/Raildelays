@@ -6,6 +6,7 @@ import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.util.ArrayList;
@@ -26,6 +27,8 @@ public class FilterTwoSensPerDayProcessor implements
     private String stationA;
 
     private String stationB;
+
+    private ItemStreamReader outputReader;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -77,6 +80,10 @@ public class FilterTwoSensPerDayProcessor implements
         LOGGER.trace("sens={} maxDelay={}", sens, maxDelay);
 
         return result;
+    }
+
+    public void setOutputReader(ItemStreamReader outputReader) {
+        this.outputReader = outputReader;
     }
 
     public void setStationA(String stationA) {
