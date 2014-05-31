@@ -136,6 +136,8 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
         if (executionContext.containsKey(getExecutionContextKey(WRITE_COUNT))) {
             int itemCount = executionContext.getInt(getExecutionContextKey(WRITE_COUNT));
 
+            currentItemCount = itemCount;
+
             if (itemCount < maxItemCount) {
                 try {
                     jumpToItem(itemCount);
@@ -144,7 +146,6 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
                     throw new ItemStreamException("Could not move to stored position on restart", e);
                 }
             }
-            currentItemCount = itemCount;
 
         }
 

@@ -20,7 +20,7 @@ public class ExcelRowMapper implements RowMapper<ExcelRow> {
         Train effectiveTrain2 = null;
         Station linkStation = null;
 
-        if (row.getCell(2) != null) {
+        if (row.getCell(2).getDateCellValue() != null) {
             if (row.getCell(24) != null) {
                 linkStation = new Station(row.getCell(24).getStringCellValue());
             }
@@ -46,7 +46,7 @@ public class ExcelRowMapper implements RowMapper<ExcelRow> {
                     .effectiveTrain1(new Train(row.getCell(48).getStringCellValue()))
                     .effectiveTrain2(effectiveTrain2)
                     .delay((long) row.getCell(53).getNumericCellValue())
-                    .rowIndex(new Long(rowIndex))
+                    .rowIndex(new Long(row.getRowNum()))
                     .build();
         } //-- If the first cell contains nothing we return null
 

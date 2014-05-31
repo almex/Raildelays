@@ -84,7 +84,7 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<ExcelRow> {
         //-- We manage creation of file in doWrite()
     }
 
-    protected void createNewWorkbook(String fileName) throws ItemStreamException {
+    protected void createNewWorkbook(String fileName) throws Exception {
         setResource(new FileSystemResource(new File(outputDirectory + File.separator + fileName)));
         super.doOpen();
     }

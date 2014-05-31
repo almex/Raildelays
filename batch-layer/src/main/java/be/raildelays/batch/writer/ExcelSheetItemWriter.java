@@ -62,7 +62,12 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
     }
 
     @Override
-    public void doOpen() {
+    protected void jumpToItem(int itemIndex) throws Exception {
+        super.jumpToItem(rowsToSkip + itemIndex);
+    }
+
+    @Override
+    public void doOpen() throws Exception {
         try {
             File outputFile = resource.getFile();
 
@@ -84,7 +89,6 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
             } else {
                 this.workbook = WorkbookFactory.create(resource.getFile());
             }
-
         } catch (IOException | InvalidFormatException e) {
             throw new ItemStreamException("I/O when opening Excel template", e);
         }
@@ -95,6 +99,7 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
         ExcelRow previousRow = null;
 
         try {
+             rowIndex = rowsToSkip + itemIndex;
              rowAggregator.aggregate(item, workbook, sheetIndex, rowIndex);
         } catch(Exception e) {
             LOGGER.error("We were not able to write in the Excel file", e);
