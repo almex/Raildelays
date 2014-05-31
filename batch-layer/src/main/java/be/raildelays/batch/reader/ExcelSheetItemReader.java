@@ -2,7 +2,6 @@ package be.raildelays.batch.reader;
 
 import be.raildelays.batch.poi.ExcelRowMappingException;
 import be.raildelays.batch.poi.RowMapper;
-import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -30,7 +28,7 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
 
     private int rowsToSkip = 0;
 
-    private int rowCount = 0;
+    private int rowIndex = 0;
 
     private int sheetIndex = 0;
 
@@ -49,12 +47,10 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
     @Override
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(rowMapper, "LineMapper is required");
-        setName(this.getClass().getCanonicalName());
     }
 
     @Override
     protected T doRead() throws Exception {
-
         T result = null;
 
         if (!noInput) {
@@ -62,10 +58,10 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
 
             if (row != null) {
                 try {
-                    result = rowMapper.mapRow(row, rowCount);
+                    result = rowMapper.mapRow(row, rowIndex);
                 } catch (Exception ex) {
-                    throw new ExcelRowMappingException("Parsing error at line: " + rowCount + " in resource=["
-                            + resource.getDescription() + "], input=[" + row + "]", ex, row, rowCount);
+                    throw new ExcelRowMappingException("Parsing error at line: " + rowIndex + " in resource=["
+                            + resource.getDescription() + "], input=[" + row + "]", ex, row, rowIndex);
                 }
             }
         }
@@ -87,9 +83,9 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
             sheet = getCurrentSheet();
         }
 
-        result =  this.sheet.getRow(rowCount);
+        result =  this.sheet.getRow(rowIndex);
         if (result != null) {
-            rowCount++;
+            rowIndex++;
         } else {
             noInput = true;
         }
@@ -123,14 +119,12 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
 
     @Override
     protected void jumpToItem(int itemIndex) throws Exception {
-        for (int i = 0; i < itemIndex; i++) {
-            readRow();
-        }
+        rowIndex = rowsToSkip + itemIndex;
     }
 
     @Override
     protected void doClose() throws Exception {
-        rowCount = 0;
+        rowIndex = 0;
         if (inputStream != null) {
             inputStream.close();
         }
@@ -138,6 +132,10 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
 
     public Sheet getCurrentSheet() {
         return workbook != null ? workbook.getSheetAt(sheetIndex) : null;
+    }
+
+    public int getRowIndex() {
+        return rowIndex;
     }
 
     @Override

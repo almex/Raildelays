@@ -6,5 +6,5 @@ import org.apache.poi.ss.usermodel.Row;
  * @author Almex
  */
 public interface RowMapper<T> {
-    T mapRow(Row row, int lineNumber) throws Exception;
+    T mapRow(Row row, int rowIndex) throws Exception;
 }
