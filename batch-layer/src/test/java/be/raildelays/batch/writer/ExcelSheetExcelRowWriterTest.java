@@ -46,9 +46,11 @@ public class ExcelSheetExcelRowWriterTest {
 
         writer = new ExcelSheetExcelRowWriter();
 
-        writer.setTemplatePath(new ClassPathResource("template.xls").getFile().getAbsolutePath());
+        writer.setTemplate(new ClassPathResource("template.xls"));
         writer.setOutputDirectory(CURRENT_PATH);
         writer.setName("test");
+        writer.setRowsToSkip(21);
+        writer.setRowAggregator(new ExcelRowAggregator());
         writer.afterPropertiesSet();
         writer.open(MetaDataInstanceFactory.createStepExecution()
                 .getExecutionContext());

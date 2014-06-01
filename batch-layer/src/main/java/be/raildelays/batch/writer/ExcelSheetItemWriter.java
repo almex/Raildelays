@@ -6,8 +6,10 @@ import be.raildelays.batch.support.AbstractItemCountingItemStreamItemWriter;
 import be.raildelays.domain.support.ItemIndexAware;
 import be.raildelays.domain.xls.ExcelRow;
 import org.apache.commons.lang.Validate;
+import org.apache.poi.POIXMLDocument;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
@@ -59,6 +61,8 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
     public void afterPropertiesSet() throws Exception {
         Validate.notNull(resource,
                 "You must provide an resource before using this bean");
+        Validate.notNull(rowAggregator,
+                "You must provide a rowAggregator before using this bean");
     }
 
     @Override
@@ -72,23 +76,36 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
             File outputFile = resource.getFile();
 
             boolean deleted = true;
-
-            if (template != null && !outputFile.exists()) {
-                this.workbook = WorkbookFactory.create(template.getInputStream());
-            } else {
-                this.workbook = WorkbookFactory.create(resource.getInputStream());
-            }
-
-
             if (outputFile.exists() && shouldDeleteIfExists) {
                 deleted = outputFile.delete();
 
                 LOGGER.debug("Output file '{}' deleted:{}", outputFile.getAbsolutePath(), deleted);
-            } else if (deleted) {
-                boolean created = outputFile.createNewFile();
+            }
+
+            boolean created = false;
+            if (!outputFile.exists()) {
+                created = outputFile.createNewFile();
 
                 LOGGER.debug("Output file '{}' created:{}", outputFile.getAbsolutePath(), created);
             }
+
+            if (template != null && created) {
+                this.workbook = WorkbookFactory.create(template.getInputStream());
+            } else {
+                if (created) {
+                    if (outputFile.getName().endsWith(".xls")) {
+                        this.workbook = new HSSFWorkbook();
+                    } else if (outputFile.getName().endsWith(".xlsx")) {
+                        this.workbook = new XSSFWorkbook();
+                    } else {
+                        throw new InvalidFormatException("Your template is neither an OLE2 format, nor an OOXML format");
+                    }
+                } else {
+                    this.workbook = WorkbookFactory.create(resource.getInputStream());
+                }
+            }
+
+
 
             this.outputStream = new FileOutputStream(outputFile);
 

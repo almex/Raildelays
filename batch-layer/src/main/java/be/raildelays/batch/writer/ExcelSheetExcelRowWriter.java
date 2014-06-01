@@ -33,8 +33,6 @@ import java.util.List;
 public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<ExcelRow> {
     private static final int MAX_ITEM_PER_SHEET = 40;
 
-    protected String templatePath;
-
     protected String outputDirectory;
 
     protected boolean recoveryMode = false;
@@ -51,11 +49,10 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<ExcelRow> {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Validate.notNull(templatePath,
-                "You must provide an templatePath before using this bean");
         Validate.notNull(outputDirectory,
                 "You must provide an outputDirectory before using this bean");
-        super.afterPropertiesSet();
+        Validate.notNull(template,
+                "You must provide a template before using this bean");
     }
 
     @Override
@@ -75,11 +72,6 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<ExcelRow> {
     }
 
     @Override
-    public void write(List<? extends ExcelRow> items) throws Exception, UnexpectedInputException, ParseException {
-        super.write(items);
-    }
-
-    @Override
     public void doOpen() {
         //-- We manage creation of file in doWrite()
     }
@@ -87,22 +79,6 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<ExcelRow> {
     protected void createNewWorkbook(String fileName) throws Exception {
         setResource(new FileSystemResource(new File(outputDirectory + File.separator + fileName)));
         super.doOpen();
-    }
-
-
-    private Closeable extractCloseable(final Workbook workbook, final Closeable closeable) throws InvalidFormatException {
-        return new WorkbookAction<Closeable>(workbook) {
-
-            @Override
-            protected Closeable doWithHSSFWorkbook(HSSFWorkbook workbook) {
-                return closeable;
-            }
-
-            @Override
-            protected Closeable doWithXSSFWorkbook(XSSFWorkbook workbook) {
-                return workbook.getPackage();
-            }
-        }.execute();
     }
 
     private boolean isExistingWorkbooks(ExcelRow firstItem) throws Exception {
@@ -137,6 +113,7 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<ExcelRow> {
                 reader.setRowsToSkip(rowsToSkip);
                 reader.setSaveState(false);
                 container.setReader(reader);
+                container.afterPropertiesSet();
 
                 int currentRowIndex = container.indexOf(content);
                 if (currentRowIndex != -1) {
@@ -161,7 +138,7 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<ExcelRow> {
         InputStream inputStream = null;
 
         try {
-            inputStream = new PushbackInputStream(new FileInputStream(templatePath), 8);
+            inputStream = new PushbackInputStream(template.getInputStream(), 8);
 
             if (POIFSFileSystem.hasPOIFSHeader(inputStream)) {
                 fileExtension = Format.OLE2.getFileExtension();
@@ -177,10 +154,6 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<ExcelRow> {
                 inputStream.close();
             }
         }
-    }
-
-    public void setTemplatePath(String templatePath) {
-        this.templatePath = templatePath;
     }
 
     public void setOutputDirectory(String outputDirectory) {
