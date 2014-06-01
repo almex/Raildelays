@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.core.io.ClassPathResource;
 
@@ -34,6 +35,8 @@ public class ExcelSheetExcelRowWriterTest {
 
     private List<ExcelRow> items = new ArrayList<>();
 
+    private ExecutionContext executionContext;
+
     @Before
     public void setUp() throws Exception {
         File directory = new File(CURRENT_PATH);
@@ -44,6 +47,7 @@ public class ExcelSheetExcelRowWriterTest {
             cleanUp();
         }
 
+        executionContext = MetaDataInstanceFactory.createStepExecution().getExecutionContext();
         writer = new ExcelSheetExcelRowWriter();
 
         writer.setTemplate(new ClassPathResource("template.xls"));
@@ -52,14 +56,13 @@ public class ExcelSheetExcelRowWriterTest {
         writer.setRowsToSkip(21);
         writer.setRowAggregator(new ExcelRowAggregator());
         writer.afterPropertiesSet();
-        writer.open(MetaDataInstanceFactory.createStepExecution()
-                .getExecutionContext());
+        writer.open(executionContext);
 
         items = new ArrayList<>();
         DateFormat formatter = new SimpleDateFormat("HH:mm");
         Iterator<Calendar> it = DateUtils.iterator(new SimpleDateFormat("dd/MM/yyyy").parse("01/01/2000"), DateUtils.RANGE_MONTH_MONDAY);
 
-        for (int i = 0; i < 40 && it.hasNext(); i++) {
+        for (int i = 0; i < 80 && it.hasNext(); i++) {
             List<ExcelRow> excelRows = new ArrayList<>();
             Date date = it.next().getTime();
             ExcelRow from = new Builder(date, Sens.DEPARTURE) //
@@ -102,6 +105,7 @@ public class ExcelSheetExcelRowWriterTest {
         writer.write(items.subList(10, 20));
         writer.write(items.subList(20, 30));
         writer.write(items.subList(30, 40));
+        writer.write(items.subList(40, 80));
         writer.close();
 
         Assert.assertEquals(2, getExcelFiles().length);
@@ -111,11 +115,11 @@ public class ExcelSheetExcelRowWriterTest {
     public void testRestart() throws Exception {
         writer.write(items.subList(0, 10));
         writer.close();
-        writer.open(MetaDataInstanceFactory.createStepExecution().getExecutionContext());
+        writer.open(executionContext);
         writer.write(items.subList(10, 40));
         writer.close();
 
-        Assert.assertEquals(2, getExcelFiles().length);
+        Assert.assertEquals(1, getExcelFiles().length);
     }
 
     @Test
