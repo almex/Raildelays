@@ -72,6 +72,14 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
             File outputFile = resource.getFile();
 
             boolean deleted = true;
+
+            if (template != null && !outputFile.exists()) {
+                this.workbook = WorkbookFactory.create(template.getInputStream());
+            } else {
+                this.workbook = WorkbookFactory.create(resource.getInputStream());
+            }
+
+
             if (outputFile.exists() && shouldDeleteIfExists) {
                 deleted = outputFile.delete();
 
@@ -84,11 +92,6 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
 
             this.outputStream = new FileOutputStream(outputFile);
 
-            if (template != null) {
-                this.workbook = WorkbookFactory.create(template.getInputStream());
-            } else {
-                this.workbook = WorkbookFactory.create(resource.getFile());
-            }
         } catch (IOException | InvalidFormatException e) {
             throw new ItemStreamException("I/O when opening Excel template", e);
         }
@@ -99,9 +102,9 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
         ExcelRow previousRow = null;
 
         try {
-             rowIndex = rowsToSkip + itemIndex;
-             rowAggregator.aggregate(item, workbook, sheetIndex, rowIndex);
-        } catch(Exception e) {
+            rowIndex = rowsToSkip + itemIndex;
+            rowAggregator.aggregate(item, workbook, sheetIndex, rowIndex);
+        } catch (Exception e) {
             LOGGER.error("We were not able to write in the Excel file", e);
         }
 

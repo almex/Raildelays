@@ -9,6 +9,7 @@ import org.apache.commons.lang.time.DateUtils;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
@@ -32,6 +33,8 @@ public class ExcelSheetItemWriterTest {
 
     private List<ExcelRow> items = new ArrayList<>();
 
+    private ExecutionContext executionContext;
+
     @Before
     public void setUp() throws Exception {
         File directory = new File(CURRENT_PATH);
@@ -42,16 +45,17 @@ public class ExcelSheetItemWriterTest {
             cleanUp();
         }
 
+
+        executionContext = MetaDataInstanceFactory.createStepExecution().getExecutionContext();
         writer = new ExcelSheetItemWriter<ExcelRow>();
         writer.setTemplate(new ClassPathResource("template.xls"));
-        writer.setResource(new FileSystemResource(CURRENT_PATH + "output" + OPEN_XML_FILE_EXTENSION));
+        writer.setResource(new FileSystemResource(CURRENT_PATH + "output" + EXCEL_FILE_EXTENSION));
         writer.setRowAggregator(new ExcelRowAggregator());
         writer.setName("test");
         writer.setRowsToSkip(21);
         writer.setMaxItemCount(40);
         writer.afterPropertiesSet();
-        writer.open(MetaDataInstanceFactory.createStepExecution()
-                .getExecutionContext());
+        writer.open(executionContext);
 
 
         items = new ArrayList<>();
@@ -93,36 +97,40 @@ public class ExcelSheetItemWriterTest {
         writer.close();
 
         Assert.assertEquals(1, getExcelFiles().length);
+        Assert.assertEquals(117248, getExcelFiles()[0].length());
     }
 
-//    @Test
-//    public void testFileLimits() throws Exception {
-//        writer.write(items.subList(0, 10));
-//        writer.write(items.subList(10, 20));
-//        writer.write(items.subList(20, 30));
-//        writer.write(items.subList(30, 40));
-//        writer.close();
-//
-//        Assert.assertEquals(2, getExcelFiles().length);
-//    }
-//
-//    @Test
-//    public void testRestart() throws Exception {
-//        writer.write(items.subList(0, 10));
-//        writer.close();
-//        writer.open(MetaDataInstanceFactory.createStepExecution().getExecutionContext());
-//        writer.write(items.subList(10, 40));
-//        writer.close();
-//
-//        Assert.assertEquals(2, getExcelFiles().length);
-//    }
+    @Test
+    public void testFileLimits() throws Exception {
+        writer.write(items.subList(0, 10));
+        writer.write(items.subList(10, 20));
+        writer.write(items.subList(20, 30));
+        writer.write(items.subList(30, 40));
+        writer.close();
+
+        Assert.assertEquals(1, getExcelFiles().length);
+        Assert.assertEquals(123392, getExcelFiles()[0].length());
+    }
+
+    @Test
+    public void testRestart() throws Exception {
+        writer.write(items.subList(0, 10));
+        writer.close();
+        writer.open(executionContext); //-- By retrieving the same execution context it should be able to restart
+        writer.write(items.subList(10, 40));
+        writer.close();
+
+        Assert.assertEquals(1, getExcelFiles().length);
+        Assert.assertEquals(123392, getExcelFiles()[0].length());
+    }
 
     @Test
     public void testEmptyList() throws Exception {
-        writer.write(Collections.<List<ExcelRow>>emptyList());
+        writer.write(Collections.<ExcelRow>emptyList());
         writer.close();
 
-        Assert.assertEquals(0, getExcelFiles().length);
+        Assert.assertEquals(1, getExcelFiles().length);
+        Assert.assertEquals(117248, getExcelFiles()[0].length());
     }
 
     private File[] getExcelFiles() {
