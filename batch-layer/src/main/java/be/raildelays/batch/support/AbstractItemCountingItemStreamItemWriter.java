@@ -11,17 +11,17 @@ import java.util.List;
  * Created by soumagn on 31/05/2014.
  */
 public abstract class AbstractItemCountingItemStreamItemWriter<T> extends AbstractItemStreamItemWriter<T> {
-    private static final String WRITE_COUNT = "write.count";
 
-    private static final String WRITE_COUNT_MAX = "write.count.max";
+    private boolean saveState = true;
+
+    private int currentItemIndex = 0;
 
     private int currentItemCount = 0;
 
     private int maxItemCount = Integer.MAX_VALUE;
 
-    private boolean saveState = true;
-
-    private int currentItemIndex = 0;
+    private static final String WRITE_COUNT = "write.count";
+    private static final String WRITE_COUNT_MAX = "write.count.max";
 
     /**
      * Write item to a certain index.
@@ -29,7 +29,7 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
      * @return true if it's a new item, false if it has replaced something
      * @throws Exception
      */
-    protected abstract boolean doWrite(T item, int itemIndex) throws Exception;
+    protected abstract boolean doWrite(T item) throws Exception;
 
     /**
      * Open resources necessary to start writing output.
@@ -44,7 +44,7 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
     /**
      * Move to the given item index. Subclasses should override this method if
      * there is a more efficient way of moving to given index than re-reading
-     * the input using {@link #doWrite(T, int)}.
+     * the input using {@link #doWrite(T)}.
      */
     protected void jumpToItem(int itemIndex) throws Exception {
         this.currentItemIndex = itemIndex;
@@ -62,7 +62,7 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
                     }
                 }
 
-                if (doWrite(item, currentItemIndex)) {
+                if (doWrite(item)) {
                     currentItemCount++;
                 }
                 currentItemIndex++;
@@ -83,10 +83,10 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
      *
      * @see #setName(String)
      *
-     * @param count the value of the current item count
+     * @param itemIndex the value of the current item index
      */
-    public void setCurrentItemCount(int count) {
-        this.currentItemCount = count;
+    public void setCurrentItemIndex(int itemIndex) {
+        this.currentItemIndex = itemIndex;
     }
 
     /**
@@ -112,7 +112,7 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
             doClose();
         }
         catch (Exception e) {
-            throw new ItemStreamException("Error while closing item reader", e);
+            throw new ItemStreamException("Error while closing item writer", e);
         }
     }
 
@@ -184,5 +184,9 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
      */
     public boolean isSaveState() {
         return saveState;
+    }
+
+    protected int getCurrentItemIndex() {
+        return currentItemIndex;
     }
 }

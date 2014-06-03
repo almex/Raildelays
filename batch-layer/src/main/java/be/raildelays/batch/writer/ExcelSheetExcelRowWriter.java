@@ -1,37 +1,33 @@
 package be.raildelays.batch.writer;
 
-import be.raildelays.batch.poi.WorkbookAction;
 import be.raildelays.batch.poi.WorkbookSearch;
 import be.raildelays.batch.reader.ExcelRowMapper;
 import be.raildelays.batch.reader.ExcelSheetItemReader;
 import be.raildelays.domain.xls.ExcelRow;
+import groovy.lang.IllegalPropertyAccessException;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.poi.POIXMLDocument;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 
 import java.io.*;
-import java.util.List;
 
 /**
  * @author Almex
  */
 public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<ExcelRow> {
     private static final int MAX_ITEM_PER_SHEET = 40;
+
+    private static final String RESOURCE_KEY = "resource.key";
 
     protected String outputDirectory;
 
@@ -40,11 +36,6 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<ExcelRow> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExcelSheetExcelRowWriter.class);
 
     private ExecutionContext executionContext;
-
-    @BeforeStep
-    public void beforeStep(StepExecution stepExecution) {
-        executionContext = stepExecution.getExecutionContext();
-    }
 
 
     @Override
@@ -56,29 +47,36 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<ExcelRow> {
     }
 
     @Override
-    public boolean doWrite(ExcelRow item, int itemIndex) throws Exception {
-        if (workbook == null) {
+    public boolean doWrite(ExcelRow item) throws Exception {
+        if (this.resource == null) {
             if (!isExistingWorkbooks(item)) {
                 createNewWorkbook(getFileName(item));
             }
-        }
-
-        if (getCurrentItemCount() == MAX_ITEM_PER_SHEET) {
+            super.doOpen();
+        } else if (getCurrentItemCount() % MAX_ITEM_PER_SHEET == 0) {
             doClose();
             createNewWorkbook(getFileName(item));
+            super.doOpen();
         }
 
-        return super.doWrite(item, itemIndex);
+        return super.doWrite(item);
     }
 
     @Override
     public void doOpen() {
         //-- We manage creation of file in doWrite()
+        resource = null;
+    }
+
+    @Override
+    public void open(ExecutionContext executionContext) throws ItemStreamException {
+        super.open(executionContext);
+
+        this.executionContext = executionContext;
     }
 
     protected void createNewWorkbook(String fileName) throws Exception {
-        setResource(new FileSystemResource(new File(outputDirectory + File.separator + fileName)));
-        super.doOpen();
+        resource = new FileSystemResource(new File(outputDirectory + File.separator + fileName));
     }
 
     private boolean isExistingWorkbooks(ExcelRow firstItem) throws Exception {
@@ -93,7 +91,7 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<ExcelRow> {
 
     private boolean retrieveFirstRowContaining(ExcelRow content) throws Exception {
         File directory = new File(outputDirectory);
-        this.workbook = null;
+        this.resource = null;
 
         Validate.isTrue(directory.isDirectory(), "The outputDirectory '" + outputDirectory + "' parameter must be a directory path and nothing else.");
 
@@ -117,10 +115,8 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<ExcelRow> {
 
                 int currentRowIndex = container.indexOf(content);
                 if (currentRowIndex != -1) {
-                    this.workbook = currentWorkbook;
-                    this.outputStream = new FileOutputStream(file);
-
-                    setCurrentRowIndex(currentRowIndex);
+                    this.resource = new FileSystemResource(file);
+                    jumpToItem(currentRowIndex - rowsToSkip);
                     break;
                 }
             } catch (InvalidFormatException e) {
@@ -130,7 +126,7 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<ExcelRow> {
             }
         }
 
-        return this.workbook != null;
+        return this.resource != null;
     }
 
     private String getFileName(ExcelRow firstItem) throws InvalidFormatException, IOException {
@@ -160,11 +156,12 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<ExcelRow> {
         this.outputDirectory = outputDirectory;
     }
 
-
     @Override
-    public void doClose() throws ItemStreamException {
-        super.doClose();
+    public void setResource(Resource resource) {
+        try {
+            throw new IllegalPropertyAccessException(this.getClass().getField("resource"), this.getClass());
+        } catch (NoSuchFieldException e) {
+            LOGGER.error("No such field error", e);
+        }
     }
-
-
 }

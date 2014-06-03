@@ -9,8 +9,8 @@ import org.apache.poi.ss.usermodel.Row;
 import java.text.SimpleDateFormat;
 
 /**
-* Created by soumagn on 30/05/2014.
-*/
+ * Created by soumagn on 30/05/2014.
+ */
 public class ExcelRowMapper implements RowMapper<ExcelRow> {
     @Override
     public ExcelRow mapRow(Row row, int rowIndex) throws Exception {
@@ -20,7 +20,7 @@ public class ExcelRowMapper implements RowMapper<ExcelRow> {
         Train effectiveTrain2 = null;
         Station linkStation = null;
 
-        if (row.getCell(2).getDateCellValue() != null) {
+        if (row.getCell(2) != null && row.getCell(2).getDateCellValue() != null) {
             if (row.getCell(24) != null) {
                 linkStation = new Station(row.getCell(24).getStringCellValue());
             }

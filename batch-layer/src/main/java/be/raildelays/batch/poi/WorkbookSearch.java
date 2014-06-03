@@ -27,19 +27,22 @@ public class WorkbookSearch<T extends Comparable<T>> implements InitializingBean
     public int indexOf(T item) throws Exception {
         int result = -1;
 
-        if (item != null) {
-            try {
-                T object = reader.read();
-                while (object != null) {
-                    if (item.compareTo(object) == 0) {
-                        result = reader.getRowIndex();
-                        break;
-                    }
-                    object = reader.read();
+        reader.open(executionContext);
+
+        try {
+            T object = null;
+            do {
+                object = reader.read();
+
+                if (item == null ? object == null : item.compareTo(object) == 0) {
+                    result = reader.getRowIndex();
+                    break;
                 }
-            } finally {
-                reader.close();
-            }
+            } while (object != null);
+
+
+        } finally {
+            reader.close();
         }
 
         return result;
@@ -52,6 +55,5 @@ public class WorkbookSearch<T extends Comparable<T>> implements InitializingBean
     @Override
     public void afterPropertiesSet() throws Exception {
         reader.afterPropertiesSet();
-        reader.open(executionContext);
     }
 }

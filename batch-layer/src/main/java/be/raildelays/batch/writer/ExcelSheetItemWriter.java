@@ -3,17 +3,15 @@ package be.raildelays.batch.writer;
 import be.raildelays.batch.poi.RowAggregator;
 import be.raildelays.batch.poi.WorkbookAction;
 import be.raildelays.batch.support.AbstractItemCountingItemStreamItemWriter;
-import be.raildelays.domain.support.ItemIndexAware;
-import be.raildelays.domain.xls.ExcelRow;
 import org.apache.commons.lang.Validate;
-import org.apache.poi.POIXMLDocument;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
 import org.springframework.beans.factory.InitializingBean;
@@ -23,23 +21,26 @@ import java.io.*;
 
 public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemWriter<T> implements ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
+    protected RowAggregator<T> rowAggregator;
+
+    protected Resource resource;
+
+    protected Resource template;
+
+    private boolean shouldDeleteIfExists = false;
+
     protected OutputStream outputStream;
 
     protected Workbook workbook;
 
     protected int rowsToSkip = 0;
 
-    protected RowAggregator rowAggregator;
+    protected int sheetIndex = 0;
 
-    protected int sheetIndex;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExcelSheetItemWriter.class);
 
-    protected int rowIndex;
-
-    protected Resource resource;
-
-    protected Resource template;
-
-    private boolean shouldDeleteIfExists = true;
+    private static final String ROW_TO_SKIP_KEY = "row.to.skip.key";
+    private static final String SHEET_INDEX_KEY = "sheet.index.key";
 
     enum Format {
         OLE2(".xls"), OOXML(".xlsx");
@@ -55,8 +56,6 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
         }
     }
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExcelSheetItemWriter.class);
-
     @Override
     public void afterPropertiesSet() throws Exception {
         Validate.notNull(resource,
@@ -68,6 +67,18 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
     @Override
     protected void jumpToItem(int itemIndex) throws Exception {
         super.jumpToItem(rowsToSkip + itemIndex);
+    }
+
+    @Override
+    public void open(ExecutionContext executionContext) throws ItemStreamException {
+        super.open(executionContext);
+        if (executionContext.containsKey(getExecutionContextKey(ROW_TO_SKIP_KEY))) {
+            rowsToSkip = executionContext.getInt(getExecutionContextKey(ROW_TO_SKIP_KEY));
+        }
+
+        if (executionContext.containsKey(getExecutionContextKey(SHEET_INDEX_KEY))) {
+            sheetIndex = executionContext.getInt(getExecutionContextKey(SHEET_INDEX_KEY));
+        }
     }
 
     @Override
@@ -85,27 +96,34 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
             boolean created = false;
             if (!outputFile.exists()) {
                 created = outputFile.createNewFile();
+                jumpToItem(0);
 
                 LOGGER.debug("Output file '{}' created:{}", outputFile.getAbsolutePath(), created);
             }
 
             if (template != null && created) {
-                this.workbook = WorkbookFactory.create(template.getInputStream());
+                InputStream inputStream = template.getInputStream();
+                this.workbook = WorkbookFactory.create(inputStream);
+                inputStream.close();
             } else {
                 if (created) {
-                    if (outputFile.getName().endsWith(".xls")) {
+                    if (outputFile.getName().endsWith(Format.OLE2.getFileExtension())) {
                         this.workbook = new HSSFWorkbook();
-                    } else if (outputFile.getName().endsWith(".xlsx")) {
+                    } else if (outputFile.getName().endsWith(Format.OOXML.getFileExtension())) {
                         this.workbook = new XSSFWorkbook();
                     } else {
                         throw new InvalidFormatException("Your template is neither an OLE2 format, nor an OOXML format");
                     }
                 } else {
-                    this.workbook = WorkbookFactory.create(resource.getInputStream());
+                    /**
+                     * ATTENTION: if we use the resource.getFileInputStream() the stream is never released!
+                     * So, we create our own FileInputStream instead. Don't know why. Seems like a bug in Apache POI
+                     */
+                    InputStream inputStream = new FileInputStream(resource.getFile());
+                    this.workbook = WorkbookFactory.create(inputStream);
+                    inputStream.close(); //-- Everything is in the buffer we can close the file
                 }
             }
-
-
 
             this.outputStream = new FileOutputStream(outputFile);
 
@@ -115,14 +133,15 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
     }
 
     @Override
-    public boolean doWrite(T item, int itemIndex) throws Exception {
-        ExcelRow previousRow = null;
+    public boolean doWrite(T item) throws Exception {
+        T previousRow = null;
 
-        try {
-            rowIndex = rowsToSkip + itemIndex;
-            rowAggregator.aggregate(item, workbook, sheetIndex, rowIndex);
-        } catch (Exception e) {
-            LOGGER.error("We were not able to write in the Excel file", e);
+        if (item != null) {
+            try {
+                previousRow = rowAggregator.aggregate(item, workbook, sheetIndex, getCurrentItemIndex());
+            } catch (Exception e) {
+                LOGGER.error("We were not able to write in the Excel file", e);
+            }
         }
 
         return previousRow == null;
@@ -146,25 +165,36 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
             } catch (IOException e) {
                 LOGGER.error("I/O error when closing Excel outputDirectory file", e);
             }
-
-            try {
-                if (template != null) {
-                    template.getInputStream().close();
-                }
-            } catch (IOException e) {
-                LOGGER.error("I/O error when closing Excel templatePath file", e);
-            }
         }
 
 
     }
 
-    protected void setCurrentRowIndex(int rowIndex) {
-        setCurrentItemCount(rowIndex - rowsToSkip);
+    private Closeable extractCloseable(final Workbook workbook, final Closeable closeable) throws InvalidFormatException {
+        return new WorkbookAction<Closeable>(workbook) {
+
+            @Override
+            protected Closeable doWithHSSFWorkbook(HSSFWorkbook workbook) {
+                return closeable;
+            }
+
+            @Override
+            protected Closeable doWithXSSFWorkbook(XSSFWorkbook workbook) {
+                return workbook.getPackage();
+            }
+        }.execute();
     }
 
-    protected Sheet getCurrentSheet() {
-        return workbook != null ? workbook.getSheetAt(sheetIndex) : null;
+    @Override
+    public void update(ExecutionContext executionContext) throws ItemStreamException {
+        super.update(executionContext);
+        if (isSaveState()) {
+            if (rowsToSkip < Integer.MAX_VALUE) {
+                executionContext.putInt(getExecutionContextKey(ROW_TO_SKIP_KEY), rowsToSkip);
+            }
+
+            executionContext.putInt(getExecutionContextKey(SHEET_INDEX_KEY), sheetIndex);
+        }
     }
 
     public void setRowsToSkip(int rowsToSkip) {

@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -47,7 +48,8 @@ public class ExcelSheetExcelRowWriterTest {
             cleanUp();
         }
 
-        executionContext = MetaDataInstanceFactory.createStepExecution().getExecutionContext();
+        StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution();
+        executionContext = stepExecution.getExecutionContext();
         writer = new ExcelSheetExcelRowWriter();
 
         writer.setTemplate(new ClassPathResource("template.xls"));
@@ -94,37 +96,49 @@ public class ExcelSheetExcelRowWriterTest {
     @Test
     public void testTemplate() throws Exception {
         writer.write(items.subList(0, 2));
+        writer.update(executionContext);
         writer.close();
 
         Assert.assertEquals(1, getExcelFiles().length);
+        Assert.assertEquals(117248, getExcelFiles()[0].length());
     }
 
     @Test
     public void testFileLimits() throws Exception {
         writer.write(items.subList(0, 10));
+        writer.update(executionContext);
         writer.write(items.subList(10, 20));
+        writer.update(executionContext);
         writer.write(items.subList(20, 30));
+        writer.update(executionContext);
         writer.write(items.subList(30, 40));
+        writer.update(executionContext);
         writer.write(items.subList(40, 80));
         writer.close();
 
         Assert.assertEquals(2, getExcelFiles().length);
+        Assert.assertEquals(123392, getExcelFiles()[0].length());
+        Assert.assertEquals(123392, getExcelFiles()[1].length());
     }
 
     @Test
     public void testRestart() throws Exception {
         writer.write(items.subList(0, 10));
+        writer.update(executionContext);
         writer.close();
         writer.open(executionContext);
         writer.write(items.subList(10, 40));
+        writer.update(executionContext);
         writer.close();
 
         Assert.assertEquals(1, getExcelFiles().length);
+        Assert.assertEquals(123392, getExcelFiles()[0].length());
     }
 
     @Test
     public void testEmptyList() throws Exception {
         writer.write(Collections.<ExcelRow>emptyList());
+        writer.update(executionContext);
         writer.close();
 
         Assert.assertEquals(0, getExcelFiles().length);

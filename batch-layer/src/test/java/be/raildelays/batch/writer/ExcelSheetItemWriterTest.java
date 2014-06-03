@@ -60,9 +60,9 @@ public class ExcelSheetItemWriterTest {
 
         items = new ArrayList<>();
         DateFormat formatter = new SimpleDateFormat("HH:mm");
-        Iterator<Calendar> it = DateUtils.iterator(new SimpleDateFormat("dd/MM/yyyy").parse("01/01/2000"), DateUtils.RANGE_MONTH_MONDAY);
+        Iterator<Calendar> it = DateUtils.<Calendar>iterator(new SimpleDateFormat("dd/MM/yyyy").parse("01/01/2000"), DateUtils.RANGE_MONTH_MONDAY);
 
-        for (int i = 0; i < 40 && it.hasNext(); i++) {
+        for (int i = 0; i < 80 && it.hasNext(); i++) {
             List<ExcelRow> excelRows = new ArrayList<>();
             Date date = it.next().getTime();
             ExcelRow from = new Builder(date, Sens.DEPARTURE) //
@@ -94,6 +94,7 @@ public class ExcelSheetItemWriterTest {
     @Test
     public void testTemplate() throws Exception {
         writer.write(items.subList(0, 2));
+        writer.update(executionContext);
         writer.close();
 
         Assert.assertEquals(1, getExcelFiles().length);
@@ -103,9 +104,15 @@ public class ExcelSheetItemWriterTest {
     @Test
     public void testFileLimits() throws Exception {
         writer.write(items.subList(0, 10));
+        writer.update(executionContext);
         writer.write(items.subList(10, 20));
+        writer.update(executionContext);
         writer.write(items.subList(20, 30));
+        writer.update(executionContext);
         writer.write(items.subList(30, 40));
+        writer.update(executionContext);
+        writer.write(items.subList(40, 80));
+        writer.update(executionContext);
         writer.close();
 
         Assert.assertEquals(1, getExcelFiles().length);
@@ -115,9 +122,11 @@ public class ExcelSheetItemWriterTest {
     @Test
     public void testRestart() throws Exception {
         writer.write(items.subList(0, 10));
+        writer.update(executionContext);
         writer.close();
         writer.open(executionContext); //-- By retrieving the same execution context it should be able to restart
         writer.write(items.subList(10, 40));
+        writer.update(executionContext);
         writer.close();
 
         Assert.assertEquals(1, getExcelFiles().length);
@@ -127,6 +136,7 @@ public class ExcelSheetItemWriterTest {
     @Test
     public void testEmptyList() throws Exception {
         writer.write(Collections.<ExcelRow>emptyList());
+        writer.update(executionContext);
         writer.close();
 
         Assert.assertEquals(1, getExcelFiles().length);

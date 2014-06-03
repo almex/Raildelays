@@ -3,18 +3,18 @@ package be.raildelays.batch.reader;
 import be.raildelays.batch.poi.ExcelRowMappingException;
 import be.raildelays.batch.poi.RowMapper;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.item.*;
-import org.springframework.batch.item.file.*;
+import org.springframework.batch.item.ReaderNotOpenException;
+import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 
 /**
@@ -22,25 +22,19 @@ import java.io.InputStream;
  */
 public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements ResourceAwareItemReaderItemStream<T>, InitializingBean {
 
-    private Resource resource;
-
     private RowMapper<T> rowMapper;
 
-    private int rowsToSkip = 0;
-
-    private int rowIndex = 0;
-
-    private int sheetIndex = 0;
-
-    private boolean noInput = false;
+    private Resource resource;
 
     private Workbook workbook;
 
-    private Sheet sheet;
-
-    private InputStream inputStream;
+    private boolean noInput = false;
 
     private WorkbookFactory workbookFactory = new WorkbookFactory();
+
+    private int rowsToSkip = 0;
+
+    private int sheetIndex = 0;
 
     private static Logger LOGGER = LoggerFactory.getLogger(ExcelSheetItemReader.class);
 
@@ -58,10 +52,10 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
 
             if (row != null) {
                 try {
-                    result = rowMapper.mapRow(row, rowIndex);
+                    result = rowMapper.mapRow(row, getRowIndex());
                 } catch (Exception ex) {
-                    throw new ExcelRowMappingException("Parsing error at line: " + rowIndex + " in resource=["
-                            + resource.getDescription() + "], input=[" + row + "]", ex, row, rowIndex);
+                    throw new ExcelRowMappingException("Parsing error at line: " + getRowIndex() + " in resource=["
+                            + resource.getDescription() + "], input=[" + row + "]", ex, row, getRowIndex());
                 }
             }
         }
@@ -79,14 +73,8 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
             throw new ReaderNotOpenException("Reader must be open before it can be read.");
         }
 
-        if (sheet == null) {
-            sheet = getCurrentSheet();
-        }
-
-        result =  this.sheet.getRow(rowIndex);
-        if (result != null) {
-            rowIndex++;
-        } else {
+        result =  workbook.getSheetAt(sheetIndex).getRow(getRowIndex());
+        if (result == null) {
             noInput = true;
         }
 
@@ -108,8 +96,13 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
             return;
         }
 
-        inputStream = resource.getInputStream();
-        workbook = workbookFactory.create(inputStream);
+        /**
+         * ATTENTION: if we use the resource.getFileInputStream() the stream is never released!
+         * So, we create our own FileInputStream instead. Don't know why. Seems like a bug in Apache POI
+         */
+        InputStream inputStream = new FileInputStream(resource.getFile());
+        this.workbook = WorkbookFactory.create(inputStream);
+        inputStream.close(); //-- Everything is in the buffer we can close the file
 
         for (int i = 0; i < rowsToSkip; i++) {
             Row row = readRow();
@@ -118,24 +111,11 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
     }
 
     @Override
-    protected void jumpToItem(int itemIndex) throws Exception {
-        rowIndex = rowsToSkip + itemIndex;
-    }
-
-    @Override
     protected void doClose() throws Exception {
-        rowIndex = 0;
-        if (inputStream != null) {
-            inputStream.close();
-        }
-    }
-
-    public Sheet getCurrentSheet() {
-        return workbook != null ? workbook.getSheetAt(sheetIndex) : null;
     }
 
     public int getRowIndex() {
-        return rowIndex;
+        return getCurrentItemCount() + rowsToSkip;
     }
 
     @Override
