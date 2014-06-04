@@ -27,7 +27,7 @@ import java.util.List;
  * @author Almex
  */
 public class SearchNextTrainProcessor implements
-		ItemProcessor<List<BatchExcelRow>, List<BatchExcelRow>>, InitializingBean {
+		ItemProcessor<BatchExcelRow, BatchExcelRow>, InitializingBean {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(SearchNextTrainProcessor.class);
@@ -40,7 +40,6 @@ public class SearchNextTrainProcessor implements
 
 	}
 
-	@Override
 	public List<BatchExcelRow> process(List<BatchExcelRow> items) throws Exception {
 		List<BatchExcelRow> result = new ArrayList<>();
 		
@@ -51,6 +50,7 @@ public class SearchNextTrainProcessor implements
 		return result;
 	}
 
+    @Override
 	public BatchExcelRow process(final BatchExcelRow item) throws Exception {
 		BatchExcelRow result = item; // By default we return the item itself
 		List<LineStop> candidates = new ArrayList<>();

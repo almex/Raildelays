@@ -19,9 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 public class ExcelRowMapperProcessor implements
-		ItemProcessor<List<LineStop>, List<BatchExcelRow>>, InitializingBean {
-
-	private static final int DELAY_THRESHOLD = 15;
+		ItemProcessor<LineStop, BatchExcelRow>, InitializingBean {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ExcelRowMapperProcessor.class);
@@ -40,67 +38,48 @@ public class ExcelRowMapperProcessor implements
 	}
 
 	@Override
-	public List<BatchExcelRow> process(final List<LineStop> items) throws Exception {
-		List<BatchExcelRow> result = null;
-		List<BatchExcelRow> temp = extractSens(items, stationA, stationB);
+	public BatchExcelRow process(final LineStop item) throws Exception {
+		BatchExcelRow result = null;
 
-		if (temp.size() > 0) { // We remove empty list (a null returned value do
-								// not pass-through the Writer)
-			result = temp;
-		}
+        result = extractSens(item, stationA, stationB);
 
 		return result;
 	}
 
-	protected List<BatchExcelRow> extractSens(List<LineStop> items,
+	protected BatchExcelRow extractSens(LineStop item,
 			String stationAName, String stationBName) throws ArrivalDepartureEqualsException {
-		List<BatchExcelRow> result = new ArrayList<>();
 		Station stationA = new Station(stationAName);
 		Station stationB = new Station(stationBName);
 		Sens sens = null;
 
-		for (LineStop lineStop : items) {
-			LineStop departure = readPrevious(lineStop.getPrevious(), stationA,
-					stationB);
-			LineStop arrival = readNext(lineStop.getNext(), stationA, stationB);
+        LineStop departure = readPrevious(item.getPrevious(), stationA,
+                stationB);
+        LineStop arrival = readNext(item.getNext(), stationA, stationB);
 
-			if (departure == null) {
-				departure = lineStop;
-			}
-
-			if (arrival == null) {
-				arrival = lineStop;
-			}
-
-			if (arrival == departure) {
-                throw new ArrivalDepartureEqualsException(
-                        "Arrival must not be equal to departure");
-            }
-
-			LOGGER.debug("departure={} arrival={}", departure, arrival);
-
-			if (departure.getStation().equals(stationA)
-					&& arrival.getStation().equals(stationB)) {
-				sens = Sens.DEPARTURE;
-			} else if (departure.getStation().equals(stationB)
-					&& arrival.getStation().equals(stationA)) {
-				sens = Sens.ARRIVAL;
-			}
-
-            BatchExcelRow excelRow = map(departure, arrival, sens);
-
-            /*
-             * It's possible that we have processed the same ExcelRow by following the path from departureStation and
-             * another one from arrivalStation.
-             */
-            if (!result.contains(excelRow)) {
-                result.add(excelRow);
-
-                LOGGER.trace("excelRow={}", excelRow);
-            }
+        if (departure == null) {
+            departure = item;
         }
 
-		return result;
+        if (arrival == null) {
+            arrival = item;
+        }
+
+        if (arrival == departure) {
+            throw new ArrivalDepartureEqualsException(
+                    "Arrival must not be equal to departure");
+        }
+
+        LOGGER.debug("departure={} arrival={}", departure, arrival);
+
+        if (departure.getStation().equals(stationA)
+                && arrival.getStation().equals(stationB)) {
+            sens = Sens.DEPARTURE;
+        } else if (departure.getStation().equals(stationB)
+                && arrival.getStation().equals(stationA)) {
+            sens = Sens.ARRIVAL;
+        }
+
+		return map(departure, arrival, sens);
 	}
 
 	protected LineStop readPrevious(LineStop lineStop, Station stationA,

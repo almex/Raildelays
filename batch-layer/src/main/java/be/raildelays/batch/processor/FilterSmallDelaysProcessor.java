@@ -11,13 +11,11 @@ import org.springframework.beans.factory.InitializingBean;
 import java.util.*;
 
 /**
- * Filter items to get only two. One for departure and the other one for arrival.
- * The only remaining items are those which have the maximum delay for a given sens.
+ * Filter delay lower than a certain threshold.
  *
  * @author Almex
  */
-public class FilterSmallDelaysProcessor implements
-        ItemProcessor<List<BatchExcelRow>, List<BatchExcelRow>>, InitializingBean {
+public class FilterSmallDelaysProcessor implements ItemProcessor<BatchExcelRow, BatchExcelRow>, InitializingBean {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(FilterSmallDelaysProcessor.class);
@@ -32,16 +30,14 @@ public class FilterSmallDelaysProcessor implements
     }
 
     @Override
-    public List<BatchExcelRow> process(final List<BatchExcelRow> items) throws Exception {
-        List<BatchExcelRow> result = new ArrayList<>();
+    public BatchExcelRow process(final BatchExcelRow item) throws Exception {
+        BatchExcelRow result = null;
 
-        for (BatchExcelRow item : items) {
-            if (item.getDelay() >= threshold) {
-                result.add(item);
-            }
+        if (item.getDelay() >= threshold) {
+            result = item;
         }
 
-        return result.size() == 0 ? null : result; // To apply the ItemReader contract
+        return result; // To apply the ItemReader contract
     }
 
     public void setThreshold(Long threshold) {

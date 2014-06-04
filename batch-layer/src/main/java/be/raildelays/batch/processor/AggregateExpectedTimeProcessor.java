@@ -18,7 +18,7 @@ import java.util.List;
  *
  * @author Almex
  */
-public class AggregateExpectedTimeProcessor implements ItemProcessor<List<LineStop>, List<LineStop>> {
+public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, LineStop> {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(AggregateExpectedTimeProcessor.class);
@@ -26,7 +26,7 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<List<LineSt
     @Resource
     private RaildelaysService service;
 
-    @Override
+
     public List<LineStop> process(List<LineStop> items) throws Exception {
         List<LineStop> result = null;
 
@@ -70,6 +70,7 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<List<LineSt
         return result;
     }
 
+    @Override
     public LineStop process(LineStop item) throws Exception {
         LineStop result = null;
         LineStop.Builder builder = fetchScheduling(item);

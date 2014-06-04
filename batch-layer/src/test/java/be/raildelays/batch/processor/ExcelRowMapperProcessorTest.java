@@ -23,9 +23,9 @@ import be.raildelays.domain.xls.ExcelRow;
 @RunWith(value = BlockJUnit4ClassRunner.class)
 public class ExcelRowMapperProcessorTest {
 
-	private List<LineStop> fromA;
+	private LineStop fromA;
 
-	private List<LineStop> fromB;
+	private LineStop fromB;
 
 	/**
 	 * S.U.T.
@@ -105,12 +105,10 @@ public class ExcelRowMapperProcessorTest {
                 .canceled(false));
 
         LineStop lineStop = builder.build();
-        
-		fromA = new ArrayList<>();
-		fromA.add(lineStop.getNext());  // stationA
 
-		fromB = new ArrayList<>();
-		fromB.add(lineStop.getNext().getNext().getNext()); // stationB
+		fromA = lineStop.getNext();  // stationA
+
+		fromB = lineStop.getNext().getNext().getNext(); // stationB
 
 		processor = new ExcelRowMapperProcessor();
 		processor.setStationA("stationA");
@@ -119,11 +117,9 @@ public class ExcelRowMapperProcessorTest {
 
 	@Test
 	public void testProcessFromA() throws Exception {
-		List<BatchExcelRow> excelRows = processor.process(fromA);
+		BatchExcelRow excelRow = processor.process(fromA);
 		SimpleDateFormat formater = new SimpleDateFormat("HH:mm");
 
-		Assert.assertEquals(1, excelRows.size());
-		ExcelRow excelRow = excelRows.get(0);
 		Assert.assertEquals(new Station("stationA"),
 				excelRow.getDepartureStation());
 		Assert.assertEquals(new Station("stationB"),
@@ -143,10 +139,8 @@ public class ExcelRowMapperProcessorTest {
 
 	@Test
 	public void testProcessFromB() throws Exception {
-		List<BatchExcelRow> excelRows = processor.process(fromB);
+		BatchExcelRow excelRow = processor.process(fromB);
 
-		Assert.assertEquals(1, excelRows.size());
-		ExcelRow excelRow = excelRows.get(0);
 		Assert.assertEquals(new Station("stationA"),
 				excelRow.getDepartureStation());
 		Assert.assertEquals(new Station("stationB"),

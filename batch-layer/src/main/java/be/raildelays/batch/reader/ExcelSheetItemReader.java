@@ -2,9 +2,13 @@ package be.raildelays.batch.reader;
 
 import be.raildelays.batch.poi.ExcelRowMappingException;
 import be.raildelays.batch.poi.RowMapper;
+import be.raildelays.batch.poi.WorkbookAction;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ReaderNotOpenException;
@@ -14,6 +18,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
+import java.io.Closeable;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
