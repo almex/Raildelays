@@ -1,5 +1,6 @@
 package be.raildelays.batch.reader;
 
+import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.domain.xls.ExcelRow;
 import org.junit.After;
 import org.junit.Assert;
@@ -15,7 +16,7 @@ import java.io.File;
 @RunWith(value = BlockJUnit4ClassRunner.class)
 public class ExcelSheetItemReaderTest {
 
-    private ExcelSheetItemReader<ExcelRow> reader;
+    private ExcelSheetItemReader<BatchExcelRow> reader;
 
     private static final String CURRENT_PATH = "." + File.separator + "target" + File.separator;
 
@@ -25,7 +26,7 @@ public class ExcelSheetItemReaderTest {
 
     @Before
     public void setUp() throws Exception {
-        reader = new ExcelSheetItemReader<ExcelRow>();
+        reader = new ExcelSheetItemReader<BatchExcelRow>();
         reader.setResource(new ClassPathResource("retard_sncb 20140522"+EXCEL_FILE_EXTENSION));
         reader.setRowsToSkip(21);
         reader.setSheetIndex(0);

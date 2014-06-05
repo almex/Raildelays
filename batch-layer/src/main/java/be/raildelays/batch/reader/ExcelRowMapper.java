@@ -1,5 +1,6 @@
 package be.raildelays.batch.reader;
 
+import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.poi.RowMapper;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
@@ -11,10 +12,10 @@ import java.text.SimpleDateFormat;
 /**
  * Created by soumagn on 30/05/2014.
  */
-public class ExcelRowMapper implements RowMapper<ExcelRow> {
+public class ExcelRowMapper implements RowMapper<BatchExcelRow> {
     @Override
-    public ExcelRow mapRow(Row row, int rowIndex) throws Exception {
-        ExcelRow result = null;
+    public BatchExcelRow mapRow(Row row, int rowIndex) throws Exception {
+        BatchExcelRow result = null;
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
         Train train2 = null;
         Train effectiveTrain2 = null;
@@ -33,7 +34,7 @@ public class ExcelRowMapper implements RowMapper<ExcelRow> {
                 effectiveTrain2 = new Train(row.getCell(51).getStringCellValue());
             }
 
-            result = new ExcelRow.Builder(row.getCell(2).getDateCellValue(), null)
+            result = new BatchExcelRow.Builder(row.getCell(2).getDateCellValue(), null)
                     .departureStation(new Station(row.getCell(12).getStringCellValue()))
                     .arrivalStation(new Station(row.getCell(18).getStringCellValue()))
                     .linkStation(linkStation)
@@ -46,7 +47,7 @@ public class ExcelRowMapper implements RowMapper<ExcelRow> {
                     .effectiveTrain1(new Train(row.getCell(48).getStringCellValue()))
                     .effectiveTrain2(effectiveTrain2)
                     .delay((long) row.getCell(53).getNumericCellValue())
-                    .rowIndex(new Long(row.getRowNum()))
+                    .index(new Long(row.getRowNum()))
                     .build();
         } //-- If the first cell contains nothing we return null
 

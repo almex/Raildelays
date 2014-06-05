@@ -1,22 +1,15 @@
 package be.raildelays.batch.poi;
 
 import be.raildelays.batch.reader.ExcelSheetItemReader;
-import be.raildelays.batch.writer.ExcelSheetItemWriter;
-import be.raildelays.domain.xls.ExcelRow;
-import org.apache.commons.lang.builder.CompareToBuilder;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.InitializingBean;
 
 /**
-* @author Almex
-*/
-public class WorkbookSearch<T extends Comparable<T>> implements InitializingBean {
+ * @author Almex
+ */
+public class WorkbookSearch<T extends Comparable<? super T>> implements InitializingBean {
 
-    private ExcelSheetItemReader<T> reader;
+    private ExcelSheetItemReader<? extends T> reader;
 
     private ExecutionContext executionContext;
 

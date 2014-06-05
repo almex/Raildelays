@@ -1,147 +1,203 @@
 package be.raildelays.batch.processor;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.BlockJUnit4ClassRunner;
-
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.bean.BatchExcelRow.Builder;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
-import be.raildelays.domain.xls.ExcelRow;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.BlockJUnit4ClassRunner;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.NonTransientResourceException;
+import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
+import org.springframework.core.io.Resource;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 @RunWith(value = BlockJUnit4ClassRunner.class)
 public class FilterTwoSensPerDayProcessorTest {
 
-	private List<BatchExcelRow> list;
+    private List<BatchExcelRow> list;
 
-	/**
-	 * S.U.T.
-	 */
-	private FilterTwoSensPerDayProcessor processor;
+    /**
+     * S.U.T.
+     */
+    private FilterTwoSensPerDayProcessor processor;
 
-	@Before
-	public void setUp() throws ParseException {
-		Date today = new Date();
-		SimpleDateFormat f = new SimpleDateFormat("HH:mm");
-		Station stationA = new Station("A");
-		Station stationB = new Station("B");
+    private ResourceAwareItemReaderItemStream<BatchExcelRow> fakeReader;
 
-		list = new ArrayList<>();
-		
-		list.add(new Builder(today, Sens.DEPARTURE) //
-				.departureStation(stationA) //
-				.arrivalStation(stationB) //
-				.expectedTrain1(new Train("466")) //
-				.expectedArrivalTime(f.parse("07:00")) //
-				.expectedDepartureTime(f.parse("07:05")) //
-				.effectiveTrain1(new Train("466")) //
-				.effectiveDepartureTime(f.parse("07:03")) //
-				.effectiveArrivalTime(f.parse("07:10")) //
-				.delay(5L) //
-				.build());
+    private static final SimpleDateFormat F = new SimpleDateFormat("HH:mm");
 
-		list.add(new Builder(today, Sens.DEPARTURE) //
-				.departureStation(stationA) //
-				.arrivalStation(stationB) //
-				.expectedTrain1(new Train("530")) //
-				.expectedArrivalTime(f.parse("08:00")) //
-				.expectedDepartureTime(f.parse("08:05")) //
-				.effectiveTrain1(new Train("466")) //
-				.effectiveDepartureTime(f.parse("08:03")) //
-				.effectiveArrivalTime(f.parse("08:15")) //
-				.delay(10L) //
-				.build());
+    private Date today;
 
-		list.add(new Builder(today, Sens.DEPARTURE) //
-				.departureStation(stationA) //
-				.arrivalStation(stationB) //
-				.expectedTrain1(new Train("531")) //
-				.expectedArrivalTime(f.parse("12:00")) //
-				.expectedDepartureTime(f.parse("12:05")) //
-				.effectiveTrain1(new Train("466")) //
-				.effectiveDepartureTime(f.parse("12:03")) //
-				.effectiveArrivalTime(f.parse("12:20")) //
-				.delay(15L) //
-				.build());
+    private Station stationA;
 
-		list.add(new Builder(today, Sens.ARRIVAL) //
-				.departureStation(stationB) //
-				.arrivalStation(stationA) //
-				.expectedTrain1(new Train("467")) //
-				.expectedArrivalTime(f.parse("15:00")) //
-				.expectedDepartureTime(f.parse("15:05")) //
-				.effectiveTrain1(new Train("466")) //
-				.effectiveDepartureTime(f.parse("15:03")) //
-				.effectiveArrivalTime(f.parse("15:10")) //
-				.delay(5L) //
-				.build());
+    private Station stationB;
 
-		list.add(new Builder(today, Sens.ARRIVAL) //
-				.departureStation(stationB) //
-				.arrivalStation(stationA) //
-				.expectedTrain1(new Train("477")) //
-				.expectedArrivalTime(f.parse("16:00")) //
-				.expectedDepartureTime(f.parse("16:05")) //
-				.effectiveTrain1(new Train("466")) //
-				.effectiveDepartureTime(f.parse("16:03")) //
-				.effectiveArrivalTime(f.parse("16:10")) //
-				.delay(5L) //
-				.build());
+    @Before
+    public void setUp() throws ParseException {
+        today = new Date();
+        stationA = new Station("A");
+        stationB = new Station("B");
 
-		processor = new FilterTwoSensPerDayProcessor();
-		processor.setStationA(stationA.getEnglishName());
-		processor.setStationB(stationB.getEnglishName());
-	}
+        fakeReader = new ResourceAwareItemReaderItemStream<BatchExcelRow>() {
+            private Iterator<BatchExcelRow> iterator;
 
-	@Test
-	public void testProcessReturnTwo() throws Exception {
-		List<BatchExcelRow> excelRows = processor.process(list);
+            @Override
+            public void setResource(Resource resource) {
 
-		Assert.assertEquals(2, excelRows.size());
-	}
-	
-	@Test
-	public void testProcessOrder() throws Exception {
-		List<BatchExcelRow> excelRows = processor.process(list);
+            }
 
-		ExcelRow excelRow1 = excelRows.get(0);
-		ExcelRow excelRow2 = excelRows.get(1);
-		
-		Assert.assertEquals(Sens.DEPARTURE, excelRow1.getSens());
-		Assert.assertEquals(Sens.ARRIVAL, excelRow2.getSens());
-	}
-	
-	@Test
-	public void testProcessMaxDelaysPerSens() throws Exception {
-		List<BatchExcelRow> excelRows = processor.process(list);
+            @Override
+            public BatchExcelRow read() throws Exception, UnexpectedInputException, org.springframework.batch.item.ParseException, NonTransientResourceException {
+                return iterator.hasNext() ? iterator.next() : null;
+            }
 
-		ExcelRow excelRow1 = excelRows.get(0);
-		ExcelRow excelRow2 = excelRows.get(1);
-		
-		Assert.assertEquals(15, excelRow1.getDelay());
-		Assert.assertEquals(5, excelRow2.getDelay());
-	}
-	
-	@Test
-	public void testProcessTime() throws Exception {
-		SimpleDateFormat f = new SimpleDateFormat("HH:mm");
-		List<BatchExcelRow> excelRows = processor.process(list);
+            @Override
+            public void open(ExecutionContext executionContext) throws ItemStreamException {
+                iterator = list.iterator();
+            }
 
-		ExcelRow excelRow1 = excelRows.get(0);
-		ExcelRow excelRow2 = excelRows.get(1);
-		
-		Assert.assertEquals(f.parse("12:00"), excelRow1.getExpectedArrivalTime());
-		Assert.assertEquals("The first element with the max delay should be the one we keep", f.parse("15:10"), excelRow2.getEffectiveArrivalTime());
-	}
+            @Override
+            public void update(ExecutionContext executionContext) throws ItemStreamException {
+
+            }
+
+            @Override
+            public void close() throws ItemStreamException {
+                iterator = null;
+            }
+        };
+
+        list = new ArrayList<>();
+
+        list.add(new Builder(today, Sens.DEPARTURE) //
+                .departureStation(stationA) //
+                .arrivalStation(stationB) //
+                .expectedTrain1(new Train("466")) //
+                .expectedArrivalTime(F.parse("07:00")) //
+                .expectedDepartureTime(F.parse("07:05")) //
+                .effectiveTrain1(new Train("466")) //
+                .effectiveDepartureTime(F.parse("07:03")) //
+                .effectiveArrivalTime(F.parse("07:10")) //
+                .delay(5L) //
+                .build());
+
+        list.add(new Builder(today, Sens.DEPARTURE) //
+                .departureStation(stationA) //
+                .arrivalStation(stationB) //
+                .expectedTrain1(new Train("530")) //
+                .expectedArrivalTime(F.parse("08:00")) //
+                .expectedDepartureTime(F.parse("08:05")) //
+                .effectiveTrain1(new Train("466")) //
+                .effectiveDepartureTime(F.parse("08:03")) //
+                .effectiveArrivalTime(F.parse("08:15")) //
+                .delay(10L) //
+                .build());
+
+        list.add(new Builder(today, Sens.DEPARTURE) //
+                .departureStation(stationA) //
+                .arrivalStation(stationB) //
+                .expectedTrain1(new Train("531")) //
+                .expectedArrivalTime(F.parse("12:00")) //
+                .expectedDepartureTime(F.parse("12:05")) //
+                .effectiveTrain1(new Train("466")) //
+                .effectiveDepartureTime(F.parse("12:03")) //
+                .effectiveArrivalTime(F.parse("12:20")) //
+                .delay(15L) //
+                .build());
+
+        list.add(new Builder(today, Sens.ARRIVAL) //
+                .departureStation(stationB) //
+                .arrivalStation(stationA) //
+                .expectedTrain1(new Train("467")) //
+                .expectedArrivalTime(F.parse("15:00")) //
+                .expectedDepartureTime(F.parse("15:05")) //
+                .effectiveTrain1(new Train("466")) //
+                .effectiveDepartureTime(F.parse("15:03")) //
+                .effectiveArrivalTime(F.parse("15:10")) //
+                .delay(5L) //
+                .build());
+
+        list.add(new Builder(today, Sens.ARRIVAL) //
+                .departureStation(stationB) //
+                .arrivalStation(stationA) //
+                .expectedTrain1(new Train("477")) //
+                .expectedArrivalTime(F.parse("16:00")) //
+                .expectedDepartureTime(F.parse("16:05")) //
+                .effectiveTrain1(new Train("466")) //
+                .effectiveDepartureTime(F.parse("16:03")) //
+                .effectiveArrivalTime(F.parse("16:10")) //
+                .delay(5L) //
+                .build());
+
+        processor = new FilterTwoSensPerDayProcessor();
+        processor.setStationA(stationA.getEnglishName());
+        processor.setStationB(stationB.getEnglishName());
+    }
+
+    @Test
+    public void testProcessReturnNew() throws Exception {
+        BatchExcelRow excelRow = processor.process(new Builder(new SimpleDateFormat("dd/MM/yyyy").parse("08/11/1980"), Sens.ARRIVAL) //
+                .departureStation(stationB) //
+                .arrivalStation(stationA) //
+                .expectedTrain1(new Train("578")) //
+                .expectedArrivalTime(F.parse("22:00")) //
+                .expectedDepartureTime(F.parse("22:05")) //
+                .effectiveTrain1(new Train("578")) //
+                .effectiveDepartureTime(F.parse("16:03")) //
+                .effectiveArrivalTime(F.parse("16:10")) //
+                .delay(5L) //
+                .build());
+
+        Assert.assertNotNull(excelRow);
+        Assert.assertNull(excelRow.getIndex());
+    }
+
+    @Test
+    public void testProcessReturnReplace() throws Exception {
+        BatchExcelRow excelRow = processor.process(new Builder(today, Sens.ARRIVAL) //
+                .departureStation(stationB) //
+                .arrivalStation(stationA) //
+                .expectedTrain1(new Train("578")) //
+                .expectedArrivalTime(F.parse("17:00")) //
+                .expectedDepartureTime(F.parse("17:05")) //
+                .effectiveTrain1(new Train("578")) //
+                .effectiveDepartureTime(F.parse("16:03")) //
+                .effectiveArrivalTime(F.parse("16:10")) //
+                .delay(25L) //
+                .build());
+
+        Assert.assertNotNull(excelRow);
+        Assert.assertNotNull(excelRow.getIndex());
+    }
+
+    @Test
+    public void testProcessReturnSkip() throws Exception {
+        BatchExcelRow excelRow = processor.process(new Builder(today, Sens.ARRIVAL) //
+                .departureStation(stationB) //
+                .arrivalStation(stationA) //
+                .expectedTrain1(new Train("578")) //
+                .expectedArrivalTime(F.parse("16:00")) //
+                .expectedDepartureTime(F.parse("16:05")) //
+                .effectiveTrain1(new Train("466")) //
+                .effectiveDepartureTime(F.parse("16:03")) //
+                .effectiveArrivalTime(F.parse("16:10")) //
+                .delay(0L) //
+                .build());
+
+
+        Assert.assertNull(excelRow);
+    }
 
 }

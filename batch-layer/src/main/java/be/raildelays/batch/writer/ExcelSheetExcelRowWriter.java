@@ -1,5 +1,6 @@
 package be.raildelays.batch.writer;
 
+import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.poi.WorkbookSearch;
 import be.raildelays.batch.reader.ExcelRowMapper;
 import be.raildelays.batch.reader.ExcelSheetItemReader;
@@ -24,7 +25,7 @@ import java.io.*;
 /**
  * @author Almex
  */
-public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<ExcelRow> {
+public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<BatchExcelRow> {
     private static final int MAX_ITEM_PER_SHEET = 40;
 
     private static final String RESOURCE_KEY = "resource.key";
@@ -47,7 +48,7 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<ExcelRow> {
     }
 
     @Override
-    public boolean doWrite(ExcelRow item) throws Exception {
+    public boolean doWrite(BatchExcelRow item) throws Exception {
         if (this.resource == null) {
             if (!isExistingWorkbooks(item)) {
                 createNewWorkbook(getFileName(item));
@@ -79,7 +80,7 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<ExcelRow> {
         resource = new FileSystemResource(new File(outputDirectory + File.separator + fileName));
     }
 
-    private boolean isExistingWorkbooks(ExcelRow firstItem) throws Exception {
+    private boolean isExistingWorkbooks(BatchExcelRow firstItem) throws Exception {
         Validate.notNull(firstItem, "You must provide the first ExcelRow of this Excel sheet prior to check " +
                 "if a file already exists.");
 
@@ -89,7 +90,7 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<ExcelRow> {
         return recoveryMode;
     }
 
-    private boolean retrieveFirstRowContaining(ExcelRow content) throws Exception {
+    private boolean retrieveFirstRowContaining(BatchExcelRow content) throws Exception {
         File directory = new File(outputDirectory);
         this.resource = null;
 
@@ -103,8 +104,8 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<ExcelRow> {
         })) {
             try {
                 final Workbook currentWorkbook = WorkbookFactory.create(file);
-                ExcelSheetItemReader<ExcelRow> reader = new ExcelSheetItemReader<>();
-                WorkbookSearch<ExcelRow> container = new WorkbookSearch<>(executionContext);
+                ExcelSheetItemReader<BatchExcelRow> reader = new ExcelSheetItemReader<>();
+                WorkbookSearch<BatchExcelRow> container = new WorkbookSearch<>(executionContext);
                 reader.setResource(new FileSystemResource(file));
                 reader.setName(file.getName());
                 reader.setRowMapper(new ExcelRowMapper());

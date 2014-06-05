@@ -3,7 +3,6 @@ package be.raildelays.domain.xls;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
-import be.raildelays.domain.support.ItemIndexAware;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -24,7 +23,7 @@ import java.util.Date;
 @Entity
 @Table(name = "EXCEL_ROW", uniqueConstraints = @UniqueConstraint(columnNames = {
         "DATE", "SENS"}))
-public class ExcelRow implements ItemIndexAware, Comparable<ExcelRow> {
+public class ExcelRow implements Comparable<ExcelRow> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
@@ -100,8 +99,6 @@ public class ExcelRow implements ItemIndexAware, Comparable<ExcelRow> {
     @NotNull
     private Sens sens;
 
-    private Long index;
-
     @Override
     public int compareTo(ExcelRow excelRow) {
         int result = 0;
@@ -135,7 +132,6 @@ public class ExcelRow implements ItemIndexAware, Comparable<ExcelRow> {
         protected Train effectiveTrain2;
         protected Long delay;
         protected final Sens sens;
-        protected Long rowIndex;
 
         public Builder(final Date date, final Sens sens) {
             this.date = (Date) (date != null ? date.clone() : null);
@@ -208,11 +204,6 @@ public class ExcelRow implements ItemIndexAware, Comparable<ExcelRow> {
             return this;
         }
 
-        public Builder rowIndex(final Long rowIndex) {
-            this.delay = delay;
-            return this;
-        }
-
         public ExcelRow build() {
             return new ExcelRow(this);
         }
@@ -234,7 +225,6 @@ public class ExcelRow implements ItemIndexAware, Comparable<ExcelRow> {
         this.effectiveTrain2 = builder.effectiveTrain2;
         this.delay = builder.delay;
         this.sens = builder.sens;
-        this.index = builder.rowIndex;
     }
 
     public Date getDate() {
@@ -351,14 +341,6 @@ public class ExcelRow implements ItemIndexAware, Comparable<ExcelRow> {
 
     public Long getId() {
         return id;
-    }
-
-    public Long getIndex() {
-        return index;
-    }
-
-    public void setIndex(Long index) {
-        this.index = index;
     }
 
     @Override

@@ -1,16 +1,17 @@
 package be.raildelays.batch.processor;
 
 import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.domain.Sens;
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang.builder.CompareToBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.annotation.BeforeStep;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemStreamReader;
+import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.beans.factory.InitializingBean;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.core.io.FileSystemResource;
 
 /**
  * Filter items to get only two. One for departure and the other one for arrival.
@@ -18,71 +19,97 @@ import java.util.List;
  *
  * @author Almex
  */
-public class FilterTwoSensPerDayProcessor implements
-        ItemProcessor<List<BatchExcelRow>, List<BatchExcelRow>>, InitializingBean {
-
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(FilterTwoSensPerDayProcessor.class);
+public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow, BatchExcelRow>, InitializingBean {
 
     private String stationA;
 
     private String stationB;
 
-    private ItemStreamReader outputReader;
+    private ResourceAwareItemReaderItemStream<BatchExcelRow> outputReader;
+
+    private String resourceKey;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FilterTwoSensPerDayProcessor.class);
+
+    private ExecutionContext executionContext;
 
     @Override
     public void afterPropertiesSet() throws Exception {
         Validate.notNull(stationA, "Station A name is mandatory");
         Validate.notNull(stationB, "Station B name is mandatory");
+        Validate.notNull(outputReader, "outputReader is mandatory");
+        Validate.notNull(resourceKey, "resourceKey is mandatory");
 
         LOGGER.info("Processing for stationA={} and stationB={}...", stationA,
                 stationB);
     }
 
+    @BeforeStep
+    public void beforeStep(StepExecution stepExecution) {
+        executionContext = stepExecution.getExecutionContext();
+    }
+
+
+    public void openReader() {
+        String path = executionContext.getString(resourceKey);
+
+        outputReader.setResource(new FileSystemResource(path));
+        outputReader.open(executionContext);
+    }
+
     @Override
-    public List<BatchExcelRow> process(final List<BatchExcelRow> items) throws Exception {
-        List<BatchExcelRow> result = null;
-
-        BatchExcelRow fromAtoB = extractMaxDelay(items, Sens.DEPARTURE);
-        BatchExcelRow fromBtoA = extractMaxDelay(items, Sens.ARRIVAL);
-
-        LOGGER.debug("From A to B : {}", fromAtoB);
-        LOGGER.debug("From B to A : {}", fromBtoA);
-
-        if (fromAtoB != null || fromBtoA != null) {
-            result = new ArrayList<>();
-
-            if (fromAtoB != null) {
-                result.add(fromAtoB);
-            }
-
-            if (fromBtoA != null) {
-                result.add(fromBtoA);
-            }
-        }
-
-
-        return result;
-    }
-
-    private BatchExcelRow extractMaxDelay(List<BatchExcelRow> items, Sens sens) {
+    public BatchExcelRow process(final BatchExcelRow item) throws Exception {
         BatchExcelRow result = null;
-        long maxDelay = -1;
 
-        for (BatchExcelRow excelRow : items) {
-            if (excelRow.getSens().equals(sens)
-                    && excelRow.getDelay() > maxDelay) {
-                maxDelay = excelRow.getDelay();
-                result = excelRow;
-            }
+        openReader();
+        try {
+            BatchExcelRow matchingExcelRow = null;
+            do {
+                matchingExcelRow = outputReader.read();
+
+                if (matchingExcelRow != null) {
+                    if (new CompareToBuilder().append(item.getDate(), matchingExcelRow.getDate())
+                            .append(item.getDepartureStation(), matchingExcelRow.getDepartureStation())
+                            .append(item.getArrivalStation(), matchingExcelRow.getArrivalStation())
+                            .toComparison() == 0) {
+                        /**
+                         * Here we know that we have a collision: we match the same date and the same sens.
+                         * If the delay of the item is not greater than the one in the Excel sheet then we skip it.
+                         */
+                        if (item.getDelay() > matchingExcelRow.getDelay()) {
+                            /**
+                             * Here, the delay of the item is greater than the matching Excel row.
+                             * We must replace the row currently in the Excel sheet with our item.
+                             */
+                            result = item;
+                            if (matchingExcelRow.getIndex() != null) {
+                                result.setIndex(matchingExcelRow.getIndex());
+                            } else {
+                                throw new IllegalArgumentException("We don't know the current index of this Excel row. We cannot replace it!");
+                            }
+                        }
+                    }
+                } else {
+                    /**
+                     * In that case we reach the first empty row without matching any previous data.
+                     * So, we have to add a new row to the Excel sheet.
+                     */
+                    result = item;
+                    result.setIndex(null);
+                }
+            } while (matchingExcelRow != null && result == null);
+        } finally {
+            closeReader();
         }
-
-        LOGGER.trace("sens={} maxDelay={}", sens, maxDelay);
 
         return result;
     }
 
-    public void setOutputReader(ItemStreamReader outputReader) {
+    public void closeReader() {
+        outputReader.close();
+    }
+
+    public void setOutputReader(ResourceAwareItemReaderItemStream<BatchExcelRow> outputReader) {
         this.outputReader = outputReader;
     }
 
