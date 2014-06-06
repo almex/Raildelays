@@ -21,10 +21,6 @@ import org.springframework.core.io.FileSystemResource;
  */
 public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow, BatchExcelRow>, InitializingBean {
 
-    private String stationA;
-
-    private String stationB;
-
     private ResourceAwareItemReaderItemStream<BatchExcelRow> outputReader;
 
     private String resourceKey;
@@ -35,13 +31,8 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Validate.notNull(stationA, "Station A name is mandatory");
-        Validate.notNull(stationB, "Station B name is mandatory");
         Validate.notNull(outputReader, "outputReader is mandatory");
         Validate.notNull(resourceKey, "resourceKey is mandatory");
-
-        LOGGER.info("Processing for stationA={} and stationB={}...", stationA,
-                stationB);
     }
 
     @BeforeStep
@@ -88,6 +79,17 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
                                 throw new IllegalArgumentException("We don't know the current index of this Excel row. We cannot replace it!");
                             }
                         }
+
+                        /**
+                         * We stop searching here. Either the result is found or we have to skip this item.
+                         */
+                        break;
+                    } else if (item.getDate().before(matchingExcelRow.getDate())) {
+                        /**
+                         * We stop searching. We expect that the content of the Excel file is sorted by date.
+                         * This clause should never happen if the data read are also sorted by date.
+                         */
+                        break;
                     }
                 } else {
                     /**
@@ -96,8 +98,9 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
                      */
                     result = item;
                     result.setIndex(null);
+                    break;
                 }
-            } while (matchingExcelRow != null && result == null);
+            } while (matchingExcelRow != null);
         } finally {
             closeReader();
         }
@@ -113,12 +116,8 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
         this.outputReader = outputReader;
     }
 
-    public void setStationA(String stationA) {
-        this.stationA = stationA;
-    }
-
-    public void setStationB(String stationB) {
-        this.stationB = stationB;
+    public void setResourceKey(String resourceKey) {
+        this.resourceKey = resourceKey;
     }
 
 }
