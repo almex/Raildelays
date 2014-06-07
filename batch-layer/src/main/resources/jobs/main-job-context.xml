@@ -52,6 +52,7 @@
             </batch:tasklet>
             <batch:listeners>
                 <batch:listener ref="skippedItemsListener"/>
+                <batch:listener ref="filterTwoSensPerDayProcessor"/>
                 <batch:listener ref="copyResourceToStepExecutionContextListener" />
             </batch:listeners>
         </batch:step>
