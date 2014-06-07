@@ -13,6 +13,7 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 
 /**
  * Filter items to get only two. One for departure and the other one for arrival.
@@ -43,6 +44,7 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
         BatchExcelRow result = null;
 
         try {
+            outputReader.setResource((Resource) executionContext.get("outputExcelFileResource"));
             outputReader.open(executionContext);
 
             try {

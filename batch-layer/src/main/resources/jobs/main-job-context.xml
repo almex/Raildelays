@@ -156,7 +156,7 @@
 
     <bean id="excelSheetItemReader"
           class="be.raildelays.batch.reader.ExcelSheetItemReader"
-          scope="prototype">
+          scope="step">
         <property name="name" value="excelSheetItemReader" />
         <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}" />
         <property name="maxItemCount" value="${excel.sheet0.maxitemcount}" />
