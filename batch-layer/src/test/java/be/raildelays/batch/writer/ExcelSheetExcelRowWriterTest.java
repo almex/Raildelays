@@ -55,6 +55,7 @@ public class ExcelSheetExcelRowWriterTest {
         writer.setOutputDirectory(CURRENT_PATH);
         writer.setName("test");
         writer.setRowsToSkip(21);
+        writer.setMaxItemCount(40);
         writer.setRowAggregator(new ExcelRowAggregator());
         writer.afterPropertiesSet();
         writer.open(executionContext);
@@ -162,9 +163,14 @@ public class ExcelSheetExcelRowWriterTest {
     }
 
     private void cleanUp() {
+        if (writer != null) {
+            writer.close();
+        }
         //-- We remove any result from the test
         for (File file : getExcelFiles()) {
-            file.delete();
+            if (!file.delete()) {
+                file.delete();
+            }
         }
     }
 }

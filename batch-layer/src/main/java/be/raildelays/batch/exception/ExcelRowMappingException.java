@@ -1,4 +1,4 @@
-package be.raildelays.batch.poi;
+package be.raildelays.batch.exception;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.batch.item.ParseException;

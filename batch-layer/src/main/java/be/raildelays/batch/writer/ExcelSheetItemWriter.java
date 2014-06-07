@@ -148,7 +148,9 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
         } finally {
             try {
                 if (outputStream != null) {
+                    outputStream.flush();
                     outputStream.close();
+                    outputStream = null;
                 }
             } catch (IOException e) {
                 LOGGER.error("I/O error when closing Excel outputDirectory file", e);

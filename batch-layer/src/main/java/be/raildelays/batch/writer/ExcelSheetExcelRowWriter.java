@@ -19,10 +19,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.ParseException;
+import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import java.io.*;
+import java.util.List;
 
 /**
  * @author Almex
@@ -47,19 +50,24 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<BatchExcelRow
     }
 
     @Override
-    public boolean doWrite(BatchExcelRow item) throws Exception {
-        if (this.resource == null) {
-            if (!isExistingWorkbooks(item)) {
-                createNewWorkbook(getFileName(item));
+    public void write(List<? extends BatchExcelRow> items) throws Exception {
+        if (!items.isEmpty()) {
+            BatchExcelRow firstItem = items.get(0);
+
+            if (this.resource == null) {
+                close();
+                if (!isExistingWorkbooks(firstItem)) {
+                    createNewWorkbook(getFileName(firstItem));
+                }
+                super.doOpen();
+            } else if (getCurrentItemCount() % getMaxItemCount() == 0) {
+                close();
+                createNewWorkbook(getFileName(firstItem));
+                super.doOpen();
             }
-            super.doOpen();
-        } else if (getCurrentItemCount() % getMaxItemCount() == 0) {
-            doClose();
-            createNewWorkbook(getFileName(item));
-            super.doOpen();
         }
 
-        return super.doWrite(item);
+        super.write(items);
     }
 
     @Override
@@ -102,7 +110,6 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<BatchExcelRow
             }
         })) {
             try {
-                final Workbook currentWorkbook = WorkbookFactory.create(file);
                 ExcelSheetItemReader<BatchExcelRow> reader = new ExcelSheetItemReader<>();
                 WorkbookSearch<BatchExcelRow> container = new WorkbookSearch<>(executionContext);
                 reader.setResource(new FileSystemResource(file));
@@ -132,13 +139,15 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<BatchExcelRow
     private String getFileName(ExcelRow firstItem) throws InvalidFormatException, IOException {
         String fileExtension = Format.OOXML.getFileExtension();
         InputStream inputStream = null;
+        PushbackInputStream pushbackInputStream = null;
 
         try {
-            inputStream = new PushbackInputStream(template.getInputStream(), 8);
+            inputStream = new FileInputStream(template.getFile());
+            pushbackInputStream = new PushbackInputStream(inputStream, 8);
 
-            if (POIFSFileSystem.hasPOIFSHeader(inputStream)) {
+            if (POIFSFileSystem.hasPOIFSHeader(pushbackInputStream)) {
                 fileExtension = Format.OLE2.getFileExtension();
-            } else if (!POIXMLDocument.hasOOXMLHeader(inputStream)) {
+            } else if (!POIXMLDocument.hasOOXMLHeader(pushbackInputStream)) {
                 throw new InvalidFormatException("Your template is neither an OLE2 format, nor an OOXML format");
             }
 
@@ -148,6 +157,10 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<BatchExcelRow
         } finally {
             if (inputStream != null) {
                 inputStream.close();
+            }
+
+            if (pushbackInputStream != null) {
+                pushbackInputStream.close();
             }
         }
     }

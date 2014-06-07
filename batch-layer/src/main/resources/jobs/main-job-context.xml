@@ -61,11 +61,13 @@
         </batch:step>
     </batch:job>
 
-    <bean id="partitioner" class="be.raildelays.batch.reader.TrainIdPartitioner">
+    <bean id="partitioner"
+          class="be.raildelays.batch.reader.TrainIdPartitioner">
         <constructor-arg ref="trainListReader" />
     </bean>	
 
-    <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+    <bean id="taskExecutor"
+          class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
         <property name="corePoolSize" value="2"/>
         <property name="maxPoolSize" value="4"/>
         <property name="allowCoreThreadTimeOut" value="true"/>
@@ -108,7 +110,8 @@
         </property>
     </bean>
 
-    <bean id="delaysItemReader" class="be.raildelays.batch.reader.DelaysItemReader"
+    <bean id="delaysItemReader"
+          class="be.raildelays.batch.reader.DelaysItemReader"
           scope="step">
         <property name="stationA" value="#{jobParameters['station.a.name']}"/>
         <property name="stationB" value="#{jobParameters['station.b.name']}"/>
@@ -116,7 +119,8 @@
     </bean>
 
     <bean id="delaysFromDepartureItemReader"
-          class="org.springframework.batch.item.data.RepositoryItemReader" scope="step">
+          class="org.springframework.batch.item.data.RepositoryItemReader"
+          scope="step">
         <property name="pageSize" value="2"/>
         <property name="methodName" value="findArrivalDelays"/>
         <property name="repository" ref="lineStopDao"/>
@@ -135,7 +139,8 @@
     </bean>
 
     <bean id="delaysFromArrivalItemReader"
-          class="org.springframework.batch.item.data.RepositoryItemReader" scope="step">
+          class="org.springframework.batch.item.data.RepositoryItemReader"
+          scope="step">
         <property name="pageSize" value="2"/>
         <property name="methodName" value="findArrivalDelays"/>
         <property name="repository" ref="lineStopDao"/>
@@ -153,7 +158,9 @@
         </property>
     </bean>
 
-    <bean id="excelSheetItemReader" class="be.raildelays.batch.reader.ExcelSheetItemReader">
+    <bean id="excelSheetItemReader"
+          class="be.raildelays.batch.reader.ExcelSheetItemReader"
+          scope="step">
         <property name="name" value="excelSheetItemReader" />
         <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}" />
         <property name="maxItemCount" value="${excel.sheet0.maxitemcount}" />
@@ -170,7 +177,8 @@
     <!-- ================================================================================================== -->
 
     <bean id="chainedProcessorsForRailtime"
-          class="org.springframework.batch.item.support.CompositeItemProcessor">
+          class="org.springframework.batch.item.support.CompositeItemProcessor"
+          scope="step">
         <property name="delegates">
             <list>
                 <ref bean="routeLogMapperProcessor" />
@@ -179,7 +187,9 @@
         </property>
     </bean>
 
-    <bean id="chainedProcessorsForDelays" class="org.springframework.batch.item.support.CompositeItemProcessor">
+    <bean id="chainedProcessorsForDelays"
+          class="org.springframework.batch.item.support.CompositeItemProcessor"
+          scope="step">
         <property name="delegates">
             <list>
                 <ref bean="aggregateExpectedTimeProcessor"/>
@@ -193,25 +203,32 @@
         </property>
     </bean>
 
-    <bean id="routeLogMapperProcessor" class="be.raildelays.batch.processor.RouteLogMapperProcessor"
+    <bean id="routeLogMapperProcessor"
+          class="be.raildelays.batch.processor.RouteLogMapperProcessor"
           scope="step">
         <property name="date" value="#{jobParameters[date]}" />
     </bean>
 
-    <bean id="aggregateExpectedTimeProcessor" class="be.raildelays.batch.processor.AggregateExpectedTimeProcessor"
+    <bean id="aggregateExpectedTimeProcessor"
+          class="be.raildelays.batch.processor.AggregateExpectedTimeProcessor"
           scope="step">
     </bean>
 
-    <bean id="excelRowMapperProcessor" class="be.raildelays.batch.processor.ExcelRowMapperProcessor" scope="step">
+    <bean id="excelRowMapperProcessor"
+          class="be.raildelays.batch.processor.ExcelRowMapperProcessor"
+          scope="step">
         <property name="stationA" value="#{jobParameters['station.a.name']}"/>
         <property name="stationB" value="#{jobParameters['station.b.name']}"/>
     </bean>
 
-    <bean id="searchNextTrainProcessor" class="be.raildelays.batch.processor.SearchNextTrainProcessor"
+    <bean id="searchNextTrainProcessor"
+          class="be.raildelays.batch.processor.SearchNextTrainProcessor"
           scope="step">
     </bean>
 
-    <bean id="validatorProcessor" class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+    <bean id="validatorProcessor"
+          class="org.springframework.batch.item.validator.ValidatingItemProcessor"
+          scope="step">
         <property name="validator">
             <bean class="org.springframework.batch.item.validator.SpringValidator">
                 <property name="validator">
@@ -221,12 +238,14 @@
         </property>
     </bean>
 
-    <bean id="filterTwoSensPerDayProcessor" class="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor"
+    <bean id="filterTwoSensPerDayProcessor"
+          class="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor"
           scope="step">
         <property name="outputReader" ref="excelSheetItemReader" />
     </bean>
 
-    <bean id="filterSmallDelaysProcessor" class="be.raildelays.batch.processor.FilterSmallDelaysProcessor"
+    <bean id="filterSmallDelaysProcessor"
+          class="be.raildelays.batch.processor.FilterSmallDelaysProcessor"
           scope="step">
         <property name="threshold" value="${excel.item.delay.threshold}"/>
     </bean>
@@ -234,16 +253,20 @@
     <!-- ================================================================================================== -->
     <!-- =====================================         WRITERS        ===================================== -->
     <!-- ================================================================================================== -->
-    <bean id="compositeItemWriter" class="org.springframework.batch.item.support.CompositeItemWriter">
+    <bean id="compositeItemWriter"
+          class="org.springframework.batch.item.support.CompositeItemWriter"
+          scope="step">
         <property name="delegates">
             <list>
-                <value>flatFileItemWriter</value>
-                <value>excelSheetItemWriter</value>
+                <ref bean="flatFileItemWriter" />
+                <ref bean="excelSheetItemWriter" />
             </list>
         </property>
     </bean>
 
-    <bean id="flatFileItemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter" scope="step">
+    <bean id="flatFileItemWriter"
+          class="org.springframework.batch.item.file.FlatFileItemWriter"
+          scope="step">
         <property name="resource" value="#{jobParameters['output.file.path']}"/>
         <property name="appendAllowed" value="true"/>
         <property name="shouldDeleteIfExists" value="false"/>
@@ -253,7 +276,8 @@
         </property>
     </bean>
 
-    <bean id="excelSheetItemWriter" class="be.raildelays.batch.writer.ExcelSheetExcelRowWriter"
+    <bean id="excelSheetItemWriter"
+          class="be.raildelays.batch.writer.ExcelSheetExcelRowWriter"
           scope="step">
         <property name="name" value="excelSheetItemWriter" />
         <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}" />
@@ -264,17 +288,20 @@
             <bean class="be.raildelays.batch.writer.ExcelRowAggregator" />
         </property>
     </bean>
-    <bean id="raildelaysServiceWriter" class="be.raildelays.batch.writer.RaildelaysServiceWriter"
+    <bean id="raildelaysServiceWriter"
+          class="be.raildelays.batch.writer.RaildelaysServiceWriter"
           scope="step">
     </bean>
 
     <!-- ================================================================================================== -->
     <!-- =====================================        LISTENERS       ===================================== -->
     <!-- ================================================================================================== -->
-    <bean id="skippedItemsListener" class="be.raildelays.batch.listener.LogSkippedItemListener"
+    <bean id="skippedItemsListener"
+          class="be.raildelays.batch.listener.LogSkippedItemListener"
           scope="step" />
 
-    <bean id="copyResourceToStepExecutionContextListener" class="be.raildelays.batch.listener.CopyResourceToStepExecutionContextListener"
+    <bean id="copyResourceToStepExecutionContextListener"
+          class="be.raildelays.batch.listener.CopyResourceToStepExecutionContextListener"
           scope="step">
         <property name="contextKey" value="outputExcelFileResource" />
         <property name="itemStream" ref="excelSheetItemWriter" />
