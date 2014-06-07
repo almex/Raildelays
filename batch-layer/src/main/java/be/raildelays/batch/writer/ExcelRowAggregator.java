@@ -2,7 +2,7 @@ package be.raildelays.batch.writer;
 
 import be.raildelays.batch.poi.RowAggregator;
 import be.raildelays.batch.poi.WorkbookAction;
-import be.raildelays.batch.reader.ExcelRowMapper;
+import be.raildelays.batch.reader.BatchExcelRowMapper;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.xls.ExcelRow;
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +30,7 @@ public class ExcelRowAggregator implements RowAggregator<ExcelRow> {
         ExcelRow previousRow = null;
 
         if (row != null && row.getCell(2) != null) {
-            previousRow = new ExcelRowMapper().mapRow(row, rowIndex);
+            previousRow = new BatchExcelRowMapper().mapRow(row, rowIndex);
             String departureStation = getStationName(item.getDepartureStation());
             String arrivalStation = getStationName(item.getArrivalStation());
 

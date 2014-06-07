@@ -1,5 +1,6 @@
 package be.raildelays.domain.entities;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -18,7 +19,7 @@ import java.util.Date;
 @Entity
 @Table(name = "LINE_STOP", uniqueConstraints = @UniqueConstraint(columnNames = {
         "TRAIN_ID", "DATE", "STATION_ID"}))
-public class LineStop implements Serializable, Cloneable {
+public class LineStop implements Serializable, Cloneable, Comparable<LineStop> {
 
     private static final long serialVersionUID = 7142886242889314414L;
 
@@ -187,6 +188,25 @@ public class LineStop implements Serializable, Cloneable {
     @Override
     public LineStop clone() {
         return new Builder(this).build();
+    }
+
+    @Override
+    public int compareTo(LineStop lineStop) {
+        int result = 0;
+
+        if (lineStop == null) {
+            result = -1;
+        } else {
+            result = new CompareToBuilder()
+                    .append(date, lineStop.getDate())
+                    .append(station, lineStop.getStation())
+                    .append(train, lineStop.getTrain())
+                    .append(arrivalTime, lineStop.getArrivalTime())
+                    .append(departureTime, lineStop.getDepartureTime())
+                    .toComparison();
+        }
+
+        return result;
     }
 
     public static class Builder {

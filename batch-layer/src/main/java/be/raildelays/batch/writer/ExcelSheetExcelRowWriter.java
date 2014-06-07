@@ -1,9 +1,11 @@
 package be.raildelays.batch.writer;
 
 import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.batch.poi.Format;
 import be.raildelays.batch.poi.WorkbookSearch;
-import be.raildelays.batch.reader.ExcelRowMapper;
+import be.raildelays.batch.reader.BatchExcelRowMapper;
 import be.raildelays.batch.reader.ExcelSheetItemReader;
+import be.raildelays.batch.support.ResourceAwareItemStream;
 import be.raildelays.domain.xls.ExcelRow;
 import groovy.lang.IllegalPropertyAccessException;
 import org.apache.commons.lang.Validate;
@@ -25,10 +27,7 @@ import java.io.*;
 /**
  * @author Almex
  */
-public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<BatchExcelRow> {
-    private static final int MAX_ITEM_PER_SHEET = 40;
-
-    private static final String RESOURCE_KEY = "resource.key";
+public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<BatchExcelRow> implements ResourceAwareItemStream {
 
     protected String outputDirectory;
 
@@ -54,7 +53,7 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<BatchExcelRow
                 createNewWorkbook(getFileName(item));
             }
             super.doOpen();
-        } else if (getCurrentItemCount() % MAX_ITEM_PER_SHEET == 0) {
+        } else if (getCurrentItemCount() % getMaxItemCount() == 0) {
             doClose();
             createNewWorkbook(getFileName(item));
             super.doOpen();
@@ -108,7 +107,7 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<BatchExcelRow
                 WorkbookSearch<BatchExcelRow> container = new WorkbookSearch<>(executionContext);
                 reader.setResource(new FileSystemResource(file));
                 reader.setName(file.getName());
-                reader.setRowMapper(new ExcelRowMapper());
+                reader.setRowMapper(new BatchExcelRowMapper());
                 reader.setRowsToSkip(rowsToSkip);
                 reader.setSaveState(false);
                 container.setReader(reader);
@@ -164,5 +163,10 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<BatchExcelRow
         } catch (NoSuchFieldException e) {
             LOGGER.error("No such field error", e);
         }
+    }
+
+    @Override
+    public Resource getResource() {
+        return resource;
     }
 }

@@ -1,8 +1,10 @@
 package be.raildelays.batch.writer;
 
+import be.raildelays.batch.poi.Format;
 import be.raildelays.batch.poi.RowAggregator;
 import be.raildelays.batch.poi.WorkbookAction;
 import be.raildelays.batch.support.AbstractItemCountingItemStreamItemWriter;
+import be.raildelays.batch.support.ResourceAwareItemStream;
 import org.apache.commons.lang.Validate;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -41,20 +43,6 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
 
     private static final String ROW_TO_SKIP_KEY = "row.to.skip.key";
     private static final String SHEET_INDEX_KEY = "sheet.index.key";
-
-    enum Format {
-        OLE2(".xls"), OOXML(".xlsx");
-
-        private String fileExtension;
-
-        Format(String fileExtension) {
-            this.fileExtension = fileExtension;
-        }
-
-        public String getFileExtension() {
-            return fileExtension;
-        }
-    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -209,6 +197,7 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
         this.sheetIndex = sheetIndex;
     }
 
+    @Override
     public void setResource(Resource resource) {
         this.resource = resource;
     }
@@ -220,4 +209,5 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
     public void setShouldDeleteIfExists(boolean shouldDeleteIfExists) {
         this.shouldDeleteIfExists = shouldDeleteIfExists;
     }
+
 }

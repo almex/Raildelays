@@ -1,6 +1,5 @@
 package be.raildelays.batch.support;
 
-import be.raildelays.domain.support.ItemIndexAware;
 import org.springframework.batch.item.*;
 import org.springframework.batch.item.support.AbstractItemStreamItemWriter;
 import org.springframework.util.Assert;
@@ -189,4 +188,6 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
     protected int getCurrentItemIndex() {
         return currentItemIndex;
     }
+
+    protected int getMaxItemCount() { return maxItemCount; }
 }

@@ -176,8 +176,7 @@ public class RaildelaysServiceImpl implements RaildelaysService {
                                               Station stationB, int delayThreshold) {
         List<LineStop> result = new ArrayList<LineStop>();
 
-        LOGGER.info(
-                "Searching line stops for date={} stationA={} stationB={} delayThreshold={}",
+        LOGGER.info("Searching line stops for date={} stationA={} stationB={} delayThreshold={}",
                 new Object[]{date, stationA, stationB, delayThreshold});
 
         result.addAll(lineStopDao.findArrivalDelays(date, stationA,

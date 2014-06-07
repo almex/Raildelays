@@ -148,7 +148,6 @@ public class FilterTwoSensPerDayProcessorTest {
         StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution();
 		processor = new FilterTwoSensPerDayProcessor();
         stepExecution.getExecutionContext().putString("foo", "");
-        processor.setResourceKey("foo");
         processor.setOutputReader(fakeReader);
         processor.afterPropertiesSet();
         processor.beforeStep(stepExecution);

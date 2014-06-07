@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat;
 /**
  * Created by soumagn on 30/05/2014.
  */
-public class ExcelRowMapper implements RowMapper<BatchExcelRow> {
+public class BatchExcelRowMapper implements RowMapper<BatchExcelRow> {
     @Override
     public BatchExcelRow mapRow(Row row, int rowIndex) throws Exception {
         BatchExcelRow result = null;

@@ -31,7 +31,7 @@ public class ExcelSheetItemReaderTest {
         reader.setRowsToSkip(21);
         reader.setSheetIndex(0);
         reader.setMaxItemCount(40);
-        reader.setRowMapper(new ExcelRowMapper());
+        reader.setRowMapper(new BatchExcelRowMapper());
         reader.afterPropertiesSet();
         reader.setName("test");
         reader.open(MetaDataInstanceFactory.createStepExecution()

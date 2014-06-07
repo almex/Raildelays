@@ -12,6 +12,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -25,7 +26,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Entity
 @Table(name = "TRAIN")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public class Train implements Serializable {
+public class Train implements Serializable, Comparable<Train> {
 
 	private static final long serialVersionUID = -1527666012499664304L;
 
@@ -133,4 +134,19 @@ public class Train implements Serializable {
 	public String getDutchName() {
 		return dutchName;
 	}
+
+    @Override
+    public int compareTo(Train train) {
+        int result = 0;
+
+        if (train == null) {
+            result = -1;
+        } else {
+            result = new CompareToBuilder()
+                    .append(englishName, train.getEnglishName())
+                    .toComparison();
+        }
+
+        return result;
+    }
 }

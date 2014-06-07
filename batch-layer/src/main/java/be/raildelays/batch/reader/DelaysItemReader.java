@@ -1,5 +1,6 @@
 package be.raildelays.batch.reader;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
@@ -8,10 +9,15 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.annotation.AfterStep;
+import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.batch.item.support.IteratorItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -24,13 +30,15 @@ import be.raildelays.service.RaildelaysService;
  * 
  * @author Almex
  */
-public class DelaysItemReader implements ItemReader<List<LineStop>>, InitializingBean {
+public class DelaysItemReader implements ItemReader<LineStop>, InitializingBean {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(DelaysItemReader.class);
 
 	@Resource
 	private RaildelaysService service;
+
+    private IteratorItemReader<LineStop> delegate;
 	
 	private String stationA;
 	
@@ -45,18 +53,24 @@ public class DelaysItemReader implements ItemReader<List<LineStop>>, Initializin
 		Assert.notNull(stationB, "You must provide the stationB parameter to this Reader.");
 	}
 
-	public List<LineStop> read() throws Exception, UnexpectedInputException,
-			ParseException, NonTransientResourceException {
-		List<LineStop> result = new ArrayList<>();
-		
-		LOGGER.debug("Searching delays for date={}", date);
+    @BeforeStep
+    public void beforeStep(StepExecution stepExecution) {
+        List<LineStop> result = new ArrayList<>();
+
+        LOGGER.debug("Searching delays for date={}", date);
 
         if (date != null) {
             result = service.searchDelaysBetween(date, new Station(stationA), new Station(stationB), 15);
-            date = null; //-- for next read we need a new date
         }
 
-		return result.isEmpty() ? null : result; //-- To apply the ItemReader contract
+        Collections.sort(result);
+
+        delegate = new IteratorItemReader<LineStop>(result.iterator());
+    }
+
+
+	public LineStop read() throws Exception {
+		return delegate.read();
 	}
 
 	public void setStationA(String stationA) {

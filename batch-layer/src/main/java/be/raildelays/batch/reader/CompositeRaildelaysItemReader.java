@@ -47,15 +47,19 @@ public class CompositeRaildelaysItemReader extends CompositeItemStream implement
 		
 		if (date != null) {			
 			delaysItemReader.setDate(date);
+
+            // At this point we must return a non null value to continue reading
+            result = new ArrayList<>();
 			
-			List<LineStop> lineStops = delaysItemReader.read();
-			
-			// At this point we must return a non null value to continue reading
-			result = new ArrayList<>();
-			
-			if (lineStops != null) {
-				result.addAll(lineStops);
-			}
+			LineStop lineStop = null;
+			do {
+                lineStop = delaysItemReader.read();
+
+                if (lineStop != null) {
+                    result.add(lineStop);
+                }
+            } while (lineStop != null);
+
 			
 			LOGGER.debug("Found {} delays for {}", result.size(), date);
 		}

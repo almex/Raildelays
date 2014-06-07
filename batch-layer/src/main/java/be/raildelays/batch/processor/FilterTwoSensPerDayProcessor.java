@@ -23,8 +23,6 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
 
     private ResourceAwareItemReaderItemStream<BatchExcelRow> outputReader;
 
-    private String resourceKey;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(FilterTwoSensPerDayProcessor.class);
 
     private ExecutionContext executionContext;
@@ -32,7 +30,6 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
     @Override
     public void afterPropertiesSet() throws Exception {
         Validate.notNull(outputReader, "outputReader is mandatory");
-        Validate.notNull(resourceKey, "resourceKey is mandatory");
     }
 
     @BeforeStep
@@ -40,19 +37,12 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
         executionContext = stepExecution.getExecutionContext();
     }
 
-
-    public void openReader() {
-        String path = executionContext.getString(resourceKey);
-
-        outputReader.setResource(new FileSystemResource(path));
-        outputReader.open(executionContext);
-    }
-
     @Override
     public BatchExcelRow process(final BatchExcelRow item) throws Exception {
         BatchExcelRow result = null;
 
-        openReader();
+        outputReader.open(executionContext);
+
         try {
             BatchExcelRow matchingExcelRow = null;
             do {
@@ -102,22 +92,14 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
                 }
             } while (matchingExcelRow != null);
         } finally {
-            closeReader();
+            outputReader.close();
         }
 
         return result;
     }
 
-    public void closeReader() {
-        outputReader.close();
-    }
-
     public void setOutputReader(ResourceAwareItemReaderItemStream<BatchExcelRow> outputReader) {
         this.outputReader = outputReader;
-    }
-
-    public void setResourceKey(String resourceKey) {
-        this.resourceKey = resourceKey;
     }
 
 }

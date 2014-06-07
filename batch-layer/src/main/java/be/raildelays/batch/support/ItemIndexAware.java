@@ -1,4 +1,4 @@
-package be.raildelays.domain.support;
+package be.raildelays.batch.support;
 
 /**
  * @author Almex

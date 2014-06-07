@@ -95,9 +95,18 @@ public class TimestampDelay implements Serializable, Comparable<TimestampDelay> 
 
     @Override
     public int compareTo(TimestampDelay timestampDelay) {
-        return new CompareToBuilder()
-                .append(expected, timestampDelay != null ? timestampDelay.getExpected() : null)
-                .append(delay, timestampDelay != null ? timestampDelay.getDelay() : null)
-                .toComparison();
+
+        int result = 0;
+
+        if (timestampDelay == null) {
+            result = -1;
+        } else {
+            result = new CompareToBuilder()
+                    .append(expected, timestampDelay.getExpected())
+                    .append(delay, timestampDelay.getDelay())
+                    .toComparison();
+        }
+
+        return result;
     }
 }

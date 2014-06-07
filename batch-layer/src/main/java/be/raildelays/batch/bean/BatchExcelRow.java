@@ -3,7 +3,7 @@ package be.raildelays.batch.bean;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
-import be.raildelays.domain.support.ItemIndexAware;
+import be.raildelays.batch.support.ItemIndexAware;
 import be.raildelays.domain.xls.ExcelRow;
 import org.springframework.batch.item.ItemCountAware;
 
