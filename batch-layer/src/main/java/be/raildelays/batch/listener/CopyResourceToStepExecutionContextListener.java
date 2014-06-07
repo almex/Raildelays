@@ -2,6 +2,7 @@ package be.raildelays.batch.listener;
 
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.support.ResourceAwareItemStream;
+import be.raildelays.domain.entities.LineStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.*;
@@ -12,7 +13,7 @@ import java.util.List;
 /**
  * @author Almex
  */
-public class CopyResourceToStepExecutionContextListener implements ItemWriteListener<BatchExcelRow>, ItemReadListener<BatchExcelRow>, StepExecutionListener {
+public class CopyResourceToStepExecutionContextListener implements ItemWriteListener<BatchExcelRow>, ItemReadListener<LineStop>, StepExecutionListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CopyResourceToStepExecutionContextListener.class);
 
@@ -33,7 +34,7 @@ public class CopyResourceToStepExecutionContextListener implements ItemWriteList
     }
 
     @Override
-    public void afterRead(BatchExcelRow item) {
+    public void afterRead(LineStop item) {
         copyResourceToStepExecutionContext();
     }
 

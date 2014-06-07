@@ -50,9 +50,10 @@ public class RailtimeItemReader implements ItemReader<Direction>, InitializingBe
 			ParseException, NonTransientResourceException {
 		Direction result = null;
 		
-		LOGGER.debug("Requesting Railtime for trainId={} date={} sens={}", new Object[]{trainId, date, sens});
-		
 		if (trainId != null && date != null && sens != null) {
+
+            LOGGER.debug("Requesting Railtime for trainId={} date={} sens={}", new Object[]{trainId, date, sens});
+
 			// -- Create a request to target Railtime
 			Reader englishStream = streamer.getDelays(trainId, date,
 					Language.ENGLISH.getRailtimeParameter(),

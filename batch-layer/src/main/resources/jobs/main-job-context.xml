@@ -28,8 +28,7 @@
                                 <batch:include class="java.io.IOException" />
                             </batch:retryable-exception-classes>
                             <batch:skippable-exception-classes>
-                                <batch:include
-                                        class="org.springframework.batch.item.validator.ValidationException" />
+                                <batch:include class="org.springframework.batch.item.validator.ValidationException" />
                             </batch:skippable-exception-classes>
                         </batch:chunk>
                         <batch:transaction-attributes
@@ -45,14 +44,11 @@
                              writer="compositeItemWriter"
                              commit-interval="4" skip-limit="10">
                     <batch:skippable-exception-classes>
-                        <batch:include
-                                class="org.springframework.batch.item.validator.ValidationException"/>
-                        <batch:include
-                                class="be.raildelays.batch.exception.ArrivalDepartureEqualsException"/>
+                        <batch:include class="org.springframework.batch.item.validator.ValidationException"/>
+                        <batch:include class="be.raildelays.batch.exception.ArrivalDepartureEqualsException"/>
                     </batch:skippable-exception-classes>
                 </batch:chunk>
-                <batch:transaction-attributes
-                        isolation="DEFAULT" propagation="REQUIRED"/>
+                <batch:transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
             </batch:tasklet>
             <batch:listeners>
                 <batch:listener ref="skippedItemsListener"/>
@@ -160,7 +156,7 @@
 
     <bean id="excelSheetItemReader"
           class="be.raildelays.batch.reader.ExcelSheetItemReader"
-          scope="step">
+          scope="prototype">
         <property name="name" value="excelSheetItemReader" />
         <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}" />
         <property name="maxItemCount" value="${excel.sheet0.maxitemcount}" />

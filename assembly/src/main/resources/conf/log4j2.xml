@@ -85,7 +85,7 @@
 	    <logger name="org.springframework.batch.item.file.FlatFileItemWriter" level="info" additivity="false">
 	        <appender-ref ref="output" />
 	    </logger>
-	    <logger name="org.springframework.batch" level="info" additivity="false">
+	    <logger name="org.springframework.batch" level="debug" additivity="false">
 	        <appender-ref ref="springbatch" />
 	    </logger>
         <logger name="be.raildelays.batch.listener.LogSkippedItemListener" level="info" additivity="false">

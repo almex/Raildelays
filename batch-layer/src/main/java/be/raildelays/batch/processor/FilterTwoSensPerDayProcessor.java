@@ -9,6 +9,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.FileSystemResource;
@@ -41,58 +42,63 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
     public BatchExcelRow process(final BatchExcelRow item) throws Exception {
         BatchExcelRow result = null;
 
-        outputReader.open(executionContext);
-
         try {
-            BatchExcelRow matchingExcelRow = null;
-            do {
-                matchingExcelRow = outputReader.read();
+            outputReader.open(executionContext);
 
-                if (matchingExcelRow != null) {
-                    if (new CompareToBuilder().append(item.getDate(), matchingExcelRow.getDate())
-                            .append(item.getDepartureStation(), matchingExcelRow.getDepartureStation())
-                            .append(item.getArrivalStation(), matchingExcelRow.getArrivalStation())
-                            .toComparison() == 0) {
-                        /**
-                         * Here we know that we have a collision: we match the same date and the same sens.
-                         * If the delay of the item is not greater than the one in the Excel sheet then we skip it.
-                         */
-                        if (item.getDelay() > matchingExcelRow.getDelay()) {
+            try {
+                BatchExcelRow matchingExcelRow = null;
+                do {
+                    matchingExcelRow = outputReader.read();
+
+                    if (matchingExcelRow != null) {
+                        if (new CompareToBuilder().append(item.getDate(), matchingExcelRow.getDate())
+                                .append(item.getDepartureStation(), matchingExcelRow.getDepartureStation())
+                                .append(item.getArrivalStation(), matchingExcelRow.getArrivalStation())
+                                .toComparison() == 0) {
                             /**
-                             * Here, the delay of the item is greater than the matching Excel row.
-                             * We must replace the row currently in the Excel sheet with our item.
+                             * Here we know that we have a collision: we match the same date and the same sens.
+                             * If the delay of the item is not greater than the one in the Excel sheet then we skip it.
                              */
-                            result = item;
-                            if (matchingExcelRow.getIndex() != null) {
-                                result.setIndex(matchingExcelRow.getIndex());
-                            } else {
-                                throw new IllegalArgumentException("We don't know the current index of this Excel row. We cannot replace it!");
+                            if (item.getDelay() > matchingExcelRow.getDelay()) {
+                                /**
+                                 * Here, the delay of the item is greater than the matching Excel row.
+                                 * We must replace the row currently in the Excel sheet with our item.
+                                 */
+                                result = item;
+                                if (matchingExcelRow.getIndex() != null) {
+                                    result.setIndex(matchingExcelRow.getIndex());
+                                } else {
+                                    throw new IllegalArgumentException("We don't know the current index of this Excel row. We cannot replace it!");
+                                }
                             }
-                        }
 
+                            /**
+                             * We stop searching here. Either the result is found or we have to skip this item.
+                             */
+                            break;
+                        } else if (item.getDate().before(matchingExcelRow.getDate())) {
+                            /**
+                             * We stop searching. We expect that the content of the Excel file is sorted by date.
+                             * This clause should never happen if the data read are also sorted by date.
+                             */
+                            break;
+                        }
+                    } else {
                         /**
-                         * We stop searching here. Either the result is found or we have to skip this item.
+                         * In that case we reach the first empty row without matching any previous data.
+                         * So, we have to add a new row to the Excel sheet.
                          */
-                        break;
-                    } else if (item.getDate().before(matchingExcelRow.getDate())) {
-                        /**
-                         * We stop searching. We expect that the content of the Excel file is sorted by date.
-                         * This clause should never happen if the data read are also sorted by date.
-                         */
+                        result = item;
+                        result.setIndex(null);
                         break;
                     }
-                } else {
-                    /**
-                     * In that case we reach the first empty row without matching any previous data.
-                     * So, we have to add a new row to the Excel sheet.
-                     */
-                    result = item;
-                    result.setIndex(null);
-                    break;
-                }
-            } while (matchingExcelRow != null);
-        } finally {
-            outputReader.close();
+                } while (matchingExcelRow != null);
+            } finally {
+                outputReader.close();
+            }
+        } catch (ItemStreamException e) {
+            LOGGER.warn("Error when opening ResourceAwareItemReaderItemStream. Maybe the resource is not available yet.", e);
+            result = item;
         }
 
         return result;
