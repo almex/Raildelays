@@ -241,6 +241,7 @@
           class="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor"
           scope="step">
         <property name="outputReader" ref="excelSheetItemReader" />
+        <property name="contextKey" value="outputExcelFileResource" />
     </bean>
 
     <bean id="filterSmallDelaysProcessor"

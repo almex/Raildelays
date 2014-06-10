@@ -15,6 +15,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
+import java.io.File;
+
 /**
  * Filter items to get only two. One for departure and the other one for arrival.
  * The only remaining items are those which have the maximum delay for a given sens.
@@ -28,6 +30,8 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
     private static final Logger LOGGER = LoggerFactory.getLogger(FilterTwoSensPerDayProcessor.class);
 
     private ExecutionContext executionContext;
+
+    private String contextKey;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -44,7 +48,12 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
         BatchExcelRow result = null;
 
         try {
-            outputReader.setResource((Resource) executionContext.get("outputExcelFileResource"));
+            File resource = (File) executionContext.get(contextKey);
+
+            if (resource != null) {
+                outputReader.setResource(new FileSystemResource(resource));
+            }
+
             outputReader.open(executionContext);
 
             try {
@@ -110,4 +119,7 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
         this.outputReader = outputReader;
     }
 
+    public void setContextKey(String contextKey) {
+        this.contextKey = contextKey;
+    }
 }

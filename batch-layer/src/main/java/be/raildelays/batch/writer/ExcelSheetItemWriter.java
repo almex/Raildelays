@@ -196,7 +196,7 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
         this.rowsToSkip = rowsToSkip;
     }
 
-    public void setRowAggregator(RowAggregator<T> rowAggregator) {
+    public void setRowAggregator(RowAggregator rowAggregator) {
         this.rowAggregator = rowAggregator;
     }
 

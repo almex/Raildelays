@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.*;
 import org.springframework.batch.item.ExecutionContext;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -65,8 +66,12 @@ public class CopyResourceToStepExecutionContextListener implements ItemWriteList
 
     private void copyResourceToStepExecutionContext() {
         if (itemStream.getResource() != null) {
-            executionContext.put(contextKey, itemStream.getResource());
-            LOGGER.debug("Copied resource={} to step execution context with key={}.", itemStream.getResource().getDescription(), contextKey);
+            try {
+                executionContext.put(contextKey, itemStream.getResource().getFile());
+                LOGGER.debug("Copied resource={} to step execution context with key={}.", itemStream.getResource().getDescription(), contextKey);
+            } catch (IOException e) {
+                LOGGER.debug("Exception during copy of resource", e);
+            }
         }
     }
 
