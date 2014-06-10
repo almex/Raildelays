@@ -54,7 +54,7 @@
                 <batch:listener ref="delaysItemReader"/>
                 <batch:listener ref="skippedItemsListener"/>
                 <batch:listener ref="filterTwoSensPerDayProcessor"/>
-                <batch:listener ref="copyResourceToStepExecutionContextListener" />
+                <batch:listener ref="copyResourceStepExecutionListener" />
             </batch:listeners>
         </batch:step>
     </batch:job>
@@ -241,7 +241,6 @@
           class="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor"
           scope="step">
         <property name="outputReader" ref="excelSheetItemReader" />
-        <property name="contextKey" value="outputExcelFileResource" />
     </bean>
 
     <bean id="filterSmallDelaysProcessor"
@@ -300,11 +299,11 @@
           class="be.raildelays.batch.listener.LogSkippedItemListener"
           scope="step" />
 
-    <bean id="copyResourceToStepExecutionContextListener"
-          class="be.raildelays.batch.listener.CopyResourceToStepExecutionContextListener"
+    <bean id="copyResourceStepExecutionListener"
+          class="be.raildelays.batch.listener.CopyResourceStepExecutionListener"
           scope="step">
-        <property name="contextKey" value="outputExcelFileResource" />
-        <property name="itemStream" ref="excelSheetItemWriter" />
+        <property name="source" ref="excelSheetItemWriter" />
+        <property name="destination" value="excelSheetItemReader" />
     </bean>
 
 </beans>
