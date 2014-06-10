@@ -282,7 +282,7 @@
         <property name="template" value="file:#{jobParameters['excel.input.template']}"/>
         <property name="outputDirectory" value="#{jobParameters['excel.output.file']}"/>
         <property name="rowAggregator">
-            <bean class="be.raildelays.batch.writer.ExcelRowAggregator" />
+            <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator" />
         </property>
     </bean>
     <bean id="raildelaysServiceWriter"

@@ -1,5 +1,6 @@
 package be.raildelays.batch.writer;
 
+import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.poi.RowAggregator;
 import be.raildelays.batch.poi.WorkbookAction;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
@@ -8,26 +9,30 @@ import be.raildelays.domain.xls.ExcelRow;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 /**
  * @author Almex
  */
-public class ExcelRowAggregator implements RowAggregator<ExcelRow> {
+public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
 
     @Override
-    public ExcelRow aggregate(ExcelRow item, Workbook workbook, int sheetIndex, int rowIndex) throws Exception {
+    public BatchExcelRow aggregate(BatchExcelRow item, Workbook workbook, int sheetIndex, int rowIndex) throws Exception {
         SimpleDateFormat hh = new SimpleDateFormat("HH");
         SimpleDateFormat mm = new SimpleDateFormat("mm");
+        NumberFormat numberFormat = new DecimalFormat("#");
         final Row row = workbook.getSheetAt(sheetIndex).getRow(rowIndex);
-        ExcelRow previousRow = null;
+        BatchExcelRow previousRow = null;
 
         if (row != null && row.getCell(2) != null) {
             previousRow = new BatchExcelRowMapper().mapRow(row, rowIndex);
@@ -38,8 +43,9 @@ public class ExcelRowAggregator implements RowAggregator<ExcelRow> {
             row.getCell(12).setCellValue(departureStation);
             row.getCell(18).setCellValue(arrivalStation);
             if (item.getLinkStation() != null) {
-                row.getCell(24).setCellValue(
-                        item.getLinkStation().getEnglishName());
+                row.getCell(24).setCellValue(getStationName(item.getLinkStation()));
+            } else {
+                row.getCell(39).setCellType(Cell.CELL_TYPE_BLANK);
             }
             row.getCell(30).setCellValue(
                     hh.format(item.getExpectedDepartureTime()));
@@ -49,11 +55,13 @@ public class ExcelRowAggregator implements RowAggregator<ExcelRow> {
                     hh.format(item.getExpectedArrivalTime()));
             row.getCell(35).setCellValue(
                     mm.format(item.getExpectedArrivalTime()));
-            row.getCell(36).setCellValue(
-                    item.getExpectedTrain1().getEnglishName());
+            row.getCell(36).setCellValue(numberFormat.parse(
+                    item.getExpectedTrain1().getEnglishName()).longValue());
             if (item.getExpectedTrain2() != null) {
-                row.getCell(39).setCellValue(
-                        item.getExpectedTrain2().getEnglishName());
+                row.getCell(39).setCellValue(numberFormat.parse(
+                        item.getExpectedTrain2().getEnglishName()).longValue());
+            } else {
+                row.getCell(39).setCellType(Cell.CELL_TYPE_BLANK);
             }
             row.getCell(42).setCellValue(
                     hh.format(item.getEffectiveDepartureTime()));
@@ -63,11 +71,13 @@ public class ExcelRowAggregator implements RowAggregator<ExcelRow> {
                     hh.format(item.getEffectiveArrivalTime()));
             row.getCell(47).setCellValue(
                     mm.format(item.getEffectiveArrivalTime()));
-            row.getCell(48).setCellValue(
-                    item.getEffectiveTrain1().getEnglishName());
+            row.getCell(48).setCellValue(numberFormat.parse(
+                    item.getEffectiveTrain1().getEnglishName()).longValue());
             if (item.getExpectedTrain2() != null) {
-                row.getCell(51).setCellValue(
-                        item.getEffectiveTrain2().getEnglishName());
+                row.getCell(51).setCellValue(numberFormat.parse(
+                        item.getEffectiveTrain2().getEnglishName()).longValue());
+            } else {
+                row.getCell(39).setCellType(Cell.CELL_TYPE_BLANK);
             }
 
             FormulaEvaluator evaluator = new WorkbookAction<FormulaEvaluator>(workbook) {
@@ -86,7 +96,6 @@ public class ExcelRowAggregator implements RowAggregator<ExcelRow> {
             evaluator.evaluateFormulaCell(row.getCell(56));
             evaluator.evaluateFormulaCell(row.getCell(55));
             evaluator.evaluateFormulaCell(row.getCell(54));
-            evaluator.evaluateFormulaCell(row.getCell(53));
         }
 
         return previousRow;

@@ -30,8 +30,6 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
 
     private boolean noInput = false;
 
-    private WorkbookFactory workbookFactory = new WorkbookFactory();
-
     private int rowsToSkip = 0;
 
     private int sheetIndex = 0;
@@ -82,6 +80,14 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
     }
 
     @Override
+    protected void jumpToItem(int itemIndex) throws Exception {
+        for (int i = 0; i < rowsToSkip; i++) {
+            readRow();
+        }
+        super.jumpToItem(itemIndex);
+    }
+
+    @Override
     protected void doOpen() throws Exception {
         Assert.notNull(resource, "Input resource must be set");
 
@@ -105,12 +111,9 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
             this.workbook = WorkbookFactory.create(inputStream);
         } finally {
             inputStream.close(); //-- Everything is in the buffer we can close the file
-            inputStream = null;
         }
 
-        for (int i = 0; i < rowsToSkip; i++) {
-            Row row = readRow();
-        }
+        jumpToItem(0);
         noInput = false;
     }
 
@@ -119,7 +122,7 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
     }
 
     public int getRowIndex() {
-        return getCurrentItemCount() + rowsToSkip;
+        return getCurrentItemCount() + rowsToSkip - 1;
     }
 
     @Override

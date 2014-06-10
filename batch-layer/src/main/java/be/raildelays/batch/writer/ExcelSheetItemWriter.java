@@ -4,7 +4,6 @@ import be.raildelays.batch.poi.Format;
 import be.raildelays.batch.poi.RowAggregator;
 import be.raildelays.batch.poi.WorkbookAction;
 import be.raildelays.batch.support.AbstractItemCountingItemStreamItemWriter;
-import be.raildelays.batch.support.ResourceAwareItemStream;
 import org.apache.commons.lang.Validate;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -91,8 +90,11 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
 
             if (template != null && created) {
                 InputStream inputStream = template.getInputStream();
-                this.workbook = WorkbookFactory.create(inputStream);
-                inputStream.close();
+                try {
+                    this.workbook = WorkbookFactory.create(inputStream);
+                } finally {
+                    inputStream.close(); //-- Everything is in the buffer we can close the file
+                }
             } else {
                 if (created) {
                     if (outputFile.getName().endsWith(Format.OLE2.getFileExtension())) {
@@ -108,8 +110,11 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
                      * So, we create our own FileInputStream instead. Don't know why. Seems like a bug in Apache POI
                      */
                     InputStream inputStream = new FileInputStream(resource.getFile());
-                    this.workbook = WorkbookFactory.create(inputStream);
-                    inputStream.close(); //-- Everything is in the buffer we can close the file
+                    try {
+                        this.workbook = WorkbookFactory.create(inputStream);
+                    } finally {
+                        inputStream.close(); //-- Everything is in the buffer we can close the file
+                    }
                 }
             }
 
@@ -191,7 +196,7 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
         this.rowsToSkip = rowsToSkip;
     }
 
-    public void setRowAggregator(RowAggregator rowAggregator) {
+    public void setRowAggregator(RowAggregator<T> rowAggregator) {
         this.rowAggregator = rowAggregator;
     }
 

@@ -56,7 +56,7 @@ public class ExcelSheetExcelRowWriterTest {
         writer.setName("test");
         writer.setRowsToSkip(21);
         writer.setMaxItemCount(40);
-        writer.setRowAggregator(new ExcelRowAggregator());
+        writer.setRowAggregator(new BatchExcelRowAggregator());
         writer.afterPropertiesSet();
         writer.open(executionContext);
 
@@ -117,8 +117,8 @@ public class ExcelSheetExcelRowWriterTest {
         writer.close();
 
         Assert.assertEquals(2, getExcelFiles().length);
-        Assert.assertEquals(123392, getExcelFiles()[0].length());
-        Assert.assertEquals(123392, getExcelFiles()[1].length());
+        Assert.assertEquals(123904, getExcelFiles()[0].length());
+        Assert.assertEquals(123904, getExcelFiles()[1].length());
     }
 
     @Test
@@ -132,7 +132,7 @@ public class ExcelSheetExcelRowWriterTest {
         writer.close();
 
         Assert.assertEquals(1, getExcelFiles().length);
-        Assert.assertEquals(123392, getExcelFiles()[0].length());
+        Assert.assertEquals(123904, getExcelFiles()[0].length());
     }
 
     @Test

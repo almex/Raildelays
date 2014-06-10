@@ -4,34 +4,39 @@ import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.poi.RowMapper;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
-import be.raildelays.domain.xls.ExcelRow;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 
 /**
- * Created by soumagn on 30/05/2014.
+ * @autho Almex
  */
 public class BatchExcelRowMapper implements RowMapper<BatchExcelRow> {
     @Override
     public BatchExcelRow mapRow(Row row, int rowIndex) throws Exception {
         BatchExcelRow result = null;
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+        NumberFormat numberFormat = new DecimalFormat("#");
+
         Train train2 = null;
         Train effectiveTrain2 = null;
         Station linkStation = null;
 
+
         if (row.getCell(2) != null && row.getCell(2).getDateCellValue() != null) {
-            if (row.getCell(24) != null) {
-                linkStation = new Station(row.getCell(24).getStringCellValue());
+            if (row.getCell(25) != null && row.getCell(25).getCellType() != Cell.CELL_TYPE_BLANK) {
+                linkStation = new Station(row.getCell(25).getStringCellValue());
             }
 
-            if (row.getCell(39) != null) {
-                train2 = new Train(row.getCell(39).getStringCellValue());
+            if (row.getCell(39) != null && row.getCell(39).getCellType() != Cell.CELL_TYPE_BLANK) {
+                train2 = new Train(numberFormat.format(row.getCell(39).getNumericCellValue()));
             }
 
-            if (row.getCell(51) != null) {
-                effectiveTrain2 = new Train(row.getCell(51).getStringCellValue());
+            if (row.getCell(51) != null && row.getCell(51).getCellType() != Cell.CELL_TYPE_BLANK) {
+                effectiveTrain2 = new Train(numberFormat.format(row.getCell(51).getNumericCellValue()));
             }
 
             result = new BatchExcelRow.Builder(row.getCell(2).getDateCellValue(), null)
@@ -40,14 +45,14 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow> {
                     .linkStation(linkStation)
                     .expectedDepartureTime(timeFormat.parse(row.getCell(30).getStringCellValue() + ":" + row.getCell(32).getStringCellValue()))
                     .expectedArrivalTime(timeFormat.parse(row.getCell(33).getStringCellValue() + ":" + row.getCell(35).getStringCellValue()))
-                    .expectedTrain1(new Train(row.getCell(36).getStringCellValue()))
+                    .expectedTrain1(new Train(numberFormat.format(row.getCell(36).getNumericCellValue())))
                     .expectedTrain2(train2)
                     .effectiveDepartureTime(timeFormat.parse(row.getCell(42).getStringCellValue() + ":" + row.getCell(44).getStringCellValue()))
-                    .effectiveDepartureTime(timeFormat.parse(row.getCell(45).getStringCellValue() + ":" + row.getCell(47).getStringCellValue()))
-                    .effectiveTrain1(new Train(row.getCell(48).getStringCellValue()))
+                    .effectiveArrivalTime(timeFormat.parse(row.getCell(45).getStringCellValue() + ":" + row.getCell(47).getStringCellValue()))
+                    .effectiveTrain1(new Train(numberFormat.format(row.getCell(48).getNumericCellValue())))
                     .effectiveTrain2(effectiveTrain2)
-                    .delay((long) row.getCell(53).getNumericCellValue())
-                    .index(new Long(row.getRowNum()))
+                    .delay((long) row.getCell(54).getNumericCellValue())
+                    .index((long) row.getRowNum())
                     .build();
         } //-- If the first cell contains nothing we return null
 

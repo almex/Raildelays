@@ -1,5 +1,6 @@
 package be.raildelays.batch.writer;
 
+import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
@@ -23,7 +24,7 @@ import java.util.*;
 @RunWith(BlockJUnit4ClassRunner.class)
 public class ExcelSheetItemWriterTest {
 
-    private ExcelSheetItemWriter writer;
+    private ExcelSheetItemWriter<BatchExcelRow> writer;
 
     private static final String CURRENT_PATH = "." + File.separator + "target" + File.separator;
 
@@ -31,7 +32,7 @@ public class ExcelSheetItemWriterTest {
 
     private static final String EXCEL_FILE_EXTENSION = ".xls";
 
-    private List<ExcelRow> items = new ArrayList<>();
+    private List<BatchExcelRow> items = new ArrayList<>();
 
     private ExecutionContext executionContext;
 
@@ -47,10 +48,10 @@ public class ExcelSheetItemWriterTest {
 
 
         executionContext = MetaDataInstanceFactory.createStepExecution().getExecutionContext();
-        writer = new ExcelSheetItemWriter<ExcelRow>();
+        writer = new ExcelSheetItemWriter<>();
         writer.setTemplate(new ClassPathResource("template.xls"));
         writer.setResource(new FileSystemResource(CURRENT_PATH + "output" + EXCEL_FILE_EXTENSION));
-        writer.setRowAggregator(new ExcelRowAggregator());
+        writer.setRowAggregator(new BatchExcelRowAggregator());
         writer.setName("test");
         writer.setRowsToSkip(21);
         writer.setMaxItemCount(40);
@@ -63,9 +64,8 @@ public class ExcelSheetItemWriterTest {
         Iterator<Calendar> it = DateUtils.<Calendar>iterator(new SimpleDateFormat("dd/MM/yyyy").parse("01/01/2000"), DateUtils.RANGE_MONTH_MONDAY);
 
         for (int i = 0; i < 80 && it.hasNext(); i++) {
-            List<ExcelRow> excelRows = new ArrayList<>();
             Date date = it.next().getTime();
-            ExcelRow from = new Builder(date, Sens.DEPARTURE) //
+            BatchExcelRow from = new BatchExcelRow.Builder(date, Sens.DEPARTURE) //
                     .departureStation(new Station("Liège-Guillemins")) //
                     .arrivalStation(new Station("Bruxelles-central")) //
                     .expectedDepartureTime(formatter.parse("08:00")) //
@@ -75,7 +75,7 @@ public class ExcelSheetItemWriterTest {
                     .effectiveArrivalTime(formatter.parse("09:15")) //
                     .effectiveTrain1(new Train("466")) //
                     .build();
-            ExcelRow to = new Builder(date, Sens.ARRIVAL) //
+            BatchExcelRow to = new BatchExcelRow.Builder(date, Sens.ARRIVAL) //
                     .departureStation(new Station("Bruxelles-central")) //
                     .arrivalStation(new Station("Liège-Guillemins")) //
                     .expectedDepartureTime(formatter.parse("14:00")) //
@@ -116,7 +116,7 @@ public class ExcelSheetItemWriterTest {
         writer.close();
 
         Assert.assertEquals(1, getExcelFiles().length);
-        Assert.assertEquals(123392, getExcelFiles()[0].length());
+        Assert.assertEquals(123904, getExcelFiles()[0].length());
     }
 
     @Test
@@ -130,12 +130,12 @@ public class ExcelSheetItemWriterTest {
         writer.close();
 
         Assert.assertEquals(1, getExcelFiles().length);
-        Assert.assertEquals(123392, getExcelFiles()[0].length());
+        Assert.assertEquals(123904, getExcelFiles()[0].length());
     }
 
     @Test
     public void testEmptyList() throws Exception {
-        writer.write(Collections.<ExcelRow>emptyList());
+        writer.write(Collections.<BatchExcelRow>emptyList());
         writer.update(executionContext);
         writer.close();
 
