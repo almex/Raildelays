@@ -51,6 +51,7 @@
                 <batch:transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
             </batch:tasklet>
             <batch:listeners>
+                <batch:listener ref="delaysItemReader"/>
                 <batch:listener ref="skippedItemsListener"/>
                 <batch:listener ref="filterTwoSensPerDayProcessor"/>
                 <batch:listener ref="copyResourceToStepExecutionContextListener" />

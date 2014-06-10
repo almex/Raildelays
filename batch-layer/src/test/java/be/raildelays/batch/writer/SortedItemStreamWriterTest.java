@@ -33,11 +33,10 @@ public class SortedItemStreamWriterTest {
 
     public static final String EXCEL_FILE_NAME = "retard_sncb 20140522.xls";
 
-    public static final String EXCEL_FILE_SOURCE_PATH = "." + File.separator + "batch-layer" + File.separator + "src"
+    public static final String EXCEL_FILE_SOURCE_PATH = "." + File.separator  + "src"
             + File.separator + "it" + File.separator + "resources" + File.separator + EXCEL_FILE_NAME;
 
-    public static final String EXCEL_FILE_DESTINATION_PATH = "." + File.separator + "batch-layer" + File.separator
-            + "target" + File.separator + EXCEL_FILE_NAME;
+    public static final String EXCEL_FILE_DESTINATION_PATH = "." + File.separator + "target" + File.separator + EXCEL_FILE_NAME;
 
     private SortedItemStreamWriter<BatchExcelRow> sortedItemStreamWriter;
 
@@ -138,6 +137,9 @@ public class SortedItemStreamWriterTest {
         Path destination = Paths.get(EXCEL_FILE_DESTINATION_PATH);
         Path tempFile = Paths.get(EXCEL_FILE_DESTINATION_PATH+".tmp");
         Path backupFile = Paths.get(EXCEL_FILE_DESTINATION_PATH+".bak");
+
+        Path newPAth =  Paths.get(".");
+        System.out.println("path="+newPAth.toFile().getAbsolutePath());
 
         Assert.assertTrue(destination.toFile().exists());
         Assert.assertTrue(destination.toFile().isFile());
