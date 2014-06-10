@@ -46,6 +46,8 @@ public class DelaysItemReader implements ItemReader<LineStop>, InitializingBean 
 	
 	private Date date;
 
+    private Integer threshold;
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		// Validate all job parameters
@@ -60,7 +62,7 @@ public class DelaysItemReader implements ItemReader<LineStop>, InitializingBean 
         LOGGER.debug("Searching delays for date={}", date);
 
         if (date != null) {
-            result = service.searchDelaysBetween(date, new Station(stationA), new Station(stationB), 15);
+            result = service.searchDelaysBetween(date, new Station(stationA), new Station(stationB), threshold);
         }
 
         Collections.sort(result);
@@ -85,4 +87,7 @@ public class DelaysItemReader implements ItemReader<LineStop>, InitializingBean 
 		this.date = date;
 	}
 
+    public void setThreshold(Integer threshold) {
+        this.threshold = threshold;
+    }
 }

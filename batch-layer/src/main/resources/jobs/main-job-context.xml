@@ -114,6 +114,7 @@
         <property name="stationA" value="#{jobParameters['station.a.name']}"/>
         <property name="stationB" value="#{jobParameters['station.b.name']}"/>
         <property name="date" value="#{jobParameters['date']}" />
+        <property name="threshold" value="${excel.item.delay.threshold}" />
     </bean>
 
     <bean id="delaysFromDepartureItemReader"
