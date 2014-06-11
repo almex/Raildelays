@@ -11,11 +11,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URL;
 
 /**
  * @author Almex
  */
-public class FileSystemResourceDecorator extends AbstractResource implements WritableResourceDecorator, InitializingBean {
+public class FileSystemResourceDecorator implements WritableResourceDecorator, InitializingBean {
 
     private WritableResource delegate;
 
@@ -38,7 +40,7 @@ public class FileSystemResourceDecorator extends AbstractResource implements Wri
 
     @Override
     public boolean isWritable() {
-        return delegate.isWritable();
+        return delegate != null ? delegate.isWritable() : false;
     }
 
     @Override
@@ -57,8 +59,53 @@ public class FileSystemResourceDecorator extends AbstractResource implements Wri
     }
 
     @Override
+    public boolean exists() {
+        return delegate != null ? delegate.exists() : false;
+    }
+
+    @Override
+    public boolean isReadable() {
+        return delegate != null ? delegate.isReadable() : false;
+    }
+
+    @Override
+    public boolean isOpen() {
+        return delegate != null ? delegate.isOpen() : false;
+    }
+
+    @Override
+    public URL getURL() throws IOException {
+        return delegate != null ? delegate.getURL() : null;
+    }
+
+    @Override
+    public URI getURI() throws IOException {
+        return delegate != null ? delegate.getURI() : null;
+    }
+
+    @Override
     public File getFile() throws IOException {
         return delegate != null ? delegate.getFile() : null;
+    }
+
+    @Override
+    public long contentLength() throws IOException {
+        return delegate != null ? delegate.contentLength() : -1;
+    }
+
+    @Override
+    public long lastModified() throws IOException {
+        return delegate != null ? delegate.lastModified() : -1;
+    }
+
+    @Override
+    public Resource createRelative(String relativePath) throws IOException {
+        return delegate != null ? delegate.createRelative(relativePath) : null;
+    }
+
+    @Override
+    public String getFilename() {
+        return delegate != null ? delegate.getFilename() : null;
     }
 
     @Override
