@@ -300,7 +300,7 @@
           scope="step" />
 
     <bean id="excelFileOutput" class="be.raildelays.batch.support.FileSystemResourceDecorator" >
-        <property name="outputDirectory" value="#{jobParameters['excel.output.file']}" />
+        <constructor-arg  name="outputDirectory" value="#{jobParameters['excel.output.file']}" />
     </bean>
 
 </beans>
