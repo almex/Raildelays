@@ -302,8 +302,8 @@
         <constructor-arg  name="outputDirectory" ref="outputDirectory" />
     </bean>
 
-    <bean id="outputDirectory" class="org.springframework.core.io.FileSystemResource" scope="step" >
-        <constructor-arg index="0" value="#{jobParameters['excel.output.file']}" />
+    <bean id="outputDirectory" class="org.springframework.core.io.FileSystemResource" >
+        <constructor-arg index="0" value="./" />
     </bean>
 
 </beans>
