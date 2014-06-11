@@ -54,7 +54,6 @@
                 <batch:listener ref="delaysItemReader"/>
                 <batch:listener ref="skippedItemsListener"/>
                 <batch:listener ref="filterTwoSensPerDayProcessor"/>
-                <batch:listener ref="copyResourceStepExecutionListener" />
             </batch:listeners>
         </batch:step>
     </batch:job>
