@@ -282,7 +282,6 @@
         <property name="maxItemCount" value="${excel.sheet0.maxitemcount}" />
         <property name="template" value="file:#{jobParameters['excel.input.template']}"/>
         <property name="resourceDecorator" ref="excelFileOutput"/>
-        <property name="resource" ref="excelFileOutput"/>
         <property name="rowAggregator">
             <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator" />
         </property>
@@ -299,7 +298,7 @@
           class="be.raildelays.batch.listener.LogSkippedItemListener"
           scope="step" />
 
-    <bean id="excelFileOutput" class="be.raildelays.batch.support.FileSystemResourceDecorator" >
+    <bean id="excelFileOutput" class="be.raildelays.batch.support.FileSystemResourceDecorator" scope="step" >
         <constructor-arg  name="outputDirectory" value="#{jobParameters['excel.output.file']}" />
     </bean>
 

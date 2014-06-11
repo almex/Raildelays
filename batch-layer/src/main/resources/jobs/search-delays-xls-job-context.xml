@@ -103,7 +103,7 @@
     <bean id="excelSheetItemWriter" class="be.raildelays.batch.writer.ExcelSheetExcelRowWriter"
           scope="step">
         <property name="template" value="file:#{jobParameters['excel.input.template']}"/>
-        <property name="resourceDecorator" value="#{jobParameters['excel.output.file']}"/>
+        <property name="resourceDecorator" ref="excelFileOutput"/>
         <property name="rowAggregator">
             <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator" />
         </property>
@@ -111,5 +111,9 @@
     </bean>
 
     <bean id="skippedItemsListener" class="be.raildelays.batch.listener.LogSkippedItemListener"/>
+
+    <bean id="excelFileOutput" class="be.raildelays.batch.support.FileSystemResourceDecorator" scope="step" >
+        <constructor-arg  name="outputDirectory" value="#{jobParameters['excel.output.file']}" />
+    </bean>
 
 </beans>
