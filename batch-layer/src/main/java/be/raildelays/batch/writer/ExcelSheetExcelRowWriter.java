@@ -5,6 +5,7 @@ import be.raildelays.batch.poi.Format;
 import be.raildelays.batch.poi.WorkbookSearch;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
 import be.raildelays.batch.reader.ExcelSheetItemReader;
+import be.raildelays.batch.support.WritableResourceDecorator;
 import be.raildelays.batch.support.ResourceAwareItemStream;
 import be.raildelays.domain.xls.ExcelRow;
 import groovy.lang.IllegalPropertyAccessException;
@@ -13,14 +14,10 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.poi.POIXMLDocument;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
@@ -32,7 +29,7 @@ import java.util.List;
  */
 public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<BatchExcelRow> implements ResourceAwareItemStream {
 
-    protected String outputDirectory;
+    protected WritableResourceDecorator resourceDecorator;
 
     protected boolean recoveryMode = false;
 
@@ -43,8 +40,8 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<BatchExcelRow
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Validate.notNull(outputDirectory,
-                "You must provide an outputDirectory before using this bean");
+        Validate.notNull(resourceDecorator,
+                "You must provide an resourceDecorator before using this bean");
         Validate.notNull(template,
                 "You must provide a template before using this bean");
     }
@@ -56,13 +53,16 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<BatchExcelRow
 
             if (this.resource == null) {
                 close();
-                if (!isExistingWorkbooks(firstItem)) {
-                    createNewWorkbook(getFileName(firstItem));
+                File file = getExistingWorkbooks(firstItem);
+                if (file != null) {
+                    this.resource = resourceDecorator.createNewResource(file.getName());
+                } else {
+                    this.resource = resourceDecorator.createNewResource(getFileName(firstItem));
                 }
                 super.doOpen();
             } else if (getCurrentItemCount() % getMaxItemCount() == 0) {
                 close();
-                createNewWorkbook(getFileName(firstItem));
+                this.resource = resourceDecorator.createNewResource(getFileName(firstItem));
                 super.doOpen();
             }
         }
@@ -83,25 +83,31 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<BatchExcelRow
         this.executionContext = executionContext;
     }
 
-    protected void createNewWorkbook(String fileName) throws Exception {
-        resource = new FileSystemResource(new File(outputDirectory + File.separator + fileName));
-    }
+//    protected void createNewWorkbook(String fileName) throws Exception {
+//        resource = resourceDecorator.createNewResource(fileName);
+//    }
 
-    private boolean isExistingWorkbooks(BatchExcelRow firstItem) throws Exception {
+    private File getExistingWorkbooks(BatchExcelRow firstItem) throws Exception {
+        File result = null;
+
         Validate.notNull(firstItem, "You must provide the first ExcelRow of this Excel sheet prior to check " +
                 "if a file already exists.");
 
         // By comparing on new WorkbookSearch(null) fileExtension we are retrieving the first workbook containing the first free row.
-        recoveryMode = retrieveFirstRowContaining(firstItem) || retrieveFirstRowContaining(null);
+        result = retrieveFirstRowContaining(firstItem);
+        if (result == null ) {
+            result = retrieveFirstRowContaining(null);
+        }
 
-        return recoveryMode;
+        return result;
     }
 
-    private boolean retrieveFirstRowContaining(BatchExcelRow content) throws Exception {
-        File directory = new File(outputDirectory);
+    private File retrieveFirstRowContaining(BatchExcelRow content) throws Exception {
+        File result = null;
+        File directory = resourceDecorator.getOutputDirectory().getFile();
         this.resource = null;
 
-        Validate.isTrue(directory.isDirectory(), "The outputDirectory '" + outputDirectory + "' parameter must be a directory path and nothing else.");
+        Validate.isTrue(directory.isDirectory(), "The outputDirectory '" + resourceDecorator + "' parameter must be a directory path and nothing else.");
 
         for (File file : directory.listFiles(new FileFilter() {
             @Override
@@ -122,8 +128,8 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<BatchExcelRow
 
                 int currentRowIndex = container.indexOf(content);
                 if (currentRowIndex != -1) {
-                    this.resource = new FileSystemResource(file);
-                    jumpToItem(currentRowIndex - rowsToSkip);
+                    result = file;
+                    setCurrentItemIndex(currentRowIndex);
                     break;
                 }
             } catch (InvalidFormatException e) {
@@ -133,7 +139,7 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<BatchExcelRow
             }
         }
 
-        return this.resource != null;
+        return result;
     }
 
     private String getFileName(ExcelRow firstItem) throws InvalidFormatException, IOException {
@@ -165,8 +171,8 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<BatchExcelRow
         }
     }
 
-    public void setOutputDirectory(String outputDirectory) {
-        this.outputDirectory = outputDirectory;
+    public void setResourceDecorator(WritableResourceDecorator resourceDecorator) {
+        this.resourceDecorator = resourceDecorator;
     }
 
     @Override

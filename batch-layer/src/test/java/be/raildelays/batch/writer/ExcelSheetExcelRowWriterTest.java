@@ -1,6 +1,7 @@
 package be.raildelays.batch.writer;
 
 import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.batch.support.FileSystemResourceDecorator;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
@@ -52,7 +53,7 @@ public class ExcelSheetExcelRowWriterTest {
         writer = new ExcelSheetExcelRowWriter();
 
         writer.setTemplate(new ClassPathResource("template.xls"));
-        writer.setOutputDirectory(CURRENT_PATH);
+        writer.setResourceDecorator(new FileSystemResourceDecorator(CURRENT_PATH));
         writer.setName("test");
         writer.setRowsToSkip(21);
         writer.setMaxItemCount(40);

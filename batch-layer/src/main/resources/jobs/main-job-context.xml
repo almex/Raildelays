@@ -163,7 +163,7 @@
         <property name="name" value="excelSheetItemReader" />
         <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}" />
         <property name="maxItemCount" value="${excel.sheet0.maxitemcount}" />
-        <property name="resource" value="#{stepExecutionContext['outputExcelFileResource']}" />
+        <property name="resource" ref="excelFileOutput"/>
         <property name="rowMapper">
             <bean class="be.raildelays.batch.reader.BatchExcelRowMapper" />
         </property>
@@ -282,7 +282,8 @@
         <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}" />
         <property name="maxItemCount" value="${excel.sheet0.maxitemcount}" />
         <property name="template" value="file:#{jobParameters['excel.input.template']}"/>
-        <property name="outputDirectory" value="#{jobParameters['excel.output.file']}"/>
+        <property name="resourceDecorator" ref="excelFileOutput"/>
+        <property name="resource" ref="excelFileOutput"/>
         <property name="rowAggregator">
             <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator" />
         </property>
@@ -299,11 +300,8 @@
           class="be.raildelays.batch.listener.LogSkippedItemListener"
           scope="step" />
 
-    <bean id="copyResourceStepExecutionListener"
-          class="be.raildelays.batch.listener.CopyResourceStepExecutionListener"
-          scope="step">
-        <property name="source" ref="excelSheetItemWriter" />
-        <property name="destination" value="excelSheetItemReader" />
+    <bean id="excelFileOutput" class="be.raildelays.batch.support.FileSystemResourceDecorator" >
+        <property name="outputDirectory" value="#{jobParameters['excel.output.file']}" />
     </bean>
 
 </beans>
