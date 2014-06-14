@@ -100,19 +100,14 @@ public class FileSystemResourceDecorator implements WritableResourceDecorator, I
 
     @Override
     public Resource createRelative(String relativePath) throws IOException {
-        return delegate != null ? delegate.createRelative(relativePath) : null;
+        delegate = (WritableResource) outputDirectory.createRelative(relativePath);
+
+        return this;
     }
 
     @Override
     public String getFilename() {
         return delegate != null ? delegate.getFilename() : null;
-    }
-
-    @Override
-    public Resource createNewResource(String fileName) throws Exception {
-        delegate = (WritableResource) outputDirectory.createRelative(fileName);
-
-        return delegate;
     }
 
     @Override

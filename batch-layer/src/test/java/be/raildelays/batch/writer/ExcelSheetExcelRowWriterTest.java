@@ -54,10 +54,8 @@ public class ExcelSheetExcelRowWriterTest {
 
         writer.setTemplate(new ClassPathResource("template.xls"));
         writer.setResourceDecorator(new FileSystemResourceDecorator(CURRENT_PATH));
-        writer.setName("test");
         writer.setRowsToSkip(21);
         writer.setMaxItemCount(40);
-        writer.setRowAggregator(new BatchExcelRowAggregator());
         writer.afterPropertiesSet();
         writer.open(executionContext);
 

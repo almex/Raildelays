@@ -2,6 +2,8 @@ package be.raildelays.batch.writer;
 
 import be.raildelays.batch.support.ItemIndexAware;
 import org.apache.commons.lang.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemCountAware;
 import org.springframework.batch.item.ItemStream;
@@ -47,6 +49,8 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
 
     protected Comparator<? super T> comparator;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SortedItemStreamWriter.class);
+
     @Override
     public void afterPropertiesSet() throws Exception {
         Validate.notNull(writer,
@@ -68,12 +72,11 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
             List<T> allItems = replaceItems(readContent(), items);
             sort(allItems);
             writeAll(allItems);
-
-            commit();
         } catch (Exception e) {
-            rollback();
-            throw e;
+            rollback(e);
         }
+
+        commit();
     }
 
     @Override
@@ -172,19 +175,21 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
             if (tempFile.renameTo(outputFile)) {
                 if (!backupFile.delete()) {
                     backupFile.renameTo(outputFile);
-                    throw new IllegalStateException("Commit failure: we were not able to delete the original file");
+                    LOGGER.error("Commit failure: we were not able to delete the original file");
                 }
             } else {
-                throw new IllegalStateException("Commit failure: we were not able to rename the temporary file");
+                LOGGER.error("Commit failure: we were not able to rename the temporary file");
             }
         } else {
-            throw new IllegalStateException("Commit failure: we were not able to rename the original file");
+            LOGGER.error("Commit failure: we were not able to rename the original file");
         }
     }
 
-    private void rollback() throws Exception {
+    private void rollback(Exception e) throws Exception {
         if (!tempResource.getFile().delete()) {
-            throw new IllegalStateException("Rollback failure: we were not able to delete the temporary file");
+            throw new IllegalStateException("Rollback failure: we were not able to delete the temporary file", e);
+        } else {
+            throw e;
         }
     }
 

@@ -12,6 +12,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -144,7 +145,7 @@ public class Station implements Serializable, Cloneable, Comparable<Station> {
             result = -1;
         } else {
             result = new CompareToBuilder()
-                    .append(englishName, station.getEnglishName())
+                    .append(StringUtils.stripAccents(englishName), StringUtils.stripAccents(station.getEnglishName()), String.CASE_INSENSITIVE_ORDER)
                     .toComparison();
         }
 

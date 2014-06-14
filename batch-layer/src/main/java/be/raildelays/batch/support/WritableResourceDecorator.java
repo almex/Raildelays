@@ -8,8 +8,6 @@ import org.springframework.core.io.WritableResource;
  */
 public interface WritableResourceDecorator extends WritableResource {
 
-    Resource createNewResource(String fileName) throws Exception;
-
     void setOutputDirectory(Resource outputDirectory);
 
     Resource getOutputDirectory();

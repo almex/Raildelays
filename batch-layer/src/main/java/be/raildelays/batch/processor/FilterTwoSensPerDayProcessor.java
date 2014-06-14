@@ -16,6 +16,8 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Filter items to get only two. One for departure and the other one for arrival.
@@ -65,13 +67,16 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
                              * If the delay of the item is not greater than the one in the Excel sheet then we skip it.
                              */
                             if (item.getDelay() > matchingExcelRow.getDelay()) {
-                                /**
-                                 * Here, the delay of the item is greater than the matching Excel row.
-                                 * We must replace the row currently in the Excel sheet with our item.
-                                 */
                                 result = item;
+
                                 if (matchingExcelRow.getIndex() != null) {
                                     result.setIndex(matchingExcelRow.getIndex());
+
+                                    /**
+                                     * Here, the delay of the item is greater than the matching Excel row.
+                                     * We must replace the row currently in the Excel sheet with our item.
+                                     */
+                                    LOGGER.debug("We replace matchingExcelRow={} by result={}", matchingExcelRow, result);
                                 } else {
                                     throw new IllegalArgumentException("We don't know the current index of this Excel row. We cannot replace it!");
                                 }
@@ -80,21 +85,28 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
                             /**
                              * We stop searching here. Either the result is found or we have to skip this item.
                              */
+                            LOGGER.debug("We stop searching result={}", result);
+
                             break;
                         } else if (item.getDate().before(matchingExcelRow.getDate())) {
                             /**
                              * We stop searching. We expect that the content of the Excel file is sorted by date.
                              * This clause should never happen if the data read are also sorted by date.
                              */
+                            LOGGER.debug("We stop searching item={} is before matchingExcelRow={} then result={}", item, matchingExcelRow, result);
+
                             break;
                         }
                     } else {
+                        result = item;
+                        result.setIndex(null);
+
                         /**
                          * In that case we reach the first empty row without matching any previous data.
                          * So, we have to add a new row to the Excel sheet.
                          */
-                        result = item;
-                        result.setIndex(null);
+                        LOGGER.debug("We reach the first empty row, we add new row with result={}", result);
+
                         break;
                     }
                 } while (matchingExcelRow != null);

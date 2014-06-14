@@ -104,10 +104,6 @@
           scope="step">
         <property name="template" value="file:#{jobParameters['excel.input.template']}"/>
         <property name="resourceDecorator" ref="excelFileOutput"/>
-        <property name="rowAggregator">
-            <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator" />
-        </property>
-        <property name="name" value="excelSheetItemWriter" />
     </bean>
 
     <bean id="skippedItemsListener" class="be.raildelays.batch.listener.LogSkippedItemListener"/>

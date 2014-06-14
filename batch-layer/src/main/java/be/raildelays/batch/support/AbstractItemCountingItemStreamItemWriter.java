@@ -68,7 +68,7 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
         }
     }
 
-    protected int getCurrentItemCount() {
+    public int getCurrentItemCount() {
         return currentItemCount;
     }
 
@@ -187,5 +187,5 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
         return currentItemIndex;
     }
 
-    protected int getMaxItemCount() { return maxItemCount; }
+    public int getMaxItemCount() { return maxItemCount; }
 }

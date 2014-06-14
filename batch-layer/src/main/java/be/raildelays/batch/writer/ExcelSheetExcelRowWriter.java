@@ -5,6 +5,7 @@ import be.raildelays.batch.poi.Format;
 import be.raildelays.batch.poi.WorkbookSearch;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
 import be.raildelays.batch.reader.ExcelSheetItemReader;
+import be.raildelays.batch.support.FileSystemResourceDecorator;
 import be.raildelays.batch.support.WritableResourceDecorator;
 import be.raildelays.batch.support.ResourceAwareItemStream;
 import be.raildelays.domain.xls.ExcelRow;
@@ -18,8 +19,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.util.ClassUtils;
 
 import java.io.*;
 import java.util.List;
@@ -27,16 +31,25 @@ import java.util.List;
 /**
  * @author Almex
  */
-public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<BatchExcelRow> implements ResourceAwareItemStream {
+public class ExcelSheetExcelRowWriter implements ResourceAwareItemWriterItemStream<BatchExcelRow>, ResourceAwareItemStream, InitializingBean {
 
     protected WritableResourceDecorator resourceDecorator;
 
-    protected boolean recoveryMode = false;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExcelSheetExcelRowWriter.class);
-
     private ExecutionContext executionContext;
 
+    private Resource template;
+
+    private ExcelSheetItemWriter<BatchExcelRow> delegate;
+
+    private boolean shouldDeleteIfExists = false;
+
+    protected int rowsToSkip = 0;
+
+    protected int sheetIndex = 0;
+
+    private int maxItemCount = Integer.MAX_VALUE;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExcelSheetExcelRowWriter.class);
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -44,6 +57,13 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<BatchExcelRow
                 "You must provide an resourceDecorator before using this bean");
         Validate.notNull(template,
                 "You must provide a template before using this bean");
+        delegate = new ExcelSheetItemWriter<>();
+        delegate.setTemplate(template);
+        delegate.setRowsToSkip(rowsToSkip);
+        delegate.setRowAggregator(new BatchExcelRowAggregator());
+        delegate.setMaxItemCount(maxItemCount);
+        delegate.setSheetIndex(sheetIndex);
+        delegate.setShouldDeleteIfExists(shouldDeleteIfExists);
     }
 
     @Override
@@ -51,41 +71,43 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<BatchExcelRow
         if (!items.isEmpty()) {
             BatchExcelRow firstItem = items.get(0);
 
-            if (this.resource == null) {
-                close();
+            if (resourceDecorator.getFile() == null) {
                 File file = getExistingWorkbooks(firstItem);
                 if (file != null) {
-                    this.resource = resourceDecorator.createNewResource(file.getName());
+                    delegate.setResource(resourceDecorator.createRelative(file.getName()));
                 } else {
-                    this.resource = resourceDecorator.createNewResource(getFileName(firstItem));
+                    delegate.setResource(resourceDecorator.createRelative(getFileName(firstItem)));
                 }
-                super.doOpen();
-            } else if (getCurrentItemCount() % getMaxItemCount() == 0) {
-                close();
-                this.resource = resourceDecorator.createNewResource(getFileName(firstItem));
-                super.doOpen();
             }
+
+            delegate.open(executionContext);
+            if (delegate.getCurrentItemCount() % delegate.getMaxItemCount() == 0) {
+                delegate.close();
+                delegate.update(executionContext);
+                delegate.setResource(resourceDecorator.createRelative(getFileName(firstItem)));
+                delegate.open(executionContext);
+            }
+            delegate.write(items);
+            delegate.update(executionContext);
+            delegate.close();
         }
 
-        super.write(items);
-    }
-
-    @Override
-    public void doOpen() {
-        //-- We manage creation of file in doWrite()
-        resource = null;
     }
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
-        super.open(executionContext);
-
         this.executionContext = executionContext;
     }
 
-//    protected void createNewWorkbook(String fileName) throws Exception {
-//        resource = resourceDecorator.createNewResource(fileName);
-//    }
+    @Override
+    public void update(ExecutionContext executionContext) throws ItemStreamException {
+
+    }
+
+    @Override
+    public void close() throws ItemStreamException {
+        resourceDecorator = new FileSystemResourceDecorator(resourceDecorator.getOutputDirectory());
+    }
 
     private File getExistingWorkbooks(BatchExcelRow firstItem) throws Exception {
         File result = null;
@@ -105,7 +127,6 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<BatchExcelRow
     private File retrieveFirstRowContaining(BatchExcelRow content) throws Exception {
         File result = null;
         File directory = resourceDecorator.getOutputDirectory().getFile();
-        this.resource = null;
 
         Validate.isTrue(directory.isDirectory(), "The outputDirectory '" + resourceDecorator + "' parameter must be a directory path and nothing else.");
 
@@ -129,7 +150,7 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<BatchExcelRow
                 int currentRowIndex = container.indexOf(content);
                 if (currentRowIndex != -1) {
                     result = file;
-                    setCurrentItemIndex(currentRowIndex);
+                    delegate.setCurrentItemIndex(currentRowIndex);
                     break;
                 }
             } catch (InvalidFormatException e) {
@@ -176,16 +197,32 @@ public class ExcelSheetExcelRowWriter extends ExcelSheetItemWriter<BatchExcelRow
     }
 
     @Override
-    public void setResource(Resource resource) {
-        try {
-            throw new IllegalPropertyAccessException(this.getClass().getField("resource"), this.getClass());
-        } catch (NoSuchFieldException e) {
-            LOGGER.error("No such field error", e);
-        }
+    public Resource getResource() {
+        return resourceDecorator;
     }
 
     @Override
-    public Resource getResource() {
-        return resource;
+    public void setResource(Resource resource)  {
+
+    }
+
+    public void setRowsToSkip(int rowsToSkip) {
+        this.rowsToSkip = rowsToSkip;
+    }
+
+    public void setSheetIndex(int sheetIndex) {
+        this.sheetIndex = sheetIndex;
+    }
+
+    public void setShouldDeleteIfExists(boolean shouldDeleteIfExists) {
+        this.shouldDeleteIfExists = shouldDeleteIfExists;
+    }
+
+    public void setMaxItemCount(int maxItemCount) {
+        this.maxItemCount = maxItemCount;
+    }
+
+    public void setTemplate(Resource template) {
+        this.template = template;
     }
 }

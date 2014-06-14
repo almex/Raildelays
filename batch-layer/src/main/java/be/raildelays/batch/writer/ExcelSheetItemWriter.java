@@ -17,6 +17,7 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
+import org.springframework.util.ClassUtils;
 
 import java.io.*;
 
@@ -28,11 +29,11 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
 
     protected Resource template;
 
-    private boolean shouldDeleteIfExists = false;
-
     protected OutputStream outputStream;
 
     protected Workbook workbook;
+
+    private boolean shouldDeleteIfExists = false;
 
     protected int rowsToSkip = 0;
 
@@ -49,6 +50,11 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
                 "You must provide an resource before using this bean");
         Validate.notNull(rowAggregator,
                 "You must provide a rowAggregator before using this bean");
+    }
+
+
+    public ExcelSheetItemWriter() {
+        this.setExecutionContextName(ClassUtils.getShortName(ExcelSheetItemWriter.class));
     }
 
     @Override
@@ -146,16 +152,14 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
         try {
             if (outputStream != null && workbook != null) {
                 workbook.write(outputStream);
-                workbook = null;
+                outputStream.flush();
             }
         } catch (IOException e) {
             throw new ItemStreamException("I/O error when writing Excel outputDirectory file", e);
         } finally {
             try {
                 if (outputStream != null) {
-                    outputStream.flush();
                     outputStream.close();
-                    outputStream = null;
                 }
             } catch (IOException e) {
                 LOGGER.error("I/O error when closing Excel outputDirectory file", e);
@@ -163,21 +167,6 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
         }
 
 
-    }
-
-    private Closeable extractCloseable(final Workbook workbook, final Closeable closeable) throws InvalidFormatException {
-        return new WorkbookAction<Closeable>(workbook) {
-
-            @Override
-            protected Closeable doWithHSSFWorkbook(HSSFWorkbook workbook) {
-                return closeable;
-            }
-
-            @Override
-            protected Closeable doWithXSSFWorkbook(XSSFWorkbook workbook) {
-                return workbook.getPackage();
-            }
-        }.execute();
     }
 
     @Override

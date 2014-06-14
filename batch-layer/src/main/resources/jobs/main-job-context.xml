@@ -42,7 +42,7 @@
                 <batch:chunk reader="delaysItemReader"
                              processor="chainedProcessorsForDelays"
                              writer="compositeItemWriter"
-                             commit-interval="4" skip-limit="10">
+                             commit-interval="1" skip-limit="10">
                     <batch:skippable-exception-classes>
                         <batch:include class="org.springframework.batch.item.validator.ValidationException"/>
                         <batch:include class="be.raildelays.batch.exception.ArrivalDepartureEqualsException"/>
@@ -257,7 +257,7 @@
         <property name="delegates">
             <list>
                 <ref bean="flatFileItemWriter" />
-                <ref bean="excelSheetItemWriter" />
+                <ref bean="sortedItemWriter" />
             </list>
         </property>
     </bean>
@@ -277,15 +277,19 @@
     <bean id="excelSheetItemWriter"
           class="be.raildelays.batch.writer.ExcelSheetExcelRowWriter"
           scope="step">
-        <property name="name" value="excelSheetItemWriter" />
+        <property name="shouldDeleteIfExists" value="false" />
         <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}" />
         <property name="maxItemCount" value="${excel.sheet0.maxitemcount}" />
         <property name="template" value="file:#{jobParameters['excel.input.template']}"/>
         <property name="resourceDecorator" ref="excelFileOutput"/>
-        <property name="rowAggregator">
-            <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator" />
-        </property>
     </bean>
+
+    <bean id="sortedItemWriter" class="be.raildelays.batch.writer.SortedItemStreamWriter">
+        <property name="reader" ref="excelSheetItemReader" />
+        <property name="writer" ref="excelSheetItemWriter" />
+        <property name="resource" ref="excelFileOutput" />
+    </bean>
+
     <bean id="raildelaysServiceWriter"
           class="be.raildelays.batch.writer.RaildelaysServiceWriter"
           scope="step">
