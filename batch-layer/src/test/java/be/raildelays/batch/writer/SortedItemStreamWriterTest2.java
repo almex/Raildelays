@@ -1,8 +1,10 @@
 package be.raildelays.batch.writer;
 
 import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.batch.poi.ExcelItemSearch;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
 import be.raildelays.batch.reader.ExcelSheetItemReader;
+import be.raildelays.batch.support.ExcelFileSystemResourceDecorator;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
@@ -15,9 +17,9 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,11 +31,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RunWith(BlockJUnit4ClassRunner.class)
-public class SortedItemStreamWriterTest {
+public class SortedItemStreamWriterTest2 {
 
     public static final String EXCEL_FILE_NAME = "retard_sncb 20140522.xls";
 
-    public static final String EXCEL_FILE_SOURCE_PATH = "." + File.separator  + "src"
+    public static final String EXCEL_FILE_SOURCE_PATH = "." + File.separator + "src"
             + File.separator + "it" + File.separator + "resources" + File.separator + EXCEL_FILE_NAME;
 
     public static final String EXCEL_FILE_DESTINATION_PATH = "." + File.separator + "target" + File.separator + EXCEL_FILE_NAME;
@@ -48,20 +50,20 @@ public class SortedItemStreamWriterTest {
 
     @Before
     public void setUp() throws Exception {
-        ExcelSheetItemWriter<BatchExcelRow> writer = new ExcelSheetItemWriter<>();
+        ExcelSheetExcelRowWriter writer = new ExcelSheetExcelRowWriter();
         ExcelSheetItemReader<BatchExcelRow> reader = new ExcelSheetItemReader<>();
         DateFormat timeFormat = new SimpleDateFormat("HH:mm");
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        ExcelFileSystemResourceDecorator resource = new ExcelFileSystemResourceDecorator<BatchExcelRow>(BASE_DIRECTORY);
+        ExcelItemSearch<BatchExcelRow> container = new ExcelItemSearch<>();
 
         copyFile();
 
-        writer.setName("test");
         writer.setSheetIndex(0);
         writer.setRowsToSkip(21);
         writer.setMaxItemCount(40);
-        writer.setRowAggregator(new BatchExcelRowAggregator());
         writer.setTemplate(new ClassPathResource("template.xls"));
-        writer.setResource(new FileSystemResource(BASE_DIRECTORY));
+        writer.setResourceDecorator(resource);
         writer.afterPropertiesSet();
 
         reader.setName("test");
@@ -69,12 +71,15 @@ public class SortedItemStreamWriterTest {
         reader.setRowsToSkip(21);
         reader.setMaxItemCount(40);
         reader.setRowMapper(new BatchExcelRowMapper());
-        reader.setResource(new FileSystemResource(BASE_DIRECTORY));
+        reader.setResource(resource);
         reader.afterPropertiesSet();
+
+        container.setReader(reader);
+        resource.setItemSearch(container);
 
         sortedItemStreamWriter = new SortedItemStreamWriter<>();
         executionContext = MetaDataInstanceFactory.createStepExecution().getExecutionContext();
-        sortedItemStreamWriter.setResource(new FileSystemResource(EXCEL_FILE_DESTINATION_PATH));
+        sortedItemStreamWriter.setResource(resource);
         sortedItemStreamWriter.setReader(reader);
         sortedItemStreamWriter.setWriter(writer);
         sortedItemStreamWriter.afterPropertiesSet();
@@ -122,29 +127,29 @@ public class SortedItemStreamWriterTest {
         items.add(replace);
     }
 
+    public void deleteFile() throws IOException {
+        for (File file : getFiles()) {
+            file.delete();
+        }
+    }
+
+    public void assertFile() {
+        Assert.assertEquals(1, getFiles().length);
+    }
+
     public void copyFile() throws IOException {
         Path source = new ClassPathResource(EXCEL_FILE_NAME).getFile().toPath();
         Path destination = Paths.get(EXCEL_FILE_DESTINATION_PATH);
         Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
     }
 
-    public void deleteFile() throws IOException {
-        Path destination = Paths.get(EXCEL_FILE_DESTINATION_PATH);
-        Files.delete(destination);
-    }
-
-    public void assertFile() {
-        Path destination = Paths.get(EXCEL_FILE_DESTINATION_PATH);
-        Path tempFile = Paths.get(EXCEL_FILE_DESTINATION_PATH+".tmp");
-        Path backupFile = Paths.get(EXCEL_FILE_DESTINATION_PATH+".bak");
-
-        Path newPAth =  Paths.get(".");
-        System.out.println("path="+newPAth.toFile().getAbsolutePath());
-
-        Assert.assertTrue(destination.toFile().exists());
-        Assert.assertTrue(destination.toFile().isFile());
-        Assert.assertFalse(tempFile.toFile().exists());
-        Assert.assertFalse(backupFile.toFile().exists());
+    File[] getFiles() {
+        return new File(BASE_DIRECTORY).listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.getName().endsWith(".xls") || pathname.getName().endsWith(".xlsx");
+            }
+        });
     }
 
     @After

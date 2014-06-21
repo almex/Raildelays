@@ -1,7 +1,10 @@
 package be.raildelays.batch.writer;
 
 import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.batch.support.FileSystemResourceDecorator;
+import be.raildelays.batch.poi.ExcelItemSearch;
+import be.raildelays.batch.reader.BatchExcelRowMapper;
+import be.raildelays.batch.reader.ExcelSheetItemReader;
+import be.raildelays.batch.support.ExcelFileSystemResourceDecorator;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
@@ -49,11 +52,27 @@ public class ExcelSheetExcelRowWriterTest {
         }
 
         StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution();
+        ExcelItemSearch<BatchExcelRow> itemSearch = new ExcelItemSearch<>();
+        ExcelSheetItemReader<BatchExcelRow> reader = new ExcelSheetItemReader<>();
+        ExcelFileSystemResourceDecorator<BatchExcelRow> resource = new ExcelFileSystemResourceDecorator<>(CURRENT_PATH);
         executionContext = stepExecution.getExecutionContext();
         writer = new ExcelSheetExcelRowWriter();
 
+
+        reader.setName("test");
+        reader.setSheetIndex(0);
+        reader.setRowsToSkip(21);
+        reader.setMaxItemCount(40);
+        reader.setRowMapper(new BatchExcelRowMapper());
+        reader.setResource(resource);
+        reader.afterPropertiesSet();
+
+        itemSearch.setReader(reader);
+
+        resource.setItemSearch(itemSearch);
+
         writer.setTemplate(new ClassPathResource("template.xls"));
-        writer.setResourceDecorator(new FileSystemResourceDecorator(CURRENT_PATH));
+        writer.setResourceDecorator(resource);
         writer.setRowsToSkip(21);
         writer.setMaxItemCount(40);
         writer.afterPropertiesSet();

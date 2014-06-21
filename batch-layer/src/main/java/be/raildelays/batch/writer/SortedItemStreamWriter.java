@@ -43,13 +43,15 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
 
     protected Resource resource;
 
-    private Resource tempResource;
+    private Resource outputResource;
 
     private ExecutionContext executionContext;
 
     protected Comparator<? super T> comparator;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SortedItemStreamWriter.class);
+
+    private boolean createBackupFile = false;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -100,18 +102,18 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
         allItems.addAll(content);
 
         for (T item : items) {
-            if (item instanceof ItemIndexAware) {
-                Long index = ((ItemIndexAware) item).getIndex();
+            Long index = null;
 
-                if (index != null) {
-                    /**
-                     * We know here that expect to replace a item and we must do it before sorting.
-                     */
-                    allItems.remove(index.intValue());
-                    allItems.add(index.intValue(), item);
-                } else {
-                    allItems.add(item);
-                }
+            if (item instanceof ItemIndexAware) {
+                index = ((ItemIndexAware) item).getIndex();
+            }
+
+            if (index != null) {
+                /**
+                 * We know here that expect to replace a item and we must do it before sorting.
+                 */
+                allItems.remove(index.intValue());
+                allItems.add(index.intValue(), item);
             } else {
                 allItems.add(item);
             }
@@ -150,10 +152,14 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
     }
 
     private void initializeStreams() throws Exception {
-        tempResource = resource.createRelative(resource.getFilename() + ".tmp");
+        if (createBackupFile) {
+            outputResource = resource.createRelative(resource.getFilename() + ".tmp");
+        } else {
+            outputResource = resource;
+        }
 
         reader.setResource(resource);
-        writer.setResource(tempResource);
+        writer.setResource(outputResource);
     }
 
     private void writeAll(List<? extends T> items) throws Exception {
@@ -166,27 +172,24 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
     }
 
     private void commit() throws Exception {
-        File tempFile = tempResource.getFile();
-        File outputFile = resource.getFile();
-        File directory = outputFile.getParentFile();
-        File backupFile = new File(directory, resource.getFilename() + ".bak");
+        if (createBackupFile) {
+            File tempFile = outputResource.getFile();
+            File outputFile = resource.getFile();
+            File directory = outputFile.getParentFile();
+            File backupFile = new File(directory, resource.getFilename() + ".bak");
 
-        if (outputFile.renameTo(backupFile)) {
-            if (tempFile.renameTo(outputFile)) {
-                if (!backupFile.delete()) {
-                    backupFile.renameTo(outputFile);
-                    LOGGER.error("Commit failure: we were not able to delete the original file");
-                }
-            } else {
-                LOGGER.error("Commit failure: we were not able to rename the temporary file");
+            if (!outputFile.renameTo(backupFile)
+                || !tempFile.renameTo(outputFile)
+                || !backupFile.delete()
+                ) {
+                backupFile.renameTo(outputFile);
+                LOGGER.error("Commit failure: we were not able to delete the original file");
             }
-        } else {
-            LOGGER.error("Commit failure: we were not able to rename the original file");
         }
     }
 
     private void rollback(Exception e) throws Exception {
-        if (!tempResource.getFile().delete()) {
+        if (createBackupFile && !outputResource.getFile().delete()) {
             throw new IllegalStateException("Rollback failure: we were not able to delete the temporary file", e);
         } else {
             throw e;

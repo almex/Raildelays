@@ -119,8 +119,7 @@ public class SearchNextTrainProcessor implements
                 continue;
             }
 			
-			// FIXME We must go recursively into getNext() to search any other 
-			// cancellation.
+			// FIXME We must go recursively into getNext() to search any other cancellation.
             if (candidateDeparture.isCanceled() || candidateArrival.isCanceled()) {
                 LOGGER.trace("Filtering canceling: candidateDeparture={} candidateArrival={}", candidateDeparture, candidateArrival);
                 continue;

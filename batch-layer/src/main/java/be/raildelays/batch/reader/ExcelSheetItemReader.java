@@ -38,7 +38,7 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Assert.notNull(rowMapper, "LineMapper is required");
+        Assert.notNull(rowMapper, "rowMapper is required");
     }
 
     @Override

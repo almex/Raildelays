@@ -2,14 +2,10 @@ package be.raildelays.batch.writer;
 
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.poi.Format;
-import be.raildelays.batch.poi.WorkbookSearch;
-import be.raildelays.batch.reader.BatchExcelRowMapper;
-import be.raildelays.batch.reader.ExcelSheetItemReader;
-import be.raildelays.batch.support.FileSystemResourceDecorator;
-import be.raildelays.batch.support.WritableResourceDecorator;
+import be.raildelays.batch.support.ExcelFileSystemResourceDecorator;
+import be.raildelays.batch.support.ExcelFileResource;
 import be.raildelays.batch.support.ResourceAwareItemStream;
 import be.raildelays.domain.xls.ExcelRow;
-import groovy.lang.IllegalPropertyAccessException;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.poi.POIXMLDocument;
@@ -21,9 +17,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.util.ClassUtils;
 
 import java.io.*;
 import java.util.List;
@@ -33,7 +27,7 @@ import java.util.List;
  */
 public class ExcelSheetExcelRowWriter implements ResourceAwareItemWriterItemStream<BatchExcelRow>, ResourceAwareItemStream, InitializingBean {
 
-    protected WritableResourceDecorator resourceDecorator;
+    protected ExcelFileResource<BatchExcelRow> resourceDecorator;
 
     private ExecutionContext executionContext;
 
@@ -71,13 +65,17 @@ public class ExcelSheetExcelRowWriter implements ResourceAwareItemWriterItemStre
         if (!items.isEmpty()) {
             BatchExcelRow firstItem = items.get(0);
 
-            if (resourceDecorator.getFile() == null) {
-                File file = getExistingWorkbooks(firstItem);
-                if (file != null) {
-                    delegate.setResource(resourceDecorator.createRelative(file.getName()));
-                } else {
-                    delegate.setResource(resourceDecorator.createRelative(getFileName(firstItem)));
-                }
+            // By comparing on new WorkbookSearch(null) fileExtension we are retrieving the first workbook containing the first free row.
+            File file = resourceDecorator.getFile(firstItem);
+            if (file == null ) {
+                file = resourceDecorator.getFile();
+            }
+
+            if (file != null) {
+                delegate.setCurrentItemIndex(resourceDecorator.getContentRowIndex());
+                delegate.setResource(resourceDecorator);
+            } else {
+                delegate.setResource(resourceDecorator.createRelative(getFileName(firstItem)));
             }
 
             delegate.open(executionContext);
@@ -106,61 +104,6 @@ public class ExcelSheetExcelRowWriter implements ResourceAwareItemWriterItemStre
 
     @Override
     public void close() throws ItemStreamException {
-        resourceDecorator = new FileSystemResourceDecorator(resourceDecorator.getOutputDirectory());
-    }
-
-    private File getExistingWorkbooks(BatchExcelRow firstItem) throws Exception {
-        File result = null;
-
-        Validate.notNull(firstItem, "You must provide the first ExcelRow of this Excel sheet prior to check " +
-                "if a file already exists.");
-
-        // By comparing on new WorkbookSearch(null) fileExtension we are retrieving the first workbook containing the first free row.
-        result = retrieveFirstRowContaining(firstItem);
-        if (result == null ) {
-            result = retrieveFirstRowContaining(null);
-        }
-
-        return result;
-    }
-
-    private File retrieveFirstRowContaining(BatchExcelRow content) throws Exception {
-        File result = null;
-        File directory = resourceDecorator.getOutputDirectory().getFile();
-
-        Validate.isTrue(directory.isDirectory(), "The outputDirectory '" + resourceDecorator + "' parameter must be a directory path and nothing else.");
-
-        for (File file : directory.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return pathname.getName().endsWith(Format.OLE2.getFileExtension()) || pathname.getName().endsWith(Format.OOXML.getFileExtension());
-            }
-        })) {
-            try {
-                ExcelSheetItemReader<BatchExcelRow> reader = new ExcelSheetItemReader<>();
-                WorkbookSearch<BatchExcelRow> container = new WorkbookSearch<>(executionContext);
-                reader.setResource(new FileSystemResource(file));
-                reader.setName(file.getName());
-                reader.setRowMapper(new BatchExcelRowMapper());
-                reader.setRowsToSkip(rowsToSkip);
-                reader.setSaveState(false);
-                container.setReader(reader);
-                container.afterPropertiesSet();
-
-                int currentRowIndex = container.indexOf(content);
-                if (currentRowIndex != -1) {
-                    result = file;
-                    delegate.setCurrentItemIndex(currentRowIndex);
-                    break;
-                }
-            } catch (InvalidFormatException e) {
-                LOGGER.error("Excel format not supported for this workbook!", e);
-            } catch (IOException e) {
-                LOGGER.error("Error when opening an Excel workbook", e);
-            }
-        }
-
-        return result;
     }
 
     private String getFileName(ExcelRow firstItem) throws InvalidFormatException, IOException {
@@ -192,7 +135,7 @@ public class ExcelSheetExcelRowWriter implements ResourceAwareItemWriterItemStre
         }
     }
 
-    public void setResourceDecorator(WritableResourceDecorator resourceDecorator) {
+    public void setResourceDecorator(ExcelFileSystemResourceDecorator<BatchExcelRow> resourceDecorator) {
         this.resourceDecorator = resourceDecorator;
     }
 
