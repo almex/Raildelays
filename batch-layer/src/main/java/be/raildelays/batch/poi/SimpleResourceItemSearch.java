@@ -1,20 +1,18 @@
 package be.raildelays.batch.poi;
 
-import be.raildelays.batch.reader.ExcelSheetItemReader;
-import be.raildelays.batch.support.ItemSearch;
+import be.raildelays.batch.support.IndexedResourceAwareItemStreamReader;
+import be.raildelays.batch.support.ResourceItemSearch;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 
 /**
  * @author Almex
  */
-public class ExcelItemSearch<T extends Comparable<? super T>> implements ItemSearch<T> {
+public class SimpleResourceItemSearch<T extends Comparable<? super T>> implements ResourceItemSearch<T> {
 
-    private ResourceAwareItemReaderItemStream<? extends T> reader;
+    private IndexedResourceAwareItemStreamReader<? extends T> reader;
 
-    public ExcelItemSearch() {
+    public SimpleResourceItemSearch() {
     }
 
     public int indexOf(T item, Resource resource) throws Exception {
@@ -27,9 +25,7 @@ public class ExcelItemSearch<T extends Comparable<? super T>> implements ItemSea
 
             for (T object = reader.read() ; object != null ; object = reader.read() ) {
                 if (item == null ? object == null : item.compareTo(object) == 0) {
-                    if (reader instanceof ExcelSheetItemReader) {
-                        result =  ((ExcelSheetItemReader) reader).getRowIndex();
-                    }
+                    result =  reader.getCurrentIndex();
                     break;
                 }
             }
@@ -41,7 +37,7 @@ public class ExcelItemSearch<T extends Comparable<? super T>> implements ItemSea
         return result;
     }
 
-    public void setReader(ExcelSheetItemReader<T> reader) {
+    public void setReader(IndexedResourceAwareItemStreamReader<T> reader) {
         this.reader = reader;
     }
 }

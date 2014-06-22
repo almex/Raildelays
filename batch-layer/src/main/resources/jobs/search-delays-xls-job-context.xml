@@ -130,14 +130,14 @@
 
     <bean id="excelFileOutput" class="be.raildelays.batch.support.ExcelFileSystemResourceDecorator" >
         <constructor-arg  name="outputDirectory" ref="outputDirectory" />
-        <property name="itemSearch" ref="itemSearch" />
+        <property name="resourceItemSearch" ref="resourceItemSearch" />
     </bean>
 
     <bean id="outputDirectory" class="org.springframework.core.io.FileSystemResource">
         <constructor-arg index="0" value="./" />
     </bean>
 
-    <bean id="itemSearch" class="be.raildelays.batch.poi.ExcelItemSearch">
+    <bean id="resourceItemSearch" class="be.raildelays.batch.poi.SimpleResourceItemSearch">
         <property name="reader" ref="excelSheetItemReader" />
     </bean>
 

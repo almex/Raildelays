@@ -1,7 +1,7 @@
 package be.raildelays.batch.writer;
 
 import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.batch.poi.ExcelItemSearch;
+import be.raildelays.batch.poi.SimpleResourceItemSearch;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
 import be.raildelays.batch.reader.ExcelSheetItemReader;
 import be.raildelays.batch.support.ExcelFileSystemResourceDecorator;
@@ -55,7 +55,7 @@ public class SortedItemStreamWriterTest2 {
         DateFormat timeFormat = new SimpleDateFormat("HH:mm");
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         ExcelFileSystemResourceDecorator resource = new ExcelFileSystemResourceDecorator<BatchExcelRow>(BASE_DIRECTORY);
-        ExcelItemSearch<BatchExcelRow> container = new ExcelItemSearch<>();
+        SimpleResourceItemSearch<BatchExcelRow> container = new SimpleResourceItemSearch<>();
 
         copyFile();
 
@@ -75,7 +75,7 @@ public class SortedItemStreamWriterTest2 {
         reader.afterPropertiesSet();
 
         container.setReader(reader);
-        resource.setItemSearch(container);
+        resource.setResourceItemSearch(container);
 
         sortedItemStreamWriter = new SortedItemStreamWriter<>();
         executionContext = MetaDataInstanceFactory.createStepExecution().getExecutionContext();

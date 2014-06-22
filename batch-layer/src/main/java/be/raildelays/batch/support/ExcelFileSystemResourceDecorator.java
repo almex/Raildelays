@@ -19,7 +19,7 @@ public class ExcelFileSystemResourceDecorator<T extends Comparable<? super T>> e
 
     private int currentRowIndex = 0;
 
-    private ItemSearch<T> itemSearch;
+    private ResourceItemSearch<T> resourceItemSearch;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExcelFileSystemResourceDecorator.class);
 
@@ -35,7 +35,7 @@ public class ExcelFileSystemResourceDecorator<T extends Comparable<? super T>> e
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Validate.notNull(itemSearch,
+        Validate.notNull(resourceItemSearch,
                 "You must provide a itemSearch before using this bean");
     }
 
@@ -69,7 +69,7 @@ public class ExcelFileSystemResourceDecorator<T extends Comparable<? super T>> e
                 })) {
                     try {
 
-                        int currentRowIndex = itemSearch.indexOf(content, new FileSystemResource(file));
+                        int currentRowIndex = resourceItemSearch.indexOf(content, new FileSystemResource(file));
 
                         if (currentRowIndex != -1) {
                             this.file = file;
@@ -95,7 +95,7 @@ public class ExcelFileSystemResourceDecorator<T extends Comparable<? super T>> e
         return currentRowIndex;
     }
 
-    public void setItemSearch(ItemSearch<T> itemSearch) {
-        this.itemSearch = itemSearch;
+    public void setResourceItemSearch(ResourceItemSearch<T> resourceItemSearch) {
+        this.resourceItemSearch = resourceItemSearch;
     }
 }

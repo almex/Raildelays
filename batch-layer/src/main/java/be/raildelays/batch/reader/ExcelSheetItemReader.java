@@ -2,13 +2,13 @@ package be.raildelays.batch.reader;
 
 import be.raildelays.batch.exception.ExcelRowMappingException;
 import be.raildelays.batch.poi.RowMapper;
+import be.raildelays.batch.support.IndexedResourceAwareItemStreamReader;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ReaderNotOpenException;
-import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
@@ -20,7 +20,7 @@ import java.io.InputStream;
 /**
  * @author Almex
  */
-public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements ResourceAwareItemReaderItemStream<T>, InitializingBean {
+public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements IndexedResourceAwareItemStreamReader<T>, InitializingBean {
 
     private RowMapper<T> rowMapper;
 
@@ -50,10 +50,10 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
 
             if (row != null) {
                 try {
-                    result = rowMapper.mapRow(row, getRowIndex());
+                    result = rowMapper.mapRow(row, getCurrentIndex());
                 } catch (Exception ex) {
-                    throw new ExcelRowMappingException("Parsing error at line: " + getRowIndex() + " in resource=["
-                            + resource.getDescription() + "], input=[" + row + "]", ex, row, getRowIndex());
+                    throw new ExcelRowMappingException("Parsing error at line: " + getCurrentIndex() + " in resource=["
+                            + resource.getDescription() + "], input=[" + row + "]", ex, row, getCurrentIndex());
                 }
             }
         }
@@ -71,7 +71,7 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
             throw new ReaderNotOpenException("Reader must be open before it can be read.");
         }
 
-        result =  workbook.getSheetAt(sheetIndex).getRow(getRowIndex());
+        result =  workbook.getSheetAt(sheetIndex).getRow(getCurrentIndex());
         if (result == null) {
             noInput = true;
         }
@@ -121,7 +121,8 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
     protected void doClose() throws Exception {
     }
 
-    public int getRowIndex() {
+    @Override
+    public int getCurrentIndex() {
         return getCurrentItemCount() + rowsToSkip - 1;
     }
 

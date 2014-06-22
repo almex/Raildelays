@@ -1,7 +1,7 @@
 package be.raildelays.batch.writer;
 
 import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.batch.poi.ExcelItemSearch;
+import be.raildelays.batch.poi.SimpleResourceItemSearch;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
 import be.raildelays.batch.reader.ExcelSheetItemReader;
 import be.raildelays.batch.support.ExcelFileSystemResourceDecorator;
@@ -52,7 +52,7 @@ public class ExcelSheetExcelRowWriterTest {
         }
 
         StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution();
-        ExcelItemSearch<BatchExcelRow> itemSearch = new ExcelItemSearch<>();
+        SimpleResourceItemSearch<BatchExcelRow> itemSearch = new SimpleResourceItemSearch<>();
         ExcelSheetItemReader<BatchExcelRow> reader = new ExcelSheetItemReader<>();
         ExcelFileSystemResourceDecorator<BatchExcelRow> resource = new ExcelFileSystemResourceDecorator<>(CURRENT_PATH);
         executionContext = stepExecution.getExecutionContext();
@@ -69,7 +69,7 @@ public class ExcelSheetExcelRowWriterTest {
 
         itemSearch.setReader(reader);
 
-        resource.setItemSearch(itemSearch);
+        resource.setResourceItemSearch(itemSearch);
 
         writer.setTemplate(new ClassPathResource("template.xls"));
         writer.setResourceDecorator(resource);
