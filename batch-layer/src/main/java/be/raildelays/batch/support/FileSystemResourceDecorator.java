@@ -119,4 +119,8 @@ public class FileSystemResourceDecorator implements WritableResourceDecorator, I
     public Resource getOutputDirectory() {
         return this.outputDirectory;
     }
+
+    public WritableResource getDelegate() {
+        return delegate;
+    }
 }
