@@ -89,93 +89,20 @@ public class ExcelFileSystemResourceDecorator<T extends Comparable<? super T>> e
     }
 
     @Override
+    public boolean exists() {
+        try {
+            getFile(); // We try to retrieve a file dynamically before saying it does not exist.
+
+            return super.exists();
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    @Override
     public int getContentRowIndex() {
         return currentRowIndex;
     }
-
-//    @Override
-//    public boolean isWritable() {
-//        try {
-//            return getFile() != null ? super.isWritable() : false;
-//        } catch (IOException e) {
-//            return false;
-//        }
-//    }
-//
-//    @Override
-//    public OutputStream getOutputStream() throws IOException {
-//        return getFile() != null ? super.getOutputStream() : null;
-//    }
-//
-//    @Override
-//    public String getDescription() {
-//        try {
-//            return getFile() != null ? super.getDescription() : null;
-//        } catch (IOException e) {
-//            return null;
-//        }
-//    }
-//
-//    @Override
-//    public InputStream getInputStream() throws IOException {
-//        return getFile() != null ? super.getInputStream() : null;
-//    }
-//
-//    @Override
-//    public boolean exists() {
-//        try {
-//            return getFile() != null ? super.exists() : false;
-//        } catch (IOException e) {
-//            return false;
-//        }
-//    }
-//
-//    @Override
-//    public boolean isReadable() {
-//        try {
-//            return getFile() != null ? super.isReadable() : false;
-//        } catch (IOException e) {
-//            return false;
-//        }
-//    }
-//
-//    @Override
-//    public boolean isOpen() {
-//        try {
-//            return getFile() != null ? super.isOpen() : false;
-//        } catch (IOException e) {
-//            return false;
-//        }
-//    }
-//
-//    @Override
-//    public URL getURL() throws IOException {
-//        return getFile() != null ? super.getURL() : null;
-//    }
-//
-//    @Override
-//    public URI getURI() throws IOException {
-//        return getFile() != null ? super.getURI() : null;
-//    }
-//
-//    @Override
-//    public long contentLength() throws IOException {
-//        return getFile() != null ? super.contentLength() : -1;
-//    }
-//
-//    @Override
-//    public long lastModified() throws IOException {
-//        return getFile() != null ? super.lastModified() : -1;
-//    }
-//
-//    @Override
-//    public String getFilename() {
-//        try {
-//            return getFile() != null ? super.getFilename() : "";
-//        } catch (IOException e) {
-//            return "";
-//        }
-//    }
 
     public void setResourceItemSearch(ResourceItemSearch<T> resourceItemSearch) {
         this.resourceItemSearch = resourceItemSearch;
