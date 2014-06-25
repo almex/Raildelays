@@ -135,7 +135,7 @@ public class ExcelSheetExcelRowWriter implements ResourceAwareItemWriterItemStre
         }
     }
 
-    public void setResourceDecorator(ExcelFileSystemResourceDecorator<BatchExcelRow> resourceDecorator) {
+    public void setResourceDecorator(ExcelFileResource<BatchExcelRow> resourceDecorator) {
         this.resourceDecorator = resourceDecorator;
     }
 
