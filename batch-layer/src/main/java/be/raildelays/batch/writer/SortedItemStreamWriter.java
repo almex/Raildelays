@@ -14,10 +14,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Write items into a certain order using a {@link Comparator}.</br>
@@ -96,10 +93,10 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
         indexItems(allItems);
     }
 
-    private List<T> replaceItems(List<T> content, List<? extends T> items) {
+    private List<T> replaceItems(Map<Long, T> content, List<? extends T> items) {
         List<T> allItems = new ArrayList<>();
 
-        allItems.addAll(content);
+        allItems.addAll(content.values());
 
         for (T item : items) {
             Long index = null;
@@ -112,11 +109,12 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
                 /**
                  * We know here that expect to replace a item and we must do it before sorting.
                  */
-                allItems.remove(index.intValue());
-                allItems.add(index.intValue(), item);
-            } else {
-                allItems.add(item);
+                if (content.containsKey(index)) {
+                    allItems.remove(content.get(index));
+                }
             }
+
+            allItems.add(item);
         }
 
         return allItems;
@@ -135,14 +133,25 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
         }
     }
 
-    private List<T> readContent() throws Exception {
-        List<T> result = new ArrayList<>();
+    private Map<Long, T> readContent() throws Exception {
+        Map<Long, T> result = new HashMap<>();
 
         try {
             reader.open(executionContext);
 
-            for (T item = reader.read(); item != null; item = reader.read()) {
-                result.add(item);
+            int i = 0;
+            for (T item = reader.read() ; item != null; item = reader.read()) {
+                Long index = null;
+
+                if (item instanceof ItemIndexAware) {
+                    index = ((ItemIndexAware) item).getIndex();
+                }
+
+                if (index == null) {
+                    index = new Long(i++);
+                }
+
+                result.put(index, item);
             }
         } finally {
             reader.close();
