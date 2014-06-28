@@ -66,9 +66,15 @@ public class ExcelSheetExcelRowWriter implements ResourceAwareItemWriterItemStre
             BatchExcelRow firstItem = items.get(0);
 
             // By comparing on new WorkbookSearch(null) fileExtension we are retrieving the first workbook containing the first free row.
-            File file = resourceDecorator.getFile(firstItem);
-            if (file == null ) {
-                file = resourceDecorator.getFile();
+            File file = null;
+            try {
+                file = resourceDecorator.getFile(firstItem);
+            } catch (FileNotFoundException e) {
+                try {
+                    file = resourceDecorator.getFile();
+                } catch (FileNotFoundException e2) {
+                    file = null;
+                }
             }
 
             if (file != null) {
@@ -135,7 +141,7 @@ public class ExcelSheetExcelRowWriter implements ResourceAwareItemWriterItemStre
         }
     }
 
-    public void setResourceDecorator(ExcelFileSystemResourceDecorator<BatchExcelRow> resourceDecorator) {
+    public void setResourceDecorator(ExcelFileResource<BatchExcelRow> resourceDecorator) {
         this.resourceDecorator = resourceDecorator;
     }
 

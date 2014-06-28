@@ -143,6 +143,7 @@ public class ExcelRowMapperProcessor implements
 					.effectiveArrivalTime(effectiveArrivalTime) //
 					.effectiveTrain1(lineStopTo.getTrain()) //
 					.delay(lineStopTo.getArrivalTime().getDelay()) //
+                    .canceled(lineStopTo.isCanceled() || lineStopFrom.isCanceled())
 					.build();
 
 			break;
@@ -159,6 +160,7 @@ public class ExcelRowMapperProcessor implements
 					.effectiveArrivalTime(effectiveArrivalTime) //
 					.effectiveTrain1(lineStopTo.getTrain()) //
 					.delay(lineStopTo.getArrivalTime().getDelay()) //
+                    .canceled(lineStopTo.isCanceled() || lineStopFrom.isCanceled())
 					.build();
 
 			break;
