@@ -23,6 +23,9 @@ public class FileSystemResourceDecorator implements WritableResourceDecorator, I
 
     private Resource outputDirectory;
 
+    public FileSystemResourceDecorator() {
+    }
+
     public FileSystemResourceDecorator(String outputDirectory) {
         this.outputDirectory = new FileSystemResource(outputDirectory);
     }

@@ -23,6 +23,10 @@ public class ExcelFileSystemResourceDecorator<T extends Comparable<? super T>> e
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExcelFileSystemResourceDecorator.class);
 
+    public ExcelFileSystemResourceDecorator() {
+        super();
+    }
+
     public ExcelFileSystemResourceDecorator(Resource outputDirectory) {
         super(outputDirectory);
     }
@@ -37,6 +41,7 @@ public class ExcelFileSystemResourceDecorator<T extends Comparable<? super T>> e
     public void afterPropertiesSet() throws Exception {
         Validate.notNull(resourceItemSearch,
                 "You must provide a itemSearch before using this bean");
+        super.afterPropertiesSet();
     }
 
     @Override

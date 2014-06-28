@@ -89,7 +89,7 @@ public class SearchNextTrainProcessor implements
 				.arrivalStation(item.getArrivalStation())
 				.departureStation(item.getDepartureStation())
 				.expectedTrain1(item.getExpectedTrain1())
-				.expectedTrain2(item.getEffectiveTrain2())
+				.expectedTrain2(item.getExpectedTrain2())
 				.effectiveTrain1(arrivalStop.getTrain())
 				.expectedDepartureTime(item.getExpectedDepartureTime())
 				.expectedArrivalTime(item.getExpectedArrivalTime())
