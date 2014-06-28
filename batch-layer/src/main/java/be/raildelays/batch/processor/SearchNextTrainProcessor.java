@@ -67,34 +67,38 @@ public class SearchNextTrainProcessor implements
 		LineStop fastestTrain = searchFastestTrain(item, candidates);
 
 		if (fastestTrain != null) {
-			result = map(item, searchDepartureLineStop(fastestTrain, item.getDepartureStation()), fastestTrain);
+			//result = aggregate(item, searchDepartureLineStop(fastestTrain, item.getDepartureStation()), fastestTrain);
+            ExcelRowMapperProcessor processor = new ExcelRowMapperProcessor();
+
+            processor.setStationA(item.getDepartureStation().getEnglishName());
+            processor.setStationB(item.getArrivalStation().getEnglishName());
+
+            BatchExcelRow fasterItem = processor.process(fastestTrain);
+
+            result = aggregate(item, fasterItem);
+
 			LOGGER.info("Found faster train={}", result);
 		}
 
 		return result;
 	}
 
-	private BatchExcelRow map(final BatchExcelRow item, LineStop departureStop, LineStop arrivalStop) {	
-		LocalDate date = new LocalDate(item.getDate());
-		DateTime effectiveArrivalTime = date.toDateTime(new LocalTime(arrivalStop
-				.getArrivalTime().getExpected()).plusMinutes(arrivalStop
-				.getArrivalTime().getDelay().intValue()));		
-		DateTime effectiveDepartureTime = date.toDateTime(new LocalTime(departureStop
-				.getDepartureTime().getExpected()).plusMinutes(departureStop
-				.getDepartureTime().getDelay().intValue()));
-		Duration delay = new Duration(date.toDateTime(new LocalTime(item.getExpectedArrivalTime())), effectiveArrivalTime);
+	private BatchExcelRow aggregate(final BatchExcelRow item, final BatchExcelRow fasterItem) {
+		DateTime expectedArrivalTime = new DateTime(item.getExpectedArrivalTime());
+		DateTime effectiveArrivalTime = new DateTime(fasterItem.getEffectiveArrivalTime());
+		Duration delay = new Duration(expectedArrivalTime, effectiveArrivalTime);
 		
-		return new BatchExcelRow.Builder(arrivalStop.getDate(),
-				item.getSens())
+		return new BatchExcelRow.Builder(item.getDate(), item.getSens())
 				.arrivalStation(item.getArrivalStation())
 				.departureStation(item.getDepartureStation())
 				.expectedTrain1(item.getExpectedTrain1())
-				.expectedTrain2(item.getEffectiveTrain2())
-				.effectiveTrain1(arrivalStop.getTrain())
+				.expectedTrain2(item.getExpectedTrain2())
+				.effectiveTrain1(fasterItem.getEffectiveTrain1())
+                		.effectiveTrain2(fasterItem.getEffectiveTrain2())
 				.expectedDepartureTime(item.getExpectedDepartureTime())
 				.expectedArrivalTime(item.getExpectedArrivalTime())
-				.effectiveArrivalTime(effectiveArrivalTime.toDate())
-				.effectiveDepartureTime(effectiveDepartureTime.toDate())
+                		.effectiveDepartureTime(fasterItem.getExpectedDepartureTime())
+				.effectiveArrivalTime(fasterItem.getEffectiveArrivalTime())
 				.delay(delay.getMillis() / 1000 / 60)
 				.build();
 	}
@@ -146,8 +150,8 @@ public class SearchNextTrainProcessor implements
 
 		return fastestTrain;
 	}
-	
-	private LineStop searchDepartureLineStop(LineStop lineStop, Station departureStation) {		
+
+	private LineStop searchDepartureLineStop(LineStop lineStop, Station departureStation) {
 		LineStop result = null;
 
 		if (lineStop != null) {
@@ -157,7 +161,7 @@ public class SearchNextTrainProcessor implements
 				result = searchDepartureLineStop(lineStop.getPrevious(), departureStation);
 			}
 		}
-		
+
 		return result;
 	}
 
