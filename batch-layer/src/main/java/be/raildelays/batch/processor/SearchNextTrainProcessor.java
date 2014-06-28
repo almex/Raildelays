@@ -97,7 +97,7 @@ public class SearchNextTrainProcessor implements
                 		.effectiveTrain2(fasterItem.getEffectiveTrain2())
 				.expectedDepartureTime(item.getExpectedDepartureTime())
 				.expectedArrivalTime(item.getExpectedArrivalTime())
-                		.effectiveDepartureTime(fasterItem.getExpectedDepartureTime())
+                		.effectiveDepartureTime(fasterItem.getEffectiveDepartureTime())
 				.effectiveArrivalTime(fasterItem.getEffectiveArrivalTime())
 				.delay(delay.getMillis() / 1000 / 60)
 				.build();
