@@ -4,46 +4,125 @@
 		<Console name="console" target="SYSTEM_OUT">
 			<PatternLayout pattern="%m%n" />
 		</Console>
-        <File name="railtime-data-reader" fileName="logs/railtime-data.log" append="true">
-        <PatternLayout pattern="[Reader]: %m%n" />
-		</File>
-        <File name="railtime-data-parser" fileName="logs/railtime-data.log" append="true">
-        <PatternLayout pattern="[Parser]: %m%n" />
-        </File>
-        <File name="railtime-data-streamer" fileName="logs/railtime-data.log" append="true">
-        <PatternLayout pattern="[Streamer]: %m%n" />
-        </File>
-        <File name="railtime-data" fileName="logs/railtime-data.log" append="true">
-        <PatternLayout pattern="[Data]: %m%n" />
-        </File>
-        <File name="output" fileName="logs/output.log" append="true">
-        <PatternLayout pattern="%d{DATE} %m%n" />
-        </File>
-        <File name="springbatch" fileName="logs/springbatch.log" append="true">
-        <PatternLayout pattern="%d{DATE} %-5p: %m%n" />
-        </File>
-        <File name="railtime-route-processor" fileName="logs/railtime-processor.log" append="true">
-        <PatternLayout pattern="[Route]: %m%n" />
-        </File>
-        <File name="raildelays-xls-processor" fileName="logs/railtime-processor.log" append="true">
-        <PatternLayout pattern="[Xls]: %m%n" />
-        </File>
-        <File name="raildelays-next-processor" fileName="logs/railtime-processor.log" append="true">
-        <PatternLayout pattern="[Next]: %m%n" />
-        </File>
-        <File name="raildelays-aggregate-processor" fileName="logs/railtime-processor.log" append="true">
-        <PatternLayout pattern="[Aggregate]: %m%n" />
-        </File>
-        <File name="raildelays-filter-processor" fileName="logs/railtime-processor.log" append="true">
-        <PatternLayout pattern="[Filter]: %m%n" />
-        </File>
-        <File name="jdbc" fileName="logs/jdbc.log" append="true">
-        <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %level - %m%n%ex%n"/>
-        </File>
-        <File name="skipped-items" fileName="logs/skipped-items.log" append="true">
-        <PatternLayout pattern="%d{DATE} %-5p: %m%n" />
-        </File>
+        <RollingFile name="railtime-data-reader" fileName="logs/railtime-data.log"
+                filePattern="logs/$${date:yyyy-MM}/railtime-data-%d{MM-dd-yyyy}-%i.log.gz" append="true">
+            <PatternLayout pattern="[Reader]: %m%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10 MB"/> 
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+		</RollingFile>
+        <RollingFile name="railtime-data-parser" fileName="logs/railtime-data.log"
+                filePattern="logs/$${date:yyyy-MM}/railtime-data-%d{MM-dd-yyyy}-%i.log.gz" append="true">
+            <PatternLayout pattern="[Parser]: %m%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10 MB"/> 
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+        <RollingFile name="railtime-data-streamer" fileName="logs/railtime-data.log"
+                filePattern="logs/$${date:yyyy-MM}/railtime-data-%d{MM-dd-yyyy}-%i.log.gz" append="true">
+            <PatternLayout pattern="[Streamer]: %m%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10 MB"/> 
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+        <RollingFile name="railtime-data" fileName="logs/railtime-data.log"
+                filePattern="logs/$${date:yyyy-MM}/railtime-data-%d{MM-dd-yyyy}-%i.log.gz" append="true">
+            <PatternLayout pattern="[Data]: %m%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10 MB"/> 
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+        <RollingFile name="output" fileName="logs/output.log"
+                filePattern="logs/$${date:yyyy-MM}/output-%d{MM-dd-yyyy}-%i.log.gz" append="true">
+            <PatternLayout pattern="%d{DATE} %m%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10 MB"/> 
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+        <RollingFile name="springbatch" fileName="logs/springbatch.log"
+                filePattern="logs/$${date:yyyy-MM}/springbatch-%d{MM-dd-yyyy}-%i.log.gz" append="true">
+            <PatternLayout pattern="%d{DATE} %-5p: %m%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10 MB"/> 
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+        <RollingFile name="railtime-route-processor" fileName="logs/railtime-processor.log"
+                filePattern="logs/$${date:yyyy-MM}/railtime-processor-%d{MM-dd-yyyy}-%i.log.gz" append="true">
+            <PatternLayout pattern="[Route]: %m%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10 MB"/> 
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+        <RollingFile name="raildelays-xls-processor" fileName="logs/railtime-processor.log"
+                filePattern="logs/$${date:yyyy-MM}/railtime-processor-%d{MM-dd-yyyy}-%i.log.gz" append="true">
+            <PatternLayout pattern="[Xls]: %m%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10 MB"/> 
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+        <RollingFile name="raildelays-next-processor" fileName="logs/railtime-processor.log"
+                filePattern="logs/$${date:yyyy-MM}/railtime-processor-%d{MM-dd-yyyy}-%i.log.gz" append="true">
+            <PatternLayout pattern="[Next]: %m%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10 MB"/> 
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+        <RollingFile name="raildelays-aggregate-processor" fileName="logs/railtime-processor.log"
+                filePattern="logs/$${date:yyyy-MM}/railtime-processor-%d{MM-dd-yyyy}-%i.log.gz" append="true">
+            <PatternLayout pattern="[Aggregate]: %m%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10 MB"/> 
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+        <RollingFile name="raildelays-filter-processor" fileName="logs/railtime-processor.log"
+                filePattern="logs/$${date:yyyy-MM}/railtime-processor-%d{MM-dd-yyyy}-%i.log.gz" append="true">
+            <PatternLayout pattern="[Filter]: %m%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10 MB"/> 
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+        <RollingFile name="jdbc" fileName="logs/jdbc.log"
+                filePattern="logs/$${date:yyyy-MM}/jdbc-%d{MM-dd-yyyy}-%i.log.gz" append="true">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %level - %m%n%ex%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10 MB"/> 
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+        <RollingFile name="skipped-items" fileName="logs/skipped-items.log"
+                filePattern="logs/$${date:yyyy-MM}/skipped-items-%d{MM-dd-yyyy}-%i.log.gz" append="true">
+            <PatternLayout pattern="%d{DATE} %-5p: %m%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10 MB"/> 
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
 	</appenders>
+    
 	<loggers>
 	
 		<logger name="be.raildelays.batch.Bootstrap" level="info" additivity="false">

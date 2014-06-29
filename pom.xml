@@ -81,7 +81,7 @@
         <version.derby>10.10.1.1</version.derby>
         <version.servlet>3.1.0</version.servlet>
         <version.atomikos>3.9.2</version.atomikos>
-        <version.log4j>2.0-rc1</version.log4j>
+        <version.log4j>2.0-rc2</version.log4j>
         <version.slf4j>1.7.5</version.slf4j>
         <version.log4jdbc>1.16</version.log4jdbc>
         <version.groovy>2.3.0</version.groovy>

@@ -29,10 +29,6 @@ public class Bootstrap {
 
     private static final String LOGGER_CONFIG_PATH = "./conf/log4j2.xml";
 
-    static {
-        Log4j2ConfigurationFactory.getInstance().getConfiguration(null);
-    }
-
     /**
      * @param args
      * @throws Exception
