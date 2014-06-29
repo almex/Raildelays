@@ -98,7 +98,7 @@ public class SortedItemStreamWriterTest2 {
                 .effectiveTrain1(new Train("466")) //
                 .delay(15L) //
                 .build();
-        BatchExcelRow to = new BatchExcelRow.Builder(dateFormat.parse("21/05/2014"), Sens.ARRIVAL) //
+        BatchExcelRow to = new BatchExcelRow.Builder(dateFormat.parse("23/05/2014"), Sens.ARRIVAL) //
                 .departureStation(new Station("Bruxelles-central")) //
                 .arrivalStation(new Station("Liège-Guillemins")) //
                 .expectedDepartureTime(timeFormat.parse("14:00")) //
