@@ -5,12 +5,29 @@ import be.raildelays.batch.support.ResourceItemSearch;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.io.Resource;
 
+import java.util.Comparator;
+
 /**
  * @author Almex
  */
 public class SimpleResourceItemSearch<T extends Comparable<? super T>> implements ResourceItemSearch<T> {
 
     private IndexedResourceAwareItemStreamReader<? extends T> reader;
+
+    protected Comparator<? super T> comparator = new Comparator<T>() {
+        @Override
+        public int compare(T o1, T o2) {
+            int result = 0;
+
+            if (o1 != null) {
+                result = o1.compareTo(o2);
+            } else {
+                result = o2 != null ? 1 : 0;
+            }
+
+            return result;
+        }
+    };
 
     public SimpleResourceItemSearch() {
     }
@@ -22,13 +39,16 @@ public class SimpleResourceItemSearch<T extends Comparable<? super T>> implement
         reader.open(new ExecutionContext());
 
         try {
+            T object = null;
 
-            for (T object = reader.read() ; object != null ; object = reader.read() ) {
-                if (item == null ? object == null : item.compareTo(object) == 0) {
+            do {
+                object = reader.read();
+
+                if (item == null ? object == null : comparator.compare(item, object) == 0) {
                     result =  reader.getCurrentIndex();
                     break;
                 }
-            }
+            } while (object != null );
 
         } finally {
             reader.close();
@@ -39,5 +59,9 @@ public class SimpleResourceItemSearch<T extends Comparable<? super T>> implement
 
     public void setReader(IndexedResourceAwareItemStreamReader<T> reader) {
         this.reader = reader;
+    }
+
+    public void setComparator(Comparator<? super T> comparator) {
+        this.comparator = comparator;
     }
 }

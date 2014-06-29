@@ -32,8 +32,7 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow> {
         BatchExcelRow result = null;
 
 
-        if (row.getCell(2) != null && row.getCell(2).getDateCellValue() != null) {
-
+        if (getDate(row, 2) != null) {
             result = new BatchExcelRow.Builder(getDate(row, 2), null)
                     .departureStation(getStation(row, 12))
                     .arrivalStation(getStation(row, 18))
@@ -198,6 +197,7 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow> {
 
                 try {
                     switch (cell.getCellType()) {
+                        case Cell.CELL_TYPE_FORMULA:
                         case Cell.CELL_TYPE_NUMERIC:
                             result = (long) cell.getNumericCellValue();
                             break;
