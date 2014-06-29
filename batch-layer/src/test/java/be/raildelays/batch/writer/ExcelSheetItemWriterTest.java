@@ -116,7 +116,7 @@ public class ExcelSheetItemWriterTest {
         writer.close();
 
         Assert.assertEquals(1, getExcelFiles().length);
-        Assert.assertEquals(123904, getExcelFiles()[0].length());
+        Assert.assertEquals(124416, getExcelFiles()[0].length());
     }
 
     @Test
@@ -130,7 +130,7 @@ public class ExcelSheetItemWriterTest {
         writer.close();
 
         Assert.assertEquals(1, getExcelFiles().length);
-        Assert.assertEquals(123904, getExcelFiles()[0].length());
+        Assert.assertEquals(124416, getExcelFiles()[0].length());
     }
 
     @Test

@@ -41,9 +41,6 @@ public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
 
     @Override
     public BatchExcelRow aggregate(BatchExcelRow item, Workbook workbook, int sheetIndex, int rowIndex) throws Exception {
-        SimpleDateFormat hh = new SimpleDateFormat("HH");
-        SimpleDateFormat mm = new SimpleDateFormat("mm");
-        NumberFormat numberFormat = new DecimalFormat("#");
         final Row row = workbook.getSheetAt(sheetIndex).getRow(rowIndex);
         BatchExcelRow previousRow = null;
 
@@ -111,7 +108,7 @@ public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
                 cell.setCellType(Cell.CELL_TYPE_BLANK);
             }
         } else {
-            LOGGER.warn("Cannot aggregate rowIndex={} cellIndex={} this cell does not exists");
+            LOGGER.warn("Cannot aggregate rowIndex={} cellIndex={} this cell does not exists", row.getRowNum(), cellIndex);
         }
     }
 
@@ -217,7 +214,7 @@ public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
     }
 
     private static String getTrainName(Train train) {
-        String result = "";
+        String result = null;
 
         if (train != null) {
             result = train.getEnglishName();

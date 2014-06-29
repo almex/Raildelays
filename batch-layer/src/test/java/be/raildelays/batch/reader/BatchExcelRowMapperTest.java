@@ -84,14 +84,16 @@ public class BatchExcelRowMapperTest {
                 .expectedDepartureTime(timeFormat.parse("14:00")) //
                 .expectedArrivalTime(timeFormat.parse("15:00")) //
                 .expectedTrain1(new Train("529")) //
+                .expectedTrain2(new Train("516")) //
                 .effectiveDepartureTime(timeFormat.parse("14:05")) //
                 .effectiveArrivalTime(timeFormat.parse("15:15")) //
                 .effectiveTrain1(new Train("529")) //
+                .effectiveTrain2(new Train("516")) //
                 .delay(10L) //
                 .build();
 
 
-        ExcelRow previousRow = new BatchExcelRowAggregator().aggregate(expected, workbook, SHEET_INDEX, ROW_INDEX);
+        BatchExcelRow previousRow = new BatchExcelRowAggregator().aggregate(expected, workbook, SHEET_INDEX, ROW_INDEX);
         BatchExcelRow batchExcelRow = mapper.mapRow(workbook.getSheetAt(SHEET_INDEX).getRow(ROW_INDEX), ROW_INDEX);
 
         Assert.assertNotNull(previousRow);
