@@ -109,7 +109,7 @@ public class ExcelRow implements Comparable<ExcelRow> {
             // We give only a chronologic order based on expected time        
             result = new CompareToBuilder()
                     .append(this.getDate(), excelRow.getDate())
-                    .append(this.getExpectedDepartureTime(), exelRow.getExpectedDepartureTime())
+                    .append(this.getExpectedDepartureTime(), excelRow.getExpectedDepartureTime())
                     .append(this.getExpectedArrivalTime(), excelRow.getExpectedArrivalTime())
                     .toComparison();
         }
