@@ -75,12 +75,9 @@ public class Bootstrap {
 
             final String departure = configuration.getProperty("departure");
             final String arrival = configuration.getProperty("arrival");
-            final String excelInputTemplate = configuration
-                    .getProperty("excel.input.template");
-            final String textOutputPath = configuration
-                    .getProperty("text.output.path");
-            final String excelOutputPath = configuration
-                    .getProperty("excel.output.path");
+            final String excelInputTemplate = configuration.getProperty("excel.input.template");
+            final String textOutputPath = configuration.getProperty("text.output.path");
+            final String excelOutputPath = configuration.getProperty("excel.output.path");
 
             Assert.notNull(departure, "You must add a 'departure' property into the ./conf/raildelays.properties");
             Assert.notNull(arrival, "You must add a 'arrival' property into the ./conf/raildelays.properties");
@@ -97,21 +94,14 @@ public class Bootstrap {
             for (Date date : dates) {
                 Map<String, JobParameter> parameters = new HashMap<>();
 
-                parameters.put("date", new JobParameter(
-                        date));
-                parameters.put("station.a.name",
-                        new JobParameter(departure));
-                parameters.put("station.b.name",
-                        new JobParameter(arrival));
-                parameters.put("excel.input.template", new JobParameter(
-                        excelInputTemplate));
-                parameters.put("excel.output.file", new JobParameter(
-                        excelOutputPath));
-                parameters.put("output.file.path", new JobParameter(
-                        textOutputPath));
+                parameters.put("date", new JobParameter(date));
+                parameters.put("station.a.name", new JobParameter(departure));
+                parameters.put("station.b.name", new JobParameter(arrival));
+                parameters.put("excel.input.template", new JobParameter(excelInputTemplate));
+                parameters.put("excel.output.file", new JobParameter(excelOutputPath));
+                parameters.put("output.file.path", new JobParameter(textOutputPath));
 
-                JobParameters jobParameters = new JobParameters(
-                        parameters);
+                JobParameters jobParameters = new JobParameters(parameters);
 
                 service.start("mainJob", jobParameters);
             }

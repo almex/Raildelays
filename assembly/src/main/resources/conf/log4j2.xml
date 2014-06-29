@@ -9,7 +9,7 @@
             <PatternLayout pattern="[Reader]: %m%n" />
             <Policies>
                 <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="10 MB"/> 
+                <SizeBasedTriggeringPolicy size="1 MB"/> 
             </Policies>
             <DefaultRolloverStrategy max="5"/>
 		</RollingFile>
@@ -18,7 +18,7 @@
             <PatternLayout pattern="[Parser]: %m%n" />
             <Policies>
                 <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="10 MB"/> 
+                <SizeBasedTriggeringPolicy size="1 MB"/> 
             </Policies>
             <DefaultRolloverStrategy max="5"/>
         </RollingFile>
@@ -27,7 +27,7 @@
             <PatternLayout pattern="[Streamer]: %m%n" />
             <Policies>
                 <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="10 MB"/> 
+                <SizeBasedTriggeringPolicy size="1 MB"/> 
             </Policies>
             <DefaultRolloverStrategy max="5"/>
         </RollingFile>
@@ -36,7 +36,7 @@
             <PatternLayout pattern="[Data]: %m%n" />
             <Policies>
                 <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="10 MB"/> 
+                <SizeBasedTriggeringPolicy size="1 MB"/> 
             </Policies>
             <DefaultRolloverStrategy max="5"/>
         </RollingFile>
@@ -45,7 +45,7 @@
             <PatternLayout pattern="%d{DATE} %m%n" />
             <Policies>
                 <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="10 MB"/> 
+                <SizeBasedTriggeringPolicy size="1 MB"/> 
             </Policies>
             <DefaultRolloverStrategy max="5"/>
         </RollingFile>
@@ -54,7 +54,7 @@
             <PatternLayout pattern="%d{DATE} %-5p: %m%n" />
             <Policies>
                 <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="10 MB"/> 
+                <SizeBasedTriggeringPolicy size="1 MB"/> 
             </Policies>
             <DefaultRolloverStrategy max="5"/>
         </RollingFile>
@@ -63,7 +63,7 @@
             <PatternLayout pattern="[Route]: %m%n" />
             <Policies>
                 <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="10 MB"/> 
+                <SizeBasedTriggeringPolicy size="1 MB"/> 
             </Policies>
             <DefaultRolloverStrategy max="5"/>
         </RollingFile>
@@ -72,7 +72,7 @@
             <PatternLayout pattern="[Xls]: %m%n" />
             <Policies>
                 <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="10 MB"/> 
+                <SizeBasedTriggeringPolicy size="1 MB"/> 
             </Policies>
             <DefaultRolloverStrategy max="5"/>
         </RollingFile>
@@ -81,7 +81,7 @@
             <PatternLayout pattern="[Next]: %m%n" />
             <Policies>
                 <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="10 MB"/> 
+                <SizeBasedTriggeringPolicy size="1 MB"/> 
             </Policies>
             <DefaultRolloverStrategy max="5"/>
         </RollingFile>
@@ -90,7 +90,7 @@
             <PatternLayout pattern="[Aggregate]: %m%n" />
             <Policies>
                 <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="10 MB"/> 
+                <SizeBasedTriggeringPolicy size="1 MB"/> 
             </Policies>
             <DefaultRolloverStrategy max="5"/>
         </RollingFile>
@@ -99,7 +99,7 @@
             <PatternLayout pattern="[Filter]: %m%n" />
             <Policies>
                 <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="10 MB"/> 
+                <SizeBasedTriggeringPolicy size="1 MB"/> 
             </Policies>
             <DefaultRolloverStrategy max="5"/>
         </RollingFile>
@@ -108,7 +108,7 @@
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %level - %m%n%ex%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="10 MB"/> 
+                <SizeBasedTriggeringPolicy size="1 MB"/> 
             </Policies>
             <DefaultRolloverStrategy max="5"/>
         </RollingFile>
@@ -117,7 +117,7 @@
             <PatternLayout pattern="%d{DATE} %-5p: %m%n" />
             <Policies>
                 <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="10 MB"/> 
+                <SizeBasedTriggeringPolicy size="1 MB"/> 
             </Policies>
             <DefaultRolloverStrategy max="5"/>
         </RollingFile>

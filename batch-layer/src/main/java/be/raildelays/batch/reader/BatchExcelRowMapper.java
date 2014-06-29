@@ -6,6 +6,8 @@ import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -15,6 +17,13 @@ import java.text.SimpleDateFormat;
  * @autho Almex
  */
 public class BatchExcelRowMapper implements RowMapper<BatchExcelRow> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BatchExcelRowMapper.class);
+
+    private interface CellParser<T> {
+        T getValue(Cell cell);
+    }
+
     @Override
     public BatchExcelRow mapRow(Row row, int rowIndex) throws Exception {
         BatchExcelRow result = null;
