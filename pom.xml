@@ -3,7 +3,7 @@
 
     <groupId>be.raildelays</groupId>
     <artifactId>raildelays-parent</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name>Raildelays</name>
     <packaging>pom</packaging>
 
