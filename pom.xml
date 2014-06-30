@@ -9,10 +9,9 @@
     <packaging>pom</packaging>
 
     <scm>
-        <url>https://github.com/almex/Raildelays.git</url>
-        <connection>scm:git:https://github.com/almex/Raildelays.git</connection>
-        <developerConnection>scm:ssh:https://github.com/almex/Raildelays.git</developerConnection>
-        <tag>HEAD</tag>
+        <url>scm:git:git@github.com:almex/Raildelays.git</url>
+        <connection>scm:git:git@github.com:almex/Raildelays.git</connection>
+        <developerConnection>scm:git:git@github.com:almex/Raildelays.git</developerConnection>
     </scm>
 
     <repositories>

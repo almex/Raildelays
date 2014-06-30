@@ -156,6 +156,8 @@ public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
             @Override
             public void setFormat(Cell cell, Date date) {
                 switch (cell.getCellType()) {
+                    case Cell.CELL_TYPE_NUMERIC:
+                        cell.setCellValue(date.getTime());
                     case Cell.CELL_TYPE_BLANK:
                     case Cell.CELL_TYPE_STRING:
                     default:
