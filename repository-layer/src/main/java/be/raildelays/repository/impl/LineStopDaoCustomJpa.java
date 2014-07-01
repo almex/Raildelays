@@ -6,6 +6,7 @@ import be.raildelays.domain.entities.Train;
 import be.raildelays.repository.LineStopDaoCustom;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TemporalType;
 import java.util.Date;
@@ -110,19 +111,23 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 
     @Override
     public LineStop findFistScheduledLine(Train train, Station station) {
-        return (LineStop) entityManager
-                .createQuery(
-                        "SELECT o "
-                                + "FROM LineStop o "
-                                + "WHERE o.train.englishName = :trainName "
-                                + "AND o.station.englishName = :stationName "
-                                + "AND o.arrivalTime.expected IS NOT NULL "
-                                + "AND o.departureTime.expected IS NOT NULL "
-                                + "AND o.canceled = false "
-                                + "ORDER BY o.arrivalTime.expected ASC")
-                .setParameter("trainName", train.getEnglishName())
-                .setParameter("stationName", station.getEnglishName())
-                .setMaxResults(1).setFirstResult(0).getSingleResult();
+        try {
+            return (LineStop) entityManager
+                    .createQuery(
+                            "SELECT o "
+                                    + "FROM LineStop o "
+                                    + "WHERE o.train.englishName = :trainName "
+                                    + "AND o.station.englishName = :stationName "
+                                    + "AND o.arrivalTime.expected IS NOT NULL "
+                                    + "AND o.departureTime.expected IS NOT NULL "
+                                    + "AND o.canceled = false "
+                                    + "ORDER BY o.arrivalTime.expected ASC")
+                    .setParameter("trainName", train.getEnglishName())
+                    .setParameter("stationName", station.getEnglishName())
+                    .setMaxResults(1).setFirstResult(0).getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
 }
