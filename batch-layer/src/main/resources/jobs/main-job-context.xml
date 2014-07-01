@@ -307,12 +307,8 @@
     <!-- ================================================================================================== -->
 
     <bean id="excelFileOutput" class="be.raildelays.batch.support.ExcelFileSystemResourceDecorator" scope="step" >
-        <constructor-arg  name="outputDirectory" ref="outputDirectory" />
+        <property  name="outputDirectory" value="file:#{jobParameters['excel.output.path']}" />
         <property name="resourceItemSearch" ref="resourceItemSearch" />
-    </bean>
-
-    <bean id="outputDirectory" class="org.springframework.core.io.FileSystemResource" scope="step">
-        <constructor-arg index="0" value="./" />
     </bean>
 
     <bean id="resourceItemSearch" class="be.raildelays.batch.poi.SimpleResourceItemSearch" scope="step">
