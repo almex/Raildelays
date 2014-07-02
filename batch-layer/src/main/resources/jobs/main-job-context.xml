@@ -157,17 +157,21 @@
     </bean>
 
     <bean id="excelSheetItemReader"
-          class="be.raildelays.batch.reader.ExcelSheetItemReader"
+          parent="excelSheetItemReaderParent"
           scope="step">
         <property name="name" value="excelSheetItemReader" />
+        <property name="resource" ref="excelFileOutput"/>
+    </bean>
+
+    <bean id="excelSheetItemReaderParent"
+          class="be.raildelays.batch.reader.ExcelSheetItemReader"
+          abstract="true">
         <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}" />
         <property name="maxItemCount" value="${excel.sheet0.maxitemcount}" />
-        <property name="resource" ref="excelFileOutput"/>
         <property name="rowMapper">
             <bean class="be.raildelays.batch.reader.BatchExcelRowMapper" />
         </property>
     </bean>
-
 
 
     <!-- ================================================================================================== -->
@@ -239,7 +243,12 @@
     <bean id="filterTwoSensPerDayProcessor"
           class="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor"
           scope="step">
-        <property name="outputReader" ref="excelSheetItemReader" />
+        <property name="outputReader">
+            <bean parent="excelSheetItemReaderParent">
+                <property name="name" value="subExcelSheetItemReader1" />
+                <property name="resource" ref="excelFileOutput"/>
+            </bean>
+        </property>
     </bean>
 
     <bean id="filterSmallDelaysProcessor"
@@ -285,7 +294,12 @@
     </bean>
 
     <bean id="sortedItemWriter" class="be.raildelays.batch.writer.SortedItemStreamWriter">
-        <property name="reader" ref="excelSheetItemReader" />
+        <property name="reader">
+            <bean parent="excelSheetItemReaderParent">
+                <property name="name" value="subExcelSheetItemReader2" />
+                <property name="resource" ref="excelFileOutput"/>
+            </bean>
+        </property>
         <property name="writer" ref="excelSheetItemWriter" />
         <property name="resource" ref="excelFileOutput" />
     </bean>
@@ -307,12 +321,20 @@
     <!-- ================================================================================================== -->
 
     <bean id="excelFileOutput" class="be.raildelays.batch.support.ExcelFileSystemResourceDecorator" scope="step" >
-        <property  name="outputDirectory" value="file:#{jobParameters['excel.output.path']}" />
+        <property name="outputDirectory" ref="outputDirectory" />
         <property name="resourceItemSearch" ref="resourceItemSearch" />
     </bean>
 
-    <bean id="resourceItemSearch" class="be.raildelays.batch.poi.SimpleResourceItemSearch" scope="step">
-        <property name="reader" ref="excelSheetItemReader" />
+    <bean id="outputDirectory" class="org.springframework.core.io.FileSystemResource" scope="step">
+        <constructor-arg index="0" value="#{jobParameters['excel.output.path']}" />
+    </bean>
+
+    <bean id="resourceItemSearch" class="be.raildelays.batch.poi.SimpleResourceItemSearch">
+        <property name="reader">
+            <bean parent="excelSheetItemReaderParent">
+                <property name="name" value="subExcelSheetItemReader3" />
+            </bean>
+        </property>
     </bean>
 
 </beans>

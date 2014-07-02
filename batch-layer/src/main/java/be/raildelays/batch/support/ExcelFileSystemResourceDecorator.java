@@ -7,11 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.WritableResource;
 
-import java.io.*;
-import java.net.URI;
-import java.net.URL;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * @author Almex
@@ -34,13 +34,6 @@ public class ExcelFileSystemResourceDecorator<T extends Comparable<? super T>> e
 
     public ExcelFileSystemResourceDecorator(String outputDirectory) {
         super(outputDirectory);
-    }
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        Validate.notNull(resourceItemSearch,
-                "You must provide a itemSearch before using this bean");
-        super.afterPropertiesSet();
     }
 
     @Override

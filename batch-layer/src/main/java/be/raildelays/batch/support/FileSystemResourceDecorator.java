@@ -17,13 +17,14 @@ import java.net.URL;
 /**
  * @author Almex
  */
-public class FileSystemResourceDecorator implements WritableResourceDecorator, InitializingBean {
+public class FileSystemResourceDecorator implements WritableResourceDecorator {
 
     private WritableResource delegate;
 
     private Resource outputDirectory;
 
     public FileSystemResourceDecorator() {
+        this.outputDirectory = new FileSystemResource("./");
     }
 
     public FileSystemResourceDecorator(String outputDirectory) {
@@ -33,13 +34,6 @@ public class FileSystemResourceDecorator implements WritableResourceDecorator, I
     public FileSystemResourceDecorator(Resource outputDirectory) {
         this.outputDirectory = outputDirectory;
     }
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        Assert.notNull(outputDirectory, "You should provide an output directory");
-        Assert.isTrue(outputDirectory.getFile().isDirectory(), "The output directory must be directory and not a file");
-    }
-
 
     @Override
     public boolean isWritable() {
