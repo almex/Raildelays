@@ -113,7 +113,7 @@
     </bean>
 
     <bean id="excelSheetItemWriter"
-          class="be.raildelays.batch.writer.ExcelSheetExcelRowWriter"
+          class="be.raildelays.batch.writer.MultiResourceItemWriter"
           scope="step">
         <property name="shouldDeleteIfExists" value="false" />
         <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}" />

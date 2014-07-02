@@ -50,7 +50,7 @@ public class SortedItemStreamWriterTest2 {
 
     @Before
     public void setUp() throws Exception {
-        ExcelSheetExcelRowWriter writer = new ExcelSheetExcelRowWriter();
+        MultiResourceItemWriter writer = new MultiResourceItemWriter();
         ExcelSheetItemReader<BatchExcelRow> reader = new ExcelSheetItemReader<>();
         DateFormat timeFormat = new SimpleDateFormat("HH:mm");
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");

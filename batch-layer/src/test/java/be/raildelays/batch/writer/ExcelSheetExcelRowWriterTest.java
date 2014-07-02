@@ -29,7 +29,7 @@ import java.util.*;
 @RunWith(BlockJUnit4ClassRunner.class)
 public class ExcelSheetExcelRowWriterTest {
 
-    private ExcelSheetExcelRowWriter writer;
+    private MultiResourceItemWriter writer;
 
     private static final String CURRENT_PATH = "." + File.separator + "target" + File.separator;
 
@@ -56,7 +56,7 @@ public class ExcelSheetExcelRowWriterTest {
         ExcelSheetItemReader<BatchExcelRow> reader = new ExcelSheetItemReader<>();
         ExcelFileSystemResourceDecorator<BatchExcelRow> resource = new ExcelFileSystemResourceDecorator<>(CURRENT_PATH);
         executionContext = stepExecution.getExecutionContext();
-        writer = new ExcelSheetExcelRowWriter();
+        writer = new MultiResourceItemWriter();
 
 
         reader.setName("test");
