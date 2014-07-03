@@ -24,7 +24,6 @@ public class LogSkippedItemListener implements SkipListener<Object, BatchExcelRo
     @Override
     public void onSkipInWrite(BatchExcelRow item, Throwable t) {
         LOGGER.info("[WRITE] Skipped item {} - {}", item, t.getMessage());
-
     }
 
     @Override

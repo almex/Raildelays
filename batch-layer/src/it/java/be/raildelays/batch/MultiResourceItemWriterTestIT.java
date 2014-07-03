@@ -1,35 +1,47 @@
-package be.raildelays.batch.writer;
+package be.raildelays.batch;
 
 import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.batch.poi.SimpleResourceItemSearch;
-import be.raildelays.batch.reader.BatchExcelRowMapper;
-import be.raildelays.batch.reader.ExcelSheetItemReader;
-import be.raildelays.batch.support.ExcelFileSystemResourceDecorator;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
+import com.excilys.ebi.spring.dbunit.config.DBOperation;
+import com.excilys.ebi.spring.dbunit.test.DataSet;
 import org.apache.commons.lang.time.DateUtils;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.BlockJUnit4ClassRunner;
+import org.springframework.batch.core.JobParameter;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.test.MetaDataInstanceFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-@RunWith(BlockJUnit4ClassRunner.class)
-public class ExcelSheetExcelRowWriterTest {
+@DirtiesContext
+// Because of issue [SPR-8849] (https://jira.springsource.org/browse/SPR-8849)
+@ContextConfiguration(locations = {
+        "/jobs/main-job-context.xml"})
+@DataSet(value = "classpath:SearchDelaysIntoExcelSheetJobIT.xml", tearDownOperation = DBOperation.DELETE_ALL)
+public class MultiResourceItemWriterTestIT extends AbstractContextIT {
 
-    private MultiResourceItemWriter writer;
+    /**
+     * SUT.
+     */
+    @Autowired
+    @Qualifier("multiResourceItemWriter")
+    private ItemWriter<BatchExcelRow> writer;
 
     private static final String CURRENT_PATH = "." + File.separator + "target" + File.separator;
 
@@ -38,8 +50,6 @@ public class ExcelSheetExcelRowWriterTest {
     private static final String EXCEL_FILE_EXTENSION = ".xls";
 
     private List<BatchExcelRow> items = new ArrayList<>();
-
-    private ExecutionContext executionContext;
 
     @Before
     public void setUp() throws Exception {
@@ -50,33 +60,6 @@ public class ExcelSheetExcelRowWriterTest {
         } else {
             cleanUp();
         }
-
-        StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution();
-        SimpleResourceItemSearch<BatchExcelRow> itemSearch = new SimpleResourceItemSearch<>();
-        ExcelSheetItemReader<BatchExcelRow> reader = new ExcelSheetItemReader<>();
-        ExcelFileSystemResourceDecorator<BatchExcelRow> resource = new ExcelFileSystemResourceDecorator<>(CURRENT_PATH);
-        executionContext = stepExecution.getExecutionContext();
-        writer = new MultiResourceItemWriter();
-
-
-        reader.setName("test");
-        reader.setSheetIndex(0);
-        reader.setRowsToSkip(21);
-        reader.setMaxItemCount(40);
-        reader.setRowMapper(new BatchExcelRowMapper());
-        reader.setResource(resource);
-        reader.afterPropertiesSet();
-
-        itemSearch.setReader(reader);
-
-        resource.setResourceItemSearch(itemSearch);
-
-        writer.setTemplate(new ClassPathResource("template.xls"));
-        writer.setResourceDecorator(resource);
-        writer.setRowsToSkip(21);
-        writer.setMaxItemCount(40);
-        writer.afterPropertiesSet();
-        writer.open(executionContext);
 
         items = new ArrayList<>();
         DateFormat formatter = new SimpleDateFormat("HH:mm");
@@ -111,55 +94,27 @@ public class ExcelSheetExcelRowWriterTest {
         }
     }
 
-    @Test
-    public void testTemplate() throws Exception {
-        writer.write(items.subList(0, 2));
-        writer.update(executionContext);
-        writer.close();
+    public StepExecution getStepExection() throws ParseException, IOException {
+        Map<String, JobParameter> parameters = new HashMap<>();
 
-        Assert.assertEquals(1, getExcelFiles().length);
-        Assert.assertEquals(117248, getExcelFiles()[0].length());
+        parameters.put("input.file.path", new JobParameter("train-list.properties"));
+        parameters.put("date", new JobParameter(new SimpleDateFormat("dd/MM/yyyy").parse("01/01/2000")));
+        parameters.put("station.a.name", new JobParameter("Liège-Guillemins"));
+        parameters.put("station.b.name", new JobParameter("Brussels (Bruxelles)-Central"));
+        parameters.put("excel.output.path", new JobParameter("./output.xls"));
+        parameters.put("excel.input.template", new JobParameter(new ClassPathResource("template.xls").getFile().getAbsolutePath()));
+
+        return MetaDataInstanceFactory.createStepExecution(new JobParameters(parameters));
     }
 
     @Test
-    public void testFileLimits() throws Exception {
-        writer.write(items.subList(0, 10));
-        writer.update(executionContext);
-        writer.write(items.subList(10, 20));
-        writer.update(executionContext);
-        writer.write(items.subList(20, 30));
-        writer.update(executionContext);
-        writer.write(items.subList(30, 40));
-        writer.update(executionContext);
-        writer.write(items.subList(40, 80));
-        writer.close();
-
-        Assert.assertEquals(2, getExcelFiles().length);
-        Assert.assertEquals(124416, getExcelFiles()[0].length());
-        Assert.assertEquals(124416, getExcelFiles()[1].length());
+    public void testWrite() throws Exception {
+        writer.write(items);
     }
 
-    @Test
-    public void testRestart() throws Exception {
-        writer.write(items.subList(0, 10));
-        writer.update(executionContext);
-        writer.close();
-        writer.open(executionContext);
-        writer.write(items.subList(10, 40));
-        writer.update(executionContext);
-        writer.close();
-
-        Assert.assertEquals(1, getExcelFiles().length);
-        Assert.assertEquals(124416, getExcelFiles()[0].length());
-    }
-
-    @Test
-    public void testEmptyList() throws Exception {
-        writer.write(Collections.<BatchExcelRow>emptyList());
-        writer.update(executionContext);
-        writer.close();
-
-        Assert.assertEquals(0, getExcelFiles().length);
+    @After
+    public void tearDown() throws InterruptedException {
+        cleanUp();
     }
 
     private File[] getExcelFiles() {
@@ -175,15 +130,7 @@ public class ExcelSheetExcelRowWriterTest {
         return result != null ? result : new File[0];
     }
 
-    @After
-    public void tearDown() throws InterruptedException {
-        cleanUp();
-    }
-
     private void cleanUp() {
-        if (writer != null) {
-            writer.close();
-        }
         //-- We remove any result from the test
         for (File file : getExcelFiles()) {
             if (!file.delete()) {

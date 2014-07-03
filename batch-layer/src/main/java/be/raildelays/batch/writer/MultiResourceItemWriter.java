@@ -1,176 +1,142 @@
 package be.raildelays.batch.writer;
 
-import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.batch.poi.Format;
-import be.raildelays.batch.support.ExcelFileResource;
-import be.raildelays.batch.support.ResourceAwareItemStream;
-import be.raildelays.domain.xls.ExcelRow;
-import org.apache.commons.lang.Validate;
-import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.poi.POIXMLDocument;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import be.raildelays.batch.support.AbstractItemCountingItemStreamItemWriter;
+import be.raildelays.batch.support.ResourceLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
+import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Almex
  */
-public class MultiResourceItemWriter<T> implements ResourceAwareItemWriterItemStream<T>, ResourceAwareItemStream, InitializingBean {
+public class MultiResourceItemWriter<T> extends AbstractItemCountingItemStreamItemWriter<T> {
 
-    protected ExcelFileResource<BatchExcelRow> resourceDecorator;
+    protected ResourceLocator resourceLocator;
+
+    private ResourceAwareItemWriterItemStream<? super T> delegate;
 
     private ExecutionContext executionContext;
 
-    private Resource template;
+    final static private String RESOURCE_INDEX_KEY = "resource.index";
 
-    private ExcelSheetItemWriter<BatchExcelRow> delegate;
+    private int resourceIndex = 0;
 
-    private boolean shouldDeleteIfExists = false;
-
-    protected int rowsToSkip = 0;
-
-    protected int sheetIndex = 0;
-
-    private int maxItemCount = Integer.MAX_VALUE;
+    private boolean opened = false;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MultiResourceItemWriter.class);
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        Validate.notNull(resourceDecorator,
-                "You must provide an resourceDecorator before using this bean");
-        Validate.notNull(template,
-                "You must provide a template before using this bean");
-        delegate = new ExcelSheetItemWriter<>();
-        delegate.setTemplate(template);
-        delegate.setRowsToSkip(rowsToSkip);
-        delegate.setRowAggregator(new BatchExcelRowAggregator());
-        delegate.setMaxItemCount(maxItemCount);
-        delegate.setSheetIndex(sheetIndex);
-        delegate.setShouldDeleteIfExists(shouldDeleteIfExists);
-    }
-
-    @Override
-    public void write(List<? extends T> items) throws Exception {
-        if (!items.isEmpty()) {
-            T firstItem = items.get(0);
-
-            // By comparing on new WorkbookSearch(null) fileExtension we are retrieving the first workbook containing the first free row.
-            File file = null;
-            try {
-                file = resourceDecorator.getFile(firstItem);
-            } catch (FileNotFoundException e) {
-                try {
-                    file = resourceDecorator.getFile();
-                } catch (FileNotFoundException e2) {
-                    file = null;
-                }
-            }
-
-            if (file != null) {
-                delegate.setCurrentItemIndex(resourceDecorator.getContentRowIndex());
-                delegate.setResource(resourceDecorator);
-            } else {
-                delegate.setResource(resourceDecorator.createRelative(getFileName(firstItem)));
-            }
-
-            delegate.open(executionContext);
-            if (delegate.getCurrentItemCount() % delegate.getMaxItemCount() == 0) {
-                delegate.close();
-                delegate.update(executionContext);
-                delegate.setResource(resourceDecorator.createRelative(getFileName(firstItem)));
-                delegate.open(executionContext);
-            }
-            delegate.write(items);
-            delegate.update(executionContext);
-            delegate.close();
-        }
-
-    }
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
         this.executionContext = executionContext;
+
+        setExecutionContextName(ClassUtils.getShortName(ExcelSheetItemWriter.class) + Math.random());
+        super.open(executionContext);
+    }
+
+    @Override
+    protected boolean doWrite(T item) throws Exception {
+        List<T> items = new ArrayList<>();
+        if (!opened) {
+            File file = setResourceToDelegate();
+            // create only if write is called
+            file.createNewFile();
+            resourceIndex++;
+            Assert.state(file.canWrite(), "Output resource " + file.getAbsolutePath() + " must be writable");
+            delegate.open(executionContext);
+            opened = true;
+        }
+
+        int beforeITemCount = -1;
+        if (delegate instanceof AbstractItemCountingItemStreamItemWriter) {
+            beforeITemCount = ((AbstractItemCountingItemStreamItemWriter) delegate).getCurrentItemCount();
+        }
+
+        items.add(item);
+        delegate.write(items);
+
+        int afterITemCount = 0;
+        if (delegate instanceof AbstractItemCountingItemStreamItemWriter) {
+            afterITemCount = ((AbstractItemCountingItemStreamItemWriter) delegate).getCurrentItemCount();
+        }
+
+        //currentResourceItemCount += items.size();
+        if (getCurrentItemCount() == getMaxItemCount() -1) {
+            delegate.close();
+            //currentResourceItemCount = 0;
+            setResourceToDelegate();
+            opened = false;
+        }
+
+        return beforeITemCount < afterITemCount;
+    }
+
+    /**
+     * Create output resource (if necessary) and point the delegate to it.
+     */
+    private File setResourceToDelegate() throws IOException {
+        Resource localResource = resourceLocator.getResource(executionContext);
+
+        delegate.setResource(localResource);
+
+        return localResource.getFile();
+    }
+
+    @Override
+    protected void doOpen() throws Exception {
+        resourceIndex = executionContext.getInt(getExecutionContextKey(RESOURCE_INDEX_KEY), 0);
+
+        try {
+            setResourceToDelegate();
+        }
+        catch (IOException e) {
+            throw new ItemStreamException("Couldn't assign resource", e);
+        }
+
+        if (executionContext.containsKey(getExecutionContextKey(RESOURCE_INDEX_KEY))) {
+            // It's a restart
+            delegate.open(executionContext);
+            // We don't have to create the resource
+            opened = true;
+        }
+        else {
+            opened = false;
+        }
+    }
+
+    @Override
+    protected void doClose() throws Exception {
+        resourceIndex = 0;
+        if (opened) {
+            delegate.close();
+        }
     }
 
     @Override
     public void update(ExecutionContext executionContext) throws ItemStreamException {
-
-    }
-
-    @Override
-    public void close() throws ItemStreamException {
-    }
-
-    private String getFileName(ExcelRow firstItem) throws InvalidFormatException, IOException {
-        String fileExtension = Format.OOXML.getFileExtension();
-        InputStream inputStream = null;
-        PushbackInputStream pushbackInputStream = null;
-
-        try {
-            inputStream = new FileInputStream(template.getFile());
-            pushbackInputStream = new PushbackInputStream(inputStream, 8);
-
-            if (POIFSFileSystem.hasPOIFSHeader(pushbackInputStream)) {
-                fileExtension = Format.OLE2.getFileExtension();
-            } else if (!POIXMLDocument.hasOOXMLHeader(pushbackInputStream)) {
-                throw new InvalidFormatException("Your template is neither an OLE2 format, nor an OOXML format");
+        if (isSaveState()) {
+            if (opened) {
+                delegate.update(executionContext);
             }
-
-            return "retard_sncb " + DateFormatUtils.format(firstItem.getDate(), "yyyyMMdd") + fileExtension;
-        } catch (FileNotFoundException e) {
-            throw new IllegalArgumentException("We were not able to determine the template format", e);
-        } finally {
-            if (inputStream != null) {
-                inputStream.close();
-            }
-
-            if (pushbackInputStream != null) {
-                pushbackInputStream.close();
-            }
+            executionContext.putInt(getExecutionContextKey(RESOURCE_INDEX_KEY), resourceIndex);
         }
     }
 
-    public void setResourceDecorator(ExcelFileResource<BatchExcelRow> resourceDecorator) {
-        this.resourceDecorator = resourceDecorator;
+    public void setResourceLocator(ResourceLocator resourceLocator) {
+        this.resourceLocator = resourceLocator;
     }
 
-    @Override
-    public Resource getResource() {
-        return resourceDecorator;
-    }
-
-    @Override
-    public void setResource(Resource resource)  {
-
-    }
-
-    public void setRowsToSkip(int rowsToSkip) {
-        this.rowsToSkip = rowsToSkip;
-    }
-
-    public void setSheetIndex(int sheetIndex) {
-        this.sheetIndex = sheetIndex;
-    }
-
-    public void setShouldDeleteIfExists(boolean shouldDeleteIfExists) {
-        this.shouldDeleteIfExists = shouldDeleteIfExists;
-    }
-
-    public void setMaxItemCount(int maxItemCount) {
-        this.maxItemCount = maxItemCount;
-    }
-
-    public void setTemplate(Resource template) {
-        this.template = template;
+    public void setDelegate(ResourceAwareItemWriterItemStream<? super T> delegate) {
+        this.delegate = delegate;
     }
 }

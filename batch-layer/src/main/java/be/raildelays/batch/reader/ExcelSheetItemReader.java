@@ -3,19 +3,23 @@ package be.raildelays.batch.reader;
 import be.raildelays.batch.exception.ExcelRowMappingException;
 import be.raildelays.batch.poi.RowMapper;
 import be.raildelays.batch.support.IndexedResourceAwareItemStreamReader;
+import org.apache.poi.POIXMLDocument;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ReaderNotOpenException;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
 
 /**
  * @author Almex
@@ -88,12 +92,26 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
     }
 
     @Override
+    public void open(ExecutionContext executionContext) throws ItemStreamException {
+        this.setExecutionContextName(ClassUtils.getShortName(ExcelSheetItemReader.class) + Math.random());
+
+        super.open(executionContext);
+    }
+
+    @Override
     protected void doOpen() throws Exception {
         Assert.notNull(resource, "Input resource must be set");
+
+
 
         noInput = true;
         if (!resource.exists()) {
             LOGGER.warn("Input resource does not exist {}", resource.getDescription());
+            return;
+        }
+
+        if (!isValidExcelFile(resource.getFile()))    {
+            LOGGER.warn("Input resource is neither an OLE2 file, nor an OOXML file {}", resource.getDescription());
             return;
         }
 
@@ -115,6 +133,16 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
 
         jumpToItem(0);
         noInput = false;
+    }
+
+    private static boolean isValidExcelFile(File file) throws IOException {
+        InputStream inputStream = new PushbackInputStream(new FileInputStream(file), 8);
+
+        try {
+            return POIFSFileSystem.hasPOIFSHeader(inputStream) || POIXMLDocument.hasOOXMLHeader(inputStream);
+        } finally {
+            inputStream.close();
+        }
     }
 
     @Override

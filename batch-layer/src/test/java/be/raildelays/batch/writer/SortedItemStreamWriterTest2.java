@@ -4,7 +4,7 @@ import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.poi.SimpleResourceItemSearch;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
 import be.raildelays.batch.reader.ExcelSheetItemReader;
-import be.raildelays.batch.support.ExcelFileSystemResourceDecorator;
+import be.raildelays.batch.support.ItemWriterResourceLocator;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
@@ -14,9 +14,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -40,22 +43,27 @@ public class SortedItemStreamWriterTest2 {
 
     public static final String EXCEL_FILE_DESTINATION_PATH = "." + File.separator + "target" + File.separator + EXCEL_FILE_NAME;
 
-    private SortedItemStreamWriter<BatchExcelRow> sortedItemStreamWriter;
-
     private static final String BASE_DIRECTORY = "." + File.separator + "target" + File.separator;
 
     private List<BatchExcelRow> items = new ArrayList<>();
 
-    private ExecutionContext executionContext;
+    private StepExecution stepExecution;
+
+    private ItemWriterResourceLocator resourceLocator;
+
+    private MultiResourceItemWriter<BatchExcelRow> writer;
 
     @Before
     public void setUp() throws Exception {
-        MultiResourceItemWriter writer = new MultiResourceItemWriter();
+        SortedItemStreamWriter<BatchExcelRow> delegate = new SortedItemStreamWriter<>();
         ExcelSheetItemReader<BatchExcelRow> reader = new ExcelSheetItemReader<>();
         DateFormat timeFormat = new SimpleDateFormat("HH:mm");
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        ExcelFileSystemResourceDecorator resource = new ExcelFileSystemResourceDecorator<BatchExcelRow>(BASE_DIRECTORY);
-        SimpleResourceItemSearch<BatchExcelRow> container = new SimpleResourceItemSearch<>();
+        FileSystemResource resource = new FileSystemResource(BASE_DIRECTORY + "retard_sncb.xls");
+        ExcelSheetItemWriter<BatchExcelRow> writer = new ExcelSheetItemWriter<>();
+        SimpleResourceItemSearch resourceItemSearch = new SimpleResourceItemSearch();
+        resourceLocator = new ItemWriterResourceLocator();
+        this.writer = new MultiResourceItemWriter<>();
 
         copyFile();
 
@@ -63,7 +71,7 @@ public class SortedItemStreamWriterTest2 {
         writer.setRowsToSkip(21);
         writer.setMaxItemCount(40);
         writer.setTemplate(new ClassPathResource("template.xls"));
-        writer.setResourceDecorator(resource);
+        writer.setRowAggregator(new BatchExcelRowAggregator());
         writer.afterPropertiesSet();
 
         reader.setName("test");
@@ -74,16 +82,19 @@ public class SortedItemStreamWriterTest2 {
         reader.setResource(resource);
         reader.afterPropertiesSet();
 
-        container.setReader(reader);
-        resource.setResourceItemSearch(container);
+        resourceItemSearch.setReader(reader);
 
-        sortedItemStreamWriter = new SortedItemStreamWriter<>();
-        executionContext = MetaDataInstanceFactory.createStepExecution().getExecutionContext();
-        sortedItemStreamWriter.setResource(resource);
-        sortedItemStreamWriter.setReader(reader);
-        sortedItemStreamWriter.setWriter(writer);
-        sortedItemStreamWriter.afterPropertiesSet();
-        sortedItemStreamWriter.open(executionContext);
+        resourceLocator.setResource(resource);
+        resourceLocator.setResourceItemSearch(resourceItemSearch);
+
+        stepExecution = MetaDataInstanceFactory.createStepExecution();
+        delegate.setReader(reader);
+        delegate.setWriter(writer);
+        delegate.afterPropertiesSet();
+        delegate.open(stepExecution.getExecutionContext());
+
+        this.writer.setDelegate(delegate);
+        this.writer.setResourceLocator(resourceLocator);
 
         items = new ArrayList<>();
 
@@ -159,7 +170,11 @@ public class SortedItemStreamWriterTest2 {
 
     @Test
     public void testWrite() throws Exception {
-        sortedItemStreamWriter.write(items);
+        resourceLocator.beforeChunk(new ChunkContext(new StepContext(stepExecution)));
+        resourceLocator.beforeWrite(items);
+        writer.open(stepExecution.getExecutionContext());
+        writer.write(items);
+        writer.close();
 
         assertFile();
     }

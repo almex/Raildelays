@@ -47,6 +47,10 @@
                         <batch:include class="org.springframework.batch.item.validator.ValidationException"/>
                         <batch:include class="be.raildelays.batch.exception.ArrivalDepartureEqualsException"/>
                     </batch:skippable-exception-classes>
+                    <batch:listeners>
+                        <batch:listener ref="itemWriterResourceLocator" />
+                        <batch:listener ref="itemReaderResourceLocator" />
+                    </batch:listeners>
                 </batch:chunk>
                 <batch:transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
             </batch:tasklet>
@@ -156,23 +160,20 @@
         </property>
     </bean>
 
-    <bean id="excelSheetItemReader"
-          parent="excelSheetItemReaderParent"
-          scope="step">
-        <property name="name" value="excelSheetItemReader" />
-        <property name="resource" ref="excelFileOutput"/>
-    </bean>
-
     <bean id="excelSheetItemReaderParent"
-          class="be.raildelays.batch.reader.ExcelSheetItemReader"
+          class="be.raildelays.batch.reader.MultiResourceAwareItemReader"
           abstract="true">
-        <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}" />
-        <property name="maxItemCount" value="${excel.sheet0.maxitemcount}" />
-        <property name="rowMapper">
-            <bean class="be.raildelays.batch.reader.BatchExcelRowMapper" />
+        <property name="delegate">
+            <bean class="be.raildelays.batch.reader.ExcelSheetItemReader">
+                <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}" />
+                <property name="maxItemCount" value="${excel.sheet0.maxitemcount}" />
+                <property name="rowMapper">
+                    <bean class="be.raildelays.batch.reader.BatchExcelRowMapper" />
+                </property>
+            </bean>
         </property>
+        <property name="resourceLocator" ref="itemReaderResourceLocator" />
     </bean>
-
 
     <!-- ================================================================================================== -->
     <!-- =====================================       PROCESSORS       ===================================== -->
@@ -244,10 +245,7 @@
           class="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor"
           scope="step">
         <property name="outputReader">
-            <bean parent="excelSheetItemReaderParent">
-                <property name="name" value="subExcelSheetItemReader1" />
-                <property name="resource" ref="excelFileOutput"/>
-            </bean>
+            <bean parent="excelSheetItemReaderParent" />
         </property>
     </bean>
 
@@ -283,25 +281,31 @@
         </property>
     </bean>
 
-    <bean id="excelSheetItemWriter"
+    <bean id="multiResourceItemWriter"
           class="be.raildelays.batch.writer.MultiResourceItemWriter"
           scope="step">
-        <property name="shouldDeleteIfExists" value="false" />
-        <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}" />
+        <property name="delegate" ref="sortedItemWriter" />
+        <property name="resourceLocator" ref="itemWriterResourceLocator" />
         <property name="maxItemCount" value="${excel.sheet0.maxitemcount}" />
-        <property name="template" value="file:#{jobParameters['excel.input.template']}"/>
-        <property name="resourceDecorator" ref="excelFileOutput"/>
     </bean>
 
     <bean id="sortedItemWriter" class="be.raildelays.batch.writer.SortedItemStreamWriter">
         <property name="reader">
-            <bean parent="excelSheetItemReaderParent">
-                <property name="name" value="subExcelSheetItemReader2" />
-                <property name="resource" ref="excelFileOutput"/>
-            </bean>
+            <bean parent="excelSheetItemReaderParent" />
         </property>
         <property name="writer" ref="excelSheetItemWriter" />
-        <property name="resource" ref="excelFileOutput" />
+    </bean>
+
+    <bean id="excelSheetItemWriter"
+          class="be.raildelays.batch.writer.ExcelSheetItemWriter"
+          scope="step">
+        <property name="rowAggregator">
+            <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator" />
+        </property>
+        <property name="shouldDeleteIfExists" value="false" />
+        <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}" />
+        <property name="maxItemCount" value="${excel.sheet0.maxitemcount}" />
+        <property name="template" value="file:#{jobParameters['excel.input.template']}"/>
     </bean>
 
     <bean id="raildelaysServiceWriter"
@@ -320,19 +324,32 @@
     <!-- =====================================        RESOURCES       ===================================== -->
     <!-- ================================================================================================== -->
 
-    <bean id="excelFileOutput" class="be.raildelays.batch.support.ExcelFileSystemResourceDecorator" scope="step" >
+    <!--bean id="excelFileOutput" class="be.raildelays.batch.support.ExcelFileSystemResourceDecorator" scope="step" >
         <property name="outputDirectory" ref="outputDirectory" />
         <property name="resourceItemSearch" ref="resourceItemSearch" />
     </bean>
 
     <bean id="outputDirectory" class="org.springframework.core.io.FileSystemResource" scope="step">
         <constructor-arg index="0" value="#{jobParameters['excel.output.path']}" />
+    </bean-->
+
+    <bean id="itemReaderResourceLocator" class="be.raildelays.batch.support.ItemReaderResourceLocator" scope="step">
+        <property name="resource" value="file:#{jobParameters['excel.output.path']}" />
+    </bean>
+
+    <bean id="itemWriterResourceLocator" class="be.raildelays.batch.support.ItemWriterResourceLocator" scope="step">
+        <property name="resource" value="file:#{jobParameters['excel.output.path']}" />
+        <property name="resourceItemSearch" ref="resourceItemSearch" />
     </bean>
 
     <bean id="resourceItemSearch" class="be.raildelays.batch.poi.SimpleResourceItemSearch">
         <property name="reader">
-            <bean parent="excelSheetItemReaderParent">
-                <property name="name" value="subExcelSheetItemReader3" />
+            <bean class="be.raildelays.batch.reader.ExcelSheetItemReader">
+                <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}" />
+                <property name="maxItemCount" value="${excel.sheet0.maxitemcount}" />
+                <property name="rowMapper">
+                    <bean class="be.raildelays.batch.reader.BatchExcelRowMapper" />
+                </property>
             </bean>
         </property>
     </bean>

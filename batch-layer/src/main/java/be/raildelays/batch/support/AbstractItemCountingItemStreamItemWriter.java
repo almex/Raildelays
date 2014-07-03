@@ -7,7 +7,9 @@ import org.springframework.util.Assert;
 import java.util.List;
 
 /**
- * Created by soumagn on 31/05/2014.
+ *
+ *
+ * @author Almex
  */
 public abstract class AbstractItemCountingItemStreamItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 
@@ -68,39 +70,6 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
         }
     }
 
-    public int getCurrentItemCount() {
-        return currentItemCount;
-    }
-
-    /**
-     * The index of the item to start writing to. If the
-     * {@link org.springframework.batch.item.ExecutionContext} contains a key <code>[name].write.count</code>
-     * (where <code>[name]</code> is the name of this component) the value from
-     * the {@link org.springframework.batch.item.ExecutionContext} will be used in preference.
-     *
-     * @see #setName(String)
-     *
-     * @param itemIndex the value of the current item index
-     */
-    public void setCurrentItemIndex(int itemIndex) {
-        this.currentItemIndex = itemIndex;
-    }
-
-    /**
-     * The maximum index of the items to be write. If the
-     * {@link org.springframework.batch.item.ExecutionContext} contains a key
-     * <code>[name].read.count.max</code> (where <code>[name]</code> is the name
-     * of this component) the value from the {@link org.springframework.batch.item.ExecutionContext} will be
-     * used in preference.
-     *
-     * @see #setName(String)
-     *
-     * @param count the value of the maximum item count
-     */
-    public void setMaxItemCount(int count) {
-        this.maxItemCount = count;
-    }
-
     @Override
     public void close() throws ItemStreamException {
         super.close();
@@ -120,7 +89,7 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
             doOpen();
         }
         catch (Exception e) {
-            throw new ItemStreamException("Failed to initialize the reader", e);
+            throw new ItemStreamException("Failed to initialize the writer", e);
         }
         if (!isSaveState()) {
             return;
@@ -162,6 +131,41 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
     }
 
 
+
+    public int getCurrentItemCount() {
+        return currentItemCount;
+    }
+
+
+
+    /**
+     * The index of the item to start writing to. If the
+     * {@link org.springframework.batch.item.ExecutionContext} contains a key <code>[name].write.count</code>
+     * (where <code>[name]</code> is the name of this component) the value from
+     * the {@link org.springframework.batch.item.ExecutionContext} will be used in preference.
+     *
+     * @see #setName(String)
+     *
+     * @param itemIndex the value of the current item index
+     */
+    public void setCurrentItemIndex(int itemIndex) {
+        this.currentItemIndex = itemIndex;
+    }
+
+    /**
+     * The maximum number of the items to be write. If the
+     * {@link org.springframework.batch.item.ExecutionContext} contains a key
+     * <code>[name].read.count.max</code> (where <code>[name]</code> is the name
+     * of this component) the value from the {@link org.springframework.batch.item.ExecutionContext} will be
+     * used in preference.
+     *
+     * @see #setName(String)
+     *
+     * @param count the value of the maximum item count
+     */
+    public void setMaxItemCount(int count) {
+        this.maxItemCount = count;
+    }
     /**
      * Set the flag that determines whether to save internal data for
      * {@link ExecutionContext}. Only switch this to false if you don't want to
@@ -183,7 +187,7 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
         return saveState;
     }
 
-    protected int getCurrentItemIndex() {
+    public int getCurrentItemIndex() {
         return currentItemIndex;
     }
 

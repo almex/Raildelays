@@ -1,7 +1,14 @@
 package be.raildelays.batch.support;
 
-/**
- * Created by xbmc on 02-07-14.
- */
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.core.io.Resource;
+
+import java.io.IOException;
+
 public interface ResourceLocator {
+
+	Resource getResource(ExecutionContext context) throws IOException;
+
+    void setResource(Resource resource);
+
 }

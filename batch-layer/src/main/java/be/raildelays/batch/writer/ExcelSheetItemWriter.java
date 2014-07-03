@@ -2,11 +2,12 @@ package be.raildelays.batch.writer;
 
 import be.raildelays.batch.poi.Format;
 import be.raildelays.batch.poi.RowAggregator;
-import be.raildelays.batch.poi.WorkbookAction;
 import be.raildelays.batch.support.AbstractItemCountingItemStreamItemWriter;
 import org.apache.commons.lang.Validate;
+import org.apache.poi.POIXMLDocument;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -46,15 +47,8 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Validate.notNull(resource,
-                "You must provide an resource before using this bean");
         Validate.notNull(rowAggregator,
                 "You must provide a rowAggregator before using this bean");
-    }
-
-
-    public ExcelSheetItemWriter() {
-        this.setExecutionContextName(ClassUtils.getShortName(ExcelSheetItemWriter.class));
     }
 
     @Override
@@ -64,7 +58,10 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
+        this.setExecutionContextName(ClassUtils.getShortName(ExcelSheetItemWriter.class) + Math.random());
+
         super.open(executionContext);
+
         if (executionContext.containsKey(getExecutionContextKey(ROW_TO_SKIP_KEY))) {
             rowsToSkip = executionContext.getInt(getExecutionContextKey(ROW_TO_SKIP_KEY));
         }
@@ -80,7 +77,7 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
             File outputFile = resource.getFile();
 
             boolean deleted = true;
-            if (outputFile.exists() && shouldDeleteIfExists) {
+            if ( outputFile.exists() && (shouldDeleteIfExists || !isValidExcelFile(outputFile))) {
                 deleted = outputFile.delete();
 
                 LOGGER.debug("Output file '{}' deleted:{}", outputFile.getAbsolutePath(), deleted);
@@ -128,6 +125,16 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
 
         } catch (IOException | InvalidFormatException e) {
             throw new ItemStreamException("I/O when opening Excel template", e);
+        }
+    }
+
+    private static boolean isValidExcelFile(File file) throws IOException {
+        InputStream inputStream = new PushbackInputStream(new FileInputStream(file), 8);
+
+        try {
+            return POIFSFileSystem.hasPOIFSHeader(inputStream) || POIXMLDocument.hasOOXMLHeader(inputStream);
+        } finally {
+            inputStream.close();
         }
     }
 

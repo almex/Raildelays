@@ -41,7 +41,7 @@ public class SearchDelaysIntoExcelSheetJobIT extends AbstractContextIT {
             parameters.put("date", new JobParameter(new SimpleDateFormat("dd/MM/yyyy").parse("01/01/2000")));
             parameters.put("station.a.name", new JobParameter("Liège-Guillemins"));
             parameters.put("station.b.name", new JobParameter("Brussels (Bruxelles)-Central"));
-            parameters.put("excel.output.file", new JobParameter("./"));
+            parameters.put("excel.output.path", new JobParameter("./output.xls"));
             parameters.put("excel.input.template", new JobParameter(new ClassPathResource("template.xls").getFile().getAbsolutePath()));
 
             batchStatus = jobLauncherTestUtils.launchJob(new JobParameters(parameters)).getStatus();

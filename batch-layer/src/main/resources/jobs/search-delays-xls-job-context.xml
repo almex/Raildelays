@@ -16,7 +16,7 @@
             <batch:tasklet transaction-manager="batchTransactionManager"
                            allow-start-if-complete="true">
                 <batch:chunk reader="compositeRaildelaysItemReader"
-                             processor="chainedProcessorsForDelays" writer="excelSheetItemWriter"
+                             processor="chainedProcessorsForDelays" writer="multiResourceItemWriter"
                              commit-interval="1" skip-limit="10">
                     <batch:skippable-exception-classes>
                         <batch:include
@@ -24,12 +24,13 @@
                         <batch:include
                                 class="be.raildelays.batch.exception.ArrivalDepartureEqualsException"/>
                     </batch:skippable-exception-classes>
+                    <batch:listeners>
+                        <batch:listener ref="skippedItemsListener"/>
+                        <batch:listener ref="itemWriterResourceLocator" />
+                    </batch:listeners>
                 </batch:chunk>
                 <batch:transaction-attributes
                         isolation="DEFAULT" propagation="REQUIRED"/>
-                <batch:listeners>
-                    <batch:listener ref="skippedItemsListener"/>
-                </batch:listeners>
             </batch:tasklet>
         </batch:step>
     </batch:job>
@@ -112,14 +113,24 @@
           scope="step">
     </bean>
 
-    <bean id="excelSheetItemWriter"
+    <bean id="multiResourceItemWriter"
           class="be.raildelays.batch.writer.MultiResourceItemWriter"
           scope="step">
+        <property name="delegate" ref="excelSheetItemWriter" />
+        <property name="resourceLocator" ref="itemWriterResourceLocator" />
+        <property name="maxItemCount" value="${excel.sheet0.maxitemcount}" />
+    </bean>
+
+    <bean id="excelSheetItemWriter"
+          class="be.raildelays.batch.writer.ExcelSheetItemWriter"
+          scope="step">
+        <property name="rowAggregator">
+            <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator" />
+        </property>
         <property name="shouldDeleteIfExists" value="false" />
         <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}" />
         <property name="maxItemCount" value="${excel.sheet0.maxitemcount}" />
         <property name="template" value="file:#{jobParameters['excel.input.template']}"/>
-        <property name="resourceDecorator" ref="excelFileOutput"/>
     </bean>
 
     <bean id="skippedItemsListener" class="be.raildelays.batch.listener.LogSkippedItemListener"/>
@@ -128,17 +139,21 @@
     <!-- =====================================        RESOURCES       ===================================== -->
     <!-- ================================================================================================== -->
 
-    <bean id="excelFileOutput" class="be.raildelays.batch.support.ExcelFileSystemResourceDecorator" >
-        <constructor-arg  name="outputDirectory" ref="outputDirectory" />
+    <bean id="itemWriterResourceLocator" class="be.raildelays.batch.support.ItemWriterResourceLocator" scope="step">
+        <property name="resource" value="file:#{jobParameters['excel.output.path']}" />
         <property name="resourceItemSearch" ref="resourceItemSearch" />
     </bean>
 
-    <bean id="outputDirectory" class="org.springframework.core.io.FileSystemResource">
-        <constructor-arg index="0" value="./" />
-    </bean>
-
     <bean id="resourceItemSearch" class="be.raildelays.batch.poi.SimpleResourceItemSearch">
-        <property name="reader" ref="excelSheetItemReader" />
+        <property name="reader">
+            <bean class="be.raildelays.batch.reader.ExcelSheetItemReader">
+                <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}" />
+                <property name="maxItemCount" value="${excel.sheet0.maxitemcount}" />
+                <property name="rowMapper">
+                    <bean class="be.raildelays.batch.reader.BatchExcelRowMapper" />
+                </property>
+            </bean>
+        </property>
     </bean>
 
 </beans>
