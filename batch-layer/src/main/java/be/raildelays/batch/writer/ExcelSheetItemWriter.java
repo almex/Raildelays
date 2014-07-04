@@ -58,8 +58,6 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
-        this.setExecutionContextName(ClassUtils.getShortName(ExcelSheetItemWriter.class) + Math.random());
-
         super.open(executionContext);
 
         if (executionContext.containsKey(getExecutionContextKey(ROW_TO_SKIP_KEY))) {

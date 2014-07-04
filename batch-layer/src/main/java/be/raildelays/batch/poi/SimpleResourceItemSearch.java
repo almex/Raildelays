@@ -45,7 +45,7 @@ public class SimpleResourceItemSearch<T extends Comparable<? super T>> implement
                 object = reader.read();
 
                 if (item == null ? object == null : comparator.compare(item, object) == 0) {
-                    result =  reader.getCurrentIndex();
+                    result = reader.getCurrentIndex();
                     break;
                 }
             } while (object != null );

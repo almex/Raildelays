@@ -16,9 +16,13 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -32,10 +36,16 @@ import java.util.Locale;
 public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchExcelRowAggregator.class);
+    private final Validator validator;
 
 
     private interface CellFormatter<T> {
         void setFormat(Cell cell, T value);
+    }
+
+    public BatchExcelRowAggregator() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
     }
 
 
@@ -46,6 +56,10 @@ public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
 
         if (row != null && row.getCell(2) != null) {
             previousRow = new BatchExcelRowMapper().mapRow(row, rowIndex);
+
+            if (!validator.validate(previousRow).isEmpty()) {
+                previousRow = null;
+            }
 
             setDateFormat(row, 2, item.getDate());
             setStringFormat(row, 12, getStationName(item.getDepartureStation()));

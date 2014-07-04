@@ -67,6 +67,7 @@ public class SortedItemStreamWriterTest2 {
 
         copyFile();
 
+        writer.setName("test");
         writer.setSheetIndex(0);
         writer.setRowsToSkip(21);
         writer.setMaxItemCount(40);
@@ -93,6 +94,7 @@ public class SortedItemStreamWriterTest2 {
         delegate.afterPropertiesSet();
         delegate.open(stepExecution.getExecutionContext());
 
+        this.writer.setName("test");
         this.writer.setDelegate(delegate);
         this.writer.setResourceLocator(resourceLocator);
 

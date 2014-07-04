@@ -1,6 +1,7 @@
 package be.raildelays.batch.writer;
 
 import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.batch.bean.BatchExcelRowComparator;
 import be.raildelays.batch.poi.SimpleResourceItemSearch;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
 import be.raildelays.batch.reader.ExcelSheetItemReader;
@@ -77,18 +78,22 @@ public class MultiResourceItemWriterTest {
         reader.afterPropertiesSet();
 
         resourceItemSearch.setReader(reader);
+        resourceItemSearch.setComparator(new BatchExcelRowComparator());
 
         resourceLocator.setResource(resource);
         resourceLocator.setResourceItemSearch(resourceItemSearch);
 
-        writer.setDelegate(delegate);
-        writer.setResourceLocator(resourceLocator);
-        writer.setMaxItemCount(40);
+        delegate.setName("test2");
         delegate.setTemplate(new ClassPathResource("template.xls"));
         delegate.setRowAggregator(new BatchExcelRowAggregator());
+        delegate.setSheetIndex(0);
         delegate.setRowsToSkip(21);
         delegate.setMaxItemCount(40);
         delegate.afterPropertiesSet();
+
+        writer.setName("test1");
+        writer.setDelegate(delegate);
+        writer.setResourceLocator(resourceLocator);
 
 
         chunkContext = new ChunkContext(new StepContext(stepExecution));
@@ -169,8 +174,26 @@ public class MultiResourceItemWriterTest {
         resourceLocator.afterChunk(chunkContext);
 
         resourceLocator.beforeChunk(chunkContext);
-        resourceLocator.beforeWrite(items.subList(40, 80));
-        writer.write(items.subList(40, 80));
+        resourceLocator.beforeWrite(items.subList(40, 50));
+        writer.write(items.subList(40, 50));
+        writer.update(executionContext);
+        resourceLocator.afterChunk(chunkContext);
+
+        resourceLocator.beforeChunk(chunkContext);
+        resourceLocator.beforeWrite(items.subList(50, 60));
+        writer.write(items.subList(50, 60));
+        writer.update(executionContext);
+        resourceLocator.afterChunk(chunkContext);
+
+        resourceLocator.beforeChunk(chunkContext);
+        resourceLocator.beforeWrite(items.subList(60, 70));
+        writer.write(items.subList(60, 70));
+        writer.update(executionContext);
+        resourceLocator.afterChunk(chunkContext);
+
+        resourceLocator.beforeChunk(chunkContext);
+        resourceLocator.beforeWrite(items.subList(70, 80));
+        writer.write(items.subList(70, 80));
         writer.update(executionContext);
         writer.close();
         resourceLocator.afterChunk(chunkContext);
@@ -183,17 +206,17 @@ public class MultiResourceItemWriterTest {
     @Test
     public void testRestart() throws Exception {
         resourceLocator.beforeChunk(chunkContext);
+        resourceLocator.beforeWrite(items.subList(0, 20));
         writer.open(executionContext);
-        resourceLocator.beforeWrite(items.subList(0, 10));
-        writer.write(items.subList(0, 10));
+        writer.write(items.subList(0, 20));
         writer.update(executionContext);
         writer.close();
         resourceLocator.afterChunk(chunkContext);
 
         resourceLocator.beforeChunk(chunkContext);
+        resourceLocator.beforeWrite(items.subList(20, 40));
         writer.open(executionContext);
-        resourceLocator.beforeWrite(items.subList(10, 40));
-        writer.write(items.subList(10, 40));
+        writer.write(items.subList(20, 40));
         writer.update(executionContext);
         writer.close();
         resourceLocator.afterChunk(chunkContext);

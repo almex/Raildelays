@@ -74,6 +74,7 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
     public void close() throws ItemStreamException {
         super.close();
         currentItemCount = 0;
+        currentItemIndex = 0;
         try {
             doClose();
         }

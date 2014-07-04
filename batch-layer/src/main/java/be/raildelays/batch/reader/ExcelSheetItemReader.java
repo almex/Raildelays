@@ -10,9 +10,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ReaderNotOpenException;
+import org.springframework.batch.item.*;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
@@ -49,16 +47,14 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
     protected T doRead() throws Exception {
         T result = null;
 
-        if (!noInput) {
-            Row row = readRow();
+        Row row = readRow();
 
-            if (row != null) {
-                try {
-                    result = rowMapper.mapRow(row, getCurrentIndex());
-                } catch (Exception ex) {
-                    throw new ExcelRowMappingException("Parsing error at line: " + getCurrentIndex() + " in resource=["
-                            + resource.getDescription() + "], input=[" + row + "]", ex, row, getCurrentIndex());
-                }
+        if (row != null) {
+            try {
+                result = rowMapper.mapRow(row, getCurrentIndex());
+            } catch (Exception ex) {
+                throw new ExcelRowMappingException("Parsing error at line: " + getCurrentIndex() + " in resource=["
+                        + resource.getDescription() + "], input=[" + row + "]", ex, row, getCurrentIndex());
             }
         }
 
@@ -84,25 +80,13 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
     }
 
     @Override
-    protected void jumpToItem(int itemIndex) throws Exception {
-        for (int i = 0; i < rowsToSkip; i++) {
-            readRow();
-        }
-        super.jumpToItem(itemIndex);
-    }
-
-    @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
-        this.setExecutionContextName(ClassUtils.getShortName(ExcelSheetItemReader.class) + Math.random());
-
         super.open(executionContext);
     }
 
     @Override
     protected void doOpen() throws Exception {
         Assert.notNull(resource, "Input resource must be set");
-
-
 
         noInput = true;
         if (!resource.exists()) {
@@ -131,8 +115,8 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
             inputStream.close(); //-- Everything is in the buffer we can close the file
         }
 
-        jumpToItem(0);
         noInput = false;
+        jumpToItem(0);
     }
 
     private static boolean isValidExcelFile(File file) throws IOException {
@@ -150,8 +134,28 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
     }
 
     @Override
+    public T read() throws Exception, UnexpectedInputException, ParseException {
+        T result = null;
+
+        if (!noInput) {
+            result = super.read();
+            if (result == null) {
+                noInput = true;
+            }
+        }
+
+        return result;
+    }
+
+    @Override
     public int getCurrentIndex() {
-        return getCurrentItemCount() + rowsToSkip - 1;
+        int result = -1;
+
+        if (!noInput) {
+            result = getCurrentItemCount() + rowsToSkip - 1;
+        }
+
+        return result;
     }
 
     @Override

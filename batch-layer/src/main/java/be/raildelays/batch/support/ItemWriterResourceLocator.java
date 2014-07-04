@@ -1,5 +1,6 @@
 package be.raildelays.batch.support;
 
+import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.poi.Format;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.slf4j.Logger;
@@ -23,11 +24,11 @@ import java.io.IOException;
  *
  * @author Almex
  */
-public class ItemWriterResourceLocator<T extends Comparable<? super T>> extends ItemResourceLocator {
+public class ItemWriterResourceLocator extends ItemResourceLocator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ItemWriterResourceLocator.class);
 
-    private ResourceItemSearch<T> resourceItemSearch;
+    private ResourceItemSearch<BatchExcelRow> resourceItemSearch;
 	
 	@Override
 	public Resource getResource(ExecutionContext context) throws IOException {
@@ -55,7 +56,7 @@ public class ItemWriterResourceLocator<T extends Comparable<? super T>> extends 
             })) {
                 try {
 
-                    int currentRowIndex = resourceItemSearch.indexOf(null, new FileSystemResource(file));
+                    int currentRowIndex = resourceItemSearch.indexOf(new BatchExcelRow.Builder(null, null).build(), new FileSystemResource(file));
 
                     if (currentRowIndex != -1) {
                         result = file;
@@ -73,7 +74,7 @@ public class ItemWriterResourceLocator<T extends Comparable<? super T>> extends 
         return result;
     }
 
-    public void setResourceItemSearch(ResourceItemSearch<T> resourceItemSearch) {
+    public void setResourceItemSearch(ResourceItemSearch<BatchExcelRow> resourceItemSearch) {
         this.resourceItemSearch = resourceItemSearch;
     }
 }

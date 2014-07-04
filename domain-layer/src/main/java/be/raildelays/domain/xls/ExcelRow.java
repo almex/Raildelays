@@ -96,7 +96,6 @@ public class ExcelRow implements Comparable<ExcelRow> {
     private Long delay;
 
     @Column(name = "SENS")
-    @NotNull
     private Sens sens;
 
     @Override

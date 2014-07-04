@@ -31,8 +31,7 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow> {
     public BatchExcelRow mapRow(Row row, int rowIndex) throws Exception {
         BatchExcelRow result = null;
 
-
-        if (getDate(row, 2) != null) {
+        if (row.getCell(2) != null) {
             result = new BatchExcelRow.Builder(getDate(row, 2), null)
                     .departureStation(getStation(row, 12))
                     .arrivalStation(getStation(row, 18))
@@ -125,11 +124,11 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow> {
         SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
         NumberFormat numberFormat = new DecimalFormat("##");
 
-        int hours = getTime(row, hhCellIndex);
-        int minutes = getTime(row, mmCellIndex);
+        Integer hours = getTime(row, hhCellIndex);
+        Integer minutes = getTime(row, mmCellIndex);
 
         try {
-            if (hours >= 0 && minutes >= 0) {
+            if (hours != null && minutes != null && hours >= 0 && minutes >= 0) {
                 String hh = numberFormat.format(hours);
                 String mm = numberFormat.format(minutes);
 
@@ -146,7 +145,7 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow> {
         return getValue(row, cellIndex, new CellParser<Integer>() {
             @Override
             public Integer getValue(Cell cell) {
-                Integer result = -1;
+                Integer result = null;
                 NumberFormat numberFormat = new DecimalFormat("#");
 
                 try {

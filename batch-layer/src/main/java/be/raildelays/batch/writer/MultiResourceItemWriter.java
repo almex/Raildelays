@@ -39,8 +39,6 @@ public class MultiResourceItemWriter<T> extends AbstractItemCountingItemStreamIt
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
         this.executionContext = executionContext;
-
-        setExecutionContextName(ClassUtils.getShortName(ExcelSheetItemWriter.class) + Math.random());
         super.open(executionContext);
     }
 
@@ -70,13 +68,15 @@ public class MultiResourceItemWriter<T> extends AbstractItemCountingItemStreamIt
             afterITemCount = ((AbstractItemCountingItemStreamItemWriter) delegate).getCurrentItemCount();
         }
 
-        //currentResourceItemCount += items.size();
-        if (getCurrentItemCount() == getMaxItemCount() -1) {
-            delegate.close();
-            //currentResourceItemCount = 0;
-            setResourceToDelegate();
-            opened = false;
+        if (delegate instanceof AbstractItemCountingItemStreamItemWriter ) {
+            if (((AbstractItemCountingItemStreamItemWriter) delegate).getCurrentItemCount() >=
+                    ((AbstractItemCountingItemStreamItemWriter) delegate).getMaxItemCount()) {
+                delegate.close();
+                opened = false;
+            }
         }
+
+
 
         return beforeITemCount < afterITemCount;
     }
@@ -96,13 +96,6 @@ public class MultiResourceItemWriter<T> extends AbstractItemCountingItemStreamIt
     protected void doOpen() throws Exception {
         resourceIndex = executionContext.getInt(getExecutionContextKey(RESOURCE_INDEX_KEY), 0);
 
-        try {
-            setResourceToDelegate();
-        }
-        catch (IOException e) {
-            throw new ItemStreamException("Couldn't assign resource", e);
-        }
-
         if (executionContext.containsKey(getExecutionContextKey(RESOURCE_INDEX_KEY))) {
             // It's a restart
             delegate.open(executionContext);
@@ -117,8 +110,10 @@ public class MultiResourceItemWriter<T> extends AbstractItemCountingItemStreamIt
     @Override
     protected void doClose() throws Exception {
         resourceIndex = 0;
+        setCurrentItemIndex(0);
         if (opened) {
             delegate.close();
+            opened = false;
         }
     }
 

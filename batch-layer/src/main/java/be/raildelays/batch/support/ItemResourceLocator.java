@@ -81,7 +81,7 @@ public abstract class ItemResourceLocator implements ResourceLocator, ChunkListe
 
             int extensionIndex = originalFileName.lastIndexOf(".");
             builder.append(originalFileName.substring(0, extensionIndex));
-            builder.append("_");
+            builder.append(" ");
             builder.append((String) context.getAttribute(FILENAME_SUFFIX_KEY));
             builder.append(originalFileName.substring(extensionIndex));
 
