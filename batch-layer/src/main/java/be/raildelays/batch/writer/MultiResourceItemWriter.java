@@ -72,6 +72,7 @@ public class MultiResourceItemWriter<T> extends AbstractItemCountingItemStreamIt
             if (((AbstractItemCountingItemStreamItemWriter) delegate).getCurrentItemCount() >=
                     ((AbstractItemCountingItemStreamItemWriter) delegate).getMaxItemCount()) {
                 delegate.close();
+                delegate.update(executionContext);
                 opened = false;
             }
         }
