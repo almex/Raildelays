@@ -1,9 +1,11 @@
 package be.raildelays.batch.support;
 
 import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.batch.listener.ResourceLocatorListener;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.io.Resource;
 
 import java.io.File;
@@ -22,56 +24,15 @@ import java.util.List;
  *
  * @author Almex
  */
-public abstract class ItemResourceLocator implements ResourceLocator, ChunkListener, ItemWriteListener<BatchExcelRow> {
-    protected static final String FILENAME_SUFFIX_KEY = "resource.filename.suffix";
-
-    protected static final String FILE_PATH_KEY = "resource.file.path";
+public abstract class ItemResourceLocator implements ResourceLocator {
 
     protected Resource resource;
 
-    private ChunkContext context;
-
-    @Override
-    public void beforeChunk(ChunkContext context) {
-        this.context = context;
-        context.setAttribute(FILENAME_SUFFIX_KEY, null);
-    }
-
-    @Override
-    public void afterChunk(ChunkContext context) {
-        context.setAttribute(FILENAME_SUFFIX_KEY, null);
-    }
-
-    @Override
-    public void afterChunkError(ChunkContext context) {
-
-    }
-
-    @Override
-    public void beforeWrite(List<? extends BatchExcelRow> items) {
-        if (!items.isEmpty()) {
-            // Retrieve first element of what would be written
-            BatchExcelRow item = items.get(0);
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
-            String suffix = formatter.format(item.getDate());
-
-            context.setAttribute(FILENAME_SUFFIX_KEY, suffix);
-        }
-    }
-
-    @Override
-    public void afterWrite(List<? extends BatchExcelRow> items) {
-
-    }
-
-    @Override
-    public void onWriteError(Exception exception, List<? extends BatchExcelRow> items) {
-
-    }
+    public static final String FILE_PATH_KEY = "resource.file.path";
 
 
-    protected File getFileBasedOnSuffix() throws IOException {
-        String suffix = (String) context.getAttribute(FILENAME_SUFFIX_KEY);
+    protected File getFileBasedOnSuffix(ExecutionContext context) throws IOException {
+        String suffix = context.getString(ResourceLocatorListener.FILENAME_SUFFIX_KEY);
         File result = resource.getFile(); // By default we return the resource itself
 
         if (suffix != null) {
@@ -82,7 +43,7 @@ public abstract class ItemResourceLocator implements ResourceLocator, ChunkListe
             int extensionIndex = originalFileName.lastIndexOf(".");
             builder.append(originalFileName.substring(0, extensionIndex));
             builder.append(" ");
-            builder.append((String) context.getAttribute(FILENAME_SUFFIX_KEY));
+            builder.append(suffix);
             builder.append(originalFileName.substring(extensionIndex));
 
             result = new File(original.getParentFile(), builder.toString());

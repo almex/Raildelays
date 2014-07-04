@@ -26,7 +26,7 @@
                     </batch:skippable-exception-classes>
                     <batch:listeners>
                         <batch:listener ref="skippedItemsListener"/>
-                        <batch:listener ref="itemWriterResourceLocator" />
+                        <batch:listener ref="resourceLocatorListener" />
                     </batch:listeners>
                 </batch:chunk>
                 <batch:transaction-attributes
@@ -116,6 +116,7 @@
     <bean id="multiResourceItemWriter"
           class="be.raildelays.batch.writer.MultiResourceItemWriter"
           scope="step">
+        <property name="name" value="multiResourceItemWriter" />
         <property name="delegate" ref="excelSheetItemWriter" />
         <property name="resourceLocator" ref="itemWriterResourceLocator" />
         <property name="maxItemCount" value="${excel.sheet0.maxitemcount}" />
@@ -127,6 +128,7 @@
         <property name="rowAggregator">
             <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator" />
         </property>
+        <property name="name" value="excelSheetItemWriter" />
         <property name="shouldDeleteIfExists" value="false" />
         <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}" />
         <property name="maxItemCount" value="${excel.sheet0.maxitemcount}" />
@@ -134,6 +136,10 @@
     </bean>
 
     <bean id="skippedItemsListener" class="be.raildelays.batch.listener.LogSkippedItemListener"/>
+
+    <bean id="resourceLocatorListener"
+          class="be.raildelays.batch.listener.ResourceLocatorListener"
+          scope="step" />
 
     <!-- ================================================================================================== -->
     <!-- =====================================        RESOURCES       ===================================== -->

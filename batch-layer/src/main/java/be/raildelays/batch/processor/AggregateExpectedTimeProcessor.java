@@ -75,23 +75,25 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, L
         LineStop result = null;
         LineStop.Builder builder = fetchScheduling(item);
 
-        //-- Modify backward
-        LineStop previous = item.getPrevious();
-        while (previous != null) {
-            builder.addPrevious(fetchScheduling(previous));
-            previous = previous.getPrevious();
+        if (builder != null) {
+            //-- Modify backward
+            LineStop previous = item.getPrevious();
+            while (previous != null) {
+                builder.addPrevious(fetchScheduling(previous));
+                previous = previous.getPrevious();
+            }
+
+            //-- Modify forward
+            LineStop next = item.getNext();
+            while (next != null) {
+                builder.addNext(fetchScheduling(next));
+                next = next.getNext();
+            }
+
+            result = builder.build();
+
+            LOGGER.debug("LineStop after processing={}", result);
         }
-
-        //-- Modify forward
-        LineStop next = item.getNext();
-        while (next != null) {
-            builder.addNext(fetchScheduling(next));
-            next = next.getNext();
-        }
-
-        result = builder.build();
-
-        LOGGER.debug("LineStop after processing={}", result);
 
         return result;
     }

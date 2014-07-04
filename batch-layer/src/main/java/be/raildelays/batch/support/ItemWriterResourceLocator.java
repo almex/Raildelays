@@ -35,7 +35,7 @@ public class ItemWriterResourceLocator extends ItemResourceLocator {
         File file = getExistingFile();
 
         if (file == null) {
-            file = getFileBasedOnSuffix();
+            file = getFileBasedOnSuffix(context);
         }
 
         context.putString(FILE_PATH_KEY, file.getAbsolutePath());

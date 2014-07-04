@@ -2,6 +2,7 @@ package be.raildelays.batch.support;
 
 import be.raildelays.batch.AbstractFileTest;
 import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.batch.listener.ResourceLocatorListener;
 import be.raildelays.batch.poi.Format;
 import be.raildelays.batch.poi.SimpleResourceItemSearch;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
@@ -32,6 +33,8 @@ public class ItemWriterResourceLocatorTest extends AbstractFileTest {
 
     private ItemWriterResourceLocator resourceLocator;
 
+    private ResourceLocatorListener listener;
+
     @Before
     public void setUp() throws Exception {
         File directory = new File(CURRENT_PATH);
@@ -44,6 +47,7 @@ public class ItemWriterResourceLocatorTest extends AbstractFileTest {
 
         copyFile();
 
+        listener = new ResourceLocatorListener();
         resourceLocator = new ItemWriterResourceLocator();
         resourceLocator.setResource(new FileSystemResource(CURRENT_PATH + EXCEL_FILE_PREFIX + Format.OLE2.getFileExtension()));
     }
@@ -59,8 +63,8 @@ public class ItemWriterResourceLocatorTest extends AbstractFileTest {
             }
         });
 
-        resourceLocator.beforeChunk(new ChunkContext(new StepContext(stepExecution)));
-        resourceLocator.beforeWrite(Arrays.asList(new BatchExcelRow[]{new BatchExcelRow.Builder(DATE, null).build()}));
+        listener.beforeStep(stepExecution);
+        listener.beforeWrite(Arrays.asList(new BatchExcelRow[]{new BatchExcelRow.Builder(DATE, null).build()}));
         Resource resource = resourceLocator.getResource(stepExecution.getExecutionContext());
 
         Assert.assertNotNull(resource);
@@ -78,8 +82,8 @@ public class ItemWriterResourceLocatorTest extends AbstractFileTest {
             }
         });
 
-        resourceLocator.beforeChunk(new ChunkContext(new StepContext(stepExecution)));
-        resourceLocator.beforeWrite(Arrays.asList(new BatchExcelRow[]{new BatchExcelRow.Builder(DATE, null).build()}));
+        listener.beforeStep(stepExecution);
+        listener.beforeWrite(Arrays.asList(new BatchExcelRow[]{new BatchExcelRow.Builder(DATE, null).build()}));
         Resource resource = resourceLocator.getResource(stepExecution.getExecutionContext());
 
         Assert.assertNotNull(resource);

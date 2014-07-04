@@ -48,17 +48,14 @@
                         <batch:include class="be.raildelays.batch.exception.ArrivalDepartureEqualsException"/>
                     </batch:skippable-exception-classes>
                     <batch:listeners>
-                        <batch:listener ref="itemWriterResourceLocator" />
-                        <batch:listener ref="itemReaderResourceLocator" />
+                        <batch:listener ref="delaysItemReader"/>
+                        <batch:listener ref="skippedItemsListener"/>
+                        <batch:listener ref="filterTwoSensPerDayProcessor"/>
+                        <batch:listener ref="resourceLocatorListener" />
                     </batch:listeners>
                 </batch:chunk>
                 <batch:transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
             </batch:tasklet>
-            <batch:listeners>
-                <batch:listener ref="delaysItemReader"/>
-                <batch:listener ref="skippedItemsListener"/>
-                <batch:listener ref="filterTwoSensPerDayProcessor"/>
-            </batch:listeners>
         </batch:step>
     </batch:job>
 
@@ -324,6 +321,11 @@
     <bean id="skippedItemsListener"
           class="be.raildelays.batch.listener.LogSkippedItemListener"
           scope="step" />
+
+    <bean id="resourceLocatorListener"
+          class="be.raildelays.batch.listener.ResourceLocatorListener"
+          scope="step" />
+
 
     <!-- ================================================================================================== -->
     <!-- =====================================        RESOURCES       ===================================== -->

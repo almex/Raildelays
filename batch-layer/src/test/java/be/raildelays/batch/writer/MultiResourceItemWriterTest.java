@@ -2,6 +2,7 @@ package be.raildelays.batch.writer;
 
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.bean.BatchExcelRowComparator;
+import be.raildelays.batch.listener.ResourceLocatorListener;
 import be.raildelays.batch.poi.SimpleResourceItemSearch;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
 import be.raildelays.batch.reader.ExcelSheetItemReader;
@@ -45,9 +46,11 @@ public class MultiResourceItemWriterTest {
 
     private ExecutionContext executionContext;
 
-    private ChunkContext chunkContext;
+    private StepExecution stepExecution;
 
     private ItemWriterResourceLocator resourceLocator;
+
+    private ResourceLocatorListener listener;
 
     @Before
     public void setUp() throws Exception {
@@ -59,7 +62,7 @@ public class MultiResourceItemWriterTest {
             cleanUp();
         }
 
-        StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution();
+        stepExecution = MetaDataInstanceFactory.createStepExecution();
         ExcelSheetItemReader<BatchExcelRow> reader = new ExcelSheetItemReader<>();
         FileSystemResource resource = new FileSystemResource(CURRENT_PATH + "retard_sncb.xls");
         ExcelSheetItemWriter<BatchExcelRow> delegate = new ExcelSheetItemWriter<>();
@@ -67,6 +70,7 @@ public class MultiResourceItemWriterTest {
         resourceLocator = new ItemWriterResourceLocator();
         executionContext = stepExecution.getExecutionContext();
         writer = new MultiResourceItemWriter();
+        listener = new ResourceLocatorListener();
 
 
         reader.setName("test");
@@ -94,9 +98,6 @@ public class MultiResourceItemWriterTest {
         writer.setName("test1");
         writer.setDelegate(delegate);
         writer.setResourceLocator(resourceLocator);
-
-
-        chunkContext = new ChunkContext(new StepContext(stepExecution));
 
 
         items = new ArrayList<>();
@@ -134,13 +135,13 @@ public class MultiResourceItemWriterTest {
 
     @Test
     public void testTemplate() throws Exception {
-        resourceLocator.beforeChunk(chunkContext);
+        listener.beforeStep(stepExecution);
         writer.open(executionContext);
-        resourceLocator.beforeWrite(items.subList(0, 2));
+        listener.beforeWrite(items.subList(0, 2));
         writer.write(items.subList(0, 2));
         writer.update(executionContext);
-        resourceLocator.afterChunk(chunkContext);
         writer.close();
+        listener.afterStep(stepExecution);
 
         Assert.assertEquals(1, getExcelFiles().length);
         Assert.assertEquals(117248, getExcelFiles()[0].length());
@@ -148,55 +149,41 @@ public class MultiResourceItemWriterTest {
 
     @Test
     public void testFileLimits() throws Exception {
-        resourceLocator.beforeChunk(chunkContext);
-        resourceLocator.beforeWrite(items.subList(0, 10));
+        listener.beforeStep(stepExecution);
+        listener.beforeWrite(items.subList(0, 10));
         writer.open(executionContext);
         writer.write(items.subList(0, 10));
         writer.update(executionContext);
-        resourceLocator.afterChunk(chunkContext);
 
-        resourceLocator.beforeChunk(chunkContext);
-        resourceLocator.beforeWrite(items.subList(10, 20));
+        listener.beforeWrite(items.subList(10, 20));
         writer.write(items.subList(10, 20));
         writer.update(executionContext);
-        resourceLocator.afterChunk(chunkContext);
 
-        resourceLocator.beforeChunk(chunkContext);
-        resourceLocator.beforeWrite(items.subList(20, 30));
+        listener.beforeWrite(items.subList(20, 30));
         writer.write(items.subList(20, 30));
         writer.update(executionContext);
-        resourceLocator.afterChunk(chunkContext);
 
-        resourceLocator.beforeChunk(chunkContext);
-        resourceLocator.beforeWrite(items.subList(30, 40));
+        listener.beforeWrite(items.subList(30, 40));
         writer.write(items.subList(30, 40));
         writer.update(executionContext);
-        resourceLocator.afterChunk(chunkContext);
 
-        resourceLocator.beforeChunk(chunkContext);
-        resourceLocator.beforeWrite(items.subList(40, 50));
+        listener.beforeWrite(items.subList(40, 50));
         writer.write(items.subList(40, 50));
         writer.update(executionContext);
-        resourceLocator.afterChunk(chunkContext);
 
-        resourceLocator.beforeChunk(chunkContext);
-        resourceLocator.beforeWrite(items.subList(50, 60));
+        listener.beforeWrite(items.subList(50, 60));
         writer.write(items.subList(50, 60));
         writer.update(executionContext);
-        resourceLocator.afterChunk(chunkContext);
 
-        resourceLocator.beforeChunk(chunkContext);
-        resourceLocator.beforeWrite(items.subList(60, 70));
+        listener.beforeWrite(items.subList(60, 70));
         writer.write(items.subList(60, 70));
         writer.update(executionContext);
-        resourceLocator.afterChunk(chunkContext);
 
-        resourceLocator.beforeChunk(chunkContext);
-        resourceLocator.beforeWrite(items.subList(70, 80));
+        listener.beforeWrite(items.subList(70, 80));
         writer.write(items.subList(70, 80));
         writer.update(executionContext);
         writer.close();
-        resourceLocator.afterChunk(chunkContext);
+        listener.afterStep(stepExecution);
 
         Assert.assertEquals(2, getExcelFiles().length);
         Assert.assertEquals(124416, getExcelFiles()[0].length());
@@ -205,21 +192,19 @@ public class MultiResourceItemWriterTest {
 
     @Test
     public void testRestart() throws Exception {
-        resourceLocator.beforeChunk(chunkContext);
-        resourceLocator.beforeWrite(items.subList(0, 20));
+        listener.beforeStep(stepExecution);
+        listener.beforeWrite(items.subList(0, 20));
         writer.open(executionContext);
         writer.write(items.subList(0, 20));
         writer.update(executionContext);
         writer.close();
-        resourceLocator.afterChunk(chunkContext);
 
-        resourceLocator.beforeChunk(chunkContext);
-        resourceLocator.beforeWrite(items.subList(20, 40));
+        listener.beforeWrite(items.subList(20, 40));
         writer.open(executionContext);
         writer.write(items.subList(20, 40));
         writer.update(executionContext);
         writer.close();
-        resourceLocator.afterChunk(chunkContext);
+        listener.afterStep(stepExecution);
 
         Assert.assertEquals(1, getExcelFiles().length);
         Assert.assertEquals(124416, getExcelFiles()[0].length());
@@ -227,13 +212,13 @@ public class MultiResourceItemWriterTest {
 
     @Test
     public void testEmptyList() throws Exception {
-        resourceLocator.beforeChunk(chunkContext);
+        listener.beforeStep(stepExecution);
         writer.open(executionContext);
-        resourceLocator.beforeWrite(Collections.<BatchExcelRow>emptyList());
+        listener.beforeWrite(Collections.<BatchExcelRow>emptyList());
         writer.write(Collections.<BatchExcelRow>emptyList());
         writer.update(executionContext);
         writer.close();
-        resourceLocator.afterChunk(chunkContext);
+        listener.afterStep(stepExecution);
 
         Assert.assertEquals(0, getExcelFiles().length);
     }

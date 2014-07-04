@@ -1,6 +1,7 @@
 package be.raildelays.batch.writer;
 
 import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.batch.listener.ResourceLocatorListener;
 import be.raildelays.batch.poi.SimpleResourceItemSearch;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
 import be.raildelays.batch.reader.ExcelSheetItemReader;
@@ -53,6 +54,8 @@ public class SortedItemStreamWriterTest2 {
 
     private MultiResourceItemWriter<BatchExcelRow> writer;
 
+    private ResourceLocatorListener listener;
+
     @Before
     public void setUp() throws Exception {
         SortedItemStreamWriter<BatchExcelRow> delegate = new SortedItemStreamWriter<>();
@@ -84,6 +87,8 @@ public class SortedItemStreamWriterTest2 {
         reader.afterPropertiesSet();
 
         resourceItemSearch.setReader(reader);
+
+        listener = new ResourceLocatorListener();
 
         resourceLocator.setResource(resource);
         resourceLocator.setResourceItemSearch(resourceItemSearch);
@@ -172,8 +177,8 @@ public class SortedItemStreamWriterTest2 {
 
     @Test
     public void testWrite() throws Exception {
-        resourceLocator.beforeChunk(new ChunkContext(new StepContext(stepExecution)));
-        resourceLocator.beforeWrite(items);
+        listener.beforeStep(stepExecution);
+        listener.beforeWrite(items);
         writer.open(stepExecution.getExecutionContext());
         writer.write(items);
         writer.close();
