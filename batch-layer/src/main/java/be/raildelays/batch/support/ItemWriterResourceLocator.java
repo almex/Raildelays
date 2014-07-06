@@ -44,31 +44,33 @@ public class ItemWriterResourceLocator extends ItemResourceLocator {
 	}
 
     public File getExistingFile() throws IOException {
-        File directory = resource.getFile().getParentFile();
+        File directory = resource.getFile().isDirectory() ? resource.getFile() : resource.getFile().getParentFile();
         File result = null;
 
-        try {
-            for (File file : directory.listFiles(new FileFilter() {
-                @Override
-                public boolean accept(File pathname) {
-                    return pathname.getName().endsWith(Format.OLE2.getFileExtension()) || pathname.getName().endsWith(Format.OOXML.getFileExtension());
-                }
-            })) {
-                try {
-
-                    int currentRowIndex = resourceItemSearch.indexOf(new BatchExcelRow.Builder(null, null).build(), new FileSystemResource(file));
-
-                    if (currentRowIndex != -1) {
-                        result = file;
+        if (directory != null) {
+            try {
+                for (File file : directory.listFiles(new FileFilter() {
+                    @Override
+                    public boolean accept(File pathname) {
+                        return pathname.getName().endsWith(Format.OLE2.getFileExtension()) || pathname.getName().endsWith(Format.OOXML.getFileExtension());
                     }
-                } catch (InvalidFormatException e) {
-                    LOGGER.error("Excel format not supported for this workbook!", e);
-                } catch (IOException e) {
-                    LOGGER.error("Error when opening an Excel workbook", e);
+                })) {
+                    try {
+
+                        int currentRowIndex = resourceItemSearch.indexOf(new BatchExcelRow.Builder(null, null).build(), new FileSystemResource(file));
+
+                        if (currentRowIndex != -1) {
+                            result = file;
+                        }
+                    } catch (InvalidFormatException e) {
+                        LOGGER.error("Excel format not supported for this workbook!", e);
+                    } catch (IOException e) {
+                        LOGGER.error("Error when opening an Excel workbook", e);
+                    }
                 }
+            } catch (Exception e) {
+                throw new IOException("Cannot find content in your Excel file", e);
             }
-        } catch (Exception e) {
-            throw new IOException("Cannot find content in your Excel file", e);
         }
 
         return result;

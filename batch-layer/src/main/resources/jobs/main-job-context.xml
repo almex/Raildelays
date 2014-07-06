@@ -264,7 +264,8 @@
     <!-- =====================================         WRITERS        ===================================== -->
     <!-- ================================================================================================== -->
     <bean id="compositeItemWriter"
-          class="org.springframework.batch.item.support.CompositeItemWriter">
+          class="org.springframework.batch.item.support.CompositeItemWriter"
+          scope="step">
         <property name="delegates">
             <list>
                 <ref bean="flatFileItemWriter"/>
@@ -286,14 +287,16 @@
     </bean>
 
     <bean id="multiResourceItemWriter"
-          class="be.raildelays.batch.writer.MultiResourceItemWriter">
+          class="be.raildelays.batch.writer.MultiResourceItemWriter"
+          scope="step">
         <property name="delegate" ref="sortedItemWriter"/>
         <property name="name" value="multiResourceItemWriter"/>
         <property name="resourceLocator" ref="itemWriterResourceLocator"/>
     </bean>
 
     <bean id="sortedItemWriter"
-          class="be.raildelays.batch.writer.SortedItemStreamWriter">
+          class="be.raildelays.batch.writer.SortedItemStreamWriter"
+          scope="step">
         <property name="reader">
             <bean class="be.raildelays.batch.reader.ExcelSheetItemReader">
                 <property name="name" value="excelSheetItemReader2"/>
@@ -357,7 +360,8 @@
     </bean>
 
     <bean id="resourceItemSearch"
-          class="be.raildelays.batch.poi.SimpleResourceItemSearch">
+          class="be.raildelays.batch.poi.SimpleResourceItemSearch"
+          scope="step">
         <property name="reader">
             <bean class="be.raildelays.batch.reader.ExcelSheetItemReader">
                 <property name="name" value="excelSheetItemReader3"/>
