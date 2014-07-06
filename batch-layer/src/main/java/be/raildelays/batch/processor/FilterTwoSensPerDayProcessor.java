@@ -31,18 +31,10 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FilterTwoSensPerDayProcessor.class);
 
-    private ExecutionContext executionContext;
-
-    private String contextKey;
 
     @Override
     public void afterPropertiesSet() throws Exception {
         Validate.notNull(outputReader, "outputReader is mandatory");
-    }
-
-    @BeforeStep
-    public void beforeStep(StepExecution stepExecution) {
-        executionContext = stepExecution.getExecutionContext();
     }
 
     @Override
@@ -50,7 +42,7 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
         BatchExcelRow result = null;
 
         try {
-            outputReader.open(executionContext);
+            outputReader.open(new ExecutionContext());
 
             try {
                 BatchExcelRow matchingExcelRow = null;
@@ -123,9 +115,5 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
 
     public void setOutputReader(ResourceAwareItemReaderItemStream<BatchExcelRow> outputReader) {
         this.outputReader = outputReader;
-    }
-
-    public void setContextKey(String contextKey) {
-        this.contextKey = contextKey;
     }
 }

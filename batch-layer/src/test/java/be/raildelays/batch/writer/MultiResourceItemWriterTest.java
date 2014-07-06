@@ -140,8 +140,8 @@ public class MultiResourceItemWriterTest {
         listener.beforeWrite(items.subList(0, 2));
         writer.write(items.subList(0, 2));
         writer.update(executionContext);
+        listener.afterWrite(Collections.<BatchExcelRow>emptyList());
         writer.close();
-        listener.afterStep(stepExecution);
 
         Assert.assertEquals(1, getExcelFiles().length);
         Assert.assertEquals(117248, getExcelFiles()[0].length());
@@ -154,36 +154,43 @@ public class MultiResourceItemWriterTest {
         writer.open(executionContext);
         writer.write(items.subList(0, 10));
         writer.update(executionContext);
+        listener.afterWrite(Collections.<BatchExcelRow>emptyList());
 
         listener.beforeWrite(items.subList(10, 20));
         writer.write(items.subList(10, 20));
         writer.update(executionContext);
+        listener.afterWrite(Collections.<BatchExcelRow>emptyList());
 
         listener.beforeWrite(items.subList(20, 30));
         writer.write(items.subList(20, 30));
         writer.update(executionContext);
+        listener.afterWrite(Collections.<BatchExcelRow>emptyList());
 
         listener.beforeWrite(items.subList(30, 40));
         writer.write(items.subList(30, 40));
         writer.update(executionContext);
+        listener.afterWrite(Collections.<BatchExcelRow>emptyList());
 
         listener.beforeWrite(items.subList(40, 50));
         writer.write(items.subList(40, 50));
         writer.update(executionContext);
+        listener.afterWrite(Collections.<BatchExcelRow>emptyList());
 
         listener.beforeWrite(items.subList(50, 60));
         writer.write(items.subList(50, 60));
         writer.update(executionContext);
+        listener.afterWrite(Collections.<BatchExcelRow>emptyList());
 
         listener.beforeWrite(items.subList(60, 70));
         writer.write(items.subList(60, 70));
         writer.update(executionContext);
+        listener.afterWrite(Collections.<BatchExcelRow>emptyList());
 
         listener.beforeWrite(items.subList(70, 80));
         writer.write(items.subList(70, 80));
         writer.update(executionContext);
+        listener.afterWrite(Collections.<BatchExcelRow>emptyList());
         writer.close();
-        listener.afterStep(stepExecution);
 
         Assert.assertEquals(2, getExcelFiles().length);
         Assert.assertEquals(124416, getExcelFiles()[0].length());
@@ -197,14 +204,15 @@ public class MultiResourceItemWriterTest {
         writer.open(executionContext);
         writer.write(items.subList(0, 20));
         writer.update(executionContext);
+        listener.afterWrite(Collections.<BatchExcelRow>emptyList());
         writer.close();
 
         listener.beforeWrite(items.subList(20, 40));
         writer.open(executionContext);
         writer.write(items.subList(20, 40));
         writer.update(executionContext);
+        listener.afterWrite(Collections.<BatchExcelRow>emptyList());
         writer.close();
-        listener.afterStep(stepExecution);
 
         Assert.assertEquals(1, getExcelFiles().length);
         Assert.assertEquals(124416, getExcelFiles()[0].length());
@@ -213,12 +221,12 @@ public class MultiResourceItemWriterTest {
     @Test
     public void testEmptyList() throws Exception {
         listener.beforeStep(stepExecution);
-        writer.open(executionContext);
         listener.beforeWrite(Collections.<BatchExcelRow>emptyList());
+        writer.open(executionContext);
         writer.write(Collections.<BatchExcelRow>emptyList());
         writer.update(executionContext);
+        listener.afterWrite(Collections.<BatchExcelRow>emptyList());
         writer.close();
-        listener.afterStep(stepExecution);
 
         Assert.assertEquals(0, getExcelFiles().length);
     }

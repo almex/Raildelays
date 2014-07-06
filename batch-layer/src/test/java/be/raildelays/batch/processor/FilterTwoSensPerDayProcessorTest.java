@@ -149,9 +149,7 @@ public class FilterTwoSensPerDayProcessorTest {
 		processor = new FilterTwoSensPerDayProcessor();
         stepExecution.getExecutionContext().putString("foo", "");
         processor.setOutputReader(fakeReader);
-        processor.setContextKey("test");
         processor.afterPropertiesSet();
-        processor.beforeStep(stepExecution);
 	}
 
 	@Test

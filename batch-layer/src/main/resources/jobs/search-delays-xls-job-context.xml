@@ -16,7 +16,8 @@
             <batch:tasklet transaction-manager="batchTransactionManager"
                            allow-start-if-complete="true">
                 <batch:chunk reader="compositeRaildelaysItemReader"
-                             processor="chainedProcessorsForDelays" writer="multiResourceItemWriter"
+                             processor="chainedProcessorsForDelays"
+                             writer="multiResourceItemWriter"
                              commit-interval="1" skip-limit="10">
                     <batch:skippable-exception-classes>
                         <batch:include

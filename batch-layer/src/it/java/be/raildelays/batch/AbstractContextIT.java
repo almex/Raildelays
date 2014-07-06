@@ -1,7 +1,6 @@
 package be.raildelays.batch;
 
 import org.junit.runner.RunWith;
-import org.springframework.batch.test.JobScopeTestExecutionListener;
 import org.springframework.batch.test.StepScopeTestExecutionListener;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
@@ -16,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 		"/spring/batch/raildelays-batch-integration-test-context.xml" })
 @TransactionConfiguration(defaultRollback = false)
 @TestExecutionListeners( { DependencyInjectionTestExecutionListener.class,
-        StepScopeTestExecutionListener.class, JobScopeTestExecutionListener.class })
+        StepScopeTestExecutionListener.class })
 @Transactional
 public abstract class AbstractContextIT extends
 		AbstractJUnit4SpringContextTests {

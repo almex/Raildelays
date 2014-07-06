@@ -5,6 +5,9 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.annotation.AfterWrite;
+import org.springframework.batch.core.annotation.BeforeStep;
+import org.springframework.batch.core.annotation.BeforeWrite;
 import org.springframework.batch.item.ExecutionContext;
 
 import java.text.SimpleDateFormat;
@@ -13,23 +16,18 @@ import java.util.List;
 /**
  * @author Almex
  */
-public class ResourceLocatorListener implements StepExecutionListener, ItemWriteListener<BatchExcelRow> {
+public class ResourceLocatorListener {
 
     public static final String FILENAME_SUFFIX_KEY = "resource.filename.suffix";
 
     private ExecutionContext context;
 
-    @Override
+    @BeforeStep
     public void beforeStep(StepExecution stepExecution) {
         this.context = stepExecution.getExecutionContext();
     }
 
-    @Override
-    public ExitStatus afterStep(StepExecution stepExecution) {
-        return null;
-    }
-
-    @Override
+    @BeforeWrite
     public void beforeWrite(List<? extends BatchExcelRow> items) {
         if (!items.isEmpty()) {
             // Retrieve first element of what would be written
@@ -41,13 +39,8 @@ public class ResourceLocatorListener implements StepExecutionListener, ItemWrite
         }
     }
 
-    @Override
+    @AfterWrite
     public void afterWrite(List<? extends BatchExcelRow> items) {
         context.putString(FILENAME_SUFFIX_KEY, null);
-    }
-
-    @Override
-    public void onWriteError(Exception exception, List<? extends BatchExcelRow> items) {
-
     }
 }

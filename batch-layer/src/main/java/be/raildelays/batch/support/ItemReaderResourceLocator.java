@@ -22,9 +22,14 @@ public class ItemReaderResourceLocator extends ItemResourceLocator {
 	
 	@Override
 	public Resource getResource(ExecutionContext context) throws IOException {
+        Resource result = resource;
         String absolutePath = context.getString(FILE_PATH_KEY, resource.getFile().getParent());
 
-        return new FileSystemResource(new File(absolutePath));
+        if (absolutePath != null) {
+            result = new FileSystemResource(new File(absolutePath));
+        }
+
+        return result;
 	}
 	
 }
