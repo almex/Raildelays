@@ -31,6 +31,13 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FilterTwoSensPerDayProcessor.class);
 
+    private ExecutionContext executionContext;
+
+    @BeforeStep
+    public void beforeStep(StepExecution stepExecution) {
+        this.executionContext = stepExecution.getExecutionContext();
+    }
+
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -42,7 +49,7 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
         BatchExcelRow result = null;
 
         try {
-            outputReader.open(new ExecutionContext());
+            outputReader.open(executionContext);
 
             try {
                 BatchExcelRow matchingExcelRow = null;

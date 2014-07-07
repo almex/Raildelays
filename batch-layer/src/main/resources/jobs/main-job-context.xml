@@ -61,6 +61,7 @@
             </batch:tasklet>
             <batch:listeners merge="true">
                 <batch:listener ref="delaysItemReader"/>
+                <batch:listener ref="filterTwoSensPerDayProcessor"/>
             </batch:listeners>
         </batch:step>
     </batch:job>
@@ -234,7 +235,9 @@
                         <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
                         <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
                         <property name="rowMapper">
-                            <bean class="be.raildelays.batch.reader.BatchExcelRowMapper"/>
+                            <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
+                                <property name="validateOutcomes" value="true"/>
+                            </bean>
                         </property>
                     </bean>
                 </property>
