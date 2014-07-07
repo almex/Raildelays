@@ -34,7 +34,7 @@ public class MultiResourceAwareItemReader<T> extends AbstractItemStreamItemReade
     public T read() throws Exception {
         final Resource currentResource = resourceLocator.getResource(executionContext);
 
-        if (previousResource == null || previousResource != currentResource) {
+        if (previousResource == null || !previousResource.equals(currentResource)) {
             delegate.close();
             delegate.setResource(currentResource);
             delegate.open(executionContext);
