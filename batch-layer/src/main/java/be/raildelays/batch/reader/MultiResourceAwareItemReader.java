@@ -10,6 +10,8 @@ import org.springframework.core.io.Resource;
 import java.io.IOException;
 
 /**
+ * This implementation make the job not restartable
+ *
  * @author Almex
  */
 public class MultiResourceAwareItemReader<T> extends AbstractItemStreamItemReader<T> implements ResourceAwareItemReaderItemStream<T> {
@@ -18,21 +20,27 @@ public class MultiResourceAwareItemReader<T> extends AbstractItemStreamItemReade
 
     private ResourceAwareItemReaderItemStream<? extends T> delegate;
 
+    private ExecutionContext executionContext;
+
+    private Resource previousResource;
+
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
         super.open(executionContext);
-
-        try {
-            delegate.setResource(resourceLocator.getResource(executionContext));
-        } catch (IOException e) {
-            throw new ItemStreamException("Couldn't assign resource", e);
-        }
-
-        delegate.open(executionContext);
+        this.executionContext = executionContext;
     }
 
     @Override
     public T read() throws Exception {
+        final Resource currentResource = resourceLocator.getResource(executionContext);
+
+        if (previousResource == null || previousResource != currentResource) {
+            delegate.close();
+            delegate.setResource(currentResource);
+            delegate.open(executionContext);
+            previousResource = currentResource;
+        }
+
         return delegate.read();
     }
 

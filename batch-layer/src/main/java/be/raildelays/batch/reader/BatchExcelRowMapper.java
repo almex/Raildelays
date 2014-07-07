@@ -9,7 +9,11 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -19,9 +23,22 @@ import java.util.Date;
 /**
  * @author Almex
  */
-public class BatchExcelRowMapper implements RowMapper<BatchExcelRow> {
+public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, InitializingBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchExcelRowMapper.class);
+
+    private boolean validateOutcomes = false;
+
+    private Validator validator;
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if (validateOutcomes) {
+            ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+            validator = factory.getValidator();
+        }
+    }
+
 
     private interface CellParser<T> {
         T getValue(Cell cell);
@@ -48,6 +65,10 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow> {
                     .index((long) row.getRowNum())
                     .build();
         } //-- If the first cell contains nothing we return null
+
+        if (validateOutcomes && !validator.validate(result).isEmpty()) {
+            result = null;
+        }
 
         return result;
     }
@@ -213,5 +234,9 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow> {
                 return result;
             }
         });
+    }
+
+    public void setValidateOutcomes(boolean validateOutcomes) {
+        this.validateOutcomes = validateOutcomes;
     }
 }

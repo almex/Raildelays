@@ -48,12 +48,8 @@
                         <batch:include class="be.raildelays.batch.exception.ArrivalDepartureEqualsException"/>
                     </batch:skippable-exception-classes>
                     <batch:listeners merge="true">
-                        <batch:listener>
-                            <bean class="be.raildelays.batch.listener.LogSkippedItemListener" scope="step"/>
-                        </batch:listener>
-                        <batch:listener>
-                            <bean class="be.raildelays.batch.listener.ResourceLocatorListener"/>
-                        </batch:listener>
+                        <batch:listener ref="logSkippedItemListener"/>
+                        <batch:listener ref="resourceLocatorListener"/>
                     </batch:listeners>
                 </batch:chunk>
                 <batch:transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
@@ -64,17 +60,9 @@
                 </batch:listeners>
             </batch:tasklet>
             <batch:listeners merge="true">
-                <batch:listener>
-                    <bean class="be.raildelays.batch.listener.ResourceLocatorListener"/>
-                </batch:listener>
                 <batch:listener ref="delaysItemReader"/>
             </batch:listeners>
         </batch:step>
-        <batch:listeners merge="true">
-            <batch:listener>
-                <bean class="be.raildelays.batch.listener.ResourceLocatorListener"/>
-            </batch:listener>
-        </batch:listeners>
     </batch:job>
 
     <bean id="partitioner"
@@ -303,7 +291,9 @@
                 <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
                 <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
                 <property name="rowMapper">
-                    <bean class="be.raildelays.batch.reader.BatchExcelRowMapper"/>
+                    <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
+                        <property name="validateOutcomes" value="true"/>
+                    </bean>
                 </property>
             </bean>
         </property>
@@ -332,6 +322,13 @@
     <!-- =====================================        LISTENERS       ===================================== -->
     <!-- ================================================================================================== -->
 
+    <bean id="logSkippedItemListener"
+          class="be.raildelays.batch.listener.LogSkippedItemListener"
+          scope="step"/>
+
+    <bean id="resourceLocatorListener"
+          class="be.raildelays.batch.listener.ResourceLocatorListener"
+          scope="step"/>
 
     <!-- ================================================================================================== -->
     <!-- =====================================        RESOURCES       ===================================== -->

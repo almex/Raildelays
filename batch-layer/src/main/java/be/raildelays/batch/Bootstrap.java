@@ -27,8 +27,6 @@ public class Bootstrap {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Bootstrap.class);
 
-    private static final String LOGGER_CONFIG_PATH = "./conf/log4j2.xml";
-
     /**
      * @param args
      * @throws Exception
@@ -98,7 +96,7 @@ public class Bootstrap {
                 parameters.put("station.a.name", new JobParameter(departure));
                 parameters.put("station.b.name", new JobParameter(arrival));
                 parameters.put("excel.input.template", new JobParameter(excelInputTemplate));
-                parameters.put("excel.output.file", new JobParameter(excelOutputPath));
+                parameters.put("excel.output.path", new JobParameter(excelOutputPath));
                 parameters.put("output.file.path", new JobParameter(textOutputPath));
 
                 JobParameters jobParameters = new JobParameters(parameters);

@@ -1,9 +1,11 @@
 package be.raildelays.batch;
 
 import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.batch.listener.ResourceLocatorListener;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.railtime.Step;
 import com.excilys.ebi.spring.dbunit.config.DBOperation;
 import com.excilys.ebi.spring.dbunit.test.DataSet;
 import org.apache.commons.lang.time.DateUtils;
@@ -52,6 +54,8 @@ public class MultiResourceItemWriterTestIT extends AbstractContextIT {
 
     private List<BatchExcelRow> items = new ArrayList<>();
 
+    private StepExecution stepExecution;
+
     @Before
     public void setUp() throws Exception {
         File directory = new File(CURRENT_PATH);
@@ -95,7 +99,7 @@ public class MultiResourceItemWriterTestIT extends AbstractContextIT {
         }
     }
 
-    public StepExecution getStepExection() throws ParseException, IOException {
+    public StepExecution getStepExecution() throws ParseException, IOException {
         Map<String, JobParameter> parameters = new HashMap<>();
 
         parameters.put("input.file.path", new JobParameter("train-list.properties"));
@@ -105,13 +109,19 @@ public class MultiResourceItemWriterTestIT extends AbstractContextIT {
         parameters.put("excel.output.path", new JobParameter("./output.xls"));
         parameters.put("excel.input.template", new JobParameter(new ClassPathResource("template.xls").getFile().getAbsolutePath()));
 
-        return MetaDataInstanceFactory.createStepExecution(new JobParameters(parameters));
+        stepExecution = MetaDataInstanceFactory.createStepExecution(new JobParameters(parameters));
+
+        return stepExecution;
     }
 
     @Test
-    @Ignore // Never mandatory listener -> no other way than disabling this test
+    @Ignore // Never trigger mandatory listener, nor stream -> no other way than disabling this test
     public void testWrite() throws Exception {
+        ResourceLocatorListener listener = new ResourceLocatorListener();
+        listener.beforeStep(stepExecution);
+        listener.beforeWrite(items);
         writer.write(items);
+        listener.afterWrite(items);
     }
 
     @After
