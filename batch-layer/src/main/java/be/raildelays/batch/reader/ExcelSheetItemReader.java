@@ -131,6 +131,7 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
 
     @Override
     protected void doClose() throws Exception {
+        noInput = true;
     }
 
     @Override

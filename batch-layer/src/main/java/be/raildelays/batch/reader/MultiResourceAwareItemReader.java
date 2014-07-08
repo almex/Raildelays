@@ -26,6 +26,7 @@ public class MultiResourceAwareItemReader<T> extends AbstractItemStreamItemReade
     public void open(ExecutionContext executionContext) throws ItemStreamException {
         super.open(executionContext);
         this.executionContext = executionContext;
+        previousResource = null;
     }
 
     @Override
