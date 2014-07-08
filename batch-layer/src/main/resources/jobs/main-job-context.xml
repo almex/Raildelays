@@ -350,6 +350,7 @@
           class="be.raildelays.batch.support.ItemReaderResourceLocator"
           scope="step">
         <property name="resource" value="file:#{jobParameters['excel.output.path']}"/>
+        <property name="resourceItemSearch" ref="resourceItemSearch"/>
     </bean>
 
     <bean id="itemWriterResourceLocator"

@@ -23,11 +23,16 @@ public class ItemReaderResourceLocator extends AbstractItemResourceLocator {
     @Override
     public Resource getResource(ExecutionContext context) throws IOException {
         Resource result = resource;
-        String absolutePath = context.getString(FILE_PATH_KEY, getExistingFile().getAbsolutePath());
 
-        if (absolutePath != null) {
-            result = new FileSystemResource(new File(absolutePath));
-        }
+        if (context.containsKey(FILE_PATH_KEY)) {
+            result = new FileSystemResource(new File(context.getString(FILE_PATH_KEY)));
+        } else {
+			File existingFile = getExistingFile();
+			
+			if (existingFile != null) {
+				result = new FileSystemResource(existingFile);
+			}
+		}
 
         return result;
     }
