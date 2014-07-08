@@ -1,11 +1,7 @@
 package be.raildelays.batch.listener;
 
 import be.raildelays.batch.bean.BatchExcelRow;
-import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.annotation.AfterWrite;
 import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.annotation.BeforeWrite;
 import org.springframework.batch.item.ExecutionContext;
@@ -37,10 +33,5 @@ public class ResourceLocatorListener {
 
             context.putString(FILENAME_SUFFIX_KEY, suffix);
         }
-    }
-
-    @AfterWrite
-    public void afterWrite(List<? extends BatchExcelRow> items) {
-        context.putString(FILENAME_SUFFIX_KEY, null);
     }
 }

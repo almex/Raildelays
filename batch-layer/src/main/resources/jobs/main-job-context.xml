@@ -373,7 +373,7 @@
             </bean>
         </property>
         <property name="comparator">
-            <bean class="be.raildelays.batch.bean.BatchExcelRowComparator"/>
+            <bean class="be.raildelays.batch.bean.ExcelRowComparator"/>
         </property>
     </bean>
 

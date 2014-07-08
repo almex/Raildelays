@@ -52,7 +52,7 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
     }
 
     @Override
-    public void write(List<? extends T> items) throws Exception, UnexpectedInputException, ParseException {
+    public void write(List<? extends T> items) throws Exception {
         for (T item : items) {
             if (item instanceof ItemIndexAware) {
                 Long index = ((ItemIndexAware) item).getIndex();

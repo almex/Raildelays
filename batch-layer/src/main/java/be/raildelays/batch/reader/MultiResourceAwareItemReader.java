@@ -7,8 +7,6 @@ import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 import org.springframework.core.io.Resource;
 
-import java.io.IOException;
-
 /**
  * This implementation make the job not restartable
  *

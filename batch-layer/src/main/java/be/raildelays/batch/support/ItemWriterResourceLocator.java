@@ -24,14 +24,12 @@ import java.io.IOException;
  *
  * @author Almex
  */
-public class ItemWriterResourceLocator extends ItemResourceLocator {
+public class ItemWriterResourceLocator extends AbstractItemResourceLocator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ItemWriterResourceLocator.class);
 
-    private ResourceItemSearch<BatchExcelRow> resourceItemSearch;
-	
-	@Override
-	public Resource getResource(ExecutionContext context) throws IOException {
+    @Override
+    public Resource getResource(ExecutionContext context) throws IOException {
         File file = getExistingFile();
 
         if (file == null) {
@@ -41,42 +39,6 @@ public class ItemWriterResourceLocator extends ItemResourceLocator {
         context.putString(FILE_PATH_KEY, file.getAbsolutePath());
 
         return new FileSystemResource(file);
-	}
-
-    public File getExistingFile() throws IOException {
-        File directory = resource.getFile().isDirectory() ? resource.getFile() : resource.getFile().getParentFile();
-        File result = null;
-
-        if (directory != null) {
-            try {
-                for (File file : directory.listFiles(new FileFilter() {
-                    @Override
-                    public boolean accept(File pathname) {
-                        return pathname.getName().endsWith(Format.OLE2.getFileExtension()) || pathname.getName().endsWith(Format.OOXML.getFileExtension());
-                    }
-                })) {
-                    try {
-
-                        int currentRowIndex = resourceItemSearch.indexOf(new BatchExcelRow.Builder(null, null).build(), new FileSystemResource(file));
-
-                        if (currentRowIndex != -1) {
-                            result = file;
-                        }
-                    } catch (InvalidFormatException e) {
-                        LOGGER.error("Excel format not supported for this workbook!", e);
-                    } catch (IOException e) {
-                        LOGGER.error("Error when opening an Excel workbook", e);
-                    }
-                }
-            } catch (Exception e) {
-                throw new IOException("Cannot find content in your Excel file", e);
-            }
-        }
-
-        return result;
     }
 
-    public void setResourceItemSearch(ResourceItemSearch<BatchExcelRow> resourceItemSearch) {
-        this.resourceItemSearch = resourceItemSearch;
-    }
 }

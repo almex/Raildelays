@@ -5,7 +5,6 @@ import be.raildelays.batch.listener.ResourceLocatorListener;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
-import be.raildelays.domain.railtime.Step;
 import com.excilys.ebi.spring.dbunit.config.DBOperation;
 import com.excilys.ebi.spring.dbunit.test.DataSet;
 import org.apache.commons.lang.time.DateUtils;
@@ -121,7 +120,6 @@ public class MultiResourceItemWriterTestIT extends AbstractContextIT {
         listener.beforeStep(stepExecution);
         listener.beforeWrite(items);
         writer.write(items);
-        listener.afterWrite(items);
     }
 
     @After

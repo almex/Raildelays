@@ -18,18 +18,18 @@ import java.io.IOException;
  *
  * @author Almex
  */
-public class ItemReaderResourceLocator extends ItemResourceLocator {
-	
-	@Override
-	public Resource getResource(ExecutionContext context) throws IOException {
+public class ItemReaderResourceLocator extends AbstractItemResourceLocator {
+
+    @Override
+    public Resource getResource(ExecutionContext context) throws IOException {
         Resource result = resource;
-        String absolutePath = context.getString(FILE_PATH_KEY, resource.getFile().getParent());
+        String absolutePath = context.getString(FILE_PATH_KEY, getExistingFile().getAbsolutePath());
 
         if (absolutePath != null) {
             result = new FileSystemResource(new File(absolutePath));
         }
 
         return result;
-	}
-	
+    }
+
 }

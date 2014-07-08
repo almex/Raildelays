@@ -1,7 +1,7 @@
 package be.raildelays.batch.writer;
 
 import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.batch.bean.BatchExcelRowComparator;
+import be.raildelays.batch.bean.ExcelRowComparator;
 import be.raildelays.batch.listener.ResourceLocatorListener;
 import be.raildelays.batch.poi.SimpleResourceItemSearch;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
@@ -18,8 +18,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -82,7 +80,7 @@ public class MultiResourceItemWriterTest {
         reader.afterPropertiesSet();
 
         resourceItemSearch.setReader(reader);
-        resourceItemSearch.setComparator(new BatchExcelRowComparator());
+        resourceItemSearch.setComparator(new ExcelRowComparator());
 
         resourceLocator.setResource(resource);
         resourceLocator.setResourceItemSearch(resourceItemSearch);
@@ -140,7 +138,6 @@ public class MultiResourceItemWriterTest {
         listener.beforeWrite(items.subList(0, 2));
         writer.write(items.subList(0, 2));
         writer.update(executionContext);
-        listener.afterWrite(Collections.<BatchExcelRow>emptyList());
         writer.close();
 
         Assert.assertEquals(1, getExcelFiles().length);
@@ -154,42 +151,34 @@ public class MultiResourceItemWriterTest {
         writer.open(executionContext);
         writer.write(items.subList(0, 10));
         writer.update(executionContext);
-        listener.afterWrite(Collections.<BatchExcelRow>emptyList());
 
         listener.beforeWrite(items.subList(10, 20));
         writer.write(items.subList(10, 20));
         writer.update(executionContext);
-        listener.afterWrite(Collections.<BatchExcelRow>emptyList());
 
         listener.beforeWrite(items.subList(20, 30));
         writer.write(items.subList(20, 30));
         writer.update(executionContext);
-        listener.afterWrite(Collections.<BatchExcelRow>emptyList());
 
         listener.beforeWrite(items.subList(30, 40));
         writer.write(items.subList(30, 40));
         writer.update(executionContext);
-        listener.afterWrite(Collections.<BatchExcelRow>emptyList());
 
         listener.beforeWrite(items.subList(40, 50));
         writer.write(items.subList(40, 50));
         writer.update(executionContext);
-        listener.afterWrite(Collections.<BatchExcelRow>emptyList());
 
         listener.beforeWrite(items.subList(50, 60));
         writer.write(items.subList(50, 60));
         writer.update(executionContext);
-        listener.afterWrite(Collections.<BatchExcelRow>emptyList());
 
         listener.beforeWrite(items.subList(60, 70));
         writer.write(items.subList(60, 70));
         writer.update(executionContext);
-        listener.afterWrite(Collections.<BatchExcelRow>emptyList());
 
         listener.beforeWrite(items.subList(70, 80));
         writer.write(items.subList(70, 80));
         writer.update(executionContext);
-        listener.afterWrite(Collections.<BatchExcelRow>emptyList());
         writer.close();
 
         Assert.assertEquals(2, getExcelFiles().length);
@@ -204,14 +193,12 @@ public class MultiResourceItemWriterTest {
         writer.open(executionContext);
         writer.write(items.subList(0, 20));
         writer.update(executionContext);
-        listener.afterWrite(Collections.<BatchExcelRow>emptyList());
         writer.close();
 
         listener.beforeWrite(items.subList(20, 40));
         writer.open(executionContext);
         writer.write(items.subList(20, 40));
         writer.update(executionContext);
-        listener.afterWrite(Collections.<BatchExcelRow>emptyList());
         writer.close();
 
         Assert.assertEquals(1, getExcelFiles().length);
@@ -225,7 +212,6 @@ public class MultiResourceItemWriterTest {
         writer.open(executionContext);
         writer.write(Collections.<BatchExcelRow>emptyList());
         writer.update(executionContext);
-        listener.afterWrite(Collections.<BatchExcelRow>emptyList());
         writer.close();
 
         Assert.assertEquals(0, getExcelFiles().length);
