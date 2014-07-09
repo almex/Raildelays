@@ -41,9 +41,12 @@ public class BatchStartAndRecoveryServiceImpl
 	private JobLauncher jobLauncher;
 
 	@Override
-	public void stopAllRunningJobs() {
-		// TODO Auto-generated method stub
-
+	public void stopAllRunningJobs() throws NoSuchJobException, NoSuchJobExecutionException, JobExecutionNotRunningException {
+        for (String jobName : jobRegistry.getJobNames()) {
+            for (Long jobExecutionId : getRunningExecutions(jobName)) {
+                stop(jobExecutionId);
+            }
+        }
 	}
 
 	@Override

@@ -16,7 +16,7 @@ public interface BatchStartAndRecoveryService {
     /**
      * Stop all running jobs (STARTING, STARTED, STOPPING)
      */
-    void stopAllRunningJobs();
+    void stopAllRunningJobs() throws NoSuchJobException, NoSuchJobExecutionException, JobExecutionNotRunningException;
 
     /**
      * This method must be call before any start of a job to recover

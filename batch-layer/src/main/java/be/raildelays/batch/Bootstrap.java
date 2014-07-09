@@ -18,6 +18,7 @@ import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Assert;
 
+import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.text.SimpleDateFormat;
@@ -54,13 +55,10 @@ public class Bootstrap {
 
         ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext(
                 contextPaths);
-//        ConfigurationFactory.ConfigurationSource source = new ConfigurationFactory.ConfigurationSource(new FileInputStream(LOGGER_CONFIG_PATH));
-//        LoggerContext loggerContext = Configurator.initialize(null, source);
 
         //-- Initialize contexts
         applicationContext.registerShutdownHook(); // Register close of this Spring context to shutdown of the JVM
         applicationContext.start();
-//        loggerContext.start();
 
         final BatchStartAndRecoveryService service = applicationContext.getBean("BatchStartAndRecoveryService", BatchStartAndRecoveryService.class);
 
@@ -85,7 +83,9 @@ public class Bootstrap {
 
             if (recovery) {
                 LOGGER.info("[Recovery activated]");
+                service.restartAllStoppedJobs();
                 service.markInconsistentJobsAsFailed();
+                service.restartAllFailedJobs();
             }
 
             //-- Launch one Job per date
@@ -101,7 +101,11 @@ public class Bootstrap {
 
                 JobParameters jobParameters = new JobParameters(parameters);
 
-                service.start("mainJob", jobParameters);
+                try {
+                    service.start("mainJob", jobParameters);
+                } catch (JobExecutionAlreadyCompleteException e) {
+                    LOGGER.warn("Job already completed for this date {}", new SimpleDateFormat("dd/MM/yyyy").format(date));
+                }
             }
         } finally {
             if (service != null) {
@@ -112,10 +116,6 @@ public class Bootstrap {
                 applicationContext.stop();
                 applicationContext.close();
             }
-
-//            if (loggerContext != null) {
-//                loggerContext.stop();
-//            }
         }
 
         System.exit(0);
