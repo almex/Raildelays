@@ -72,7 +72,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
-        <version.spring>4.0.5.RELEASE</version.spring>
+        <version.spring>4.0.6.RELEASE</version.spring>
         <version.spring.batch>3.0.1.RELEASE</version.spring.batch>
         <version.spring.data>1.5.1.RELEASE</version.spring.data>
         <version.spring.data.rest>2.0.1.RELEASE</version.spring.data.rest>
