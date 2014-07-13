@@ -83,9 +83,10 @@ public class Bootstrap {
 
             if (recovery) {
                 LOGGER.info("[Recovery activated]");
-                service.restartAllStoppedJobs();
+                //service.restartAllStoppedJobs();
                 service.markInconsistentJobsAsFailed();
-                service.restartAllFailedJobs();
+				// FIXME this method below should never throw JobInstanceAlreadyCompleteException
+                //service.restartAllFailedJobs();
             }
 
             //-- Launch one Job per date
