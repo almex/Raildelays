@@ -16,9 +16,9 @@ import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.util.Assert;
 
-import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.text.SimpleDateFormat;
@@ -103,7 +103,7 @@ public class Bootstrap {
 
                 try {
                     service.start("mainJob", jobParameters);
-                } catch (JobExecutionAlreadyCompleteException e) {
+                } catch (JobInstanceAlreadyCompleteException e) {
                     LOGGER.warn("Job already completed for this date {}", new SimpleDateFormat("dd/MM/yyyy").format(date));
                 }
             }

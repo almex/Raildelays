@@ -88,8 +88,6 @@ public class BatchStartAndRecoveryServiceImpl
 				jobRepository.update(jobExecution);
 				LOGGER.info("Setted job as FAILED!");
 			}
-
-			restartFailedJobs(jobName);
 		}
 	}
 
