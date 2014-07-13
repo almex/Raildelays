@@ -65,23 +65,22 @@ public class BatchStartAndRecoveryServiceImpl
 
 			// -- Set incoherent running jobs as FAILED
 			for (Long jobExecutionId : jobExecutionIds) {
-				LOGGER.info("Found a job already running jobExecutionId={}.",
-						jobExecutionId);
+				LOGGER.info("Found a job already running jobExecutionId={}.", jobExecutionId);
 
 				// -- Set Job Execution as FAILED
-				JobExecution jobExecution = jobExplorer
-						.getJobExecution(jobExecutionId);
+				JobExecution jobExecution = jobExplorer.getJobExecution(jobExecutionId);
 				jobExecution.setEndTime(new Date());
 				jobExecution.setStatus(BatchStatus.FAILED);
 				jobExecution.setExitStatus(ExitStatus.FAILED);
 
 				// -- Set all running Step Execution as FAILED
-				for (StepExecution stepExecution : jobExecution
-						.getStepExecutions()) {
+				for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
 					if (stepExecution.getStatus().isRunning()) {
 						stepExecution.setEndTime(new Date());
 						stepExecution.setStatus(BatchStatus.FAILED);
 						stepExecution.setExitStatus(ExitStatus.FAILED);
+						
+						jobRepository.update(stepExecution);
 					}
 				}
 
@@ -111,11 +110,22 @@ public class BatchStartAndRecoveryServiceImpl
 			JobRestartException, JobParametersInvalidException,
 			NoSuchJobInstanceException, JobExecutionAlreadyRunningException {
 		for (String jobName : jobRegistry.getJobNames()) {
-			restartFailedJobs(jobName);
+			restartJobs(jobName, BatchStatus.FAILED);
 		}
-	}
+	}	
 
-	public void restartFailedJobs(String jobName) throws NoSuchJobException,
+	@Override
+	public void restartAllStoppedJobs() throws NoSuchJobException,
+			JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
+			JobRestartException, JobParametersInvalidException,
+			NoSuchJobInstanceException, JobExecutionAlreadyRunningException {
+		for (String jobName : jobRegistry.getJobNames()) {
+			restartJobs(jobName, BatchStatus.STOPPED);
+		}
+
+	}	
+
+	public void restartJobs(String jobName, BatchStatus status) throws NoSuchJobException,
 			JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
 			JobRestartException, JobParametersInvalidException,
 			NoSuchJobInstanceException, JobExecutionAlreadyRunningException {
@@ -144,23 +154,17 @@ public class BatchStartAndRecoveryServiceImpl
 				}
 
 				for (Long jobExecutionId : jobExecutionIds) {
-					JobExecution jobExecution = jobExplorer
-							.getJobExecution(jobExecutionId);
+					JobExecution jobExecution = jobExplorer.getJobExecution(jobExecutionId);
 
 					// We will not search batch jobs older than 7 days
 					if (jobExecution.getCreateTime().before(sevenDaysBefore)) {
-						LOGGER.debug(
-								"Last job execution analyzed for a restart : {}",
-								jobExecution);
+						LOGGER.debug("Last job execution analyzed for a restart : {}", jobExecution);
 						return;
 					}
 
 					// Restartable jobs are FAILED or STOPPED
-					if (jobExecution.getStatus().equals(BatchStatus.FAILED)
-							|| jobExecution.getStatus().equals(
-									BatchStatus.STOPPED)) {
-						LOGGER.info("Restarting jobExecutionId={}...",
-								jobExecutionId);
+					if (jobExecution.getStatus().equals(status)) {
+						LOGGER.info("Restarting jobExecutionId={}...", jobExecutionId);
 						restart(jobExecutionId);
 					}
 				}
@@ -196,12 +200,6 @@ public class BatchStartAndRecoveryServiceImpl
 		
 		return list;
 	}
-
-	@Override
-	public void restartAllStoppedJobs() {
-		// TODO Auto-generated method stub
-
-	}	
 
 	@Override
 	public JobExecution start(String jobName, JobParameters jobParameters) throws JobInstanceAlreadyExistsException, NoSuchJobException, JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
