@@ -291,16 +291,16 @@ public class RaildelaysServiceImpl implements RaildelaysService {
         //-- Modify backward
         LineStop previous = lineStop.getPrevious();
         while (previous != null) {
-            previous.setArrivalTime(removeDelay(lineStop.getArrivalTime()));
-            previous.setDepartureTime(removeDelay(lineStop.getDepartureTime()));
+            previous.setArrivalTime(removeDelay(previous.getArrivalTime()));
+            previous.setDepartureTime(removeDelay(previous.getDepartureTime()));
             previous = previous.getPrevious();
         }
 
         //-- Modify forward
         LineStop next = lineStop.getNext();
         while (next != null) {
-            next.setArrivalTime(removeDelay(lineStop.getArrivalTime()));
-            next.setDepartureTime(removeDelay(lineStop.getDepartureTime()));
+            next.setArrivalTime(removeDelay(next.getArrivalTime()));
+            next.setDepartureTime(removeDelay(next.getDepartureTime()));
             next = next.getNext();
         }
 
