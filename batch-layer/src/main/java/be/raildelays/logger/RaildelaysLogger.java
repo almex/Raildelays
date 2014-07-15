@@ -8,9 +8,11 @@ import be.raildelays.domain.railtime.Direction;
 import be.raildelays.domain.railtime.Step;
 import be.raildelays.domain.railtime.TwoDirections;
 import be.raildelays.domain.xls.ExcelRow;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.joda.time.Duration;
 import org.joda.time.LocalTime;
+import org.slf4j.Marker;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -50,6 +52,17 @@ import java.util.List;
  * @author Almex
  */
 public class RaildelaysLogger implements Logger {
+
+    private static final int STATION_LENGTH = 12;
+    private static final int MESSAGE_LENGTH = 20;
+    private static final int PREFIX_LENGTH = 3;
+    private static final String ID_FORMAT = "######";
+    private static final String TRAIN_FORMAT = "####";
+    private static final String DELAY_FORMAT = "##";
+    private static final String DATE_FORMAT = "dd/MM/yyyy";
+    private static final String TIME_FORMAT = "HH:mm";
+    private static final int TOTAL_LENGTH = ID_FORMAT.length() + DATE_FORMAT.length() + 2 * TRAIN_FORMAT.length() +
+            2 * STATION_LENGTH + 4 * TIME_FORMAT.length() + 2 * ID_FORMAT.length() + 12;
 
     private org.slf4j.Logger delegate;
 
@@ -162,51 +175,45 @@ public class RaildelaysLogger implements Logger {
 
         public String build() {
             final StringBuilder builder = new StringBuilder();
-            final NumberFormat idFormat = new DecimalFormat("######");
-            final NumberFormat trainFormat = new DecimalFormat("####");
-            final NumberFormat delayFormat = new DecimalFormat("##");
-            final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-            final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+            final NumberFormat idFormat = new DecimalFormat(ID_FORMAT);
+            final NumberFormat trainFormat = new DecimalFormat(TRAIN_FORMAT);
+            final NumberFormat delayFormat = new DecimalFormat(DELAY_FORMAT);
+            final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+            final SimpleDateFormat timeFormat = new SimpleDateFormat(TIME_FORMAT);
 
-            builder.append(separator);
-            builder.append(type != null ? "[" + type.substring(0, 3) + "]" : "     ");
-            builder.append(separator);
-            builder.append(message != null ? message.substring(0, 20) : "                    ");
-            builder.append(separator);
             if (expectedTrain != null ||
                     departureStation != null ||
                     expectedDepartureTime != null ||
                     effectiveDepartureTime != null) {
-                builder.append(id != null ? idFormat.format(id) : "null  ");
+                builder.append(StringUtils.rightPad(id != null ? idFormat.format(id) : "null", ID_FORMAT.length()));
                 builder.append(separator);
-                builder.append(date != null ? dateFormat.format(date) : "      ");
+                builder.append(StringUtils.rightPad(date != null ? dateFormat.format(date) : "", DATE_FORMAT.length()));
                 builder.append(separator);
-                builder.append(expectedTrain != null ? trainFormat.format(expectedTrain) : "    ");
+                builder.append(StringUtils.rightPad(expectedTrain != null ? trainFormat.format(expectedTrain) : "", TRAIN_FORMAT.length()));
                 builder.append(separator);
-                builder.append(effectiveTrain != null ? trainFormat.format(effectiveTrain) : "    ");
+                builder.append(StringUtils.rightPad(effectiveTrain != null ? trainFormat.format(effectiveTrain) : "", TRAIN_FORMAT.length()));
                 builder.append(separator);
-                builder.append(departureStation != null ? departureStation.substring(0, 12) : "            ");
+                builder.append(StringUtils.rightPad(departureStation != null ? departureStation.substring(0, STATION_LENGTH) : "", STATION_LENGTH));
                 builder.append(separator);
-                builder.append(arrivalStation != null ? arrivalStation.substring(0, 12) : "            ");
+                builder.append(StringUtils.rightPad(arrivalStation != null ? arrivalStation.substring(0, STATION_LENGTH) : "", STATION_LENGTH));
                 builder.append(separator);
-                builder.append(expectedDepartureTime != null ? timeFormat.format(expectedDepartureTime) : "null ");
+                builder.append(StringUtils.rightPad(expectedDepartureTime != null ? timeFormat.format(expectedDepartureTime) : "null", TIME_FORMAT.length()));
                 builder.append(separator);
-                builder.append(expectedArrivalTime != null ? timeFormat.format(expectedArrivalTime) : "null ");
+                builder.append(StringUtils.rightPad(expectedArrivalTime != null ? timeFormat.format(expectedArrivalTime) : "null", TIME_FORMAT.length()));
                 builder.append(separator);
-                builder.append(effectiveDepartureTime != null ? timeFormat.format(effectiveDepartureTime) : "     ");
+                builder.append(StringUtils.rightPad(effectiveDepartureTime != null ? timeFormat.format(effectiveDepartureTime) : "", TIME_FORMAT.length()));
                 builder.append(separator);
-                builder.append(effectiveArrivalTime != null ? timeFormat.format(effectiveArrivalTime) : "     ");
+                builder.append(StringUtils.rightPad(effectiveArrivalTime != null ? timeFormat.format(effectiveArrivalTime) : "", TIME_FORMAT.length()));
                 builder.append(separator);
                 builder.append(delayFormat.format(computeDelay()));
                 builder.append(separator);
-                builder.append(idPrevious != null ? idFormat.format(idPrevious) : "null  ");
+                builder.append(StringUtils.rightPad(idPrevious != null ? idFormat.format(idPrevious) : "", ID_FORMAT.length()));
                 builder.append(separator);
-                builder.append(idNext != null ? idFormat.format(idNext) : "null  ");
-                builder.append(separator);
+                builder.append(StringUtils.rightPad(idNext != null ? idFormat.format(idNext) : "", ID_FORMAT.length()));
             } else {
-                builder.append("null                                                                                                ");
-                builder.append(separator);
+                builder.append(StringUtils.rightPad("null", TOTAL_LENGTH));
             }
+            builder.append(separator);
 
 
             return builder.toString();
@@ -233,27 +240,38 @@ public class RaildelaysLogger implements Logger {
         public abstract String logLine(String message, T object);
 
         public void log(String message, Level level, T object) {
+            final StringBuilder builder = new StringBuilder();
+
+            builder.append(separator);
+            builder.append(StringUtils.rightPad(type != null ? "[" + type.substring(0, PREFIX_LENGTH) + "]" : "", PREFIX_LENGTH + 2));
+            builder.append(separator);
+            builder.append(StringUtils.rightPad(message != null ? message.substring(0, MESSAGE_LENGTH) : "", MESSAGE_LENGTH));
+            builder.append(separator);
+
             if (object != null) {
-                switch (level) {
-                    case DEBUG:
-                        delegate.debug(logLine(message, object));
-                        break;
-                    case INFO:
-                        delegate.info(logLine(message, object));
-                        break;
-                    case TRACE:
-                        delegate.info(logLine(message, object));
-                        break;
-                }
+                builder.append(logLine(message, object));
             } else {
-                delegate.warn("Logging error : object is null");
+                builder.append(StringUtils.rightPad("null", TOTAL_LENGTH));
             }
+
+            switch (level) {
+                case DEBUG:
+                    delegate.debug(builder.toString());
+                    break;
+                case INFO:
+                    delegate.info(builder.toString());
+                    break;
+                case TRACE:
+                    delegate.trace(builder.toString());
+                    break;
+            }
+
         }
 
         public void log(String message, Level level, List<T> objects) {
-            for (int i = 0 ; i < objects.size() ; i++) {
+            for (int i = 0; i < objects.size(); i++) {
                 T object = objects.get(i);
-                log(message+"[" + i + "]", level, object);
+                log(message + "[" + i + "]", level, object);
             }
         }
     }
@@ -373,6 +391,21 @@ public class RaildelaysLogger implements Logger {
     }
 
     @Override
+    public void info(String message, List<LineStop> lineStops) {
+        lineStopDelegator.log(message, Level.INFO, lineStops);
+    }
+
+    @Override
+    public void debug(String message, List<LineStop> lineStops) {
+        lineStopDelegator.log(message, Level.DEBUG, lineStops);
+    }
+
+    @Override
+    public void trace(String message, List<LineStop> lineStops) {
+        lineStopDelegator.log(message, Level.TRACE, lineStops);
+    }
+
+    @Override
     public void info(String message, ExcelRow excelRow) {
         excelRowDelegator.log(message, Level.INFO, excelRow);
     }
@@ -436,5 +469,310 @@ public class RaildelaysLogger implements Logger {
 
     public void setSeparator(char separator) {
         this.separator = separator;
+    }
+
+    @Override
+    public String getName() {
+        return null;
+    }
+
+    @Override
+    public boolean isTraceEnabled() {
+        return false;
+    }
+
+    @Override
+    public void trace(String msg) {
+
+    }
+
+    @Override
+    public void trace(String format, Object arg) {
+
+    }
+
+    @Override
+    public void trace(String format, Object arg1, Object arg2) {
+
+    }
+
+    @Override
+    public void trace(String format, Object... arguments) {
+
+    }
+
+    @Override
+    public void trace(String msg, Throwable t) {
+
+    }
+
+    @Override
+    public boolean isTraceEnabled(Marker marker) {
+        return false;
+    }
+
+    @Override
+    public void trace(Marker marker, String msg) {
+
+    }
+
+    @Override
+    public void trace(Marker marker, String format, Object arg) {
+
+    }
+
+    @Override
+    public void trace(Marker marker, String format, Object arg1, Object arg2) {
+
+    }
+
+    @Override
+    public void trace(Marker marker, String format, Object... argArray) {
+
+    }
+
+    @Override
+    public void trace(Marker marker, String msg, Throwable t) {
+
+    }
+
+    @Override
+    public boolean isDebugEnabled() {
+        return false;
+    }
+
+    @Override
+    public void debug(String msg) {
+
+    }
+
+    @Override
+    public void debug(String format, Object arg) {
+
+    }
+
+    @Override
+    public void debug(String format, Object arg1, Object arg2) {
+
+    }
+
+    @Override
+    public void debug(String format, Object... arguments) {
+
+    }
+
+    @Override
+    public void debug(String msg, Throwable t) {
+
+    }
+
+    @Override
+    public boolean isDebugEnabled(Marker marker) {
+        return false;
+    }
+
+    @Override
+    public void debug(Marker marker, String msg) {
+
+    }
+
+    @Override
+    public void debug(Marker marker, String format, Object arg) {
+
+    }
+
+    @Override
+    public void debug(Marker marker, String format, Object arg1, Object arg2) {
+
+    }
+
+    @Override
+    public void debug(Marker marker, String format, Object... arguments) {
+
+    }
+
+    @Override
+    public void debug(Marker marker, String msg, Throwable t) {
+
+    }
+
+    @Override
+    public boolean isInfoEnabled() {
+        return false;
+    }
+
+    @Override
+    public void info(String msg) {
+
+    }
+
+    @Override
+    public void info(String format, Object arg) {
+
+    }
+
+    @Override
+    public void info(String format, Object arg1, Object arg2) {
+
+    }
+
+    @Override
+    public void info(String format, Object... arguments) {
+
+    }
+
+    @Override
+    public void info(String msg, Throwable t) {
+
+    }
+
+    @Override
+    public boolean isInfoEnabled(Marker marker) {
+        return false;
+    }
+
+    @Override
+    public void info(Marker marker, String msg) {
+
+    }
+
+    @Override
+    public void info(Marker marker, String format, Object arg) {
+
+    }
+
+    @Override
+    public void info(Marker marker, String format, Object arg1, Object arg2) {
+
+    }
+
+    @Override
+    public void info(Marker marker, String format, Object... arguments) {
+
+    }
+
+    @Override
+    public void info(Marker marker, String msg, Throwable t) {
+
+    }
+
+    @Override
+    public boolean isWarnEnabled() {
+        return delegate.isWarnEnabled();
+    }
+
+    @Override
+    public void warn(String msg) {
+        delegate.warn(msg);
+    }
+
+    @Override
+    public void warn(String format, Object arg) {
+        delegate.warn(format, arg);
+    }
+
+    @Override
+    public void warn(String format, Object... arguments) {
+        delegate.warn(format, arguments);
+    }
+
+    @Override
+    public void warn(String format, Object arg1, Object arg2) {
+        delegate.warn(format, arg1, arg2);
+    }
+
+    @Override
+    public void warn(String msg, Throwable t) {
+        delegate.warn(msg, t);
+    }
+
+    @Override
+    public boolean isWarnEnabled(Marker marker) {
+        return delegate.isWarnEnabled(marker);
+    }
+
+    @Override
+    public void warn(Marker marker, String msg) {
+        delegate.warn(marker, msg);
+    }
+
+    @Override
+    public void warn(Marker marker, String format, Object arg) {
+        delegate.warn(marker, format, arg);
+    }
+
+    @Override
+    public void warn(Marker marker, String format, Object arg1, Object arg2) {
+        delegate.warn(marker, format, arg1, arg2);
+    }
+
+    @Override
+    public void warn(Marker marker, String format, Object... arguments) {
+        delegate.warn(marker, format, arguments);
+    }
+
+    @Override
+    public void warn(Marker marker, String msg, Throwable t) {
+        delegate.warn(marker, msg, t);
+    }
+
+    @Override
+    public boolean isErrorEnabled() {
+        return delegate.isErrorEnabled();
+    }
+
+    @Override
+    public void error(String msg) {
+        delegate.error(msg);
+    }
+
+    @Override
+    public void error(String format, Object arg) {
+        delegate.error(format, arg);
+    }
+
+    @Override
+    public void error(String format, Object arg1, Object arg2) {
+        delegate.error(format, arg1, arg2);
+    }
+
+    @Override
+    public void error(String format, Object... arguments) {
+        delegate.error(format, arguments);
+    }
+
+    @Override
+    public void error(String msg, Throwable t) {
+        delegate.error(msg, t);
+    }
+
+    @Override
+    public boolean isErrorEnabled(Marker marker) {
+        return delegate.isErrorEnabled(marker);
+    }
+
+    @Override
+    public void error(Marker marker, String msg) {
+        delegate.error(marker, msg);
+    }
+
+    @Override
+    public void error(Marker marker, String format, Object arg) {
+        delegate.error(marker, format, arg);
+    }
+
+    @Override
+    public void error(Marker marker, String format, Object arg1, Object arg2) {
+        delegate.error(marker, format, arg1, arg2);
+    }
+
+    @Override
+    public void error(Marker marker, String format, Object... arguments) {
+        delegate.error(marker, format, arguments);
+    }
+
+    @Override
+    public void error(Marker marker, String msg, Throwable t) {
+        delegate.error(marker, msg, t);
     }
 }

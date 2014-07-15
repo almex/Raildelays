@@ -2,9 +2,9 @@ package be.raildelays.batch.processor;
 
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.TimestampDelay;
+import be.raildelays.logger.Logger;
+import be.raildelays.logger.LoggerFactory;
 import be.raildelays.service.RaildelaysService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
 
 import javax.annotation.Resource;
@@ -20,8 +20,7 @@ import java.util.List;
  */
 public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, LineStop> {
 
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(AggregateExpectedTimeProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("Agg", AggregateExpectedTimeProcessor.class);
 
     @Resource
     private RaildelaysService service;
@@ -46,22 +45,21 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, L
 
         if (item.getArrivalTime() == null || item.getArrivalTime().getExpected() == null ||
                 item.getDepartureTime() == null || item.getDepartureTime().getExpected() == null) {
-            LOGGER.info("It lacks one expected time from this train={} station={} departureTime={} arrivalTime={}", item.getTrain().getEnglishName(), item.getStation().getEnglishName(), item.getDepartureTime(), item.getArrivalTime());
+            LOGGER.info("lacks_expected_time", item);
 
             LineStop candidate = service.searchScheduledLine(item.getTrain(), item.getStation());
 
+            LOGGER.debug("candidate", candidate);
+
             //-- If we cannot retrieve one of the expected time then this item is corrupted we must filter it.
             if (candidate == null) {
-                LOGGER.warn("We must filter this {}", item);
+                LOGGER.trace("no_candidate", item);
 
                 return null;
             }
 
             final TimestampDelay departureTime = new TimestampDelay(candidate.getDepartureTime().getExpected(), 0L);
             final TimestampDelay arrivalTime = new TimestampDelay(candidate.getArrivalTime().getExpected(), 0L);
-
-            LOGGER.debug("We use this candidate to fill-in expected train={} station={} departureTime={} arrivalTime={}", candidate.getTrain().getEnglishName(), candidate.getStation().getEnglishName(), departureTime, arrivalTime);
-
 
             result.departureTime(departureTime) //
                     .arrivalTime(arrivalTime);
@@ -92,7 +90,7 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, L
 
             result = builder.build();
 
-            LOGGER.debug("LineStop after processing={}", result);
+            LOGGER.debug("after_processing", result);
         }
 
         return result;

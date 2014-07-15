@@ -4,13 +4,13 @@ import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.TimestampDelay;
+import be.raildelays.logger.Logger;
+import be.raildelays.logger.LoggerFactory;
 import be.raildelays.service.RaildelaysService;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -29,8 +29,7 @@ import java.util.List;
 public class SearchNextTrainProcessor implements
 		ItemProcessor<BatchExcelRow, BatchExcelRow>, InitializingBean {
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(SearchNextTrainProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("Nxt", SearchNextTrainProcessor.class);
 
 	@Resource
 	private RaildelaysService service;
@@ -58,11 +57,11 @@ public class SearchNextTrainProcessor implements
 		LocalTime time = new LocalTime(item.getExpectedArrivalTime());
 		DateTime dateTime = date.toDateTime(time);
 
-		LOGGER.debug("item={}", item);
+		LOGGER.trace("item", item);
 		
 		candidates = service.searchNextTrain(item.getArrivalStation(), dateTime.toDate());
 
-		LOGGER.trace("candidates={}", candidates);
+		LOGGER.trace("candidates", candidates);
 
 		LineStop fastestTrain = searchFastestTrain(item, candidates);
 
@@ -77,7 +76,7 @@ public class SearchNextTrainProcessor implements
 
             result = aggregate(item, fasterItem);
 
-			LOGGER.info("Found faster train={}", result);
+			LOGGER.info("aggregate_result", result);
 		}
 
 		return result;
@@ -119,17 +118,21 @@ public class SearchNextTrainProcessor implements
 
             // We don't process null values
             if (candidateDeparture == null || candidateArrival == null) {
-                LOGGER.trace("Filtering null: candidateDeparture={} candidateArrival={}", candidateDeparture, candidateArrival);
+                LOGGER.trace("filter_null_departure", candidateDeparture);
+                LOGGER.trace("filter_null_arrival", candidateArrival);
                 continue;
             }
 			
 			// FIXME We must go recursively into getNext() to search any other cancellation.
             if (candidateDeparture.isCanceled() || candidateArrival.isCanceled()) {
-                LOGGER.trace("Filtering canceling: candidateDeparture={} candidateArrival={}", candidateDeparture, candidateArrival);
+                LOGGER.trace("filter_canceled_departure", candidateDeparture);
+                LOGGER.trace("filter_canceled_arrival", candidateArrival);
                 continue;
 			}
 
 			if (item.isCanceled()) {
+                LOGGER.trace("item_canceled", item);
+                LOGGER.debug("faster_train", candidateArrival);
                 fastestTrain = candidateArrival;
                 break; // candidate arrives before item
 			}
@@ -137,16 +140,20 @@ public class SearchNextTrainProcessor implements
 			// Do not take into account train which leaves after the expected
 			// one.
             if (compareTimeAndDelay(item.getEffectiveDepartureTime(), candidateDeparture.getDepartureTime()) >= 0) {
-                LOGGER.trace("Filtering candidate leaving after item: candidateDeparture={} candidateArrival={}", candidateDeparture, candidateArrival);
+                LOGGER.trace("filter_after_departure", candidateDeparture);
+                LOGGER.trace("filter_after_arrival", candidateArrival);
                 continue; // candidate leaves after item
 			}
 
 			// expected arrivalTime to destination and using delay from departure
             if (compareTime(item.getEffectiveArrivalTime(), candidateArrival.getArrivalTime()) < 0) {
+                LOGGER.debug("faster_train", candidateArrival);
                 fastestTrain = candidateArrival;
                 break; // candidate arrives before item
 			}
 		}
+
+        LOGGER.info("fastest_train", fastestTrain);
 
 		return fastestTrain;
 	}
@@ -176,8 +183,6 @@ public class SearchNextTrainProcessor implements
             LocalTime start = new LocalTime(departureA.getTime());
             LocalTime end = new LocalTime(departureB.getExpected());
 
-            LOGGER.trace("compareTime: start={} - end={}", start, end);
-
             Duration duration = new Duration(start.toDateTimeToday(), end.toDateTimeToday());
 
             result = duration.getMillis();
@@ -196,8 +201,6 @@ public class SearchNextTrainProcessor implements
         } else {
             LocalTime start = new LocalTime(departureA.getTime());
             LocalTime end = new LocalTime(departureB.getExpected()).plusMinutes(departureB.getDelay().intValue());
-
-            LOGGER.trace("compareTimeAndDelay: start={} - end={}", start, end);
 
             Duration duration = new Duration(start.toDateTimeToday(), end.toDateTimeToday());
 
