@@ -1,194 +1,124 @@
 package be.raildelays.batch.processor;
 
 import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.batch.bean.BatchExcelRow.Builder;
-import be.raildelays.batch.exception.ArrivalDepartureEqualsException;
-import be.raildelays.domain.Sens;
-import be.raildelays.domain.entities.LineStop;
-import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.TimestampDelay;
 import be.raildelays.logger.Logger;
 import be.raildelays.logger.LoggerFactory;
 import org.apache.commons.lang.Validate;
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang.builder.CompareToBuilder;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.annotation.BeforeStep;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.beans.factory.InitializingBean;
 
-import java.util.Date;
+/**
+ * Filter items to get only two. One for departure and the other one for arrival.
+ * The only remaining items are those which have the maximum delay for a given sens.
+ *
+ * @author Almex
+ */
+public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow, BatchExcelRow>, InitializingBean {
 
-public class ExcelRowMapperProcessor implements
-        ItemProcessor<LineStop, BatchExcelRow>, InitializingBean {
+    private ResourceAwareItemReaderItemStream<BatchExcelRow> outputReader;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("Xls", ExcelRowMapperProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("2Ss", FilterTwoSensPerDayProcessor.class);
 
-    private String stationA;
+    private ExecutionContext executionContext;
 
-    private String stationB;
+    @BeforeStep
+    public void beforeStep(StepExecution stepExecution) {
+        this.executionContext = stepExecution.getExecutionContext();
+    }
+
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Validate.notNull(stationA, "Station A name is mandatory");
-        Validate.notNull(stationB, "Station B name is mandatory");
+        Validate.notNull(outputReader, "outputReader is mandatory");
     }
 
     @Override
-    public BatchExcelRow process(final LineStop item) throws Exception {
+    public BatchExcelRow process(final BatchExcelRow item) throws Exception {
         BatchExcelRow result = null;
 
-        LOGGER.trace("item", item);
+        try {
+            outputReader.open(executionContext);
 
-        result = extractSens(item, stationA, stationB);
+            LOGGER.trace("item", item);
 
-        LOGGER.trace("result", result);
+            try {
+                BatchExcelRow matchingExcelRow = null;
+                do {
+                    matchingExcelRow = outputReader.read();
 
-        return result;
-    }
+                    if (matchingExcelRow != null) {
+                        if (new CompareToBuilder().append(item.getDate(), matchingExcelRow.getDate())
+                                .append(item.getDepartureStation(), matchingExcelRow.getDepartureStation())
+                                .append(item.getArrivalStation(), matchingExcelRow.getArrivalStation())
+                                .toComparison() == 0) {
+                            /**
+                             * Here we know that we have a collision: we match the same date and the same sens.
+                             * If the delay of the item is not greater than the one in the Excel sheet then we skip it.
+                             */
+                            if (item.getDelay() > matchingExcelRow.getDelay()) {
+                                result = item;
 
-    protected BatchExcelRow extractSens(LineStop item,
-                                        String stationAName, String stationBName) throws ArrivalDepartureEqualsException {
-        Station stationA = new Station(stationAName);
-        Station stationB = new Station(stationBName);
-        Sens sens = null;
+                                if (matchingExcelRow.getIndex() != null) {
+                                    result.setIndex(matchingExcelRow.getIndex());
 
-        LineStop departure = readPrevious(item.getPrevious(), stationA,
-                stationB);
-        LineStop arrival = readNext(item.getNext(), stationA, stationB);
+                                    /**
+                                     * Here, the delay of the item is greater than the matching Excel row.
+                                     * We must replace the row currently in the Excel sheet with our item.
+                                     */
+                                    LOGGER.trace("replace_matching", matchingExcelRow);
+                                } else {
+                                    throw new IllegalArgumentException("We don't know the current index of this Excel row. We cannot replace it!");
+                                }
+                            }
 
-        if (departure == null) {
-            departure = item;
-        }
+                            /**
+                             * We stop searching here. Either the result is found or we have to skip this item.
+                             */
+                            LOGGER.debug("stop_searching", result);
 
-        if (arrival == null) {
-            arrival = item;
-        }
+                            break;
+                        } else if (item.getDate().before(matchingExcelRow.getDate())) {
+                            /**
+                             * We stop searching. We expect that the content of the Excel file is sorted by date.
+                             * This clause should never happen if the data read are also sorted by date.
+                             */
+                            LOGGER.debug("item_before_matching", matchingExcelRow);
 
-        if (arrival == departure) {
-            throw new ArrivalDepartureEqualsException(
-                    "Arrival must not be equal to departure");
-        }
+                            break;
+                        }
+                    } else {
+                        result = item;
+                        result.setIndex(null);
 
-        LOGGER.debug("departure", departure);
-        LOGGER.debug("arrival", arrival);
+                        /**
+                         * In that case we reach the first empty row without matching any previous data.
+                         * So, we have to add a new row to the Excel sheet.
+                         */
+                        LOGGER.debug("first_empty_row", result);
 
-        if (departure.getStation().equals(stationA)
-                && arrival.getStation().equals(stationB)) {
-            sens = Sens.DEPARTURE;
-        } else if (departure.getStation().equals(stationB)
-                && arrival.getStation().equals(stationA)) {
-            sens = Sens.ARRIVAL;
-        }
-
-        return map(departure, arrival, sens);
-    }
-
-    protected LineStop readPrevious(LineStop lineStop, Station stationA,
-                                    Station stationB) {
-        LineStop result = null;
-
-        if (lineStop != null) {
-            if (lineStop.getStation().equals(stationA)) {
-                result = lineStop;
-            } else if (lineStop.getStation().equals(stationB)) {
-                result = lineStop;
-            } else if (lineStop.getPrevious() != null) {
-                result = readPrevious(lineStop.getPrevious(), stationA,
-                        stationB);
+                        break;
+                    }
+                } while (matchingExcelRow != null);
+            } finally {
+                outputReader.close();
             }
+        } catch (ItemStreamException e) {
+            LOGGER.warn("Error when opening ResourceAwareItemReaderItemStream. Maybe the resource is not available yet.", e);
+            result = item;
         }
 
-        LOGGER.trace("extracted_left", result);
+        LOGGER.trace("result", item);
 
         return result;
     }
 
-    protected LineStop readNext(LineStop lineStop, Station stationA,
-                                Station stationB) {
-        LineStop result = null;
-
-        if (lineStop != null) {
-            if (lineStop.getStation().equals(stationA)) {
-                result = lineStop;
-            } else if (lineStop.getStation().equals(stationB)) {
-                result = lineStop;
-            } else if (lineStop.getNext() != null) {
-                result = readNext(lineStop.getNext(), stationA, stationB);
-            }
-        }
-
-        LOGGER.trace("extracted_right", result);
-
-        return result;
+    public void setOutputReader(ResourceAwareItemReaderItemStream<BatchExcelRow> outputReader) {
+        this.outputReader = outputReader;
     }
-
-    protected BatchExcelRow map(LineStop lineStopFrom, LineStop lineStopTo, Sens sens) {
-        Date effectiveDepartureTime = computeEffectiveTime(lineStopFrom
-                .getDepartureTime());
-        Date effectiveArrivalTime = computeEffectiveTime(lineStopTo
-                .getArrivalTime());
-
-        BatchExcelRow result = null;
-
-        switch (sens) {
-            case DEPARTURE:
-                result = new Builder(lineStopFrom.getDate(), sens) //
-                        .departureStation(lineStopFrom.getStation()) //
-                        .arrivalStation(lineStopTo.getStation()) //
-                        .expectedDepartureTime(
-                                lineStopFrom.getDepartureTime().getExpected()) //
-                        .expectedArrivalTime(
-                                lineStopTo.getArrivalTime().getExpected()) //
-                        .expectedTrain1(lineStopFrom.getTrain()) //
-                        .effectiveDepartureTime(effectiveDepartureTime) //
-                        .effectiveArrivalTime(effectiveArrivalTime) //
-                        .effectiveTrain1(lineStopTo.getTrain()) //
-                        .delay(lineStopTo.getArrivalTime().getDelay()) //
-                        .canceled(lineStopTo.isCanceled() || lineStopFrom.isCanceled())
-                        .build();
-
-                break;
-            case ARRIVAL:
-                result = new Builder(lineStopFrom.getDate(), sens) //
-                        .departureStation(lineStopFrom.getStation()) //
-                        .arrivalStation(lineStopTo.getStation()) //
-                        .expectedDepartureTime(
-                                lineStopFrom.getDepartureTime().getExpected()) //
-                        .expectedArrivalTime(
-                                lineStopTo.getArrivalTime().getExpected()) //
-                        .expectedTrain1(lineStopFrom.getTrain()) //
-                        .effectiveDepartureTime(effectiveDepartureTime) //
-                        .effectiveArrivalTime(effectiveArrivalTime) //
-                        .effectiveTrain1(lineStopTo.getTrain()) //
-                        .delay(lineStopTo.getArrivalTime().getDelay()) //
-                        .canceled(lineStopTo.isCanceled() || lineStopFrom.isCanceled())
-                        .build();
-
-                break;
-            default:
-                result = new Builder(lineStopFrom.getDate(), sens).build();
-
-                break;
-        }
-
-        return result;
-    }
-
-    protected static Date computeEffectiveTime(TimestampDelay timestampDelay) {
-        Date result = null;
-
-        if (timestampDelay.getExpected() != null) {
-            result = DateUtils.addMinutes(timestampDelay.getExpected(),
-                    timestampDelay.getDelay().intValue());
-        }
-
-        return result;
-    }
-
-    public void setStationA(String stationA) {
-        this.stationA = stationA;
-    }
-
-    public void setStationB(String stationB) {
-        this.stationB = stationB;
-    }
-
 }
