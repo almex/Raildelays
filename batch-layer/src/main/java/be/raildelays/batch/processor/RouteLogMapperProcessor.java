@@ -21,7 +21,7 @@ import java.util.Date;
 public class RouteLogMapperProcessor implements
         ItemProcessor<TwoDirections, RouteLogDTO>, InitializingBean {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("Rut", AggregateExpectedTimeProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("Rut", RouteLogMapperProcessor.class);
 
     private Date date;
 
