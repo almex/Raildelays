@@ -269,7 +269,7 @@ public class RaildelaysLogger implements Logger {
 
         }
 
-        public void log(String message, Level level, List<T> objects) {
+        public void log(String message, Level level, List<? extends T> objects) {
             for (int i = 0; i < objects.size(); i++) {
                 T object = objects.get(i);
                 log(message + "[" + i + "]", level, object);
@@ -627,62 +627,62 @@ public class RaildelaysLogger implements Logger {
 
     @Override
     public boolean isInfoEnabled() {
-        return false;
+        return delegate.isInfoEnabled();
     }
 
     @Override
     public void info(String msg) {
-
+        delegate.info(msg);
     }
 
     @Override
     public void info(String format, Object arg) {
-
+        delegate.info(format, arg);
     }
 
     @Override
     public void info(String format, Object arg1, Object arg2) {
-
+        delegate.info(format, arg1, arg2);
     }
 
     @Override
     public void info(String format, Object... arguments) {
-
+        delegate.info(format, arguments);
     }
 
     @Override
     public void info(String msg, Throwable t) {
-
+        delegate.info(msg, t);
     }
 
     @Override
     public boolean isInfoEnabled(Marker marker) {
-        return false;
+        return delegate.isInfoEnabled(marker);
     }
 
     @Override
     public void info(Marker marker, String msg) {
-
+        delegate.info(marker, msg);
     }
 
     @Override
     public void info(Marker marker, String format, Object arg) {
-
+        delegate.info(marker, format, arg);
     }
 
     @Override
     public void info(Marker marker, String format, Object arg1, Object arg2) {
-
+        delegate.info(marker, format, arg1, arg2);
     }
 
     @Override
     public void info(Marker marker, String format, Object... arguments) {
-
+        delegate.info(marker, format, arguments);
     }
 
     @Override
     public void info(Marker marker, String msg, Throwable t) {
-
+        delegate.info(marker, msg, t);
     }
 
     @Override
