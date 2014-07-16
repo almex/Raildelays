@@ -193,9 +193,9 @@ public class RaildelaysLogger implements Logger {
                 builder.append(separator);
                 builder.append(StringUtils.rightPad(effectiveTrain != null ? trainFormat.format(effectiveTrain) : "", TRAIN_FORMAT.length()));
                 builder.append(separator);
-                builder.append(StringUtils.rightPad(departureStation != null ? departureStation.substring(0, STATION_LENGTH) : "", STATION_LENGTH));
+                builder.append(StringUtils.rightPad(departureStation != null ? StringUtils.substring(departureStation, 0, STATION_LENGTH) : "", STATION_LENGTH));
                 builder.append(separator);
-                builder.append(StringUtils.rightPad(arrivalStation != null ? arrivalStation.substring(0, STATION_LENGTH) : "", STATION_LENGTH));
+                builder.append(StringUtils.rightPad(arrivalStation != null ?  StringUtils.substring(arrivalStation, 0, STATION_LENGTH) : "", STATION_LENGTH));
                 builder.append(separator);
                 builder.append(StringUtils.rightPad(expectedDepartureTime != null ? timeFormat.format(expectedDepartureTime) : "null", TIME_FORMAT.length()));
                 builder.append(separator);
@@ -243,9 +243,9 @@ public class RaildelaysLogger implements Logger {
             final StringBuilder builder = new StringBuilder();
 
             builder.append(separator);
-            builder.append(StringUtils.rightPad(type != null ? "[" + type.substring(0, PREFIX_LENGTH) + "]" : "", PREFIX_LENGTH + 2));
+            builder.append(StringUtils.rightPad(type != null ? "[" +  StringUtils.substring(type, 0, PREFIX_LENGTH) + "]" : "", PREFIX_LENGTH + 2));
             builder.append(separator);
-            builder.append(StringUtils.rightPad(message != null ? message.substring(0, MESSAGE_LENGTH) : "", MESSAGE_LENGTH));
+            builder.append(StringUtils.rightPad(message != null ?  StringUtils.substring(message, 0, MESSAGE_LENGTH) : "", MESSAGE_LENGTH));
             builder.append(separator);
 
             if (object != null) {
