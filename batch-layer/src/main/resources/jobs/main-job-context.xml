@@ -30,6 +30,9 @@
                             <batch:skippable-exception-classes>
                                 <batch:include class="org.springframework.batch.item.validator.ValidationException"/>
                             </batch:skippable-exception-classes>
+                            <!--<batch:listeners merge="true">-->
+                                <!--<batch:listener ref="logItemProcessorListener" />-->
+                            <!--</batch:listeners>-->
                         </batch:chunk>
                         <batch:transaction-attributes
                                 isolation="DEFAULT" propagation="REQUIRED"/>
@@ -50,6 +53,7 @@
                     <batch:listeners merge="true">
                         <batch:listener ref="logSkippedItemListener"/>
                         <batch:listener ref="resourceLocatorListener"/>
+                        <batch:listener ref="logItemProcessorListener" />
                     </batch:listeners>
                 </batch:chunk>
                 <batch:transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
@@ -327,6 +331,11 @@
     <bean id="resourceLocatorListener"
           class="be.raildelays.batch.listener.ResourceLocatorListener"
           scope="step"/>
+
+    <bean id="logItemProcessorListener"
+          class="be.raildelays.batch.listener.LogItemProcessorListener"
+          scope="step"/>
+
 
     <!-- ================================================================================================== -->
     <!-- =====================================        RESOURCES       ===================================== -->
