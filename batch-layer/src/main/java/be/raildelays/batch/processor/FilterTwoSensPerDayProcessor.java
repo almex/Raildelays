@@ -48,6 +48,8 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
     public BatchExcelRow process(final BatchExcelRow item) throws Exception {
         BatchExcelRow result = null;
 
+        LOGGER.trace("item", item);
+
         try {
             outputReader.open(executionContext);
 
@@ -116,6 +118,8 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
             LOGGER.warn("Error when opening ResourceAwareItemReaderItemStream. Maybe the resource is not available yet.", e);
             result = item;
         }
+
+        LOGGER.trace("result", result);
 
         return result;
     }

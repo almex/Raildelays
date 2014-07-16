@@ -40,6 +40,39 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, L
         return result;
     }
 
+
+    @Override
+    public LineStop process(LineStop item) throws Exception {
+        LineStop result = null;
+        LineStop.Builder builder = fetchScheduling(item);
+
+        LOGGER.trace("item", item);
+
+        if (builder != null) {
+            //-- Modify backward
+            LineStop previous = item.getPrevious();
+            while (previous != null) {
+                builder.addPrevious(fetchScheduling(previous));
+                previous = previous.getPrevious();
+            }
+
+            //-- Modify forward
+            LineStop next = item.getNext();
+            while (next != null) {
+                builder.addNext(fetchScheduling(next));
+                next = next.getNext();
+            }
+
+            result = builder.build();
+
+            LOGGER.debug("after_processing", result);
+        }
+
+        LOGGER.trace("result", result);
+
+        return result;
+    }
+
     public LineStop.Builder fetchScheduling(LineStop item) throws Exception {
         LineStop.Builder result = new LineStop.Builder(item, false, false);
 
@@ -63,34 +96,6 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, L
 
             result.departureTime(departureTime) //
                     .arrivalTime(arrivalTime);
-        }
-
-        return result;
-    }
-
-    @Override
-    public LineStop process(LineStop item) throws Exception {
-        LineStop result = null;
-        LineStop.Builder builder = fetchScheduling(item);
-
-        if (builder != null) {
-            //-- Modify backward
-            LineStop previous = item.getPrevious();
-            while (previous != null) {
-                builder.addPrevious(fetchScheduling(previous));
-                previous = previous.getPrevious();
-            }
-
-            //-- Modify forward
-            LineStop next = item.getNext();
-            while (next != null) {
-                builder.addNext(fetchScheduling(next));
-                next = next.getNext();
-            }
-
-            result = builder.build();
-
-            LOGGER.debug("after_processing", result);
         }
 
         return result;
