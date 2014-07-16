@@ -29,9 +29,11 @@ public class LogItemProcessorListener {
 
     @AfterProcess
     public void afterProcess(Object item, Object result) {
-        if (item instanceof LineStop && result instanceof ExcelRow) {
+        if (item instanceof LineStop) {
             LOGGER.info(HEADER);
-            LOGGER.info("afterProcess", (ExcelRow) result);
+			if (result instanceof ExcelRow) {
+				LOGGER.info("afterProcess", (ExcelRow) result);
+			}
             LOGGER.info(FOOTER);
         }
     }
