@@ -13,7 +13,7 @@ import org.springframework.batch.core.annotation.BeforeProcess;
  */
 public class LogItemProcessorListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("", AggregateExpectedTimeProcessor.class, '|');
+    private static final Logger LOGGER = LoggerFactory.getLogger("xXx", AggregateExpectedTimeProcessor.class, '|');
 
     private static final String HEADER = "|=====|====================|======|==========|====|====|============|============|=====|=====|=====|=====|==|======|======|";
     private static final String FOOTER = "|=====|====================|======|==========|====|====|============|============|=====|=====|=====|=====|==|======|======|";
