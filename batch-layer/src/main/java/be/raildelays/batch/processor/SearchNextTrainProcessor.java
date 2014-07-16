@@ -79,6 +79,8 @@ public class SearchNextTrainProcessor implements
 			LOGGER.info("aggregate_result", result);
 		}
 
+        LOGGER.trace("result", result);
+
 		return result;
 	}
 
