@@ -270,9 +270,11 @@ public class RaildelaysLogger implements Logger {
         }
 
         public void log(String message, Level level, List<? extends T> objects) {
-            for (int i = 0; i < objects.size(); i++) {
-                T object = objects.get(i);
-                log(message + "[" + i + "]", level, object);
+            if (objects != null) {
+                for (int i = 0; i < objects.size(); i++) {
+                    T object = objects.get(i);
+                    log(message + "[" + i + "]", level, object);
+                }
             }
         }
     }
@@ -451,44 +453,68 @@ public class RaildelaysLogger implements Logger {
 
     @Override
     public void info(String message, RouteLogDTO routeLog) {
-        routeLogDTODelegator.log(message, Level.INFO, routeLog);
-        servedStopDTODelegator.log("stops", Level.INFO, routeLog.getStops());
+        if (routeLog != null) {
+            routeLogDTODelegator.log(message, Level.INFO, routeLog);
+            servedStopDTODelegator.log("stops", Level.INFO, routeLog.getStops());
+        }
     }
 
     @Override
     public void debug(String message, RouteLogDTO routeLog) {
-        routeLogDTODelegator.log(message, Level.DEBUG, routeLog);
-        servedStopDTODelegator.log("stops", Level.DEBUG, routeLog.getStops());
+        if (routeLog != null) {
+            routeLogDTODelegator.log(message, Level.DEBUG, routeLog);
+            servedStopDTODelegator.log("stops", Level.DEBUG, routeLog.getStops());
+        }
     }
 
     @Override
     public void trace(String message, RouteLogDTO routeLog) {
-        routeLogDTODelegator.log(message, Level.TRACE, routeLog);
-        servedStopDTODelegator.log("stops", Level.TRACE, routeLog.getStops());
+        if (routeLog != null) {
+            routeLogDTODelegator.log(message, Level.TRACE, routeLog);
+            servedStopDTODelegator.log("stops", Level.TRACE, routeLog.getStops());
+        }
     }
 
     @Override
     public void info(String message, TwoDirections twoDirections) {
-        directionDelegator.log(message, Level.INFO, twoDirections.getDeparture());
-        stepDelegator.log(message, Level.INFO, twoDirections.getDeparture().getSteps());
-        directionDelegator.log(message, Level.INFO, twoDirections.getArrival());
-        stepDelegator.log(message, Level.INFO, twoDirections.getArrival().getSteps());
+        if (twoDirections != null) {
+            if (twoDirections.getDeparture() != null) {
+                directionDelegator.log(message, Level.INFO, twoDirections.getDeparture());
+                stepDelegator.log(message, Level.INFO, twoDirections.getDeparture().getSteps());
+            }
+            if (twoDirections.getArrival() != null) {
+                directionDelegator.log(message, Level.INFO, twoDirections.getArrival());
+                stepDelegator.log(message, Level.INFO, twoDirections.getArrival().getSteps());
+            }
+        }
     }
 
     @Override
     public void debug(String message, TwoDirections twoDirections) {
-        directionDelegator.log(message, Level.DEBUG, twoDirections.getDeparture());
-        stepDelegator.log(message, Level.DEBUG, twoDirections.getDeparture().getSteps());
-        directionDelegator.log(message, Level.DEBUG, twoDirections.getArrival());
-        stepDelegator.log(message, Level.DEBUG, twoDirections.getArrival().getSteps());
+        if (twoDirections != null) {
+            if (twoDirections.getDeparture() != null) {
+                directionDelegator.log(message, Level.DEBUG, twoDirections.getDeparture());
+                stepDelegator.log(message, Level.DEBUG, twoDirections.getDeparture().getSteps());
+            }
+            if (twoDirections.getArrival() != null) {
+                directionDelegator.log(message, Level.DEBUG, twoDirections.getArrival());
+                stepDelegator.log(message, Level.DEBUG, twoDirections.getArrival().getSteps());
+            }
+        }
     }
 
     @Override
     public void trace(String message, TwoDirections twoDirections) {
-        directionDelegator.log(message, Level.TRACE, twoDirections.getDeparture());
-        stepDelegator.log(message, Level.TRACE, twoDirections.getDeparture().getSteps());
-        directionDelegator.log(message, Level.TRACE, twoDirections.getArrival());
-        stepDelegator.log(message, Level.TRACE, twoDirections.getArrival().getSteps());
+        if (twoDirections != null) {
+            if (twoDirections.getDeparture() != null) {
+                directionDelegator.log(message, Level.TRACE, twoDirections.getDeparture());
+                stepDelegator.log(message, Level.TRACE, twoDirections.getDeparture().getSteps());
+            }
+            if (twoDirections.getArrival() != null) {
+                directionDelegator.log(message, Level.TRACE, twoDirections.getArrival());
+                stepDelegator.log(message, Level.TRACE, twoDirections.getArrival().getSteps());
+            }
+        }
     }
 
 
