@@ -32,7 +32,7 @@ public class Train implements Serializable, Comparable<Train> {
 
 	@Id
 	@Column(name = "ID")
-	@GeneratedValue(strategy = GenerationType.TABLE)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	protected final Long id;
 
 	@Column(name = "ENGLISH_NAME", updatable = false, unique = true)

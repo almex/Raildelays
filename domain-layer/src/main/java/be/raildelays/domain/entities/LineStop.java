@@ -24,7 +24,7 @@ public class LineStop implements Serializable, Cloneable, Comparable<LineStop> {
     private static final long serialVersionUID = 7142886242889314414L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID")
     protected final Long id;
 
