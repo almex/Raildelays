@@ -6,6 +6,7 @@ import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.TimestampDelay;
 import be.raildelays.domain.railtime.Direction;
 import be.raildelays.domain.railtime.Step;
+import be.raildelays.domain.railtime.Train;
 import be.raildelays.domain.railtime.TwoDirections;
 import be.raildelays.domain.xls.ExcelRow;
 import org.apache.commons.lang.StringUtils;
@@ -56,9 +57,9 @@ public class RaildelaysLogger implements Logger {
     private static final int STATION_LENGTH = 12;
     private static final int MESSAGE_LENGTH = 20;
     private static final int PREFIX_LENGTH = 3;
-    private static final String ID_FORMAT = "######";
-    private static final String TRAIN_FORMAT = "####";
-    private static final String DELAY_FORMAT = "##";
+    private static final String ID_FORMAT = "000000";
+    private static final String TRAIN_FORMAT = "0000";
+    private static final String DELAY_FORMAT = "00";
     private static final String DATE_FORMAT = "dd/MM/yyyy";
     private static final String TIME_FORMAT = "HH:mm";
     private static final int TOTAL_LENGTH = ID_FORMAT.length() + DATE_FORMAT.length() + 2 * TRAIN_FORMAT.length() +
@@ -225,7 +226,7 @@ public class RaildelaysLogger implements Logger {
             if (expectedArrivalTime != null && effectiveArrivalTime != null) {
                 LocalTime expected = new LocalTime(expectedArrivalTime);
                 LocalTime effective = new LocalTime(effectiveArrivalTime);
-                Duration duration = new Duration(effective.toDateTimeToday(), expected.toDateTimeToday());
+                Duration duration = new Duration(expected.toDateTimeToday(), effective.toDateTimeToday());
 
                 result = duration.getStandardMinutes();
             }
@@ -292,7 +293,7 @@ public class RaildelaysLogger implements Logger {
         public String logLine(String message, Direction object) {
             return new LogLineBuilder()
                     .message(object.getLibelle())
-                    .expectedTrain(object.getTrain() != null && object.getTrain().getIdRailtime() != null ? Long.parseLong(object.getTrain().getIdRailtime()) : null)
+                    .expectedTrain(getTrainId(object.getTrain()))
                     .departureStation(object.getFrom() != null ? object.getFrom().getName() : null)
                     .arrivalStation(object.getTo() != null ? object.getTo().getName() : null)
                     .build();
@@ -318,7 +319,7 @@ public class RaildelaysLogger implements Logger {
                     .message(message)
                     .id(object.getId())
                     .date(object.getDate())
-                    .expectedTrain(object.getTrain() != null ? object.getTrain().getId() : null)
+                    .expectedTrain(getTrainId(object.getTrain()))
                     .departureStation(object.getStation() != null ? object.getStation().getEnglishName() : null)
                     .expectedDepartureTime(object.getArrivalTime() != null ? object.getArrivalTime().getExpected() : null)
                     .expectedArrivalTime(object.getDepartureTime() != null ? object.getDepartureTime().getExpected() : null)
@@ -337,8 +338,8 @@ public class RaildelaysLogger implements Logger {
                     .message(message)
                     .id(object.getId())
                     .date(object.getDate())
-                    .expectedTrain(object.getExpectedTrain1() != null ? object.getExpectedTrain1().getId() : null)
-                    .effectiveTrain(object.getEffectiveTrain1() != null ? object.getEffectiveTrain1().getId() : null)
+                    .expectedTrain(getTrainId(object.getExpectedTrain1()))
+                    .effectiveTrain(getTrainId(object.getEffectiveTrain1()))
                     .departureStation(object.getDepartureStation() != null ? object.getDepartureStation().getEnglishName() : null)
                     .arrivalStation(object.getArrivalStation() != null ? object.getArrivalStation().getEnglishName() : null)
                     .expectedDepartureTime(object.getExpectedDepartureTime())
@@ -348,6 +349,34 @@ public class RaildelaysLogger implements Logger {
                     .build();
         }
     };
+
+    private static Long getTrainId(be.raildelays.domain.entities.Train train) {
+        Long result = null;
+
+        if (train != null && train.getEnglishName() != null) {
+            try {
+                result = Long.parseLong(train.getEnglishName());
+            } catch (NumberFormatException e) {
+                result = 0L;
+            }
+        }
+
+        return result;
+    }
+
+    private static Long getTrainId(Train train) {
+        Long result = null;
+
+        if (train != null && train.getIdRailtime() != null) {
+            try {
+                result = Long.parseLong(train.getIdRailtime());
+            } catch (NumberFormatException e) {
+                result = 0L;
+            }
+        }
+
+        return result;
+    }
 
     private Delegator<RouteLogDTO> routeLogDTODelegator = new Delegator<RouteLogDTO>() {
         @Override
