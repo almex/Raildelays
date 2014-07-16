@@ -7,50 +7,48 @@ import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.TimestampDelay;
+import be.raildelays.logger.Logger;
+import be.raildelays.logger.LoggerFactory;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.time.DateUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class ExcelRowMapperProcessor implements
-		ItemProcessor<LineStop, BatchExcelRow>, InitializingBean {
+        ItemProcessor<LineStop, BatchExcelRow>, InitializingBean {
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(ExcelRowMapperProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("Xls", ExcelRowMapperProcessor.class);
 
-	private String stationA;
+    private String stationA;
 
-	private String stationB;
+    private String stationB;
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		Validate.notNull(stationA, "Station A name is mandatory");
-		Validate.notNull(stationB, "Station B name is mandatory");
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        Validate.notNull(stationA, "Station A name is mandatory");
+        Validate.notNull(stationB, "Station B name is mandatory");
+    }
 
-		LOGGER.info("Processing for stationA={} and stationB={}...", stationA,
-				stationB);
-	}
+    @Override
+    public BatchExcelRow process(final LineStop item) throws Exception {
+        BatchExcelRow result = null;
 
-	@Override
-	public BatchExcelRow process(final LineStop item) throws Exception {
-		BatchExcelRow result = null;
+        LOGGER.trace("item", item);
 
         result = extractSens(item, stationA, stationB);
 
-		return result;
-	}
+        LOGGER.trace("result", result);
 
-	protected BatchExcelRow extractSens(LineStop item,
-			String stationAName, String stationBName) throws ArrivalDepartureEqualsException {
-		Station stationA = new Station(stationAName);
-		Station stationB = new Station(stationBName);
-		Sens sens = null;
+        return result;
+    }
+
+    protected BatchExcelRow extractSens(LineStop item,
+                                        String stationAName, String stationBName) throws ArrivalDepartureEqualsException {
+        Station stationA = new Station(stationAName);
+        Station stationB = new Station(stationBName);
+        Sens sens = null;
 
         LineStop departure = readPrevious(item.getPrevious(), stationA,
                 stationB);
@@ -69,7 +67,8 @@ public class ExcelRowMapperProcessor implements
                     "Arrival must not be equal to departure");
         }
 
-        LOGGER.debug("departure={} arrival={}", departure, arrival);
+        LOGGER.debug("departure", departure);
+        LOGGER.debug("arrival", arrival);
 
         if (departure.getStation().equals(stationA)
                 && arrival.getStation().equals(stationB)) {
@@ -79,117 +78,117 @@ public class ExcelRowMapperProcessor implements
             sens = Sens.ARRIVAL;
         }
 
-		return map(departure, arrival, sens);
-	}
+        return map(departure, arrival, sens);
+    }
 
-	protected LineStop readPrevious(LineStop lineStop, Station stationA,
-			Station stationB) {
-		LineStop result = null;
+    protected LineStop readPrevious(LineStop lineStop, Station stationA,
+                                    Station stationB) {
+        LineStop result = null;
 
-		if (lineStop != null) {
-			if (lineStop.getStation().equals(stationA)) {
-				result = lineStop;
-			} else if (lineStop.getStation().equals(stationB)) {
-				result = lineStop;
-			} else if (lineStop.getPrevious() != null) {
-				result = readPrevious(lineStop.getPrevious(), stationA,
-						stationB);
-			}
-		}
+        if (lineStop != null) {
+            if (lineStop.getStation().equals(stationA)) {
+                result = lineStop;
+            } else if (lineStop.getStation().equals(stationB)) {
+                result = lineStop;
+            } else if (lineStop.getPrevious() != null) {
+                result = readPrevious(lineStop.getPrevious(), stationA,
+                        stationB);
+            }
+        }
 
-		LOGGER.trace("Extracted from left={}", result);
+        LOGGER.trace("extracted_left", result);
 
-		return result;
-	}
+        return result;
+    }
 
-	protected LineStop readNext(LineStop lineStop, Station stationA,
-			Station stationB) {
-		LineStop result = null;
+    protected LineStop readNext(LineStop lineStop, Station stationA,
+                                Station stationB) {
+        LineStop result = null;
 
-		if (lineStop != null) {
-			if (lineStop.getStation().equals(stationA)) {
-				result = lineStop;
-			} else if (lineStop.getStation().equals(stationB)) {
-				result = lineStop;
-			} else if (lineStop.getNext() != null) {
-				result = readNext(lineStop.getNext(), stationA, stationB);
-			}
-		}
+        if (lineStop != null) {
+            if (lineStop.getStation().equals(stationA)) {
+                result = lineStop;
+            } else if (lineStop.getStation().equals(stationB)) {
+                result = lineStop;
+            } else if (lineStop.getNext() != null) {
+                result = readNext(lineStop.getNext(), stationA, stationB);
+            }
+        }
 
-		LOGGER.trace("Extracted from rigth={}", result);
+        LOGGER.trace("extracted_right", result);
 
-		return result;
-	}
+        return result;
+    }
 
-	protected BatchExcelRow map(LineStop lineStopFrom, LineStop lineStopTo, Sens sens) {
-		Date effectiveDepartureTime = computeEffectiveTime(lineStopFrom
-				.getDepartureTime());
-		Date effectiveArrivalTime = computeEffectiveTime(lineStopTo
-				.getArrivalTime());
+    protected BatchExcelRow map(LineStop lineStopFrom, LineStop lineStopTo, Sens sens) {
+        Date effectiveDepartureTime = computeEffectiveTime(lineStopFrom
+                .getDepartureTime());
+        Date effectiveArrivalTime = computeEffectiveTime(lineStopTo
+                .getArrivalTime());
 
-		BatchExcelRow result = null;
+        BatchExcelRow result = null;
 
-		switch (sens) {
-		case DEPARTURE:
-			result = new Builder(lineStopFrom.getDate(), sens) //
-					.departureStation(lineStopFrom.getStation()) //
-					.arrivalStation(lineStopTo.getStation()) //
-					.expectedDepartureTime(
-							lineStopFrom.getDepartureTime().getExpected()) //
-					.expectedArrivalTime(
-							lineStopTo.getArrivalTime().getExpected()) //
-					.expectedTrain1(lineStopFrom.getTrain()) //
-					.effectiveDepartureTime(effectiveDepartureTime) //
-					.effectiveArrivalTime(effectiveArrivalTime) //
-					.effectiveTrain1(lineStopTo.getTrain()) //
-					.delay(lineStopTo.getArrivalTime().getDelay()) //
-                    .canceled(lineStopTo.isCanceled() || lineStopFrom.isCanceled())
-					.build();
+        switch (sens) {
+            case DEPARTURE:
+                result = new Builder(lineStopFrom.getDate(), sens) //
+                        .departureStation(lineStopFrom.getStation()) //
+                        .arrivalStation(lineStopTo.getStation()) //
+                        .expectedDepartureTime(
+                                lineStopFrom.getDepartureTime().getExpected()) //
+                        .expectedArrivalTime(
+                                lineStopTo.getArrivalTime().getExpected()) //
+                        .expectedTrain1(lineStopFrom.getTrain()) //
+                        .effectiveDepartureTime(effectiveDepartureTime) //
+                        .effectiveArrivalTime(effectiveArrivalTime) //
+                        .effectiveTrain1(lineStopTo.getTrain()) //
+                        .delay(lineStopTo.getArrivalTime().getDelay()) //
+                        .canceled(lineStopTo.isCanceled() || lineStopFrom.isCanceled())
+                        .build();
 
-			break;
-		case ARRIVAL:
-			result = new Builder(lineStopFrom.getDate(), sens) //
-					.departureStation(lineStopFrom.getStation()) //
-					.arrivalStation(lineStopTo.getStation()) //
-					.expectedDepartureTime(
-							lineStopFrom.getDepartureTime().getExpected()) //
-					.expectedArrivalTime(
-							lineStopTo.getArrivalTime().getExpected()) //
-					.expectedTrain1(lineStopFrom.getTrain()) //
-					.effectiveDepartureTime(effectiveDepartureTime) //
-					.effectiveArrivalTime(effectiveArrivalTime) //
-					.effectiveTrain1(lineStopTo.getTrain()) //
-					.delay(lineStopTo.getArrivalTime().getDelay()) //
-                    .canceled(lineStopTo.isCanceled() || lineStopFrom.isCanceled())
-					.build();
+                break;
+            case ARRIVAL:
+                result = new Builder(lineStopFrom.getDate(), sens) //
+                        .departureStation(lineStopFrom.getStation()) //
+                        .arrivalStation(lineStopTo.getStation()) //
+                        .expectedDepartureTime(
+                                lineStopFrom.getDepartureTime().getExpected()) //
+                        .expectedArrivalTime(
+                                lineStopTo.getArrivalTime().getExpected()) //
+                        .expectedTrain1(lineStopFrom.getTrain()) //
+                        .effectiveDepartureTime(effectiveDepartureTime) //
+                        .effectiveArrivalTime(effectiveArrivalTime) //
+                        .effectiveTrain1(lineStopTo.getTrain()) //
+                        .delay(lineStopTo.getArrivalTime().getDelay()) //
+                        .canceled(lineStopTo.isCanceled() || lineStopFrom.isCanceled())
+                        .build();
 
-			break;
-		default:
-			result = new Builder(lineStopFrom.getDate(), sens).build();
+                break;
+            default:
+                result = new Builder(lineStopFrom.getDate(), sens).build();
 
-			break;
-		}
+                break;
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	protected static Date computeEffectiveTime(TimestampDelay timestampDelay) {
-		Date result = null;
+    protected static Date computeEffectiveTime(TimestampDelay timestampDelay) {
+        Date result = null;
 
-		if (timestampDelay.getExpected() != null) {
-			result = DateUtils.addMinutes(timestampDelay.getExpected(),
-					timestampDelay.getDelay().intValue());
-		}
+        if (timestampDelay.getExpected() != null) {
+            result = DateUtils.addMinutes(timestampDelay.getExpected(),
+                    timestampDelay.getDelay().intValue());
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	public void setStationA(String stationA) {
-		this.stationA = stationA;
-	}
+    public void setStationA(String stationA) {
+        this.stationA = stationA;
+    }
 
-	public void setStationB(String stationB) {
-		this.stationB = stationB;
-	}
+    public void setStationB(String stationB) {
+        this.stationB = stationB;
+    }
 
 }
