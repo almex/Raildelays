@@ -230,9 +230,9 @@ public class RaildelaysLogger implements Logger {
                 if (characters.length() <= length) {
                     result = characters;
                 } else {
-                    builder.append(characters.substring(0, length / 2));
+                    builder.append(characters.substring(0, length - 4));
                     builder.append(centerCharacter);
-                    builder.append(characters.substring(length / 2 + 1));
+                    builder.append(characters.substring(characters.length() - 3));
                     result = builder.toString();
                 }
             }
