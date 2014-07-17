@@ -194,9 +194,9 @@ public class RaildelaysLogger implements Logger {
                 builder.append(separator);
                 builder.append(StringUtils.rightPad(effectiveTrain != null ? trainFormat.format(effectiveTrain) : "", TRAIN_FORMAT.length()));
                 builder.append(separator);
-                builder.append(StringUtils.rightPad(departureStation != null ? StringUtils.substring(departureStation, 0, STATION_LENGTH) : "", STATION_LENGTH));
+                builder.append(StringUtils.rightPad(departureStation != null ? substringCenter(departureStation, STATION_LENGTH, '~') : "", STATION_LENGTH));
                 builder.append(separator);
-                builder.append(StringUtils.rightPad(arrivalStation != null ?  StringUtils.substring(arrivalStation, 0, STATION_LENGTH) : "", STATION_LENGTH));
+                builder.append(StringUtils.rightPad(arrivalStation != null ?  substringCenter(arrivalStation, STATION_LENGTH, '~') : "", STATION_LENGTH));
                 builder.append(separator);
                 builder.append(StringUtils.rightPad(expectedDepartureTime != null ? timeFormat.format(expectedDepartureTime) : "null", TIME_FORMAT.length()));
                 builder.append(separator);
@@ -218,6 +218,26 @@ public class RaildelaysLogger implements Logger {
 
 
             return builder.toString();
+        }
+
+        public String substringCenter(String characters, int length, char centerCharacter) {
+            String result = null;
+
+
+            if (characters != null) {
+                StringBuilder builder = new StringBuilder(length);
+
+                if (characters.length() <= length) {
+                    result = characters;
+                } else {
+                    builder.append(characters.substring(0, length / 2));
+                    builder.append(centerCharacter);
+                    builder.append(characters.substring(length / 2 + 1));
+                    result = builder.toString();
+                }
+            }
+
+            return result;
         }
 
         private Long computeDelay() {
