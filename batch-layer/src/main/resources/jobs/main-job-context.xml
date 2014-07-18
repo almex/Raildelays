@@ -63,6 +63,9 @@
                 <batch:listener ref="filterTwoSensPerDayProcessor"/>
             </batch:listeners>
         </batch:step>
+        <batch:listeners merge="true">
+            <batch:listener ref="loggerContextJobListener" />
+        </batch:listeners>
     </batch:job>
 
     <bean id="partitioner"
@@ -71,10 +74,11 @@
     </bean>
 
     <bean id="taskExecutor"
-          class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+          class="be.raildelays.concurent.sheduling.MdcThreadPoolTaskExecutor">
         <property name="corePoolSize" value="2"/>
         <property name="maxPoolSize" value="4"/>
         <property name="allowCoreThreadTimeOut" value="true"/>
+        <property name="waitForTasksToCompleteOnShutdown" value="true" />
     </bean>
 
     <!-- ================================================================================================== -->
@@ -335,6 +339,10 @@
     <bean id="logItemProcessorListener"
           class="be.raildelays.batch.listener.LogItemProcessorListener"
           scope="step"/>
+
+    <bean id="loggerContextJobListener"
+          class="be.raildelays.batch.listener.LoggerContextJobListener"
+          scope="job" />
 
 
     <!-- ================================================================================================== -->

@@ -8,7 +8,9 @@
     <!-- Service annotation config -->
     <context:annotation-config />
 
-    <context:component-scan base-package="be.raildelays.batch.service.impl" />
+    <bean id="BatchStartAndRecoveryService"
+          class="be.raildelays.batch.service.impl.BatchStartAndRecoveryServiceImpl"
+            destroy-method="stopAllRunningJobs" />
         
     <bean id="jobRegistry"
         class="org.springframework.batch.core.configuration.support.MapJobRegistry" />

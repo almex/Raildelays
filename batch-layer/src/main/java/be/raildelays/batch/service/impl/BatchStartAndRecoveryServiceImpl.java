@@ -1,6 +1,7 @@
 package be.raildelays.batch.service.impl;
 
 import be.raildelays.batch.service.BatchStartAndRecoveryService;
+import org.apache.logging.log4j.ThreadContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.*;
@@ -247,7 +248,9 @@ public class BatchStartAndRecoveryServiceImpl
 
         LOGGER.info("Attempting to resume job with name={} and parameters={}", jobName, parameters);
 
-        return jobLauncher.run(job, parameters);
+        JobExecution jobExecution = jobLauncher.run(job, parameters);
+
+        return jobExecution;
     }
 
     private JobExecution findExecutionById(Long jobExecutionId) throws NoSuchJobExecutionException {

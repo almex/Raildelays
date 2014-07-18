@@ -1,122 +1,256 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration monitorInterval="30">
     <appenders>
-        <Console name="console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%m%n" />
-        </Console>
-        <RollingFile name="railtime-data-reader" fileName="logs/railtime-data.log"
-                     filePattern="logs/$${date:yyyy-MM}/railtime-data-%d{MM-dd-yyyy}-%i.log.gz" append="true">
-            <PatternLayout pattern="[Reader]: %m%n" />
-            <Policies>
-                <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="1 MB"/>
-            </Policies>
-            <DefaultRolloverStrategy max="5"/>
-        </RollingFile>
-        <RollingFile name="railtime-data-parser" fileName="logs/railtime-data.log"
-                     filePattern="logs/$${date:yyyy-MM}/railtime-data-%d{MM-dd-yyyy}-%i.log.gz" append="true">
-            <PatternLayout pattern="[Parser]: %m%n" />
-            <Policies>
-                <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="1 MB"/>
-            </Policies>
-            <DefaultRolloverStrategy max="5"/>
-        </RollingFile>
-        <RollingFile name="railtime-data-streamer" fileName="logs/railtime-data.log"
-                     filePattern="logs/$${date:yyyy-MM}/railtime-data-%d{MM-dd-yyyy}-%i.log.gz" append="true">
-            <PatternLayout pattern="[Streamer]: %m%n" />
-            <Policies>
-                <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="1 MB"/>
-            </Policies>
-            <DefaultRolloverStrategy max="5"/>
-        </RollingFile>
-        <RollingFile name="railtime-data" fileName="logs/railtime-data.log"
-                     filePattern="logs/$${date:yyyy-MM}/railtime-data-%d{MM-dd-yyyy}-%i.log.gz" append="true">
-            <PatternLayout pattern="[Data]: %m%n" />
-            <Policies>
-                <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="1 MB"/>
-            </Policies>
-            <DefaultRolloverStrategy max="5"/>
-        </RollingFile>
-        <RollingFile name="output" fileName="logs/output.log"
+        <!--<Console name="console" target="SYSTEM_OUT">-->
+            <!--<PatternLayout pattern="%m%n"/>-->
+        <!--</Console>-->
+
+        <RollingFile name="console" fileName="logs/output.log"
                      filePattern="logs/$${date:yyyy-MM}/output-%d{MM-dd-yyyy}-%i.log.gz" append="true">
-            <PatternLayout pattern="%d{DATE} %m%n" />
+            <PatternLayout pattern="%d{DATE} %-5p: %m%n"/>
             <Policies>
-                <TimeBasedTriggeringPolicy />
+                <TimeBasedTriggeringPolicy/>
                 <SizeBasedTriggeringPolicy size="1 MB"/>
             </Policies>
             <DefaultRolloverStrategy max="5"/>
         </RollingFile>
-        <RollingFile name="springbatch" fileName="logs/springbatch.log"
-                     filePattern="logs/$${date:yyyy-MM}/springbatch-%d{MM-dd-yyyy}-%i.log.gz" append="true">
-            <PatternLayout pattern="%d{DATE} %-5p: %m%n" />
-            <Policies>
-                <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="1 MB"/>
-            </Policies>
-            <DefaultRolloverStrategy max="5"/>
-        </RollingFile>
-        <RollingFile name="railtime-route-processor" fileName="logs/job1step1processor.log"
-                     filePattern="logs/$${date:yyyy-MM}/railtime-processor-%d{MM-dd-yyyy}-%i.log.gz" append="true">
-            <PatternLayout pattern="%m%n" />
-            <Policies>
-                <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="1 MB"/>
-            </Policies>
-            <DefaultRolloverStrategy max="5"/>
-        </RollingFile>
-        <RollingFile name="raildelays-xls-processor" fileName="logs/job1step2processor.log"
-                     filePattern="logs/$${date:yyyy-MM}/railtime-processor-%d{MM-dd-yyyy}-%i.log.gz" append="true">
-            <PatternLayout pattern="%m%n" />
-            <Policies>
-                <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="1 MB"/>
-            </Policies>
-            <DefaultRolloverStrategy max="5"/>
-        </RollingFile>
-        <RollingFile name="raildelays-next-processor" fileName="logs/job1step2processor.log"
-                     filePattern="logs/$${date:yyyy-MM}/railtime-processor-%d{MM-dd-yyyy}-%i.log.gz" append="true">
-            <PatternLayout pattern="%m%n" />
-            <Policies>
-                <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="1 MB"/>
-            </Policies>
-            <DefaultRolloverStrategy max="5"/>
-        </RollingFile>
-        <RollingFile name="raildelays-aggregate-processor" fileName="logs/job1step2processor.log"
-                     filePattern="logs/$${date:yyyy-MM}/railtime-processor-%d{MM-dd-yyyy}-%i.log.gz" append="true">
-            <PatternLayout pattern="%m%n" />
-            <Policies>
-                <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="1 MB"/>
-            </Policies>
-            <DefaultRolloverStrategy max="5"/>
-        </RollingFile>
-        <RollingFile name="raildelays-filter-processor" fileName="logs/job1step2processor.log"
-                     filePattern="logs/$${date:yyyy-MM}/railtime-processor-%d{MM-dd-yyyy}-%i.log.gz" append="true">
-            <PatternLayout pattern="%m%n" />
-            <Policies>
-                <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="1 MB"/>
-            </Policies>
-            <DefaultRolloverStrategy max="5"/>
-        </RollingFile>
-        <RollingFile name="jdbc" fileName="logs/jdbc.log"
-                     filePattern="logs/$${date:yyyy-MM}/jdbc-%d{MM-dd-yyyy}-%i.log.gz" append="true">
+
+        <Routing name="railtime-data">
+            <Routes pattern="$${ctx:jobExecutionId}">
+                <Route>
+                    <RollingFile name="rolling-railtime-data"
+                                 fileName="logs/${ctx:jobExecutionId}/job1Step1Reader.log"
+                                 filePattern="logs/${ctx:jobExecutionId}/$${date:yyyy-MM}/job1Step1Reader-%d{MM-dd-yyyy}-%i.log.gz"
+                                 append="true">
+                        <PatternLayout pattern="[Data]: %m%n"/>
+                        <Policies>
+                            <TimeBasedTriggeringPolicy/>
+                            <SizeBasedTriggeringPolicy size="1 MB"/>
+                        </Policies>
+                        <DefaultRolloverStrategy max="5"/>
+                    </RollingFile>
+                </Route>
+            </Routes>
+        </Routing>
+
+        <Routing name="railtime-data-reader">
+            <Routes pattern="$${ctx:jobExecutionId}">
+                <Route>
+                    <RollingFile name="rolling-railtime-data-reader"
+                                 fileName="logs/${ctx:jobExecutionId}/job1Step1Reader.log"
+                                 filePattern="logs/${ctx:jobExecutionId}/$${date:yyyy-MM}/job1Step1Reader-%d{MM-dd-yyyy}-%i.log.gz"
+                                 append="true">
+                        <PatternLayout pattern="[Reader]: %m%n"/>
+                        <Policies>
+                            <TimeBasedTriggeringPolicy/>
+                            <SizeBasedTriggeringPolicy size="1 MB"/>
+                        </Policies>
+                        <DefaultRolloverStrategy max="5"/>
+                    </RollingFile>
+                </Route>
+            </Routes>
+        </Routing>
+
+        <Routing name="railtime-data-parser">
+            <Routes pattern="$${ctx:jobExecutionId}">
+                <Route>
+                    <RollingFile name="rolling-railtime-data-parser"
+                                 fileName="logs/${ctx:jobExecutionId}/job1Step1Reader.log"
+                                 filePattern="logs/${ctx:jobExecutionId}/$${date:yyyy-MM}/job1Step1Reader-%d{MM-dd-yyyy}-%i.log.gz"
+                                 append="true">
+                        <PatternLayout pattern="[Parser]: %m%n"/>
+                        <Policies>
+                            <TimeBasedTriggeringPolicy/>
+                            <SizeBasedTriggeringPolicy size="1 MB"/>
+                        </Policies>
+                        <DefaultRolloverStrategy max="5"/>
+                    </RollingFile>
+                </Route>
+            </Routes>
+        </Routing>
+
+        <Routing name="railtime-data-streamer">
+            <Routes pattern="$${ctx:jobExecutionId}">
+                <Route>
+                    <RollingFile name="rolling-railtime-data-streamer"
+                                 fileName="logs/${ctx:jobExecutionId}/job1Step1Reader.log"
+                                 filePattern="logs/${ctx:jobExecutionId}/$${date:yyyy-MM}/job1Step1Reader-%d{MM-dd-yyyy}-%i.log.gz"
+                                 append="true">
+                        <PatternLayout pattern="[Streamer]: %m%n"/>
+                        <Policies>
+                            <TimeBasedTriggeringPolicy/>
+                            <SizeBasedTriggeringPolicy size="1 MB"/>
+                        </Policies>
+                        <DefaultRolloverStrategy max="5"/>
+                    </RollingFile>
+                </Route>
+            </Routes>
+        </Routing>
+
+        <Routing name="railtime-data-parser">
+            <Routes pattern="$${ctx:jobExecutionId}">
+                <Route>
+                    <RollingFile name="rolling-railtime-data-parser"
+                                 fileName="logs/${ctx:jobExecutionId}/job1Step1Reader.log"
+                                 filePattern="logs/${ctx:jobExecutionId}/$${date:yyyy-MM}/job1Step1Reader-%d{MM-dd-yyyy}-%i.log.gz"
+                                 append="true">
+                        <PatternLayout pattern="[Data]: %m%n"/>
+                        <Policies>
+                            <TimeBasedTriggeringPolicy/>
+                            <SizeBasedTriggeringPolicy size="1 MB"/>
+                        </Policies>
+                        <DefaultRolloverStrategy max="5"/>
+                    </RollingFile>
+                </Route>
+            </Routes>
+        </Routing>
+
+        <Routing name="output">
+            <Routes pattern="$${ctx:jobExecutionId}">
+                <Route>
+                    <RollingFile name="rolling-output"
+                                 fileName="logs/${ctx:jobExecutionId}/output.log"
+                                 filePattern="logs/${ctx:jobExecutionId}/$${date:yyyy-MM}/output-%d{MM-dd-yyyy}-%i.log.gz"
+                                 append="true">
+                        <PatternLayout pattern="%d{DATE} %m%n"/>
+                        <Policies>
+                            <TimeBasedTriggeringPolicy/>
+                            <SizeBasedTriggeringPolicy size="1 MB"/>
+                        </Policies>
+                        <DefaultRolloverStrategy max="5"/>
+                    </RollingFile>
+                </Route>
+            </Routes>
+        </Routing>
+
+        <Routing name="railtime-route-processor">
+            <Routes pattern="$${ctx:jobExecutionId}">
+                <Route>
+                    <RollingFile name="rolling-railtime-route-processor"
+                                 fileName="logs/${ctx:jobExecutionId}/job1step1processor.log"
+                                 filePattern="logs/${ctx:jobExecutionId}/$${date:yyyy-MM}/job1step1processor-%d{MM-dd-yyyy}-%i.log.gz"
+                                 append="true">
+                        <PatternLayout pattern="%m%n"/>
+                        <Policies>
+                            <TimeBasedTriggeringPolicy/>
+                            <SizeBasedTriggeringPolicy size="1 MB"/>
+                        </Policies>
+                        <DefaultRolloverStrategy max="5"/>
+                    </RollingFile>
+                </Route>
+            </Routes>
+        </Routing>
+
+        <Routing name="raildelays-xls-processor">
+            <Routes pattern="$${ctx:jobExecutionId}">
+                <Route>
+                    <RollingFile name="rolling-raildelays-xls-processor"
+                                 fileName="logs/${ctx:jobExecutionId}/job1step2processor.log"
+                                 filePattern="logs/${ctx:jobExecutionId}/$${date:yyyy-MM}/job1step2processor-%d{MM-dd-yyyy}-%i.log.gz"
+                                 append="true">
+                        <PatternLayout pattern="%m%n"/>
+                        <Policies>
+                            <TimeBasedTriggeringPolicy/>
+                            <SizeBasedTriggeringPolicy size="1 MB"/>
+                        </Policies>
+                        <DefaultRolloverStrategy max="5"/>
+                    </RollingFile>
+                </Route>
+            </Routes>
+        </Routing>
+
+        <Routing name="raildelays-next-processor">
+            <Routes pattern="$${ctx:jobExecutionId}">
+                <Route>
+                    <RollingFile name="rolling-raildelays-next-processor"
+                                 fileName="logs/${ctx:jobExecutionId}/job1step2processor.log"
+                                 filePattern="logs/${ctx:jobExecutionId}/$${date:yyyy-MM}/job1step2processor-%d{MM-dd-yyyy}-%i.log.gz"
+                                 append="true">
+                        <PatternLayout pattern="%m%n"/>
+                        <Policies>
+                            <TimeBasedTriggeringPolicy/>
+                            <SizeBasedTriggeringPolicy size="1 MB"/>
+                        </Policies>
+                        <DefaultRolloverStrategy max="5"/>
+                    </RollingFile>
+                </Route>
+            </Routes>
+        </Routing>
+
+        <Routing name="raildelays-aggregate-processor">
+            <Routes pattern="$${ctx:jobExecutionId}">
+                <Route>
+                    <RollingFile name="rolling-raildelays-aggregate-processor"
+                                 fileName="logs/${ctx:jobExecutionId}/job1step2processor.log"
+                                 filePattern="logs/${ctx:jobExecutionId}/$${date:yyyy-MM}/job1step2processor-%d{MM-dd-yyyy}-%i.log.gz"
+                                 append="true">
+                        <PatternLayout pattern="%m%n"/>
+                        <Policies>
+                            <TimeBasedTriggeringPolicy/>
+                            <SizeBasedTriggeringPolicy size="1 MB"/>
+                        </Policies>
+                        <DefaultRolloverStrategy max="5"/>
+                    </RollingFile>
+                </Route>
+            </Routes>
+        </Routing>
+
+        <Routing name="raildelays-filter-processor">
+            <Routes pattern="$${ctx:jobExecutionId}">
+                <Route>
+                    <RollingFile name="rolling-raildelays-filter-processor"
+                                 fileName="logs/${ctx:jobExecutionId}/job1step2processor.log"
+                                 filePattern="logs/${ctx:jobExecutionId}/$${date:yyyy-MM}/job1step2processor-%d{MM-dd-yyyy}-%i.log.gz"
+                                 append="true">
+                        <PatternLayout pattern="%m%n"/>
+                        <Policies>
+                            <TimeBasedTriggeringPolicy/>
+                            <SizeBasedTriggeringPolicy size="1 MB"/>
+                        </Policies>
+                        <DefaultRolloverStrategy max="5"/>
+                    </RollingFile>
+                </Route>
+            </Routes>
+        </Routing>
+
+        <Routing name="skipped-items">
+            <Routes pattern="$${ctx:jobExecutionId}">
+                <Route>
+                    <RollingFile name="rolling-skipped-items"
+                                 fileName="logs/${ctx:jobExecutionId}/skipped-items.log"
+                                 filePattern="logs/${ctx:jobExecutionId}/$${date:yyyy-MM}/skipped-items-%d{MM-dd-yyyy}-%i.log.gz"
+                                 append="true">
+                        <PatternLayout pattern="%d{DATE} %-5p: %m%n"/>
+                        <Policies>
+                            <TimeBasedTriggeringPolicy/>
+                            <SizeBasedTriggeringPolicy size="1 MB"/>
+                        </Policies>
+                        <DefaultRolloverStrategy max="5"/>
+                    </RollingFile>
+                </Route>
+            </Routes>
+        </Routing>
+
+        <RollingFile name="jdbc"
+                     fileName="logs/jdbc.log"
+                     filePattern="logs/$${date:yyyy-MM}/jdbc-%d{MM-dd-yyyy}-%i.log.gz"
+                     append="true">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %level - %m%n%ex%n"/>
             <Policies>
-                <TimeBasedTriggeringPolicy />
+                <TimeBasedTriggeringPolicy/>
                 <SizeBasedTriggeringPolicy size="1 MB"/>
             </Policies>
             <DefaultRolloverStrategy max="5"/>
         </RollingFile>
-        <RollingFile name="skipped-items" fileName="logs/skipped-items.log"
-                     filePattern="logs/$${date:yyyy-MM}/skipped-items-%d{MM-dd-yyyy}-%i.log.gz" append="true">
-            <PatternLayout pattern="%d{DATE} %-5p: %m%n" />
+
+
+        <RollingFile name="springbatch"
+                     fileName="logs/springbatch.log"
+                     filePattern="logs/$${date:yyyy-MM}/springbatch-%d{MM-dd-yyyy}-%i.log.gz"
+                     append="true">
+            <PatternLayout pattern="%d{DATE} %-5p: %m%n"/>
             <Policies>
-                <TimeBasedTriggeringPolicy />
+                <TimeBasedTriggeringPolicy/>
                 <SizeBasedTriggeringPolicy size="1 MB"/>
             </Policies>
             <DefaultRolloverStrategy max="5"/>
@@ -126,52 +260,52 @@
     <loggers>
 
         <logger name="be.raildelays.batch.Bootstrap" level="trace" additivity="false">
-            <appender-ref ref="console" />
+            <appender-ref ref="console"/>
         </logger>
         <logger name="be.raildelays.batch.reader" level="trace" additivity="false">
-            <appender-ref ref="railtime-data-reader" />
+            <appender-ref ref="railtime-data-reader"/>
         </logger>
         <logger name="be.raildelays.httpclient" level="trace" additivity="false">
-            <appender-ref ref="railtime-data-streamer" />
+            <appender-ref ref="railtime-data-streamer"/>
         </logger>
         <logger name="be.raildelays.parser" level="trace" additivity="false">
-            <appender-ref ref="railtime-data-parser" />
+            <appender-ref ref="railtime-data-parser"/>
         </logger>
         <logger name="be.raildelays.repository" level="trace" additivity="false">
-            <appender-ref ref="railtime-data" />
+            <appender-ref ref="railtime-data"/>
         </logger>
         <logger name="be.raildelays.service" level="trace" additivity="false">
-            <appender-ref ref="railtime-data" />
+            <appender-ref ref="railtime-data"/>
         </logger>
         <logger name="be.raildelays.domain.railtime" level="trace" additivity="false">
-            <appender-ref ref="railtime-data" />
+            <appender-ref ref="railtime-data"/>
         </logger>
         <logger name="be.raildelays.batch.processor.RouteLogMapperProcessor" level="trace" additivity="false">
-            <appender-ref ref="railtime-route-processor" />
+            <appender-ref ref="railtime-route-processor"/>
         </logger>
         <logger name="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor" level="trace" additivity="false">
-            <appender-ref ref="raildelays-filter-processor" />
+            <appender-ref ref="raildelays-filter-processor"/>
         </logger>
         <logger name="be.raildelays.batch.processor.FilterSmallDelaysProcessor" level="trace" additivity="false">
-            <appender-ref ref="raildelays-filter-processor" />
+            <appender-ref ref="raildelays-filter-processor"/>
         </logger>
         <logger name="be.raildelays.batch.processor.ExcelRowMapperProcessor" level="trace" additivity="false">
-            <appender-ref ref="raildelays-xls-processor" />
+            <appender-ref ref="raildelays-xls-processor"/>
         </logger>
         <logger name="be.raildelays.batch.processor.SearchNextTrainProcessor" level="trace" additivity="false">
-            <appender-ref ref="raildelays-next-processor" />
+            <appender-ref ref="raildelays-next-processor"/>
         </logger>
         <logger name="be.raildelays.batch.processor.AggregateExpectedTimeProcessor" level="trace" additivity="false">
-            <appender-ref ref="raildelays-aggregate-processor" />
+            <appender-ref ref="raildelays-aggregate-processor"/>
         </logger>
         <logger name="org.springframework.batch.item.file.FlatFileItemWriter" level="trace" additivity="false">
-            <appender-ref ref="output" />
+            <appender-ref ref="output"/>
         </logger>
         <logger name="org.springframework.batch" level="debug" additivity="false">
-            <appender-ref ref="springbatch" />
+            <appender-ref ref="springbatch"/>
         </logger>
         <logger name="be.raildelays.batch.listener.LogSkippedItemListener" level="trace" additivity="false">
-            <appender-ref ref="skipped-items" />
+            <appender-ref ref="skipped-items"/>
         </logger>
         <logger name="log4jdbc.log4j2" level="info" additivity="false">
             <MarkerFilter marker="LOG4JDBC_AUDIT" onMatch="ACCEPT" onMismatch="NEUTRAL"/>
@@ -181,7 +315,7 @@
 
 
         <root level="warn">
-            <appender-ref ref="console" />
+            <appender-ref ref="console"/>
         </root>
     </loggers>
 </configuration>
