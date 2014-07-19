@@ -1,4 +1,4 @@
-package be.raildelays.logger;
+package be.raildelays.logging;
 
 import be.raildelays.domain.dto.RouteLogDTO;
 import be.raildelays.domain.dto.ServedStopDTO;
@@ -196,7 +196,7 @@ public class RaildelaysLogger implements Logger {
                 builder.append(separator);
                 builder.append(StringUtils.rightPad(departureStation != null ? substringCenter(departureStation, STATION_LENGTH, '~') : "", STATION_LENGTH));
                 builder.append(separator);
-                builder.append(StringUtils.rightPad(arrivalStation != null ?  substringCenter(arrivalStation, STATION_LENGTH, '~') : "", STATION_LENGTH));
+                builder.append(StringUtils.rightPad(arrivalStation != null ? substringCenter(arrivalStation, STATION_LENGTH, '~') : "", STATION_LENGTH));
                 builder.append(separator);
                 builder.append(StringUtils.rightPad(expectedDepartureTime != null ? timeFormat.format(expectedDepartureTime) : "null", TIME_FORMAT.length()));
                 builder.append(separator);
@@ -264,9 +264,9 @@ public class RaildelaysLogger implements Logger {
             final StringBuilder builder = new StringBuilder();
 
             builder.append(separator);
-            builder.append(StringUtils.rightPad(type != null ? "[" +  StringUtils.substring(type, 0, PREFIX_LENGTH) + "]" : "", PREFIX_LENGTH + 2));
+            builder.append(StringUtils.rightPad(type != null ? "[" + StringUtils.substring(type, 0, PREFIX_LENGTH) + "]" : "", PREFIX_LENGTH + 2));
             builder.append(separator);
-            builder.append(StringUtils.rightPad(message != null ?  StringUtils.substring(message, 0, MESSAGE_LENGTH) : "", MESSAGE_LENGTH));
+            builder.append(StringUtils.rightPad(message != null ? StringUtils.substring(message, 0, MESSAGE_LENGTH) : "", MESSAGE_LENGTH));
             builder.append(separator);
 
             if (object != null) {

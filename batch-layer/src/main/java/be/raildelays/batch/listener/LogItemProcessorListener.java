@@ -3,8 +3,8 @@ package be.raildelays.batch.listener;
 import be.raildelays.batch.processor.AggregateExpectedTimeProcessor;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.xls.ExcelRow;
-import be.raildelays.logger.Logger;
-import be.raildelays.logger.LoggerFactory;
+import be.raildelays.logging.Logger;
+import be.raildelays.logging.LoggerFactory;
 import org.springframework.batch.core.annotation.AfterProcess;
 import org.springframework.batch.core.annotation.BeforeProcess;
 
@@ -31,9 +31,9 @@ public class LogItemProcessorListener {
     public void afterProcess(Object item, Object result) {
         if (item instanceof LineStop) {
             LOGGER.info(HEADER);
-			if (result instanceof ExcelRow) {
-				LOGGER.info("afterProcess", (ExcelRow) result);
-			}
+            if (result instanceof ExcelRow) {
+                LOGGER.info("afterProcess", (ExcelRow) result);
+            }
             LOGGER.info(FOOTER);
         }
     }

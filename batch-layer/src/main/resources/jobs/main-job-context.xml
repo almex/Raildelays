@@ -74,8 +74,8 @@
     </bean>
 
     <bean id="taskExecutor"
-          class="be.raildelays.concurent.sheduling.MdcThreadPoolTaskExecutor">
-        <property name="corePoolSize" value="2"/>
+          class="be.raildelays.concurrent.scheduling.MdcThreadPoolTaskExecutor">
+    <property name="corePoolSize" value="2"/>
         <property name="maxPoolSize" value="4"/>
         <property name="allowCoreThreadTimeOut" value="true"/>
         <property name="waitForTasksToCompleteOnShutdown" value="true" />
@@ -84,8 +84,9 @@
     <!-- ================================================================================================== -->
     <!-- =====================================        READERS         ===================================== -->
     <!-- ================================================================================================== -->
-    <bean id="trainListReader" class="org.springframework.batch.item.file.FlatFileItemReader">
-        <property name="lineMapper">
+    <bean id="trainListReader"
+          class="org.springframework.batch.item.file.FlatFileItemReader">
+    <property name="lineMapper">
             <bean
                     class="org.springframework.batch.item.file.mapping.PassThroughLineMapper">
             </bean>
@@ -94,7 +95,8 @@
         <property name="resource" value="${file.trainlist.uri}"/>
     </bean>
 
-    <bean id="compositeRailtimeItemReader" class="be.raildelays.batch.reader.CompositeRailtimeItemReader"
+    <bean id="compositeRailtimeItemReader"
+          class="be.raildelays.batch.reader.CompositeRailtimeItemReader"
           scope="step">
         <property name="departureReader">
             <bean class="be.raildelays.batch.reader.RailtimeItemReader"
@@ -348,15 +350,6 @@
     <!-- ================================================================================================== -->
     <!-- =====================================        RESOURCES       ===================================== -->
     <!-- ================================================================================================== -->
-
-    <!--bean id="excelFileOutput" class="be.raildelays.batch.support.ExcelFileSystemResourceDecorator" scope="step" >
-        <property name="outputDirectory" ref="outputDirectory" />
-        <property name="resourceItemSearch" ref="resourceItemSearch" />
-    </bean>
-
-    <bean id="outputDirectory" class="org.springframework.core.io.FileSystemResource" scope="step">
-        <constructor-arg index="0" value="#{jobParameters['excel.output.path']}" />
-    </bean-->
 
     <bean id="itemReaderResourceLocator"
           class="be.raildelays.batch.support.ItemReaderResourceLocator"

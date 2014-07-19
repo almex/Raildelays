@@ -1,4 +1,4 @@
-package be.raildelays.logger;
+package be.raildelays.logging;
 
 /**
  * @author Almex

@@ -1,7 +1,6 @@
-package be.raildelays.concurent.sheduling;
+package be.raildelays.concurrent.scheduling;
 
 import org.apache.logging.log4j.ThreadContext;
-import org.slf4j.MDC;
 
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;

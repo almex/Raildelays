@@ -1,8 +1,8 @@
 package be.raildelays.batch.processor;
 
 import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.logger.Logger;
-import be.raildelays.logger.LoggerFactory;
+import be.raildelays.logging.Logger;
+import be.raildelays.logging.LoggerFactory;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.springframework.batch.core.StepExecution;
@@ -75,6 +75,8 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
                                 } else {
                                     throw new IllegalArgumentException("We don't know the current index of this Excel row. We cannot replace it!");
                                 }
+                            } else {
+                                LOGGER.trace("not_replace_matching", matchingExcelRow);
                             }
 
                             /**
@@ -88,7 +90,7 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
                              * We stop searching. We expect that the content of the Excel file is sorted by date.
                              * This clause should never happen if the data read are also sorted by date.
                              */
-                            LOGGER.debug("item=_before_matching", matchingExcelRow);
+                            LOGGER.debug("item_before_matching", matchingExcelRow);
 
                             break;
                         }

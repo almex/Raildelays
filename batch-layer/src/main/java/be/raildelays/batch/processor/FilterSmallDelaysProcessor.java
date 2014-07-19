@@ -1,8 +1,8 @@
 package be.raildelays.batch.processor;
 
 import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.logger.Logger;
-import be.raildelays.logger.LoggerFactory;
+import be.raildelays.logging.Logger;
+import be.raildelays.logging.LoggerFactory;
 import org.apache.commons.lang.Validate;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;

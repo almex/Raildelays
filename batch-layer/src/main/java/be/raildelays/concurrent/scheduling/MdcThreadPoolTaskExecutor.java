@@ -1,4 +1,4 @@
-package be.raildelays.concurent.sheduling;
+package be.raildelays.concurrent.scheduling;
 
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.Assert;
@@ -15,7 +15,7 @@ public class MdcThreadPoolTaskExecutor extends ThreadPoolTaskExecutor {
     @Override
     protected ExecutorService initializeExecutor(ThreadFactory threadFactory, RejectedExecutionHandler rejectedExecutionHandler) {
         BlockingQueue<Runnable> queue = createQueue(Integer.MAX_VALUE);
-        ThreadPoolExecutor executor  = MdcThreadPoolExecutor.newWithCurrentMdc(
+        ThreadPoolExecutor executor = MdcThreadPoolExecutor.newWithInheritedMdc(
                 this.getCorePoolSize(), this.getMaxPoolSize(), this.getKeepAliveSeconds(), TimeUnit.SECONDS,
                 queue);
 

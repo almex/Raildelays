@@ -5,7 +5,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 
 /**
- * Add jobExeuctionId to {@link org.apache.logging.log4j.ThreadContext} to be able to create
+ * Add jobExecutionId to {@link org.apache.logging.log4j.ThreadContext} to be able to create
  * log direction based on that number.
  *
  * @author Almex

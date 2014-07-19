@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration monitorInterval="30">
+
+    <Properties>
+        <Property name="jobExecutionId">default</Property>
+    </Properties>
+
     <appenders>
         <!--<Console name="console" target="SYSTEM_OUT">-->
-            <!--<PatternLayout pattern="%m%n"/>-->
+        <!--<PatternLayout pattern="%m%n"/>-->
         <!--</Console>-->
 
         <RollingFile name="console" fileName="logs/output.log"

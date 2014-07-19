@@ -2,8 +2,8 @@ package be.raildelays.batch.processor;
 
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.TimestampDelay;
-import be.raildelays.logger.Logger;
-import be.raildelays.logger.LoggerFactory;
+import be.raildelays.logging.Logger;
+import be.raildelays.logging.LoggerFactory;
 import be.raildelays.service.RaildelaysService;
 import org.springframework.batch.item.ItemProcessor;
 
