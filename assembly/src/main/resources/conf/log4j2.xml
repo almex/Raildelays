@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration monitorInterval="30">
+<configuration monitorInterval="30" status="trace">
 
     <Properties>
         <Property name="jobExecutionId">default</Property>
+        <Property name="isThreadContextMapInheritable ">true</Property>
     </Properties>
 
     <appenders>
