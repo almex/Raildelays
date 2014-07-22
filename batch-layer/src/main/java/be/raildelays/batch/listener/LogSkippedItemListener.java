@@ -1,9 +1,9 @@
 package be.raildelays.batch.listener;
 
 import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.domain.entities.LineStop;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import be.raildelays.batch.processor.AggregateExpectedTimeProcessor;
+import be.raildelays.logging.Logger;
+import be.raildelays.logging.LoggerFactory;
 import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.SkipListener;
 
@@ -14,7 +14,8 @@ import org.springframework.batch.core.SkipListener;
  */
 public class LogSkippedItemListener implements SkipListener<Object, BatchExcelRow>, ItemProcessListener<Object, Object> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LogSkippedItemListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("Ftr", LogSkippedItemListener.class);
+
 
     @Override
     public void onSkipInRead(Throwable t) {
@@ -23,12 +24,12 @@ public class LogSkippedItemListener implements SkipListener<Object, BatchExcelRo
 
     @Override
     public void onSkipInWrite(BatchExcelRow item, Throwable t) {
-        LOGGER.info("[WRITE] Skipped item {} - {}", item, t.getMessage());
+        LOGGER.info("on_skip_write", item);
     }
 
     @Override
     public void onSkipInProcess(Object item, Throwable t) {
-        LOGGER.info("[PROCESS] Skipped item {} - {}", item, t.getMessage());
+        LOGGER.info("on_skip_process", item);
     }
 
     @Override
@@ -38,7 +39,7 @@ public class LogSkippedItemListener implements SkipListener<Object, BatchExcelRo
     @Override
     public void afterProcess(Object item, Object result) {
         if (item != null && result == null) {
-            LOGGER.info("[PROCESS] Filtered item {}", item);
+            LOGGER.info("filtering", item);
         }
     }
 

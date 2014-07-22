@@ -67,6 +67,8 @@ public class RaildelaysLogger implements Logger {
 
     private org.slf4j.Logger delegate;
 
+    private Marker marker;
+
     private char separator = ' ';
 
     private String type;
@@ -74,6 +76,12 @@ public class RaildelaysLogger implements Logger {
     public RaildelaysLogger(String type, org.slf4j.Logger delegate) {
         this.type = type;
         this.delegate = delegate;
+    }
+
+    public RaildelaysLogger(String type, org.slf4j.Logger delegate, Marker marker) {
+        this.type = type;
+        this.delegate = delegate;
+        this.marker = marker;
     }
 
     private enum Level {DEBUG, TRACE, INFO}

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration monitorInterval="30" status="trace">
+<configuration monitorInterval="30">
 
     <Properties>
         <Property name="jobExecutionId">default</Property>
+        <Property name="jobInstanceId">default</Property>
+        <Property name="dateParameter">default</Property>
         <Property name="isThreadContextMapInheritable ">true</Property>
     </Properties>
 
@@ -12,7 +14,7 @@
         <!--</Console>-->
 
         <RollingFile name="console" fileName="logs/output.log"
-                     filePattern="logs/$${date:yyyy-MM}/output-%d{MM-dd-yyyy}-%i.log.gz" append="true">
+                     filePattern="logs/backup/output-%d{MM-dd-yyyy}-%i.log.gz" append="true">
             <PatternLayout pattern="%d{DATE} %-5p: %m%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy/>
@@ -22,11 +24,11 @@
         </RollingFile>
 
         <Routing name="railtime-data">
-            <Routes pattern="$${ctx:jobExecutionId}">
+            <Routes pattern="$${ctx:dateParameter}">
                 <Route>
                     <RollingFile name="rolling-railtime-data"
-                                 fileName="logs/${ctx:jobExecutionId}/job1Step1Reader.log"
-                                 filePattern="logs/${ctx:jobExecutionId}/$${date:yyyy-MM}/job1Step1Reader-%d{MM-dd-yyyy}-%i.log.gz"
+                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/step1Reader.log"
+                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/step1Reader-%d{MM-dd-yyyy}-%i.log.gz"
                                  append="true">
                         <PatternLayout pattern="[Data]: %m%n"/>
                         <Policies>
@@ -40,11 +42,11 @@
         </Routing>
 
         <Routing name="railtime-data-reader">
-            <Routes pattern="$${ctx:jobExecutionId}">
+            <Routes pattern="$${ctx:dateParameter}">
                 <Route>
                     <RollingFile name="rolling-railtime-data-reader"
-                                 fileName="logs/${ctx:jobExecutionId}/job1Step1Reader.log"
-                                 filePattern="logs/${ctx:jobExecutionId}/$${date:yyyy-MM}/job1Step1Reader-%d{MM-dd-yyyy}-%i.log.gz"
+                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/step1Reader.log"
+                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/step1Reader-%d{MM-dd-yyyy}-%i.log.gz"
                                  append="true">
                         <PatternLayout pattern="[Reader]: %m%n"/>
                         <Policies>
@@ -58,11 +60,11 @@
         </Routing>
 
         <Routing name="railtime-data-parser">
-            <Routes pattern="$${ctx:jobExecutionId}">
+            <Routes pattern="$${ctx:dateParameter}">
                 <Route>
                     <RollingFile name="rolling-railtime-data-parser"
-                                 fileName="logs/${ctx:jobExecutionId}/job1Step1Reader.log"
-                                 filePattern="logs/${ctx:jobExecutionId}/$${date:yyyy-MM}/job1Step1Reader-%d{MM-dd-yyyy}-%i.log.gz"
+                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/step1Reader.log"
+                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/step1Reader-%d{MM-dd-yyyy}-%i.log.gz"
                                  append="true">
                         <PatternLayout pattern="[Parser]: %m%n"/>
                         <Policies>
@@ -76,11 +78,11 @@
         </Routing>
 
         <Routing name="railtime-data-streamer">
-            <Routes pattern="$${ctx:jobExecutionId}">
+            <Routes pattern="$${ctx:dateParameter}">
                 <Route>
                     <RollingFile name="rolling-railtime-data-streamer"
-                                 fileName="logs/${ctx:jobExecutionId}/job1Step1Reader.log"
-                                 filePattern="logs/${ctx:jobExecutionId}/$${date:yyyy-MM}/job1Step1Reader-%d{MM-dd-yyyy}-%i.log.gz"
+                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/step1Reader.log"
+                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/step1Reader-%d{MM-dd-yyyy}-%i.log.gz"
                                  append="true">
                         <PatternLayout pattern="[Streamer]: %m%n"/>
                         <Policies>
@@ -94,11 +96,11 @@
         </Routing>
 
         <Routing name="railtime-data-parser">
-            <Routes pattern="$${ctx:jobExecutionId}">
+            <Routes pattern="$${ctx:dateParameter}">
                 <Route>
                     <RollingFile name="rolling-railtime-data-parser"
-                                 fileName="logs/${ctx:jobExecutionId}/job1Step1Reader.log"
-                                 filePattern="logs/${ctx:jobExecutionId}/$${date:yyyy-MM}/job1Step1Reader-%d{MM-dd-yyyy}-%i.log.gz"
+                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/step1Reader.log"
+                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/step1Reader-%d{MM-dd-yyyy}-%i.log.gz"
                                  append="true">
                         <PatternLayout pattern="[Data]: %m%n"/>
                         <Policies>
@@ -112,11 +114,11 @@
         </Routing>
 
         <Routing name="output">
-            <Routes pattern="$${ctx:jobExecutionId}">
+            <Routes pattern="$${ctx:dateParameter}">
                 <Route>
                     <RollingFile name="rolling-output"
-                                 fileName="logs/${ctx:jobExecutionId}/output.log"
-                                 filePattern="logs/${ctx:jobExecutionId}/$${date:yyyy-MM}/output-%d{MM-dd-yyyy}-%i.log.gz"
+                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/output.log"
+                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/output-%d{MM-dd-yyyy}-%i.log.gz"
                                  append="true">
                         <PatternLayout pattern="%d{DATE} %m%n"/>
                         <Policies>
@@ -130,11 +132,11 @@
         </Routing>
 
         <Routing name="railtime-route-processor">
-            <Routes pattern="$${ctx:jobExecutionId}">
+            <Routes pattern="$${ctx:dateParameter}">
                 <Route>
                     <RollingFile name="rolling-railtime-route-processor"
-                                 fileName="logs/${ctx:jobExecutionId}/job1step1processor.log"
-                                 filePattern="logs/${ctx:jobExecutionId}/$${date:yyyy-MM}/job1step1processor-%d{MM-dd-yyyy}-%i.log.gz"
+                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/step1processor.log"
+                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/step1processor-%d{MM-dd-yyyy}-%i.log.gz"
                                  append="true">
                         <PatternLayout pattern="%m%n"/>
                         <Policies>
@@ -148,11 +150,11 @@
         </Routing>
 
         <Routing name="raildelays-xls-processor">
-            <Routes pattern="$${ctx:jobExecutionId}">
+            <Routes pattern="$${ctx:dateParameter}">
                 <Route>
                     <RollingFile name="rolling-raildelays-xls-processor"
-                                 fileName="logs/${ctx:jobExecutionId}/job1step2processor.log"
-                                 filePattern="logs/${ctx:jobExecutionId}/$${date:yyyy-MM}/job1step2processor-%d{MM-dd-yyyy}-%i.log.gz"
+                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/step2processor.log"
+                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/step2processor-%d{MM-dd-yyyy}-%i.log.gz"
                                  append="true">
                         <PatternLayout pattern="%m%n"/>
                         <Policies>
@@ -166,11 +168,11 @@
         </Routing>
 
         <Routing name="raildelays-next-processor">
-            <Routes pattern="$${ctx:jobExecutionId}">
+            <Routes pattern="$${ctx:dateParameter}">
                 <Route>
                     <RollingFile name="rolling-raildelays-next-processor"
-                                 fileName="logs/${ctx:jobExecutionId}/job1step2processor.log"
-                                 filePattern="logs/${ctx:jobExecutionId}/$${date:yyyy-MM}/job1step2processor-%d{MM-dd-yyyy}-%i.log.gz"
+                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/step2processor.log"
+                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/step2processor-%d{MM-dd-yyyy}-%i.log.gz"
                                  append="true">
                         <PatternLayout pattern="%m%n"/>
                         <Policies>
@@ -184,11 +186,11 @@
         </Routing>
 
         <Routing name="raildelays-aggregate-processor">
-            <Routes pattern="$${ctx:jobExecutionId}">
+            <Routes pattern="$${ctx:dateParameter}">
                 <Route>
                     <RollingFile name="rolling-raildelays-aggregate-processor"
-                                 fileName="logs/${ctx:jobExecutionId}/job1step2processor.log"
-                                 filePattern="logs/${ctx:jobExecutionId}/$${date:yyyy-MM}/job1step2processor-%d{MM-dd-yyyy}-%i.log.gz"
+                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/step2processor.log"
+                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/step2processor-%d{MM-dd-yyyy}-%i.log.gz"
                                  append="true">
                         <PatternLayout pattern="%m%n"/>
                         <Policies>
@@ -202,11 +204,11 @@
         </Routing>
 
         <Routing name="raildelays-filter-processor">
-            <Routes pattern="$${ctx:jobExecutionId}">
+            <Routes pattern="$${ctx:dateParameter}">
                 <Route>
                     <RollingFile name="rolling-raildelays-filter-processor"
-                                 fileName="logs/${ctx:jobExecutionId}/job1step2processor.log"
-                                 filePattern="logs/${ctx:jobExecutionId}/$${date:yyyy-MM}/job1step2processor-%d{MM-dd-yyyy}-%i.log.gz"
+                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/step2processor.log"
+                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/step2processor-%d{MM-dd-yyyy}-%i.log.gz"
                                  append="true">
                         <PatternLayout pattern="%m%n"/>
                         <Policies>
@@ -220,13 +222,13 @@
         </Routing>
 
         <Routing name="skipped-items">
-            <Routes pattern="$${ctx:jobExecutionId}">
+            <Routes pattern="$${ctx:dateParameter}">
                 <Route>
                     <RollingFile name="rolling-skipped-items"
-                                 fileName="logs/${ctx:jobExecutionId}/skipped-items.log"
-                                 filePattern="logs/${ctx:jobExecutionId}/$${date:yyyy-MM}/skipped-items-%d{MM-dd-yyyy}-%i.log.gz"
+                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/skipped-items.log"
+                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/skipped-items-%d{MM-dd-yyyy}-%i.log.gz"
                                  append="true">
-                        <PatternLayout pattern="%d{DATE} %-5p: %m%n"/>
+                        <PatternLayout pattern="%m%n"/>
                         <Policies>
                             <TimeBasedTriggeringPolicy/>
                             <SizeBasedTriggeringPolicy size="1 MB"/>
@@ -239,7 +241,7 @@
 
         <RollingFile name="jdbc"
                      fileName="logs/jdbc.log"
-                     filePattern="logs/$${date:yyyy-MM}/jdbc-%d{MM-dd-yyyy}-%i.log.gz"
+                     filePattern="logs/backup/jdbc-%d{MM-dd-yyyy}-%i.log.gz"
                      append="true">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %level - %m%n%ex%n"/>
             <Policies>
@@ -252,7 +254,7 @@
 
         <RollingFile name="springbatch"
                      fileName="logs/springbatch.log"
-                     filePattern="logs/$${date:yyyy-MM}/springbatch-%d{MM-dd-yyyy}-%i.log.gz"
+                     filePattern="logs/backup/springbatch-%d{MM-dd-yyyy}-%i.log.gz"
                      append="true">
             <PatternLayout pattern="%d{DATE} %-5p: %m%n"/>
             <Policies>
