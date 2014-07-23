@@ -37,8 +37,8 @@ class RailtimeRequestStreamer extends AbstractRequestStreamBuilder implements Re
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Reader getDelays(String idTrain, Date day, String language = 'en', String sens = 'A') {
-		return httpGet('/mobile/HTML/TrainDetail.aspx', [ l:DEFAULT_LANGUAGE, tid: idTrain, dt: formatDate(day), da: sens ]);
+	public Reader getDelays(String idTrain, Date day, String language = DEFAULT_LANGUAGE, String sens = 'A') {
+		return httpGet('/mobile/HTML/TrainDetail.aspx', [ l: language, tid: idTrain, dt: formatDate(day), da: sens ]);
 	}
 
 	/**

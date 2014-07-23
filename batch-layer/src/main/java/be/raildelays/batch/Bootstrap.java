@@ -74,12 +74,14 @@ public class Bootstrap {
             final String excelInputTemplate = configuration.getProperty("excel.input.template");
             final String textOutputPath = configuration.getProperty("text.output.path");
             final String excelOutputPath = configuration.getProperty("excel.output.path");
+            final String language = configuration.getProperty("language");
 
             Assert.notNull(departure, "You must add a 'departure' property into the ./conf/raildelays.properties");
             Assert.notNull(arrival, "You must add a 'arrival' property into the ./conf/raildelays.properties");
             Assert.notNull(excelInputTemplate, "You must add a 'excel.input.template' property into the ./conf/raildelays.properties");
             Assert.notNull(textOutputPath, "You must add a 'text.output.path' property into the ./conf/raildelays.properties");
             Assert.notNull(excelOutputPath, "You must add a 'excel.output.path' property into the ./conf/raildelays.properties");
+            Assert.notNull(language, "You must add a 'language' property into the ./conf/raildelays.properties");
 
             if (recovery) {
                 LOGGER.info("[Recovery activated]");
@@ -98,6 +100,7 @@ public class Bootstrap {
                 parameters.put("excel.input.template", new JobParameter(excelInputTemplate));
                 parameters.put("excel.output.path", new JobParameter(excelOutputPath));
                 parameters.put("output.file.path", new JobParameter(textOutputPath));
+                parameters.put("lang", new JobParameter(language));
 
                 JobParameters jobParameters = new JobParameters(parameters);
 

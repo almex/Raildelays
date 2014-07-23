@@ -2,6 +2,7 @@ package be.raildelays.batch.reader;
 
 import java.io.Reader;
 import java.util.Date;
+import java.util.Locale;
 
 import javax.annotation.Resource;
 
@@ -39,24 +40,27 @@ public class RailtimeItemReader implements ItemReader<Direction>, InitializingBe
 
 	private Sens sens;
 
+    private String language = Language.EN.name();
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		// Validate all job parameters
 		Assert.notNull(date, "You must provide the date parameter to this Reader.");
 		Assert.notNull(sens, "You must provide the sens parameter to this Reader.");
+        Assert.notNull(language, "You must provide the language parameter to this Reader.");
 	}
 
 	public Direction read() throws Exception, UnexpectedInputException,
 			ParseException, NonTransientResourceException {
 		Direction result = null;
 		
-		if (trainId != null && date != null && sens != null) {
+		if (trainId != null && date != null && sens != null && language != null) {
 
-            LOGGER.debug("Requesting Railtime for trainId={} date={} sens={}", new Object[]{trainId, date, sens});
+            LOGGER.debug("Requesting Railtime for trainId={} date={} sens={} language={}", new Object[]{trainId, date, sens, language});
 
 			// -- Create a request to target Railtime
 			Reader englishStream = streamer.getDelays(trainId, date,
-					Language.ENGLISH.getRailtimeParameter(),
+					Language.valueOf(language.toUpperCase(Locale.US)).getRailtimeParameter(),
 					sens.getRailtimeParameter());
 	
 			// -- Parse the content
@@ -115,4 +119,7 @@ public class RailtimeItemReader implements ItemReader<Direction>, InitializingBe
 		this.trainId = trainId;
 	}
 
+    public void setLanguage(String language) {
+        this.language = language;
+    }
 }

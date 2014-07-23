@@ -102,6 +102,7 @@
             <bean class="be.raildelays.batch.reader.RailtimeItemReader"
                   scope="step">
                 <property name="date" value="#{jobParameters['date']}"/>
+                <property name="language" value="#{jobParameters['lang']}"/>
                 <property name="trainId" value="#{stepExecutionContext['trainId']}"/>
                 <property name="sens">
                     <util:constant static-field="be.raildelays.domain.Sens.DEPARTURE"/>
@@ -112,6 +113,7 @@
             <bean class="be.raildelays.batch.reader.RailtimeItemReader"
                   scope="step">
                 <property name="date" value="#{jobParameters['date']}"/>
+                <property name="language" value="#{jobParameters['lang']}"/>
                 <property name="trainId" value="#{stepExecutionContext['trainId']}"/>
                 <property name="sens">
                     <util:constant static-field="be.raildelays.domain.Sens.ARRIVAL"/>

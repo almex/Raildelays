@@ -7,6 +7,7 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Validator;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dozer.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -248,11 +249,22 @@ public class RaildelaysServiceImpl implements RaildelaysService {
     }
 
     private Station saveOrRetrieveStation(Station station) {
-        Station result = stationDao.findByEnglishName(station.getEnglishName());
+        Station result = null;
+
+        if (StringUtils.isNotBlank(station.getEnglishName())) {
+            result = stationDao.findByEnglishName(station.getEnglishName());
+        }
+
+        if (result == null && StringUtils.isNotBlank(station.getFrenchName())) {
+            result = stationDao.findByFrenchName(station.getFrenchName());
+        }
+
+        if (result == null && StringUtils.isNotBlank(station.getDutchName())) {
+            result = stationDao.findByFrenchName(station.getDutchName());
+        }
 
         if (result == null) {
-            LOGGER.debug("<<<<<<[Saving Station]>>>>>>");
-            result = stationDao.save(new Station(station.getEnglishName()));
+            result = stationDao.save(new Station(station.getEnglishName(), station.getDutchName(), station.getFrenchName()));
             LOGGER.debug("Station: {}", result);
         }
 
