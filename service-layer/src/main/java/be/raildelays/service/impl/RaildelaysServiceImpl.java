@@ -237,7 +237,7 @@ public class RaildelaysServiceImpl implements RaildelaysService {
     }
 
     private Train saveOrRetrieveTrain(Train train) {
-        Train result = trainDao.findByEnglishName(train.getEnglishName());
+        Train result = null;
 
         if (StringUtils.isNotBlank(train.getEnglishName())) {
             result = trainDao.findByEnglishName(train.getEnglishName());

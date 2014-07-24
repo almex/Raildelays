@@ -52,25 +52,25 @@ public class TrainIdPartitioner implements Partitioner {
                             ExecutionContext executionContext = new ExecutionContext();
                             int partitionId = partitions.size();
                             executionContext.putInt("trainId", Integer.parseInt(trainId));
-                            executionContext.putString("lang", Language.EN.name());
+//                            executionContext.putString("lang", Language.EN.name());
                             partitions.put("partition" + partitionId, executionContext);
                         }
 
-                        {   // French
-                            ExecutionContext executionContext = new ExecutionContext();
-                            int partitionId = partitions.size();
-                            executionContext.putInt("trainId", Integer.parseInt(trainId));
-                            executionContext.putString("lang", Language.FR.name());
-                            partitions.put("partition" + partitionId, executionContext);
-                        }
-
-                        {   // Dutch
-                            ExecutionContext executionContext = new ExecutionContext();
-                            int partitionId = partitions.size();
-                            executionContext.putInt("trainId", Integer.parseInt(trainId));
-                            executionContext.putString("lang", Language.NL.name());
-                            partitions.put("partition" + partitionId, executionContext);
-                        }
+//                        {   // French
+//                            ExecutionContext executionContext = new ExecutionContext();
+//                            int partitionId = partitions.size();
+//                            executionContext.putInt("trainId", Integer.parseInt(trainId));
+//                            executionContext.putString("lang", Language.FR.name());
+//                            partitions.put("partition" + partitionId, executionContext);
+//                        }
+//
+//                        {   // Dutch
+//                            ExecutionContext executionContext = new ExecutionContext();
+//                            int partitionId = partitions.size();
+//                            executionContext.putInt("trainId", Integer.parseInt(trainId));
+//                            executionContext.putString("lang", Language.NL.name());
+//                            partitions.put("partition" + partitionId, executionContext);
+//                        }
                     } else {
                         result = RepeatStatus.FINISHED;
                     }

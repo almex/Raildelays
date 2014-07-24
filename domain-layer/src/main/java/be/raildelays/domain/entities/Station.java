@@ -30,8 +30,7 @@ public class Station extends AbstractI18nEntity implements Serializable, Cloneab
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	protected final Long id;
 
-	@Column(name = "ENGLISH_NAME", updatable = false, unique = true)
-	@NotNull
+	@Column(name = "ENGLISH_NAME")
 	protected final String englishName;
 
 	@Column(name = "FRENCH_NAME")
