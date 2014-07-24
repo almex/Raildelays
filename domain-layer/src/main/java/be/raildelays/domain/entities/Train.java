@@ -1,20 +1,13 @@
 package be.raildelays.domain.entities;
 
-import java.io.Serializable;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
+import be.raildelays.domain.Language;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 /**
  * Immutable entity defining a train. 
@@ -66,6 +59,37 @@ public class Train implements Serializable, Comparable<Train> {
 		this.dutchName = "";
 		this.frenchName = "";
 	}
+
+    /**
+     * Initialization constructor.
+     *
+     * @param name for this train station.
+     */
+    public Train(final String name, Language language) {
+        this.id = null;
+
+        switch (language) {
+            case EN:
+                this.englishName = name;
+                this.dutchName = "";
+                this.frenchName = "";
+                break;
+            case NL:
+                this.englishName = "";
+                this.dutchName = name;
+                this.frenchName = "";
+                break;
+            case FR:
+                this.englishName = "";
+                this.dutchName = "";
+                this.frenchName = name;
+                break;
+            default:
+                this.englishName = "";
+                this.dutchName = "";
+                this.frenchName = "";
+        }
+    }
 
 	/**
 	 * Initialization constructor.

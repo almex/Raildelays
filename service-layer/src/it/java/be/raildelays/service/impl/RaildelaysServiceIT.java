@@ -1,11 +1,10 @@
 package be.raildelays.service.impl;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import javax.annotation.Resource;
-
+import be.raildelays.domain.Language;
+import be.raildelays.domain.dto.RouteLogDTO;
+import be.raildelays.domain.dto.ServedStopDTO;
+import be.raildelays.domain.entities.Station;
+import be.raildelays.service.RaildelaysService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,10 +13,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import be.raildelays.domain.dto.RouteLogDTO;
-import be.raildelays.domain.dto.ServedStopDTO;
-import be.raildelays.domain.entities.Station;
-import be.raildelays.service.RaildelaysService;
+import javax.annotation.Resource;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:/spring/service/raildelays-service-integration-test-context.xml"})
@@ -34,7 +33,7 @@ public class RaildelaysServiceIT {
     @Test
     public void test466LineStop() throws ParseException {
         Date today = new Date();
-        RouteLogDTO routeLog = new RouteLogDTO("466", today);
+        RouteLogDTO routeLog = new RouteLogDTO("466", today, Language.FR);
         SimpleDateFormat formater = new SimpleDateFormat("HH:mm");
         ServedStopDTO stop = new ServedStopDTO("Liège-Guillemins",
                 formater.parse("16:00"), 5, formater.parse("17:00"), 15, false);
@@ -47,7 +46,7 @@ public class RaildelaysServiceIT {
     @Test
     public void testLinkedLineStop() throws ParseException {
         Date today = new Date();
-        RouteLogDTO routeLog = new RouteLogDTO("466", today);
+        RouteLogDTO routeLog = new RouteLogDTO("466", today, Language.FR);
         SimpleDateFormat formater = new SimpleDateFormat("HH:mm");
         routeLog.addStop(new ServedStopDTO("Liège-Guillemins", formater
                 .parse("06:58"), 5, formater.parse("07:05"), 5, false));
@@ -62,7 +61,7 @@ public class RaildelaysServiceIT {
     @Test
     public void testSearchLineStop() throws ParseException {
         Date today = new Date();
-        RouteLogDTO routeLog = new RouteLogDTO("466", today);
+        RouteLogDTO routeLog = new RouteLogDTO("466", today, Language.FR);
         SimpleDateFormat formater = new SimpleDateFormat("HH:mm");
         routeLog.addStop(new ServedStopDTO("Liège-Guillemins", formater
                 .parse("06:58"), 5, formater.parse("07:05"), 5, false));

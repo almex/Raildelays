@@ -1,12 +1,14 @@
 package be.raildelays.service.impl;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import javax.annotation.Resource;
-import javax.validation.Validator;
-
+import be.raildelays.domain.Language;
+import be.raildelays.domain.dto.RouteLogDTO;
+import be.raildelays.domain.dto.ServedStopDTO;
+import be.raildelays.domain.entities.*;
+import be.raildelays.repository.LineStopDao;
+import be.raildelays.repository.RailtimeTrainDao;
+import be.raildelays.repository.StationDao;
+import be.raildelays.repository.TrainDao;
+import be.raildelays.service.RaildelaysService;
 import org.apache.commons.lang3.StringUtils;
 import org.dozer.Mapper;
 import org.slf4j.Logger;
@@ -15,18 +17,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-import be.raildelays.domain.dto.RouteLogDTO;
-import be.raildelays.domain.dto.ServedStopDTO;
-import be.raildelays.domain.entities.LineStop;
-import be.raildelays.domain.entities.RailtimeTrain;
-import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.TimestampDelay;
-import be.raildelays.domain.entities.Train;
-import be.raildelays.repository.LineStopDao;
-import be.raildelays.repository.RailtimeTrainDao;
-import be.raildelays.repository.StationDao;
-import be.raildelays.repository.TrainDao;
-import be.raildelays.service.RaildelaysService;
+import javax.annotation.Resource;
+import javax.validation.Validator;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * We match Train by Railtime id.<br/>
@@ -63,23 +58,25 @@ public class RaildelaysServiceImpl implements RaildelaysService {
     @Override
     @Transactional
     public List<LineStop> saveRouteLog(final RouteLogDTO routeLog) {
-        LOGGER.debug("Saving route log for train={} and date={}...",
-                routeLog.getTrainId(), routeLog.getDate());
+        LOGGER.debug("Saving route log for train={}, date={} and lang={}...",
+                routeLog.getTrainId(), routeLog.getDate(), routeLog.getLanguage());
 
         // -- Validate our inputs
         validator.validate(routeLog);
 
-        return persist(routeLog.getDate(), routeLog.getTrainId(),
+        return persist(routeLog.getDate(),
+                routeLog.getTrainId(),
+                routeLog.getLanguage(),
                 routeLog.getStops());
     }
 
-    private List<LineStop> persist(final Date date, final String trainId,
+    private List<LineStop> persist(final Date date, final String trainId, final Language language,
                                    List<? extends ServedStopDTO> stops) {
         List<LineStop> result = new ArrayList<>();
         LineStop previous = null;
 
         for (ServedStopDTO stop : stops) {
-            LineStop current = saveServedStop(date, trainId, stop, previous);
+            LineStop current = saveServedStop(date, trainId, language, stop, previous);
 
             result.add(current);
 
@@ -90,7 +87,7 @@ public class RaildelaysServiceImpl implements RaildelaysService {
         return result;
     }
 
-    private LineStop saveServedStop(final Date date, final String trainId,
+    private LineStop saveServedStop(final Date date, final String trainId, final Language language,
                                     final ServedStopDTO stop, final LineStop previous) {
 
         LOGGER.debug("Saving timetable for train={}, date={} and stop={}...",
@@ -104,9 +101,9 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 
         // -- Retrieve persisted version of sub-entities to avoid duplicate key
         RailtimeTrain persistedTrain = saveOrRetrieveRailtimeTrain(new RailtimeTrain(
-                trainId, trainId));
+                trainId, trainId, language));
         Station persistedStation = saveOrRetrieveStation(new Station(
-                stop.getStationName()));
+                stop.getStationName(), language));
         TimestampDelay arrivalTime = new TimestampDelay(stop.getArrivalTime(),
                 stop.getArrivalDelay());
         TimestampDelay departureTime = new TimestampDelay(
@@ -230,6 +227,7 @@ public class RaildelaysServiceImpl implements RaildelaysService {
                 .getRailtimeId());
 
         if (persistedTrain == null) {
+            validator.validate(train);
             result = railtimeTrainDao.save(train);
         } else {
             result = persistedTrain;
@@ -241,7 +239,20 @@ public class RaildelaysServiceImpl implements RaildelaysService {
     private Train saveOrRetrieveTrain(Train train) {
         Train result = trainDao.findByEnglishName(train.getEnglishName());
 
+        if (StringUtils.isNotBlank(train.getEnglishName())) {
+            result = trainDao.findByEnglishName(train.getEnglishName());
+        }
+
+        if (result == null && StringUtils.isNotBlank(train.getFrenchName())) {
+            result = trainDao.findByFrenchName(train.getFrenchName());
+        }
+
+        if (result == null && StringUtils.isNotBlank(train.getDutchName())) {
+            result = trainDao.findByDutchName(train.getDutchName());
+        }
+
         if (result == null) {
+            validator.validate(train);
             result = trainDao.save(train);
         }
 
@@ -260,12 +271,12 @@ public class RaildelaysServiceImpl implements RaildelaysService {
         }
 
         if (result == null && StringUtils.isNotBlank(station.getDutchName())) {
-            result = stationDao.findByFrenchName(station.getDutchName());
+            result = stationDao.findByDutchName(station.getDutchName());
         }
 
         if (result == null) {
-            result = stationDao.save(new Station(station.getEnglishName(), station.getDutchName(), station.getFrenchName()));
-            LOGGER.debug("Station: {}", result);
+            validator.validate(station);
+            result = stationDao.save(station);
         }
 
         return result;

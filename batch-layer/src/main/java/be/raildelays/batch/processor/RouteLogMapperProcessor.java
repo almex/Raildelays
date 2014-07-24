@@ -1,5 +1,6 @@
 package be.raildelays.batch.processor;
 
+import be.raildelays.domain.Language;
 import be.raildelays.domain.dto.RouteLogDTO;
 import be.raildelays.domain.dto.ServedStopDTO;
 import be.raildelays.domain.railtime.Direction;
@@ -12,6 +13,7 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Map a list of two {@link Direction} to a {@link RouteLogDTO}
@@ -25,14 +27,18 @@ public class RouteLogMapperProcessor implements
 
     private Date date;
 
+    private String language = Language.EN.name();
+
     @Override
     public void afterPropertiesSet() throws Exception {
         Validate.notNull(date, "Date is mandatory");
+        Validate.notNull(language, "Language is mandatory");
     }
 
     @Override
     public RouteLogDTO process(final TwoDirections item) throws Exception {
         RouteLogDTO result = null;
+        Language lang = Language.valueOf(language.toUpperCase(Locale.US));
 
         LOGGER.trace("item", item);
 
@@ -40,7 +46,7 @@ public class RouteLogMapperProcessor implements
         Direction arrivalDirection = item.getArrival();
 
         if (departureDirection != null && arrivalDirection != null) {
-            result = new RouteLogDTO(arrivalDirection.getTrain().getIdRailtime(), date);
+            result = new RouteLogDTO(arrivalDirection.getTrain().getIdRailtime(), date, lang);
 
             LOGGER.debug("new_route_log", result);
 
@@ -71,4 +77,7 @@ public class RouteLogMapperProcessor implements
         this.date = date;
     }
 
+    public void setLanguage(String language) {
+        this.language = language;
+    }
 }

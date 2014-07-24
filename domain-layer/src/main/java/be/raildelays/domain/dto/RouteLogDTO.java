@@ -1,14 +1,15 @@
 package be.raildelays.domain.dto;
 
+import be.raildelays.domain.Language;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 public final class RouteLogDTO implements Serializable {
 
@@ -20,12 +21,16 @@ public final class RouteLogDTO implements Serializable {
 	@NotNull
 	private final Date date;
 
+    @NotNull
+    private final Language language;
+
 	@NotNull
 	@Size(min = 1)
 	private final List<ServedStopDTO> stops;
 
-	public RouteLogDTO(final String trainId, final Date date) {
+	public RouteLogDTO(final String trainId, final Date date, final Language language) {
 		this.trainId = trainId;
+        this.language = language;
 		this.date = date;
 		stops = new ArrayList<>();
 	}
@@ -57,6 +62,9 @@ public final class RouteLogDTO implements Serializable {
                 .append("date: ") //
                 .append(date != null ? df.format(date) : "N/A") //
                 .append(", ") //
+                .append("language: ") //
+                .append(language != null ? language.name() : "N/A") //
+                .append(", ") //
                 .append("stops: [");
 
         for (ServedStopDTO stop : getStops()) {
@@ -66,5 +74,9 @@ public final class RouteLogDTO implements Serializable {
         result.append("]} ");
 
         return result.toString();
+    }
+
+    public Language getLanguage() {
+        return language;
     }
 }

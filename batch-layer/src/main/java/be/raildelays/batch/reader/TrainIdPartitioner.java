@@ -1,5 +1,6 @@
 package be.raildelays.batch.reader;
 
+import be.raildelays.domain.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.partition.support.Partitioner;
@@ -12,7 +13,6 @@ import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 
-import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,13 +46,31 @@ public class TrainIdPartitioner implements Partitioner {
                 public RepeatStatus doInIteration(RepeatContext context) throws UnexpectedInputException, ParseException, Exception {
                     RepeatStatus result = RepeatStatus.CONTINUABLE;
                     String trainId = trainListReader.read();
-                    ExecutionContext executionContext = new ExecutionContext();
-//                    int partitionId = partitions.size() % gridSize;
-                    int partitionId = partitions.size();
 
                     if (trainId != null) {
-                        executionContext.putInt("trainId", Integer.parseInt(trainId));
-                        partitions.put("partition" + partitionId, executionContext);
+                        {   // English
+                            ExecutionContext executionContext = new ExecutionContext();
+                            int partitionId = partitions.size();
+                            executionContext.putInt("trainId", Integer.parseInt(trainId));
+                            executionContext.putString("lang", Language.EN.name());
+                            partitions.put("partition" + partitionId, executionContext);
+                        }
+
+                        {   // French
+                            ExecutionContext executionContext = new ExecutionContext();
+                            int partitionId = partitions.size();
+                            executionContext.putInt("trainId", Integer.parseInt(trainId));
+                            executionContext.putString("lang", Language.FR.name());
+                            partitions.put("partition" + partitionId, executionContext);
+                        }
+
+                        {   // Dutch
+                            ExecutionContext executionContext = new ExecutionContext();
+                            int partitionId = partitions.size();
+                            executionContext.putInt("trainId", Integer.parseInt(trainId));
+                            executionContext.putString("lang", Language.NL.name());
+                            partitions.put("partition" + partitionId, executionContext);
+                        }
                     } else {
                         result = RepeatStatus.FINISHED;
                     }

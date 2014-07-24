@@ -1,10 +1,11 @@
 package be.raildelays.domain.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-
+import be.raildelays.domain.Language;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
 
 /**
  * Immutable entity of a {@link Train} specific to Railtime portal.
@@ -30,6 +31,11 @@ public class RailtimeTrain extends Train {
 		super(name);
 		this.railtimeId = railtimeId;
 	}
+
+    public RailtimeTrain(final String name, final String railtimeId, final Language language) {
+        super(name, language);
+        this.railtimeId = railtimeId;
+    }
 
 	@Override
 	public String toString() {
