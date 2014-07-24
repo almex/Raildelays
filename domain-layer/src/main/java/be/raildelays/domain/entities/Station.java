@@ -12,6 +12,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import be.raildelays.domain.Language;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -28,7 +29,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Entity
 @Table(name = "STATION")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public class Station implements Serializable, Cloneable, Comparable<Station> {
+public class Station extends AbstractI18nEntity implements Serializable, Cloneable, Comparable<Station> {
 
 	private static final long serialVersionUID = -3436298381031779337L;
 
@@ -68,6 +69,36 @@ public class Station implements Serializable, Cloneable, Comparable<Station> {
 		this.dutchName = "";
 		this.frenchName = "";
 	}
+
+    /**
+     * Initialization constructor.
+     *
+     * @param name for this train station.
+     */
+    public Station(final String name, Language language) {
+        this.id = null;
+        switch (language) {
+            case EN:
+                this.englishName = name;
+                this.dutchName = "";
+                this.frenchName = "";
+                break;
+            case NL:
+                this.englishName = "";
+                this.dutchName = name;
+                this.frenchName = "";
+                break;
+            case FR:
+                this.englishName = "";
+                this.dutchName = "";
+                this.frenchName = name;
+                break;
+            default:
+                this.englishName = "";
+                this.dutchName = "";
+                this.frenchName = "";
+        }
+    }
 	
 	/**
 	 * Initialization constructor.

@@ -127,6 +127,7 @@
           scope="step">
         <property name="stationA" value="#{jobParameters['station.a.name']}"/>
         <property name="stationB" value="#{jobParameters['station.b.name']}"/>
+        <property name="language" value="#{jobParameters['lang']}"/>
         <property name="date" value="#{jobParameters['date']}"/>
         <property name="threshold" value="${excel.item.delay.threshold}"/>
     </bean>

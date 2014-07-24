@@ -1,12 +1,11 @@
 package be.raildelays.batch.reader;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 
 import javax.annotation.Resource;
+import javax.security.auth.callback.LanguageCallback;
 
+import be.raildelays.domain.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ExitStatus;
@@ -48,6 +47,8 @@ public class DelaysItemReader implements ItemReader<LineStop>, InitializingBean 
 
     private Integer threshold;
 
+    private String language = Language.EN.name();
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		// Validate all job parameters
@@ -58,11 +59,12 @@ public class DelaysItemReader implements ItemReader<LineStop>, InitializingBean 
     @BeforeStep
     public void beforeStep(StepExecution stepExecution) {
         List<LineStop> result = new ArrayList<>();
+        Language lang = Language.valueOf(language.toUpperCase(Locale.US));
 
         LOGGER.debug("Searching delays for date={}", date);
 
         if (date != null) {
-            result = service.searchDelaysBetween(date, new Station(stationA), new Station(stationB), threshold);
+            result = service.searchDelaysBetween(date, new Station(stationA, lang), new Station(stationB, lang), threshold);
         }
 
         Collections.sort(result);
@@ -89,5 +91,9 @@ public class DelaysItemReader implements ItemReader<LineStop>, InitializingBean 
 
     public void setThreshold(Integer threshold) {
         this.threshold = threshold;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 }
