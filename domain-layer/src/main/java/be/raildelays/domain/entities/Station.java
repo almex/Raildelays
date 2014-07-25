@@ -1,177 +1,61 @@
 package be.raildelays.domain.entities;
 
 import be.raildelays.domain.Language;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 
 /**
  * Immutable entity defining a train station.
- * 
+ * <p/>
  * Unicity of a train is done on the English name.
- * 
+ *
  * @author Almex
- * @see Entity
+ * @see AbstractEntity
  */
 @Entity
 @Table(name = "STATION")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public class Station extends AbstractI18nEntity implements Serializable, Cloneable, Comparable<Station> {
+public class Station extends AbstractI18nEntity {
 
-	private static final long serialVersionUID = -3436298381031779337L;
-
-	@Id
-	@Column(name = "ID")
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	protected final Long id;
-
-	@Column(name = "ENGLISH_NAME")
-	protected final String englishName;
-
-	@Column(name = "FRENCH_NAME")
-	protected final String frenchName;
-
-	@Column(name = "DUTCH_NAME")
-	protected final String dutchName;
-
-	/**
-	 * Default contrcutor.
-	 */
-	protected Station() {
-		this.id = null;
-		this.englishName = "";
-		this.dutchName = "";
-		this.frenchName = "";
-	}
-
-	/**
-	 * Initialization constructor.
-	 * 
-	 * @param englishName English name for this train station.
-	 */
-	public Station(final String englishName) {
-		this.id = null;
-		this.englishName = englishName;
-		this.dutchName = "";
-		this.frenchName = "";
-	}
+    private static final long serialVersionUID = -3436298381031779337L;
 
     /**
-     * Initialization constructor.
-     *
-     * @param name for this train station.
+     * {@inheritDoc}
      */
-    public Station(final String name, Language language) {
-        this.id = null;
-
-        switch (language) {
-            case EN:
-                this.englishName = name;
-                this.dutchName = "";
-                this.frenchName = "";
-                break;
-            case NL:
-                this.englishName = "";
-                this.dutchName = name;
-                this.frenchName = "";
-                break;
-            case FR:
-                this.englishName = "";
-                this.dutchName = "";
-                this.frenchName = name;
-                break;
-            default:
-                this.englishName = "";
-                this.dutchName = "";
-                this.frenchName = "";
-        }
+    protected Station() {
+        super();
     }
-	
-	/**
-	 * Initialization constructor.
-	 * 
-	 * @param englishName English name for this train
-	 * @param dutchName Dutch name for this train
-	 * @param frenchName French name for this train
-	 */
-	public Station(final String englishName, final String dutchName, final String frenchName) {
-		this.id = null;
-		this.englishName = englishName;
-		this.dutchName = dutchName;
-		this.frenchName = frenchName;
-	}
 
-	@Override
-	public String toString() {
-		return new StringBuilder("Station: ") //
-				.append("{ ") //
-				.append("id: ").append(id).append(", ") //
-				.append("dutchName: ").append(dutchName).append(", ") //
-				.append("englishName: ").append(englishName).append(", ") //
-				.append("frenchName: ").append(frenchName) //
-				.append(" }").toString();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public Station(String englishName) {
+        super(englishName);
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		boolean result = false;
+    /**
+     * {@inheritDoc}
+     */
+    public Station(String name, Language language) {
+        super(name, language);
+    }
 
-		if (obj == this) {
-			result = true;
-		} else {
-			if (obj instanceof Station) {
-				Station station = (Station) obj;
-
-				result = new EqualsBuilder().append(englishName,
-						station.englishName).isEquals();
-			} else {
-				result = false;
-			}
-		}
-
-		return result;
-	}
-
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder() //
-				.append(englishName) //
-				.toHashCode();
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public String getEnglishName() {
-		return englishName;
-	}
-
-	public String getFrenchName() {
-		return frenchName;
-	}
-
-	public String getDutchName() {
-		return dutchName;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public Station(String englishName, String dutchName, String frenchName) {
+        super(englishName, dutchName, frenchName);
+    }
 
     @Override
-    public int compareTo(Station station) {
-        int result = 0;
-
-        if (station == null) {
-            result = -1;
-        } else {
-            result = new CompareToBuilder()
-                    .append(StringUtils.stripAccents(englishName), StringUtils.stripAccents(station.getEnglishName()), String.CASE_INSENSITIVE_ORDER)
-                    .toComparison();
-        }
-
-        return result;
+    public String toString() {
+        return new StringBuilder("Station: ") //
+                .append("{ ") //
+                .append("id: ").append(getId()).append(", ") //
+                .append("dutchName: ").append(getDutchName()).append(", ") //
+                .append("englishName: ").append(getEnglishName()).append(", ") //
+                .append("frenchName: ").append(getFrenchName()) //
+                .append(" }").toString();
     }
+
 }

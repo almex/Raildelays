@@ -14,19 +14,14 @@ import java.util.Date;
  * Line stop determine a stop for train line.
  *
  * @author Almex *
- * @see Entity
+ * @see AbstractEntity
  */
 @Entity
 @Table(name = "LINE_STOP", uniqueConstraints = @UniqueConstraint(columnNames = {
         "TRAIN_ID", "DATE", "STATION_ID"}))
-public class LineStop implements Serializable, Cloneable, Comparable<LineStop> {
+public class LineStop extends AbstractEntity implements Comparable<LineStop> {
 
     private static final long serialVersionUID = 7142886242889314414L;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "ID")
-    protected final Long id;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "TRAIN_ID")

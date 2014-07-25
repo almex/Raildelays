@@ -62,11 +62,11 @@ public class BRailStation extends Station {
 	public String toString() {
 		return new StringBuilder("BRailStation: ") //
 				.append("{ ") //
-				.append("id: ").append(id).append(", ") //
+				.append("id: ").append(getId()).append(", ") //
 				.append("railtimeId: ").append(bRailId).append(", ") //
-				.append("dutchName: ").append(dutchName).append(", ") //
-				.append("englishName: ").append(englishName).append(", ") //
-				.append("frenchName: ").append(frenchName) //
+				.append("dutchName: ").append(getDutchName()).append(", ") //
+				.append("englishName: ").append(getEnglishName()).append(", ") //
+				.append("frenchName: ").append(getFrenchName()) //
 				.append(" }").toString();
 	}
 
