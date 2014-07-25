@@ -4,19 +4,23 @@ import be.raildelays.domain.entities.*;
 import be.raildelays.repository.LineStopDaoCustom;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+@SuppressWarnings("unused") // Injected via Spring Data JPA
 public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 
     @PersistenceContext
+    @SuppressWarnings("unused") // Injected via CDI
     private EntityManager entityManager;
 
-    private static Predicate[] equals(Root root, CriteriaBuilder builder, Station station) {
+    private static Predicate[] equals(Root<LineStop> root, CriteriaBuilder builder, Station station) {
         List<Predicate> predicates = new ArrayList<>();
         Path<Station> path = root.get(LineStop_.station);
 
@@ -31,7 +35,7 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
         return predicates.toArray(new Predicate[predicates.size()]);
     }
 
-    private static Predicate[] equals(Root root, CriteriaBuilder builder, Train train) {
+    private static Predicate[] equals(Root<LineStop> root, CriteriaBuilder builder, Train train) {
         List<Predicate> predicates = new ArrayList<>();
         Path<Train> path = root.get(LineStop_.train);
 
@@ -49,14 +53,14 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
     @SuppressWarnings("unchecked")
     @Override
     public List<LineStop> findDepartureDelays(Date date, Station station,
-                                              int delayThreshold) {
+                                              long delayThreshold) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
         Root<LineStop> root = query.from(LineStop.class);
         Path<Long> delay = root.get(LineStop_.departureTime).get(TimestampDelay_.delay);
         query.where(builder.equal(root.get(LineStop_.date), date),
                 builder.and(delay.isNotNull()),
-                builder.and(builder.greaterThanOrEqualTo(delay, new Long(delayThreshold))),
+                builder.and(builder.greaterThanOrEqualTo(delay, delayThreshold)),
                 builder.and(equals(root, builder, station))
         );
 
@@ -67,14 +71,14 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
     @SuppressWarnings("unchecked")
     @Override
     public List<LineStop> findArrivalDelays(Date date, Station station,
-                                            int delayThreshold) {
+                                            long delayThreshold) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
         Root<LineStop> root = query.from(LineStop.class);
         Path<Long> delay = root.get(LineStop_.arrivalTime).get(TimestampDelay_.delay);
         query.where(builder.equal(root.get(LineStop_.date), date),
                 builder.and(delay.isNotNull()),
-                builder.and(builder.greaterThanOrEqualTo(delay, new Long(delayThreshold))),
+                builder.and(builder.greaterThanOrEqualTo(delay, delayThreshold)),
                 builder.and(equals(root, builder, station))
         );
 
@@ -135,19 +139,6 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
         ).orderBy(builder.asc(expected));
 
         return entityManager.createQuery(query).getResultList();
-//        return (List<LineStop>) entityManager
-//                .createQuery(
-//                        "SELECT DISTINCT o "
-//                                + "FROM LineStop o "
-//                                + "WHERE o.station.englishName = :stationName "
-//                                + "AND o.date = :date "
-//                                + "AND o.arrivalTime IS NOT NULL "
-//                                + "AND o.arrivalTime.expected > :time "
-//                                + "ORDER BY o.arrivalTime.expected ASC")
-//                .setParameter("stationName", station.getEnglishName())
-//                .setParameter("date", date, TemporalType.DATE)
-//                .setParameter("time", date, TemporalType.TIME)
-//                .getResultList();
     }
 
     @Override
@@ -170,19 +161,6 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
             ).orderBy(builder.asc(expectedArrivalTime));
 
             return entityManager.createQuery(query).setMaxResults(1).setFirstResult(0).getSingleResult();
-//            return (LineStop) entityManager
-//                    .createQuery(
-//                            "SELECT o "
-//                                    + "FROM LineStop o "
-//                                    + "WHERE o.train.englishName = :trainName "
-//                                    + "AND o.station.englishName = :stationName "
-//                                    + "AND o.arrivalTime.expected IS NOT NULL "
-//                                    + "AND o.departureTime.expected IS NOT NULL "
-//                                    + "AND o.canceled = false "
-//                                    + "ORDER BY o.arrivalTime.expected ASC")
-//                    .setParameter("trainName", train.getEnglishName())
-//                    .setParameter("stationName", station.getEnglishName())
-//                    .setMaxResults(1).setFirstResult(0).getSingleResult();
         } catch (NoResultException e) {
             return null;
         }

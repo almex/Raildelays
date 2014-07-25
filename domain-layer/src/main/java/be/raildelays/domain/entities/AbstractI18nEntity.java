@@ -143,6 +143,8 @@ public class AbstractI18nEntity extends AbstractEntity implements Serializable, 
         } else {
             result = new CompareToBuilder()
                     .append(StringUtils.stripAccents(englishName), StringUtils.stripAccents(entity.getEnglishName()), String.CASE_INSENSITIVE_ORDER)
+                    .append(StringUtils.stripAccents(frenchName), StringUtils.stripAccents(entity.getFrenchName()), String.CASE_INSENSITIVE_ORDER)
+                    .append(StringUtils.stripAccents(dutchName), StringUtils.stripAccents(entity.getDutchName()), String.CASE_INSENSITIVE_ORDER)
                     .toComparison();
         }
 

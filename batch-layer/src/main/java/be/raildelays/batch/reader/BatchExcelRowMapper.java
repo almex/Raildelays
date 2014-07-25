@@ -2,6 +2,7 @@ package be.raildelays.batch.reader;
 
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.poi.RowMapper;
+import be.raildelays.domain.Language;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
 import org.apache.commons.lang3.StringUtils;
@@ -10,6 +11,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -31,12 +33,16 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
 
     private Validator validator;
 
+    private String language = Language.EN.name();
+
     @Override
     public void afterPropertiesSet() throws Exception {
         if (validateOutcomes) {
             ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
             validator = factory.getValidator();
         }
+
+        Assert.notNull(language, "You must set language before using this bean");
     }
 
 
@@ -79,7 +85,7 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
 
         Long trainId = getLong(row, cellIndex);
         if (trainId != null) {
-            result = new Train(numberFormat.format(trainId));
+            result = new Train(numberFormat.format(trainId), getLanguage());
         }
 
         return result;
@@ -90,7 +96,7 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
 
         String stationName = getString(row, cellIndex);
         if (StringUtils.isNotBlank(stationName)) {
-            result = new Station(stationName);
+            result = new Station(stationName, getLanguage());
         }
 
         return result;
@@ -236,7 +242,15 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
         });
     }
 
+    private Language getLanguage() {
+        return Language.valueOf(language.toUpperCase());
+    }
+
     public void setValidateOutcomes(boolean validateOutcomes) {
         this.validateOutcomes = validateOutcomes;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 }

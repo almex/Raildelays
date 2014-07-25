@@ -56,7 +56,8 @@ public class RouteLogMapperProcessor implements
 
                 ServedStopDTO stop = new ServedStopDTO(arrivalStep.getStation().getName(),
                         departureStep.getTimestamp(), departureStep.getDelay(),
-                        arrivalStep.getTimestamp(), arrivalStep.getDelay(), arrivalStep.isCanceled() || departureStep.isCanceled());
+                        arrivalStep.getTimestamp(), arrivalStep.getDelay(),
+                        arrivalStep.isCanceled() || departureStep.isCanceled());
 
                 LOGGER.debug("processing_done", stop);
 

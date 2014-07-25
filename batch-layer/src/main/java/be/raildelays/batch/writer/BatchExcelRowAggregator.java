@@ -4,6 +4,7 @@ import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.poi.RowAggregator;
 import be.raildelays.batch.poi.WorkbookAction;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
+import be.raildelays.domain.Language;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
 import org.apache.commons.lang3.StringUtils;
@@ -16,7 +17,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +36,10 @@ import java.util.Locale;
 public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchExcelRowAggregator.class);
+
     private final Validator validator;
+
+    private String language = Language.EN.name();
 
 
     private interface CellFormatter<T> {
@@ -53,6 +56,7 @@ public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
     public BatchExcelRow aggregate(BatchExcelRow item, Workbook workbook, int sheetIndex, int rowIndex) throws Exception {
         final Row row = workbook.getSheetAt(sheetIndex).getRow(rowIndex);
         BatchExcelRow previousRow = null;
+        Language lang = Language.valueOf(language.toUpperCase());
 
         if (row != null && row.getCell(2) != null) {
             previousRow = new BatchExcelRowMapper().mapRow(row, rowIndex);
@@ -62,21 +66,21 @@ public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
             }
 
             setDateFormat(row, 2, item.getDate());
-            setStringFormat(row, 12, getStationName(item.getDepartureStation()));
-            setStringFormat(row, 18, getStationName(item.getArrivalStation()));
-            setStringFormat(row, 24, getStationName(item.getLinkStation()));
+            setStringFormat(row, 12, getStationName(item.getDepartureStation(), lang));
+            setStringFormat(row, 18, getStationName(item.getArrivalStation(), lang));
+            setStringFormat(row, 24, getStationName(item.getLinkStation(), lang));
             setHHFormat(row, 30, item.getExpectedDepartureTime());
             setMMFormat(row, 32, item.getExpectedDepartureTime());
             setHHFormat(row, 33, item.getExpectedArrivalTime());
             setMMFormat(row, 35, item.getExpectedArrivalTime());
-            setNumericFormat(row, 36, getTrainName(item.getExpectedTrain1()));
-            setNumericFormat(row, 39, getTrainName(item.getExpectedTrain2()));
+            setNumericFormat(row, 36, getTrainName(item.getExpectedTrain1(), lang));
+            setNumericFormat(row, 39, getTrainName(item.getExpectedTrain2(), lang));
             setHHFormat(row, 42, item.getEffectiveDepartureTime());
             setMMFormat(row, 44, item.getEffectiveDepartureTime());
             setHHFormat(row, 45, item.getEffectiveArrivalTime());
             setMMFormat(row, 47, item.getEffectiveArrivalTime());
-            setNumericFormat(row, 48, getTrainName(item.getEffectiveTrain1()));
-            setNumericFormat(row, 51, getTrainName(item.getEffectiveTrain2()));
+            setNumericFormat(row, 48, getTrainName(item.getEffectiveTrain1(), lang));
+            setNumericFormat(row, 51, getTrainName(item.getEffectiveTrain2(), lang));
             evaluateFormula(workbook, row, 56);
             evaluateFormula(workbook, row, 55);
             evaluateFormula(workbook, row, 54);
@@ -215,11 +219,23 @@ public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
         setTimeFormat(row, cellIndex, time, "mm");
     }
 
-    private static String getStationName(Station station) {
+    private static String getStationName(Station station, Language lang) {
         String result = "";
 
         if (station != null) {
-            String stationName = station.getEnglishName();
+            String stationName = null;
+
+            switch (lang) {
+                case EN:
+                    stationName = station.getEnglishName();
+                    break;
+                case FR:
+                    stationName = station.getFrenchName();
+                    break;
+                case NL:
+                    stationName = station.getDutchName();
+                    break;
+            }
 
             if (StringUtils.isNotBlank(stationName)) {
                 result = StringUtils.stripAccents(stationName.toUpperCase(Locale.UK));
@@ -229,13 +245,27 @@ public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
         return result;
     }
 
-    private static String getTrainName(Train train) {
+    private static String getTrainName(Train train, Language lang) {
         String result = null;
 
         if (train != null) {
-            result = train.getEnglishName();
+            switch (lang) {
+                case EN:
+                    result = train.getEnglishName();
+                    break;
+                case FR:
+                    result = train.getFrenchName();
+                    break;
+                case NL:
+                    result = train.getDutchName();
+                    break;
+            }
         }
 
         return result;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 }

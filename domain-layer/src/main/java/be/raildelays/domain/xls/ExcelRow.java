@@ -1,6 +1,7 @@
 package be.raildelays.domain.xls;
 
 import be.raildelays.domain.Sens;
+import be.raildelays.domain.entities.AbstractI18nEntity;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
 import org.apache.commons.lang3.StringUtils;
@@ -414,21 +415,17 @@ public class ExcelRow implements Comparable<ExcelRow> {
         return builder.toString();
     }
 
-    protected static String notNullToString(Station station) {
+    protected static String notNullToString(AbstractI18nEntity entity) {
         String result = "";
 
-        if (station != null) {
-            result = notNullToString(station.getEnglishName());
-        }
-
-        return result;
-    }
-
-    protected static String notNullToString(Train train) {
-        String result = "";
-
-        if (train != null) {
-            result = notNullToString(train.getEnglishName());
+        if (entity != null) {
+            if (StringUtils.isNotBlank(entity.getEnglishName())) {
+                result = entity.getEnglishName();
+            } else if (StringUtils.isNotBlank(entity.getFrenchName())) {
+                result = entity.getFrenchName();
+            } else if (StringUtils.isNotBlank(entity.getDutchName())) {
+                result = entity.getDutchName();
+            }
         }
 
         return result;

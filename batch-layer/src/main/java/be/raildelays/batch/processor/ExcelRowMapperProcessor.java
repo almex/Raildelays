@@ -3,6 +3,7 @@ package be.raildelays.batch.processor;
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.bean.BatchExcelRow.Builder;
 import be.raildelays.batch.exception.ArrivalDepartureEqualsException;
+import be.raildelays.domain.Language;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
@@ -25,10 +26,13 @@ public class ExcelRowMapperProcessor implements
 
     private String stationB;
 
+    private String language = Language.EN.name();
+
     @Override
     public void afterPropertiesSet() throws Exception {
         Validate.notNull(stationA, "Station A name is mandatory");
         Validate.notNull(stationB, "Station B name is mandatory");
+        Validate.notNull(language, "language is mandatory");
     }
 
     @Override
@@ -44,10 +48,12 @@ public class ExcelRowMapperProcessor implements
         return result;
     }
 
-    protected BatchExcelRow extractSens(LineStop item,
-                                        String stationAName, String stationBName) throws ArrivalDepartureEqualsException {
-        Station stationA = new Station(stationAName);
-        Station stationB = new Station(stationBName);
+    protected BatchExcelRow extractSens(LineStop item, String stationAName, String stationBName)
+            throws ArrivalDepartureEqualsException {
+        Language lang = Language.valueOf(language.toUpperCase());
+        Station stationA = new Station(stationAName, lang);
+        Station stationB = new Station(stationBName, lang);
+
         Sens sens = null;
 
         LineStop departure = readPrevious(item.getPrevious(), stationA,
@@ -81,8 +87,7 @@ public class ExcelRowMapperProcessor implements
         return map(departure, arrival, sens);
     }
 
-    protected LineStop readPrevious(LineStop lineStop, Station stationA,
-                                    Station stationB) {
+    protected LineStop readPrevious(LineStop lineStop, Station stationA, Station stationB) {
         LineStop result = null;
 
         if (lineStop != null) {
@@ -101,8 +106,7 @@ public class ExcelRowMapperProcessor implements
         return result;
     }
 
-    protected LineStop readNext(LineStop lineStop, Station stationA,
-                                Station stationB) {
+    protected LineStop readNext(LineStop lineStop, Station stationA, Station stationB) {
         LineStop result = null;
 
         if (lineStop != null) {
@@ -191,4 +195,7 @@ public class ExcelRowMapperProcessor implements
         this.stationB = stationB;
     }
 
+    public void setLanguage(String language) {
+        this.language = language;
+    }
 }

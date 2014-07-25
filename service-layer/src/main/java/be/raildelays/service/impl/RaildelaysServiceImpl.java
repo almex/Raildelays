@@ -3,7 +3,10 @@ package be.raildelays.service.impl;
 import be.raildelays.domain.Language;
 import be.raildelays.domain.dto.RouteLogDTO;
 import be.raildelays.domain.dto.ServedStopDTO;
-import be.raildelays.domain.entities.*;
+import be.raildelays.domain.entities.LineStop;
+import be.raildelays.domain.entities.Station;
+import be.raildelays.domain.entities.TimestampDelay;
+import be.raildelays.domain.entities.Train;
 import be.raildelays.repository.LineStopDao;
 import be.raildelays.repository.RailtimeTrainDao;
 import be.raildelays.repository.StationDao;
@@ -100,8 +103,8 @@ public class RaildelaysServiceImpl implements RaildelaysService {
         validator.validate(stop);
 
         // -- Retrieve persisted version of sub-entities to avoid duplicate key
-        RailtimeTrain persistedTrain = saveOrRetrieveRailtimeTrain(new RailtimeTrain(
-                trainId, trainId, language));
+        Train persistedTrain = saveOrRetrieveTrain(new Train(
+                trainId, language));
         Station persistedStation = saveOrRetrieveStation(new Station(
                 stop.getStationName(), language));
         TimestampDelay arrivalTime = new TimestampDelay(stop.getArrivalTime(),
@@ -172,7 +175,7 @@ public class RaildelaysServiceImpl implements RaildelaysService {
     @Transactional(readOnly = true)
     public List<LineStop> searchDelaysBetween(Date date, Station stationA,
                                               Station stationB, int delayThreshold) {
-        List<LineStop> result = new ArrayList<LineStop>();
+        List<LineStop> result = new ArrayList<>();
 
         LOGGER.info("Searching line stops for date={} stationA={} stationB={} delayThreshold={}",
                 new Object[]{date, stationA, stationB, delayThreshold});
@@ -221,20 +224,20 @@ public class RaildelaysServiceImpl implements RaildelaysService {
         return result;
     }
 
-    private RailtimeTrain saveOrRetrieveRailtimeTrain(RailtimeTrain train) {
-        RailtimeTrain result = null;
-        RailtimeTrain persistedTrain = railtimeTrainDao.findByRailtimeId(train
-                .getRailtimeId());
-
-        if (persistedTrain == null) {
-            validator.validate(train);
-            result = railtimeTrainDao.save(train);
-        } else {
-            result = persistedTrain;
-        }
-
-        return result;
-    }
+//    private RailtimeTrain saveOrRetrieveRailtimeTrain(RailtimeTrain train) {
+//        RailtimeTrain result = null;
+//        RailtimeTrain persistedTrain = railtimeTrainDao.findByRailtimeId(train
+//                .getRailtimeId());
+//
+//        if (persistedTrain == null) {
+//            validator.validate(train);
+//            result = railtimeTrainDao.save(train);
+//        } else {
+//            result = persistedTrain;
+//        }
+//
+//        return result;
+//    }
 
     private Train saveOrRetrieveTrain(Train train) {
         Train result = null;

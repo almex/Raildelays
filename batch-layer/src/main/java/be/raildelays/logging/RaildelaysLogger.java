@@ -350,7 +350,7 @@ public class RaildelaysLogger implements Logger {
                     .id(object.getId())
                     .date(object.getDate())
                     .expectedTrain(getTrainId(object.getTrain()))
-                    .departureStation(object.getStation() != null ? object.getStation().getEnglishName() : null)
+                    .departureStation(getStationName(object.getStation()))
                     .expectedDepartureTime(object.getArrivalTime() != null ? object.getArrivalTime().getExpected() : null)
                     .expectedArrivalTime(object.getDepartureTime() != null ? object.getDepartureTime().getExpected() : null)
                     .effectiveDepartureTime(computeEffectiveTime(object.getArrivalTime()))
@@ -370,8 +370,8 @@ public class RaildelaysLogger implements Logger {
                     .date(object.getDate())
                     .expectedTrain(getTrainId(object.getExpectedTrain1()))
                     .effectiveTrain(getTrainId(object.getEffectiveTrain1()))
-                    .departureStation(object.getDepartureStation() != null ? object.getDepartureStation().getEnglishName() : null)
-                    .arrivalStation(object.getArrivalStation() != null ? object.getArrivalStation().getEnglishName() : null)
+                    .departureStation(getStationName(object.getDepartureStation()))
+                    .arrivalStation(getStationName(object.getArrivalStation()))
                     .expectedDepartureTime(object.getExpectedDepartureTime())
                     .expectedArrivalTime(object.getExpectedArrivalTime())
                     .effectiveDepartureTime(object.getEffectiveDepartureTime())
@@ -383,11 +383,33 @@ public class RaildelaysLogger implements Logger {
     private static Long getTrainId(be.raildelays.domain.entities.Train train) {
         Long result = null;
 
-        if (train != null && train.getEnglishName() != null) {
+        if (train != null) {
             try {
-                result = Long.parseLong(train.getEnglishName());
+                if (StringUtils.isNotBlank(train.getEnglishName())) {
+                    result = Long.parseLong(train.getEnglishName());
+                } else if (StringUtils.isNotBlank(train.getFrenchName())) {
+                    result = Long.parseLong(train.getFrenchName());
+                } else if (StringUtils.isNotBlank(train.getDutchName())) {
+                    result = Long.parseLong(train.getDutchName());
+                }
             } catch (NumberFormatException e) {
                 result = 0L;
+            }
+        }
+
+        return result;
+    }
+
+    private static String getStationName(be.raildelays.domain.entities.Station station) {
+        String result = null;
+
+        if (station != null) {
+            if (StringUtils.isNotBlank(station.getEnglishName())) {
+                result = station.getEnglishName();
+            } else if (StringUtils.isNotBlank(station.getFrenchName())) {
+                result = station.getFrenchName();
+            } else if (StringUtils.isNotBlank(station.getDutchName())) {
+                result = station.getDutchName();
             }
         }
 
