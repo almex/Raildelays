@@ -1,15 +1,11 @@
 package be.raildelays.parser
 
-import org.slf4j.Logger
-
 import be.raildelays.domain.railtime.Direction
-import be.raildelays.domain.railtime.Step
 import be.raildelays.httpclient.RequestStreamer
 import be.raildelays.httpclient.impl.RailtimeRequestStreamer
-import be.raildelays.parser.StreamParser;
 import be.raildelays.parser.impl.RailtimeStreamParser
 import be.raildelays.util.ParsingUtil
-
+import org.slf4j.Logger
 
 Logger log = Logger.getLogger(GlobalTest.class)
 

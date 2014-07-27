@@ -1,54 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Generated from archetype; please customize. -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<artifactId>raildelays-parser</artifactId>
-	<name>Parser layer</name>
-	<description>Groovy Parser for Raildelays that parse SNCB/NMBS's Railtime Mobile HTML pages</description>
+    <artifactId>raildelays-parser</artifactId>
+    <name>Parser layer</name>
+    <description>Groovy Parser for Raildelays that parse SNCB/NMBS's Railtime Mobile HTML pages</description>
 
-	<parent>
-		<groupId>be.raildelays</groupId>
-		<artifactId>raildelays-parent</artifactId>
-		<version>1.0.2-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
+    <parent>
+        <groupId>be.raildelays</groupId>
+        <artifactId>raildelays-parent</artifactId>
+        <version>1.0.2-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
 
-	<dependencies>
+    <dependencies>
 
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>raildelays-domain</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>raildelays-common</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>raildelays-httpclient</artifactId>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>raildelays-domain</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>raildelays-httpclient</artifactId>
+            <!-- FIXME move ParsingUtils to its own module to remove this runtime dependency -->
+            <!--scope>test</scope-->
+        </dependency>
 
-		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
-			<artifactId>groovy-all</artifactId>
-			<type>jar</type>
-		</dependency>
-		<dependency>
-			<groupId>org.ccil.cowan.tagsoup</groupId>
-			<artifactId>tagsoup</artifactId>
-		</dependency>
-			
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.ccil.cowan.tagsoup</groupId>
+            <artifactId>tagsoup</artifactId>
+        </dependency>
 
-		
-	</dependencies>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+
+    </dependencies>
 
 </project>

@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>be.raildelays</groupId>
@@ -13,17 +14,17 @@
         <developerConnection>scm:git:git@github.com:almex/Raildelays.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
-	
-	<distributionManagement>
-       <snapshotRepository>
-           <id>cloudbees-private-snapshot-repository</id>
-           <url>dav:https://repository-palomino.forge.cloudbees.com/snapshot/ </url>
-       </snapshotRepository>
-       <repository>
-           <id>cloudbees-private-release-repository</id>
-           <url>dav:https://repository-palomino.forge.cloudbees.com/release/</url>
-       </repository>
-   </distributionManagement>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>cloudbees-private-snapshot-repository</id>
+            <url>dav:https://repository-palomino.forge.cloudbees.com/snapshot/</url>
+        </snapshotRepository>
+        <repository>
+            <id>cloudbees-private-release-repository</id>
+            <url>dav:https://repository-palomino.forge.cloudbees.com/release/</url>
+        </repository>
+    </distributionManagement>
 
     <repositories>
         <repository>
@@ -54,7 +55,6 @@
     </pluginRepositories>
 
     <modules>
-        <module>common-layer</module>
         <module>domain-layer</module>
         <module>repository-layer</module>
         <module>httpclient-layer</module>
@@ -93,10 +93,10 @@
         <version.log4j>2.0</version.log4j>
         <version.slf4j>1.7.5</version.slf4j>
         <version.log4jdbc>1.16</version.log4jdbc>
-        <version.groovy>2.3.0</version.groovy>
-        <version.groovy.all>2.3.0</version.groovy.all>
-        <version.groovy.eclipse.compiler>2.8.0-01</version.groovy.eclipse.compiler>
-        <version.groovy.eclipse.batch>2.1.8-01</version.groovy.eclipse.batch>
+        <version.groovy>2.3.4</version.groovy>
+        <version.groovy.all>2.3.4</version.groovy.all>
+        <version.groovy.eclipse.compiler>2.9.0-01</version.groovy.eclipse.compiler>
+        <version.groovy.eclipse.batch>2.3.4-01</version.groovy.eclipse.batch>
         <version.tagsoup>1.2.1</version.tagsoup>
         <version.apache.poi>3.10-FINAL</version.apache.poi>
         <version.commons.dbcp>1.4</version.commons.dbcp>
@@ -106,7 +106,7 @@
         <forkCount>1</forkCount>
         <reuseForks>true</reuseForks>
     </properties>
-	
+
 
     <dependencyManagement>
         <dependencies>
@@ -114,7 +114,7 @@
             <!-- Internal dependencies -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>raildelays-common</artifactId>
+                <artifactId>raildelays-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -584,12 +584,12 @@
                 <!--<filtering>true</filtering> -->
             </resource>
         </resources>
-		
-		<extensions>
+
+        <extensions>
             <extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-webdav-jackrabbit</artifactId>
-				<version>1.0</version>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-webdav-jackrabbit</artifactId>
+                <version>1.0</version>
             </extension>
         </extensions>
 
@@ -648,12 +648,12 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>2.9.1</version>
-                </plugin>				
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-deploy-plugin</artifactId>
-					<version>2.8.1</version>
-				</plugin>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>2.8.1</version>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
@@ -774,7 +774,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore />
+                                        <ignore/>
                                     </action>
                                 </pluginExecution>
                                 <pluginExecution>
@@ -796,7 +796,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore />
+                                        <ignore/>
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>
@@ -1087,6 +1087,14 @@
             <activation>
                 <jdk>1.8</jdk>
             </activation>
+
+            <modules>
+                <module>api</module>
+            </modules>
+
+            <properties>
+                <jdk.version>1.8</jdk.version>
+            </properties>
 
             <build>
                 <plugins>

@@ -9,12 +9,12 @@ import java.util.Date;
  *
  * @author Almex
  */
-public final class DelayUtils {
+public final class ParsingUtil {
 
     /**
      * Default constructor.
      */
-    private DelayUtils() {
+    private ParsingUtil() {
         // No instantiation is possible.
     }
 

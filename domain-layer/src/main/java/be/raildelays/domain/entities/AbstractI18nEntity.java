@@ -27,7 +27,6 @@ public class AbstractI18nEntity extends AbstractEntity implements Serializable, 
      * Default contrcutor.
      */
     protected AbstractI18nEntity() {
-        super();
         this.englishName = "";
         this.dutchName = "";
         this.frenchName = "";
@@ -39,10 +38,7 @@ public class AbstractI18nEntity extends AbstractEntity implements Serializable, 
      * @param englishName English name for this train station.
      */
     public AbstractI18nEntity(final String englishName) {
-        super();
-        this.englishName = englishName;
-        this.dutchName = "";
-        this.frenchName = "";
+        this(englishName, "", "");
     }
 
     /**
@@ -51,8 +47,6 @@ public class AbstractI18nEntity extends AbstractEntity implements Serializable, 
      * @param name for this train station.
      */
     public AbstractI18nEntity(final String name, Language language) {
-        super();
-
         switch (language) {
             case EN:
                 this.englishName = name;
@@ -84,7 +78,6 @@ public class AbstractI18nEntity extends AbstractEntity implements Serializable, 
      * @param frenchName  French name for this train
      */
     public AbstractI18nEntity(final String englishName, final String dutchName, final String frenchName) {
-        super();
         this.englishName = englishName;
         this.dutchName = dutchName;
         this.frenchName = frenchName;
@@ -92,7 +85,7 @@ public class AbstractI18nEntity extends AbstractEntity implements Serializable, 
 
     @Override
     public boolean equals(Object obj) {
-        boolean result = false;
+        boolean result;
 
         if (obj == this) {
             result = true;
@@ -135,8 +128,8 @@ public class AbstractI18nEntity extends AbstractEntity implements Serializable, 
     }
 
     @Override
-    public int compareTo(AbstractI18nEntity entity) {
-        int result = 0;
+    public int compareTo(@SuppressWarnings("NullableProblems") AbstractI18nEntity entity) {
+        int result;
 
         if (entity == null) {
             result = -1;
