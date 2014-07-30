@@ -61,7 +61,7 @@ public class SearchNextTrainProcessor implements
 
         candidates = service.searchNextTrain(item.getArrivalStation(), dateTime.toDate());
 
-        LOGGER.trace("candidates", candidates);
+        LOGGER.trace("candidates_arrival", candidates);
 
         LineStop fastestTrain = searchFastestTrain(item, candidates);
 
@@ -118,6 +118,8 @@ public class SearchNextTrainProcessor implements
             LineStop candidateDeparture = searchDepartureLineStop(candidate, item.getDepartureStation());
             LineStop candidateArrival = candidate;
 
+            LOGGER.debug("candidate_departure", candidateDeparture);
+
             // We don't process null values
             if (candidateDeparture == null || candidateArrival == null) {
                 LOGGER.trace("filter_null_departure", candidateDeparture);
@@ -134,22 +136,29 @@ public class SearchNextTrainProcessor implements
 
             if (item.isCanceled()) {
                 LOGGER.trace("item_canceled", item);
-                LOGGER.debug("faster_train", candidateArrival);
+                LOGGER.debug("faster_canceled_train_arrival", candidateArrival);
                 fastestTrain = candidateArrival;
                 break; // candidate arrives before item
             }
 
-            // Do not take into account train which leaves after the expected
-            // one.
-            if (compareTimeAndDelay(item.getEffectiveDepartureTime(), candidateDeparture.getDepartureTime()) >= 0) {
+
+            /**
+             * Do not take into account candidate which leaves after the item.
+             */
+            if (compareTimeAndDelay(candidateDeparture.getDepartureTime(), item.getEffectiveDepartureTime()) > 0) {
                 LOGGER.trace("filter_after_departure", candidateDeparture);
-                LOGGER.trace("filter_after_arrival", candidateArrival);
                 continue; // candidate leaves after item
             }
 
-            // expected arrivalTime to destination and using delay from departure
-            if (compareTime(item.getEffectiveArrivalTime(), candidateArrival.getArrivalTime()) < 0) {
-                LOGGER.debug("faster_train", candidateArrival);
+            /**
+             * A candidate is faster if its expected arrival time minus the actual item delay at departure
+             * is before the expected arrival of the item. Or in other words, if the difference between the candidate expected arrival time
+             * and the item expected arrival time is lower than the difference between the effective and the expected departure
+             * time of the item (its delay).
+             */
+            if (compareTime(candidateArrival.getArrivalTime(), item.getExpectedArrivalTime()) <
+                    compareTime(item.getEffectiveDepartureTime(), item.getExpectedDepartureTime())) {
+                LOGGER.debug("faster_delay_train_arrival", candidateArrival);
                 fastestTrain = candidateArrival;
                 break; // candidate arrives before item
             }
@@ -174,7 +183,15 @@ public class SearchNextTrainProcessor implements
         return result;
     }
 
+    public static long compareTime(TimestampDelay departureB, Date departureA) {
+        return compareTime(departureA, departureB.getExpected());
+    }
+
     public static long compareTime(Date departureA, TimestampDelay departureB) {
+        return -compareTime(departureA, departureB.getExpected());
+    }
+
+    public static long compareTime(Date departureA, Date departureB) {
         long result = 0;
 
         if (departureA == null && departureB != null) {
@@ -183,14 +200,18 @@ public class SearchNextTrainProcessor implements
             result = -1;
         } else {
             LocalTime start = new LocalTime(departureA.getTime());
-            LocalTime end = new LocalTime(departureB.getExpected());
+            LocalTime end = new LocalTime(departureB.getTime());
 
             Duration duration = new Duration(start.toDateTimeToday(), end.toDateTimeToday());
 
-            result = duration.getMillis();
+            result = -duration.getMillis(); // A comparison is the opposite of a duration
         }
 
         return result;
+    }
+
+    public static long compareTimeAndDelay(TimestampDelay departureB, Date departureA) {
+        return -compareTimeAndDelay(departureA, departureB);
     }
 
     public static long compareTimeAndDelay(Date departureA, TimestampDelay departureB) {
@@ -206,7 +227,7 @@ public class SearchNextTrainProcessor implements
 
             Duration duration = new Duration(start.toDateTimeToday(), end.toDateTimeToday());
 
-            result = duration.getMillis();
+            result = -duration.getMillis(); // A comparison is an opposite of a duration
         }
 
         return result;
