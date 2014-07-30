@@ -221,7 +221,9 @@
     </bean>
 
     <bean id="searchNextTrainProcessor"
-          class="be.raildelays.batch.processor.SearchNextTrainProcessor">
+          class="be.raildelays.batch.processor.SearchNextTrainProcessor"
+          scope="step">
+        <property name="language" value="#{jobParameters['lang']}"/>
     </bean>
 
     <bean id="validatorProcessor"

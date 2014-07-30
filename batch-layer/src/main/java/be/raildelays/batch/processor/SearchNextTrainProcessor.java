@@ -1,6 +1,7 @@
 package be.raildelays.batch.processor;
 
 import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.domain.Language;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.TimestampDelay;
@@ -18,6 +19,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Search next train which allow you to arrive earlier to your destination.
@@ -33,6 +35,8 @@ public class SearchNextTrainProcessor implements
 
     @Resource
     private RaildelaysService service;
+
+    private String language = Language.EN.name();
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -56,6 +60,7 @@ public class SearchNextTrainProcessor implements
         LocalDate date = new LocalDate(item.getDate());
         LocalTime time = new LocalTime(item.getExpectedArrivalTime());
         DateTime dateTime = date.toDateTime(time);
+        Language lang = Language.valueOf(language.toUpperCase(Locale.US));
 
         LOGGER.trace("item", item);
 
@@ -63,18 +68,33 @@ public class SearchNextTrainProcessor implements
 
         LOGGER.trace("candidates_arrival", candidates);
 
-        LineStop fastestTrain = searchFastestTrain(item, candidates);
+        LineStop fastestLineStop = searchFastestTrain(item, candidates);
 
-        if (fastestTrain != null) {
+        if (fastestLineStop != null) {
             //result = aggregate(item, searchDepartureLineStop(fastestTrain, item.getDepartureStation()), fastestTrain);
             ExcelRowMapperProcessor processor = new ExcelRowMapperProcessor();
 
-            processor.setStationA(item.getDepartureStation().getEnglishName());
-            processor.setStationB(item.getArrivalStation().getEnglishName());
+            switch (lang) {
+                case EN:
+                    processor.setStationA(item.getDepartureStation().getEnglishName());
+                    processor.setStationB(item.getArrivalStation().getEnglishName());
+                    break;
+                case FR:
+                    processor.setStationA(item.getDepartureStation().getFrenchName());
+                    processor.setStationB(item.getArrivalStation().getFrenchName());
+                    break;
+                case NL:
+                    processor.setStationA(item.getDepartureStation().getDutchName());
+                    processor.setStationB(item.getArrivalStation().getDutchName());
+                    break;
+            }
+            processor.setLanguage(lang.name());
 
-            BatchExcelRow fasterItem = processor.process(fastestTrain);
+            BatchExcelRow fastestExcelRow = processor.process(fastestLineStop);
 
-            result = aggregate(item, fasterItem);
+            LOGGER.info("fastest_train", fastestExcelRow);
+
+            result = aggregate(item, fastestExcelRow);
 
             LOGGER.info("aggregate_result", result);
         }
@@ -164,8 +184,6 @@ public class SearchNextTrainProcessor implements
             }
         }
 
-        LOGGER.info("fastest_train", fastestTrain);
-
         return fastestTrain;
     }
 
@@ -237,4 +255,7 @@ public class SearchNextTrainProcessor implements
         this.service = service;
     }
 
+    public void setLanguage(String language) {
+        this.language = language;
+    }
 }
