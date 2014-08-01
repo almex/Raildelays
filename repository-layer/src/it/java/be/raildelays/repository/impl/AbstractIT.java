@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration(locations = {
         "classpath:spring/repository/raildelays-repository-integration-test-context.xml",
         "classpath:spring/test/raildelays-tx-context.xml" })
-@TransactionConfiguration
+@TransactionConfiguration(transactionManager = "raildelaysTransactionManager", defaultRollback = true)
 @Transactional
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
         TransactionalTestExecutionListener.class,

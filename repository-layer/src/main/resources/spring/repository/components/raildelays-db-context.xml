@@ -24,7 +24,7 @@
     <!--<property name="persistenceUnitName" value="raildelays-repository"/>-->
     <!--</bean>-->
 
-    <bean id="entityManagerFactory"
+    <bean id="raildelaysEntityManagerFactory"
           class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="persistenceUnitName" value="raildelays-repository"/>

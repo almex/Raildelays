@@ -14,8 +14,11 @@
 	<context:component-scan base-package="be.raildelays.domain.entities" />
 
 	<!-- Repositories -->
+    <!-- Despite the fact that we have a service layer, Spring Data JPA requires to define a
+         transaction manager to configure its repositories. So, here we have to declare a reference
+          to a bean which only exists on the service layer -->
 	<jpa:repositories base-package="be.raildelays.repository"
-		transaction-manager-ref="transactionManager"
-		entity-manager-factory-ref="entityManagerFactory"
+		entity-manager-factory-ref="raildelaysEntityManagerFactory"
+        transaction-manager-ref="raildelaysTransactionManager"
 		repository-impl-postfix="CustomJpa" />
 </beans>

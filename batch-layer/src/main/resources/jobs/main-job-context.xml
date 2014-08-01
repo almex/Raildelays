@@ -22,7 +22,7 @@
                     <batch:tasklet transaction-manager="batchTransactionManager">
                         <batch:chunk reader="compositeRailtimeItemReader"
                                      processor="chainedProcessorsForRailtime"
-                                     writer="raildelaysServiceWriter"
+                                     writer="listIterateItemWriter"
                                      commit-interval="1" skip-limit="10" retry-limit="3">
                             <batch:retryable-exception-classes>
                                 <batch:include class="java.io.IOException"/>
@@ -182,6 +182,8 @@
             <list>
                 <ref bean="routeLogMapperProcessor"/>
                 <ref bean="validatorProcessor"/>
+                <ref bean="lineStopMapperProcessor"/>
+                <ref bean="validatorProcessor"/>
             </list>
         </property>
     </bean>
@@ -206,6 +208,11 @@
           scope="step">
         <property name="date" value="#{jobParameters[date]}"/>
         <property name="language" value="#{jobParameters['lang']}"/>
+    </bean>
+
+    <bean id="lineStopMapperProcessor"
+          class="be.raildelays.batch.processor.LineStopMapperProcessor"
+          scope="step">
     </bean>
 
     <bean id="aggregateExpectedTimeProcessor"
@@ -268,6 +275,12 @@
     <!-- ================================================================================================== -->
     <!-- =====================================         WRITERS        ===================================== -->
     <!-- ================================================================================================== -->
+    <bean id="listIterateItemWriter"
+          class="be.raildelays.batch.writer.ListIterateItemWriter"
+          scope="step">
+        <property name="delegate" ref="jpaItemWriter"/>
+    </bean>
+
     <bean id="compositeItemWriter"
           class="org.springframework.batch.item.support.CompositeItemWriter"
           scope="step">
@@ -337,6 +350,12 @@
     <bean id="raildelaysServiceWriter"
           class="be.raildelays.batch.writer.RaildelaysServiceWriter"
           scope="step">
+    </bean>
+
+    <bean id="jpaItemWriter"
+          class="org.springframework.batch.item.database.JpaItemWriter"
+          scope="step">
+        <property name="entityManagerFactory" ref="raildelaysEntityManagerFactory"/>
     </bean>
 
     <!-- ================================================================================================== -->

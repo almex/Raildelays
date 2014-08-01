@@ -23,7 +23,7 @@ import java.util.Locale;
 public class RouteLogMapperProcessor implements
         ItemProcessor<TwoDirections, RouteLogDTO>, InitializingBean {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("Rut", RouteLogMapperProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("RtL", RouteLogMapperProcessor.class);
 
     private Date date;
 

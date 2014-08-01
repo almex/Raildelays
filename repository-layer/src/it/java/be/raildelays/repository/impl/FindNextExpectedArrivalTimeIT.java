@@ -28,7 +28,8 @@ import com.excilys.ebi.spring.dbunit.config.DBOperation;
 import com.excilys.ebi.spring.dbunit.test.DataSet;
 import com.excilys.ebi.spring.dbunit.test.RollbackTransactionalDataSetTestExecutionListener;
 
-@DataSet(value = "classpath:FindNextExpectedArrivalTimeIT.xml", tearDownOperation = DBOperation.DELETE_ALL)
+@DataSet(value = "classpath:FindNextExpectedArrivalTimeIT.xml",
+        tearDownOperation = DBOperation.DELETE_ALL, dataSourceSpringName = "dataSource")
 public class FindNextExpectedArrivalTimeIT extends AbstractIT {
 
 	private static final Logger LOGGER = LoggerFactory
