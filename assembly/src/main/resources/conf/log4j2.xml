@@ -204,6 +204,9 @@
         <logger name="be.raildelays.batch.processor.RouteLogMapperProcessor" level="trace" additivity="false">
             <appender-ref ref="step1Processor"/>
         </logger>
+        <logger name="be.raildelays.batch.processor.LineStopMapperProcessor" level="trace" additivity="false">
+            <appender-ref ref="step1Processor"/>
+        </logger>
         <logger name="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor" level="trace" additivity="false">
             <appender-ref ref="step2Processor"/>
         </logger>

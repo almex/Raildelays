@@ -1,8 +1,6 @@
 package be.raildelays.batch.writer;
 
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ItemStreamWriter;
+import org.springframework.batch.item.ItemWriter;
 
 import java.util.List;
 
@@ -12,24 +10,9 @@ import java.util.List;
  * @param <T> type of the input items
  * @author Almex
  */
-public class ListIterateItemWriter<T> implements ItemStreamWriter<List<? extends T>> {
+public class ListIterateItemWriter<T> implements ItemWriter<List<? extends T>> {
 
-    private ItemStreamWriter<T> delegate;
-
-    @Override
-    public void open(ExecutionContext executionContext) throws ItemStreamException {
-        delegate.open(executionContext);
-    }
-
-    @Override
-    public void update(ExecutionContext executionContext) throws ItemStreamException {
-        delegate.update(executionContext);
-    }
-
-    @Override
-    public void close() throws ItemStreamException {
-        delegate.close();
-    }
+    private ItemWriter<T> delegate;
 
     @Override
     public void write(List<? extends List<? extends T>> items) throws Exception {
@@ -38,7 +21,7 @@ public class ListIterateItemWriter<T> implements ItemStreamWriter<List<? extends
         }
     }
 
-    public void setDelegate(ItemStreamWriter<T> delegate) {
+    public void setDelegate(ItemWriter<T> delegate) {
         this.delegate = delegate;
     }
 }
