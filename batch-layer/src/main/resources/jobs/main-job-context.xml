@@ -22,7 +22,7 @@
                     <batch:tasklet transaction-manager="batchTransactionManager">
                         <batch:chunk reader="compositeRailtimeItemReader"
                                      processor="chainedProcessorsForRailtime"
-                                     writer="listIterateItemWriter"
+                                     writer="jpaItemWriter"
                                      commit-interval="1" skip-limit="10" retry-limit="3">
                             <batch:retryable-exception-classes>
                                 <batch:include class="java.io.IOException"/>
@@ -180,8 +180,8 @@
           class="org.springframework.batch.item.support.CompositeItemProcessor">
         <property name="delegates">
             <list>
-                <ref bean="routeLogMapperProcessor"/>
-                <ref bean="validatorProcessor"/>
+                <!--<ref bean="routeLogMapperProcessor"/>-->
+                <!--<ref bean="validatorProcessor"/>-->
                 <ref bean="lineStopMapperProcessor"/>
                 <ref bean="validatorProcessor"/>
             </list>
@@ -213,6 +213,8 @@
     <bean id="lineStopMapperProcessor"
           class="be.raildelays.batch.processor.LineStopMapperProcessor"
           scope="step">
+        <property name="date" value="#{jobParameters[date]}"/>
+        <property name="language" value="#{jobParameters['lang']}"/>
     </bean>
 
     <bean id="aggregateExpectedTimeProcessor"

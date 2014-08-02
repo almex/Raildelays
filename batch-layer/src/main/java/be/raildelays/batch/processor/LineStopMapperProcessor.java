@@ -1,36 +1,31 @@
 package be.raildelays.batch.processor;
 
 import be.raildelays.domain.Language;
-import be.raildelays.domain.dto.RouteLogDTO;
-import be.raildelays.domain.dto.ServedStopDTO;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.TimestampDelay;
 import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.railtime.Direction;
+import be.raildelays.domain.railtime.Step;
+import be.raildelays.domain.railtime.TwoDirections;
 import be.raildelays.logging.Logger;
 import be.raildelays.logging.LoggerFactory;
-import be.raildelays.repository.LineStopDao;
 import be.raildelays.repository.StationDao;
 import be.raildelays.repository.TrainDao;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.Locale;
 
 /**
  * @author Almex
  */
-public class LineStopMapperProcessor implements ItemProcessor<RouteLogDTO, List<LineStop>>, InitializingBean {
+public class LineStopMapperProcessor implements ItemProcessor<TwoDirections, LineStop>, InitializingBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("LnS", LineStopMapperProcessor.class);
-
-    @Resource
-    private LineStopDao lineStopDao;
 
     @Resource
     private TrainDao trainDao;
@@ -38,32 +33,44 @@ public class LineStopMapperProcessor implements ItemProcessor<RouteLogDTO, List<
     @Resource
     private StationDao stationDao;
 
+    private Date date;
+
+    private String language = Language.EN.name();
+
     @Override
     public void afterPropertiesSet() throws Exception {
     }
 
     @Override
-    public List<LineStop> process(RouteLogDTO routeLog) {
-        LOGGER.trace("item", routeLog);
+    public LineStop process(final TwoDirections item) throws Exception {
+        LineStop result = null;
+        Language lang = Language.valueOf(language.toUpperCase(Locale.US));
 
-        return merge(routeLog.getDate(),
-                routeLog.getTrainId(),
-                routeLog.getLanguage(),
-                routeLog.getStops());
-    }
+        LOGGER.trace("item", item);
 
-    private List<LineStop> merge(final Date date, final String trainId, final Language language,
-                                 List<? extends ServedStopDTO> stops) {
-        List<LineStop> result = new ArrayList<>();
-        LineStop previous = null;
+        Direction departureDirection = item.getDeparture();
+        Direction arrivalDirection = item.getArrival();
 
-        for (ServedStopDTO stop : stops) {
-            LineStop current = mergeServedStop(date, trainId, language, stop, previous);
+        if (departureDirection != null && arrivalDirection != null) {
+            LineStop next = null;
 
-            result.add(current);
+            LOGGER.debug("departure_direction", departureDirection);
+            LOGGER.debug("arrival_direction", arrivalDirection);
 
-            // -- We are making the link to keep trace of direction
-            previous = current;
+            for (Step arrivalStep : arrivalDirection.getSteps()) {
+                int index = arrivalDirection.getSteps().indexOf(arrivalStep);
+                Step departureStep = departureDirection.getSteps().get(index);
+
+                if (result == null) {
+                    result = buildLineStop(lang, arrivalDirection, arrivalStep, departureStep);
+                    next = result;
+                } else {
+                    next.setNext(buildLineStop(lang, arrivalDirection, arrivalStep, departureStep));
+                    next.getNext().setPrevious(next);
+                    next = next.getNext();
+
+                }
+            }
         }
 
         LOGGER.trace("result", result);
@@ -71,72 +78,25 @@ public class LineStopMapperProcessor implements ItemProcessor<RouteLogDTO, List<
         return result;
     }
 
-    private LineStop mergeServedStop(final Date date, final String trainId, final Language language,
-                                     final ServedStopDTO stop, final LineStop previous) {
+    private LineStop buildLineStop(Language lang, Direction direction, Step arrivalStep, Step departureStep) {
+        LineStop result;
+        Train train = mergeTrain(new Train(direction.getTrain().getIdRailtime(), lang));
+        Station station = mergeStation(new Station(arrivalStep.getStation().getName(), lang));
+        TimestampDelay arrivalTime = new TimestampDelay(arrivalStep.getTimestamp(), arrivalStep.getDelay());
+        TimestampDelay departureTime = new TimestampDelay(departureStep.getTimestamp(), departureStep.getDelay());
 
-        // -- Validate our inputs
-        Assert.notNull(date, "You should provide a date for this served stop");
-        Assert.hasText(trainId, "You should provide a train id for this served stop");
-
-        // -- Retrieve persisted version of sub-entities to avoid duplicate key
-        Train persistedTrain = mergeTrain(new Train(trainId, language));
-        Station persistedStation = mergeStation(new Station(stop.getStationName(), language));
-        TimestampDelay arrivalTime = new TimestampDelay(stop.getArrivalTime(), stop.getArrivalDelay());
-        TimestampDelay departureTime = new TimestampDelay(stop.getDepartureTime(), stop.getDepartureDelay());
-        LineStop lineStop = new LineStop.Builder() //
-                .date(date) //
-                .station(persistedStation) //
-                .train(persistedTrain) //
-                .arrivalTime(arrivalTime) //
-                .departureTime(departureTime) //
-                .canceled(stop.isCanceled()) //
-                .addPrevious(previous) //
+        result = new LineStop.Builder()
+                .date(date)
+                .train(train)
+                .station(station)
+                .arrivalTime(arrivalTime)
+                .departureTime(departureTime)
+                .canceled(arrivalStep.isCanceled() || departureStep.isCanceled())
                 .build();
 
-        return createOrUpdate(lineStop);
-    }
+        LOGGER.debug("processing_done", result);
 
-    private LineStop createOrUpdate(LineStop lineStop) {
-        Train train = mergeTrain(lineStop.getTrain());
-        Station station = mergeStation(lineStop.getStation());
-        LineStop persistedLineStop = lineStopDao.findByTrainAndDateAndStation(train, lineStop.getDate(), station);
-
-        if (persistedLineStop != null) {
-            persistedLineStop.setDepartureTime(lineStop.getDepartureTime());
-            persistedLineStop.setArrivalTime(lineStop.getArrivalTime());
-            persistedLineStop.setCanceled(lineStop.isCanceled());
-            persistedLineStop.setDate(lineStop.getDate());
-            persistedLineStop.setStation(station);
-            persistedLineStop.setTrain(train);
-
-            LOGGER.trace("update_line_stop", persistedLineStop);
-        } else {
-            persistedLineStop = lineStop.clone();
-            persistedLineStop.setStation(station);
-            persistedLineStop.setTrain(train);
-
-            LOGGER.trace("create_line_stop", persistedLineStop);
-        }
-
-        //-- Update previous reference key
-        if (lineStop.getPrevious() != null && lineStop.getPrevious().getId() != null) {
-            LineStop previous = lineStopDao.findOne(lineStop.getPrevious().getId());
-
-            previous.setNext(persistedLineStop);
-
-            LOGGER.trace("previous_line_stop={}.", previous);
-        }
-
-        //-- Update next reference key
-        if (lineStop.getNext() != null && lineStop.getNext().getId() != null) {
-            LineStop next = lineStopDao.findOne(lineStop.getNext().getId());
-
-            next.setPrevious(persistedLineStop);
-
-            LOGGER.trace("next_line_stop={}.", next);
-        }
-
-        return persistedLineStop;
+        return result;
     }
 
     private Train mergeTrain(Train train) {
@@ -189,6 +149,14 @@ public class LineStopMapperProcessor implements ItemProcessor<RouteLogDTO, List<
         LOGGER.trace("station={}.", result);
 
         return result;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 }
 

@@ -1088,14 +1088,6 @@
                 <jdk>1.8</jdk>
             </activation>
 
-            <modules>
-                <module>api</module>
-            </modules>
-
-            <properties>
-                <jdk.version>1.8</jdk.version>
-            </properties>
-
             <build>
                 <plugins>
                     <plugin>
@@ -1107,6 +1099,18 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+
+        <profile>
+            <id>api</id>
+
+            <modules>
+                <module>api</module>
+            </modules>
+
+            <properties>
+                <jdk.version>1.8</jdk.version>
+            </properties>
         </profile>
     </profiles>
 </project>
