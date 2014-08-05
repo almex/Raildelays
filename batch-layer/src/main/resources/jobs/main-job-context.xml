@@ -15,7 +15,7 @@
     <import resource="parent-job-context.xml"/>
 
     <batch:job id="mainJob" parent="parentJob">
-        <batch:step id="retrieveDataFromRailtime" next="searchDelays">
+        <batch:step id="step1" next="step2">
             <batch:partition partitioner="partitioner">
                 <batch:handler task-executor="taskExecutor"/>
                 <batch:step>
@@ -23,16 +23,16 @@
                         <batch:chunk reader="compositeRailtimeItemReader"
                                      processor="chainedProcessorsForRailtime"
                                      writer="jpaItemWriter"
-                                     commit-interval="1" skip-limit="10" retry-limit="3">
+                                     commit-interval="10" skip-limit="10" retry-limit="3">
                             <batch:retryable-exception-classes>
                                 <batch:include class="java.io.IOException"/>
                             </batch:retryable-exception-classes>
                             <batch:skippable-exception-classes>
                                 <batch:include class="org.springframework.batch.item.validator.ValidationException"/>
                             </batch:skippable-exception-classes>
-                            <!--<batch:listeners merge="true">-->
-                            <!--<batch:listener ref="logItemProcessorListener" />-->
-                            <!--</batch:listeners>-->
+                            <batch:listeners merge="true">
+                                <batch:listener ref="logStep1ItemProcessorListener"/>
+                            </batch:listeners>
                         </batch:chunk>
                         <batch:transaction-attributes
                                 isolation="DEFAULT" propagation="REQUIRED"/>
@@ -40,7 +40,7 @@
                 </batch:step>
             </batch:partition>
         </batch:step>
-        <batch:step id="searchDelays">
+        <batch:step id="step2">
             <batch:tasklet transaction-manager="batchTransactionManager" allow-start-if-complete="true">
                 <batch:chunk reader="delaysItemReader"
                              processor="chainedProcessorsForDelays"
@@ -53,7 +53,7 @@
                     <batch:listeners merge="true">
                         <batch:listener ref="logSkippedItemListener"/>
                         <batch:listener ref="resourceLocatorListener"/>
-                        <batch:listener ref="logItemProcessorListener"/>
+                        <batch:listener ref="logStep2ItemProcessorListener"/>
                     </batch:listeners>
                 </batch:chunk>
                 <batch:transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
@@ -372,8 +372,12 @@
           class="be.raildelays.batch.listener.ResourceLocatorListener"
           scope="step"/>
 
-    <bean id="logItemProcessorListener"
-          class="be.raildelays.batch.listener.LogItemProcessorListener"
+    <bean id="logStep1ItemProcessorListener"
+          class="be.raildelays.batch.listener.LogStep1ItemProcessorListener"
+          scope="step"/>
+
+    <bean id="logStep2ItemProcessorListener"
+          class="be.raildelays.batch.listener.LogStep2ItemProcessorListener"
           scope="step"/>
 
     <bean id="loggerContextJobListener"
