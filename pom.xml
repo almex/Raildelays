@@ -74,9 +74,9 @@
         <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
         <version.spring>4.0.6.RELEASE</version.spring>
         <version.spring.batch>3.0.1.RELEASE</version.spring.batch>
-        <version.spring.data>1.5.1.RELEASE</version.spring.data>
+        <version.spring.data>1.6.2.RELEASE</version.spring.data>
         <version.spring.data.rest>2.0.1.RELEASE</version.spring.data.rest>
-        <version.spring.data.commons>1.6.3.RELEASE</version.spring.data.commons>
+        <version.spring.data.commons>1.8.2.RELEASE</version.spring.data.commons>
         <version.spring.mock>2.0.8</version.spring.mock>
         <version.xbean.spring>3.16</version.xbean.spring>
         <version.hibernate>4.3.6.Final</version.hibernate>

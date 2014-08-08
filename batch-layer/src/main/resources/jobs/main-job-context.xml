@@ -37,6 +37,9 @@
                         <batch:transaction-attributes
                                 isolation="DEFAULT" propagation="REQUIRED"/>
                     </batch:tasklet>
+                    <batch:listeners merge="true">
+                        <batch:listener ref="loggerContextStepListener"/>
+                    </batch:listeners>
                 </batch:step>
             </batch:partition>
         </batch:step>
@@ -61,6 +64,7 @@
             <batch:listeners merge="true">
                 <batch:listener ref="delaysItemReader"/>
                 <batch:listener ref="filterTwoSensPerDayProcessor"/>
+                <batch:listener ref="loggerContextStepListener"/>
             </batch:listeners>
         </batch:step>
         <batch:listeners merge="true">
@@ -383,6 +387,10 @@
     <bean id="loggerContextJobListener"
           class="be.raildelays.batch.listener.LoggerContextJobListener"
           scope="job"/>
+
+    <bean id="loggerContextStepListener"
+          class="be.raildelays.batch.listener.LoggerContextStepListener"
+          scope="step"/>
 
 
     <!-- ================================================================================================== -->
