@@ -21,7 +21,7 @@ public class Train extends AbstractI18nEntity {
     private static final long serialVersionUID = -1527666012499664304L;
 
     protected Train() {
-
+        super();
     }
 
     public Train(String englishName) {

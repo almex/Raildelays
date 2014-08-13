@@ -3,35 +3,13 @@ package be.raildelays.repository;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 
 import java.util.Date;
 import java.util.List;
 
-public interface LineStopDaoCustom {
-
-    /**
-     * Search all dates containing a line stop already stored in the database.
-     *
-     * @param after  all dates returned must be greater or equals than after
-     * @param before all dates returned must be smaller or equals than before
-     * @return a list of {@link Date}
-     */
-    List<Date> findAllUniqueDates(Date after, Date before);
-
-    /**
-     * Search all dates containing a line stop already stored in the database.
-     *
-     * @param lastDate all dates returned must be smaller or equals than last date
-     * @return a list of {@link Date}
-     */
-    List<Date> findAllUniqueDates(Date lastDate);
-
-    /**
-     * Search all dates containing a line stop already stored in the database.
-     *
-     * @return a list of {@link Date}
-     */
-    List<Date> findAllUniqueDates();
+public interface LineStopDaoCustom  {
 
     /**
      * Search a list of arrival delayed line stops that belong departure or

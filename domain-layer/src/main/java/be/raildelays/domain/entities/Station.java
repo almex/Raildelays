@@ -19,30 +19,18 @@ public class Station extends AbstractI18nEntity {
 
     private static final long serialVersionUID = -3436298381031779337L;
 
-    /**
-     * {@inheritDoc}
-     */
     protected Station() {
         super();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public Station(String englishName) {
         super(englishName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public Station(String name, Language language) {
         super(name, language);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public Station(String englishName, String dutchName, String frenchName) {
         super(englishName, dutchName, frenchName);
     }
