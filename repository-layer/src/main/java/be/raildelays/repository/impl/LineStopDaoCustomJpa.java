@@ -51,21 +51,28 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
         Root<LineStop> root = query.from(LineStop.class);
-
         Subquery<Long> canceled = query.subquery(Long.class);
-        canceled.where(where(dateEquals(date))
+        Subquery<Long> notCanceled = query.subquery(Long.class);
+        Root<LineStop> canceledRoot = canceled.from(LineStop.class);
+        Root<LineStop> notCanceledRoot = notCanceled.from(LineStop.class);
+
+        canceled.select(canceledRoot.get(LineStop_.id))
+                .where(where(dateEquals(date))
                 .and(stationEquals(station))
                 .and(isCanceled())
                 .toPredicate(root, query, builder));
 
-        Subquery<Long> notCanceled = query.subquery(Long.class);
-        notCanceled.where(where(dateEquals(date))
+        notCanceled.select(notCanceledRoot.get(LineStop_.id))
+                .where(where(dateEquals(date))
                 .and(stationEquals(station))
                 .and(departureDelayIsNotNull())
                 .and(departureDelayGreaterThan(delayThreshold))
                 .toPredicate(root, query, builder));
 
-        query.where(builder.or(canceled.in(), notCanceled.in()));
+        query.where(builder.or(
+                builder.in(root.get(LineStop_.id)).value(canceled),
+                builder.in(root.get(LineStop_.id)).value(notCanceled)
+        ));
 
         return entityManager.createQuery(query).getResultList();
     }
@@ -99,21 +106,28 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
         Root<LineStop> root = query.from(LineStop.class);
-
         Subquery<Long> canceled = query.subquery(Long.class);
-        canceled.where(where(dateEquals(date))
+        Subquery<Long> notCanceled = query.subquery(Long.class);
+        Root<LineStop> canceledRoot = canceled.from(LineStop.class);
+        Root<LineStop> notCanceledRoot = notCanceled.from(LineStop.class);
+
+        canceled.select(canceledRoot.get(LineStop_.id))
+                .where(where(dateEquals(date))
                 .and(stationEquals(station))
                 .and(isCanceled())
-                .toPredicate(root, query, builder));
+                .toPredicate(canceledRoot, query, builder));
 
-        Subquery<Long> notCanceled = query.subquery(Long.class);
-        notCanceled.where(where(dateEquals(date))
+        notCanceled.select(notCanceledRoot.get(LineStop_.id))
+                .where(where(dateEquals(date))
                 .and(stationEquals(station))
                 .and(arrivalDelayIsNotNull())
                 .and(arrivalDelayGreaterThan(delayThreshold))
-                .toPredicate(root, query, builder));
+                .toPredicate(notCanceledRoot, query, builder));
 
-        query.where(builder.or(canceled.in(), notCanceled.in()));
+        query.where(builder.or(
+                builder.in(root.get(LineStop_.id)).value(canceled),
+                builder.in(root.get(LineStop_.id)).value(notCanceled)
+        ));
 
         return entityManager.createQuery(query).getResultList();
     }
