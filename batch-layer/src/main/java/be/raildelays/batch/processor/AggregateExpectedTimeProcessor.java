@@ -43,12 +43,20 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, L
 
     @Override
     public LineStop process(LineStop item) throws Exception {
-        LineStop result = null;
-        LineStop.Builder builder = fetchScheduling(item);
+        LineStop result = item;
 
         LOGGER.trace("item", item);
 
-        if (builder != null) {
+        /*
+         * I would prefer to check if it lacks some information instead of checking if it's canceled or not
+         * but the thing is that Railtime gives wrong information when a line stop is canceled.
+         * Sometimes it gives an expected arrival time equal to the expected departure time.
+         */
+        if (hasAnyCanceled(item)) {
+            LOGGER.info("have_canceled_stop", item);
+
+            LineStop.Builder builder = fetchScheduling(item);
+
             //-- Modify backward
             LineStop previous = item.getPrevious();
             while (previous != null) {
@@ -68,35 +76,54 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, L
             LOGGER.debug("after_processing", result);
         }
 
-        LOGGER.trace("result", result);
+         LOGGER.trace("result", result);
 
         return result;
     }
 
+
+    private boolean hasAnyCanceled(LineStop item) {
+        boolean result = false;
+
+        if (item != null) {
+            LineStop  previous = item;
+            LineStop next = item;
+
+            while (!result && previous != null) {
+                result = next.isCanceled();
+                previous = previous.getPrevious();
+            }
+
+            while (!result && next != null) {
+                result = next.isCanceled();
+                next = next.getNext();
+            }
+        }
+
+        return result;
+    }
+
+
+
     public LineStop.Builder fetchScheduling(LineStop item) throws Exception {
         LineStop.Builder result = new LineStop.Builder(item, false, false);
 
-        if (item.getArrivalTime() == null || item.getArrivalTime().getExpected() == null ||
-                item.getDepartureTime() == null || item.getDepartureTime().getExpected() == null) {
-            LOGGER.info("lacks_expected_time", item);
+        LineStop candidate = service.searchScheduledLine(item.getTrain(), item.getStation());
 
-            LineStop candidate = service.searchScheduledLine(item.getTrain(), item.getStation());
+        //-- If we cannot retrieve one of the expected time then this item is corrupted we must filter it.
+        if (candidate == null) {
+            LOGGER.trace("no_candidate", item);
 
+            return null;
+        } else {
             LOGGER.debug("candidate", candidate);
-
-            //-- If we cannot retrieve one of the expected time then this item is corrupted we must filter it.
-            if (candidate == null) {
-                LOGGER.trace("no_candidate", item);
-
-                return null;
-            }
-
-            final TimestampDelay departureTime = new TimestampDelay(candidate.getDepartureTime().getExpected(), 0L);
-            final TimestampDelay arrivalTime = new TimestampDelay(candidate.getArrivalTime().getExpected(), 0L);
-
-            result.departureTime(departureTime) //
-                    .arrivalTime(arrivalTime);
         }
+
+        final TimestampDelay departureTime = new TimestampDelay(candidate.getDepartureTime().getExpected(), 0L);
+        final TimestampDelay arrivalTime = new TimestampDelay(candidate.getArrivalTime().getExpected(), 0L);
+
+        result.departureTime(departureTime) //
+                .arrivalTime(arrivalTime);
 
         return result;
     }
