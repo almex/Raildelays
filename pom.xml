@@ -91,9 +91,10 @@
         <version.derby>10.10.1.1</version.derby>
         <version.servlet>3.1.0</version.servlet>
         <version.atomikos>3.9.2</version.atomikos>
-        <version.log4j>2.0</version.log4j>
+        <version.log4j>2.0.1</version.log4j>
         <version.slf4j>1.7.5</version.slf4j>
         <version.log4jdbc>1.16</version.log4jdbc>
+        <version.disruptor>3.3.0</version.disruptor>
         <version.groovy>2.3.4</version.groovy>
         <version.groovy.all>2.3.4</version.groovy.all>
         <version.groovy.eclipse.compiler>2.9.0-01</version.groovy.eclipse.compiler>
@@ -190,6 +191,13 @@
                 <artifactId>log4jdbc-log4j2-jdbc4.1</artifactId>
                 <version>${version.log4jdbc}</version>
             </dependency>
+            <!-- To allow to use asynchronous logger with log4j2 (http://logging.apache.org/log4j/2.x/manual/async.html) -->
+            <dependency>
+                <groupId>com.lmax</groupId>
+                <artifactId>disruptor</artifactId>
+                <version>${version.disruptor}</version>
+            </dependency>
+
 
             <!-- Testing -->
             <dependency>

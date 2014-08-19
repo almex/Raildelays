@@ -152,6 +152,14 @@
             <artifactId>spring-dbunit-test</artifactId>
             <scope>test</scope>
         </dependency>
+        
+        <!-- Logging -->        
+        <!-- To allow to use asynchronous logger with log4j2 (http://logging.apache.org/log4j/2.x/manual/async.html) -->
+        <dependency>
+            <groupId>com.lmax</groupId>
+            <artifactId>disruptor</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
     </dependencies>
 </project>
