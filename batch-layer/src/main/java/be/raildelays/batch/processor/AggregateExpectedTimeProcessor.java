@@ -57,23 +57,25 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, L
 
             LineStop.Builder builder = fetchScheduling(item);
 
-            //-- Modify backward
-            LineStop previous = item.getPrevious();
-            while (previous != null) {
-                builder.addPrevious(fetchScheduling(previous));
-                previous = previous.getPrevious();
+            if (builder != null) {
+                //-- Modify backward
+                LineStop previous = item.getPrevious();
+                while (previous != null) {
+                    builder.addPrevious(fetchScheduling(previous));
+                    previous = previous.getPrevious();
+                }
+
+                //-- Modify forward
+                LineStop next = item.getNext();
+                while (next != null) {
+                    builder.addNext(fetchScheduling(next));
+                    next = next.getNext();
+                }
+
+                result = builder.build();
+
+                LOGGER.debug("after_processing", result);
             }
-
-            //-- Modify forward
-            LineStop next = item.getNext();
-            while (next != null) {
-                builder.addNext(fetchScheduling(next));
-                next = next.getNext();
-            }
-
-            result = builder.build();
-
-            LOGGER.debug("after_processing", result);
         }
 
          LOGGER.trace("result", result);
@@ -107,7 +109,6 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, L
 
     public LineStop.Builder fetchScheduling(LineStop item) throws Exception {
         LineStop.Builder result = new LineStop.Builder(item, false, false);
-
         LineStop candidate = service.searchScheduledLine(item.getTrain(), item.getStation());
 
         //-- If we cannot retrieve one of the expected time then this item is corrupted we must filter it.
@@ -119,7 +120,7 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, L
             LOGGER.debug("candidate", candidate);
         }
 
-        final TimestampDelay departureTime = new TimestampDelay(candidate.getDepartureTime().getExpected(), 0L);
+         final TimestampDelay departureTime = new TimestampDelay(candidate.getDepartureTime().getExpected(), 0L);
         final TimestampDelay arrivalTime = new TimestampDelay(candidate.getArrivalTime().getExpected(), 0L);
 
         result.departureTime(departureTime) //
