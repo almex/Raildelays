@@ -23,31 +23,9 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
     @SuppressWarnings("unused") // Injected via CDI
     private EntityManager entityManager;
 
-    //    @SuppressWarnings("unchecked")
-//    @Override
-//    public List<LineStop> findDepartureDelays(Date date, Station station,
-//                                              long delayThreshold) {
-//        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-//        CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
-//        Root<LineStop> root = query.from(LineStop.class);
-//        Path<Long> delay = root.get(LineStop_.departureTime).get(TimestampDelay_.delay);
-//        query.where(builder.equal(root.get(LineStop_.date), date),
-//                builder.and(delay.isNotNull()),
-//                builder.and(builder.greaterThanOrEqualTo(delay, delayThreshold)),
-//                builder.and(equals(root, builder, station))
-//        );
-//
-//        return entityManager.createQuery(query).getResultList();
-//
-//    }
     @Override
     public List<LineStop> findDepartureDelays(Date date, Station station,
                                               long delayThreshold) {
-//        return findAll(where(dateEquals(date))
-//                .and(departureDelayIsNotNull())
-//                .and(departureDelayGreaterThan(delayThreshold))
-//                .and(stationEquals(station)));
-
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
         Root<LineStop> root = query.from(LineStop.class);
@@ -77,32 +55,10 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
         return entityManager.createQuery(query).getResultList();
     }
 
-//    @SuppressWarnings("unchecked")
-//    @Override
-//    public List<LineStop> findArrivalDelays(Date date, Station station,
-//                                            long delayThreshold) {
-//        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-//        CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
-//        Root<LineStop> root = query.from(LineStop.class);
-//        Path<Long> delay = root.get(LineStop_.arrivalTime).get(TimestampDelay_.delay);
-//        query.where(builder.equal(root.get(LineStop_.date), date),
-//                builder.and(delay.isNotNull()),
-//                builder.and(builder.greaterThanOrEqualTo(delay, delayThreshold)),
-//                builder.and(equals(root, builder, station))
-//        );
-//
-//        return entityManager.createQuery(query).getResultList();
-//    }
-
     @SuppressWarnings("unchecked")
     @Override
     public List<LineStop> findArrivalDelays(Date date, Station station,
                                             long delayThreshold) {
-//        return findAll(where(dateEquals(date))
-//                .and(arrivalDelayIsNotNull())
-//                .and(arrivalDelayGreaterThan(delayThreshold))
-//                .and(stationEquals(station)));
-
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
         Root<LineStop> root = query.from(LineStop.class);
@@ -134,21 +90,6 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 
     @Override
     public List<LineStop> findNextExpectedArrivalTime(Station station, Date date) {
-
-//        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-//        CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
-//        Root<LineStop> root = query.from(LineStop.class);
-//
-//        return entityManager
-//                .createQuery(query
-//                        .where(where(dateEquals(date))
-//                                .and(arrivalTimeIsNotNull())
-//                                .and(arrivalTimeGreaterThan(date))
-//                                .and(stationEquals(station))
-//                                .toPredicate(root, query, builder))
-//                        .orderBy(builder.asc(root.get(LineStop_.arrivalTime).get(TimestampDelay_.expected))))
-//                .getResultList();
-
         return findAll(where(dateEquals(date))
                 .and(arrivalTimeIsNotNull())
                 .and(arrivalTimeGreaterThan(date))
