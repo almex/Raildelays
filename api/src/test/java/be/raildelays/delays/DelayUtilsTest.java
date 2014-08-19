@@ -69,6 +69,14 @@ public class DelayUtilsTest {
     }
 
     @Test
+    public void testRevertedCompareTimeGreater() throws Exception {
+        Date departureA = new SimpleDateFormat("hh:mm").parse("14:00");
+        TimestampDelay departureB = new TimestampDelay(new SimpleDateFormat("hh:mm").parse("15:00"), 0L);
+
+        Assert.assertThat(DelayUtils.compareTime(departureB, departureA), is(greaterThan(0L)));
+    }
+
+    @Test
     public void testCompareNullTime() throws Exception {
         Date departureA = new Date();
         TimestampDelay departureB = new TimestampDelay(null, 0L);

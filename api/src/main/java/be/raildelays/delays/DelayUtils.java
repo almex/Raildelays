@@ -20,6 +20,53 @@ public final class DelayUtils {
         // No instantiation is possible.
     }
 
+    public static long compareTimeAndDelay(TimestampDelay departureB, Date departureA) {
+        return -compareTimeAndDelay(departureA, departureB);
+    }
+
+    public static long compareTimeAndDelay(TimestampDelay departureA, TimestampDelay departureB) {
+        long result = 0;
+
+        if (departureA != null && departureB != null) {
+            if (departureB.getExpected() != null && departureB.getExpected() != null) {
+                LocalTime start = departureA.getExpected()
+                        .toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalTime();
+                LocalTime end = departureB.getExpected()
+                        .toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalTime();
+
+                if (departureA.getDelay() != null) {
+                    end = end.plusMinutes(departureA.getDelay());
+                }
+
+                if (departureB.getDelay() != null) {
+                    end = end.plusMinutes(departureB.getDelay());
+                }
+
+                Duration duration = Duration.between(start, end);
+
+                result = -duration.toMillis(); // The result should be the opposite of a duration
+            } else {
+                if (departureA.getExpected() != null) {
+                    result = 1;
+                } else if (departureB.getExpected() != null) {
+                    result = -1;
+                }
+            }
+        } else {
+            if (departureA != null) {
+                result = 1;
+            } else if (departureB != null) {
+                result = -1;
+            }
+        }
+
+        return result;
+    }
+
     public static long compareTimeAndDelay(Date departureA, TimestampDelay departureB) {
         long result = 0;
 
@@ -52,6 +99,10 @@ public final class DelayUtils {
         }
 
         return result;
+    }
+
+    public static long compareTime(TimestampDelay departureB, Date departureA) {
+        return -compareTime(departureA, departureB);
     }
 
     public static long compareTime(Date departureA, TimestampDelay departureB) {
