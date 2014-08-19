@@ -21,6 +21,7 @@ import java.util.List;
  */
 public class AggregateExpectedTimeProcessorTest {
 
+    public static final Train TRAIN = new Train("0");
     private AggregateExpectedTimeProcessor processor;
 
     private RaildelaysService raildelaysServiceMock;
@@ -38,6 +39,9 @@ public class AggregateExpectedTimeProcessorTest {
     private static final Station DEPARTURE_STATION = new Station(
             "Liège-Guillemins");
 
+    private static final Station INTERMEDIATE_STATION = new Station(
+            "Bruxelles-Nord");
+
     private static final Station ARRIVAL_STATION = new Station(
             "Bruxelles-Central");
 
@@ -50,22 +54,32 @@ public class AggregateExpectedTimeProcessorTest {
         processor.setService(raildelaysServiceMock);
 
         item = new LineStop.Builder().date(TODAY)
-                .train(new Train("0")).station(ARRIVAL_STATION)
-                .arrivalTime(new TimestampDelay(null, 0L))
-                .departureTime(new TimestampDelay(null, 0L))
+                .train(TRAIN).station(INTERMEDIATE_STATION)
+                .arrivalTime(new TimestampDelay(F.parse("18:20"), 0L))
+                .departureTime(new TimestampDelay(F.parse("18:20"), 0L))
                 .canceled(true)
+                .addNext(new LineStop.Builder().date(TODAY)
+                        .train(TRAIN).station(ARRIVAL_STATION)
+                        .arrivalTime(new TimestampDelay(null, 0L))
+                        .departureTime(new TimestampDelay(null, 0L))
+                        .canceled(true))
                 .addPrevious(new LineStop.Builder().date(TODAY)
-                        .train(new Train("0")).station(DEPARTURE_STATION)
+                        .train(TRAIN).station(DEPARTURE_STATION)
                         .arrivalTime(new TimestampDelay(null, 0L))
                         .departureTime(new TimestampDelay(null, 0L))
                         .canceled(true))
                 .build();
 
         expected = new LineStop.Builder().date(TODAY)
-                .train(new Train("1")).station(ARRIVAL_STATION)
-                .arrivalTime(new TimestampDelay(F.parse("18:30"), 0L))
-                .departureTime(new TimestampDelay(F.parse("18:31"), 0L))
-                .canceled(false)
+                .train(TRAIN).station(INTERMEDIATE_STATION)
+                .arrivalTime(new TimestampDelay(F.parse("18:20"), 0L))
+                .departureTime(new TimestampDelay(F.parse("18:21"), 0L))
+                .canceled(true)
+                .addNext(new LineStop.Builder().date(TODAY)
+                        .train(new Train("1")).station(ARRIVAL_STATION)
+                        .arrivalTime(new TimestampDelay(F.parse("18:30"), 0L))
+                        .departureTime(new TimestampDelay(F.parse("18:31"), 0L))
+                        .canceled(false))
                 .addPrevious(new LineStop.Builder().date(TODAY)
                         .train(new Train("1")).station(DEPARTURE_STATION)
                         .arrivalTime(new TimestampDelay(F.parse("17:00"), 0L))
@@ -85,14 +99,19 @@ public class AggregateExpectedTimeProcessorTest {
     public void testProcess() throws Exception {
         EasyMock.expect(
                 raildelaysServiceMock.searchScheduledLine(
-                        EasyMock.anyObject(Train.class),
-                        EasyMock.anyObject(Station.class))).andReturn(
+                        TRAIN,
+                        DEPARTURE_STATION)).andReturn(
+                expected.getPrevious());
+        EasyMock.expect(
+                raildelaysServiceMock.searchScheduledLine(
+                        TRAIN,
+                        INTERMEDIATE_STATION)).andReturn(
                 expected);
         EasyMock.expect(
                 raildelaysServiceMock.searchScheduledLine(
-                        EasyMock.anyObject(Train.class),
-                        EasyMock.anyObject(Station.class))).andReturn(
-                expected.getPrevious());
+                        TRAIN,
+                        ARRIVAL_STATION)).andReturn(
+                expected.getNext());
         EasyMock.replay(raildelaysServiceMock);
 
         LineStop result = processor.process(item);
@@ -101,8 +120,10 @@ public class AggregateExpectedTimeProcessorTest {
 
         Assert.assertEquals(F.parse("17:00"), result.getPrevious().getArrivalTime().getExpected());
         Assert.assertEquals(F.parse("17:01"), result.getPrevious().getDepartureTime().getExpected());
-        Assert.assertEquals(F.parse("18:30"), result.getArrivalTime().getExpected());
-        Assert.assertEquals(F.parse("18:31"), result.getDepartureTime().getExpected());
+        Assert.assertEquals(F.parse("18:20"), result.getArrivalTime().getExpected());
+        Assert.assertEquals(F.parse("18:21"), result.getDepartureTime().getExpected());
+        Assert.assertEquals(F.parse("18:30"), result.getNext().getArrivalTime().getExpected());
+        Assert.assertEquals(F.parse("18:31"), result.getNext().getDepartureTime().getExpected());
 
         EasyMock.verify(raildelaysServiceMock);
     }
