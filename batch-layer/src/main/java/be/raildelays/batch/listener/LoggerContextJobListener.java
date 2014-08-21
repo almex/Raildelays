@@ -12,13 +12,12 @@ import java.util.Date;
  *
  * @author Almex
  */
-public class LoggerContextJobListener implements JobExecutionListener, StepExecutionListener {
+public class LoggerContextJobListener implements JobExecutionListener {
 
 
     public static final String JOB_EXECUTION_ID = "jobExecutionId";
     public static final String JOB_INSTANCE_ID = "jobInstanceId";
     public static final String DATE_PARAMETER = "dateParameter";
-    public static final String STEP_NAME = "stepName";
 
     @Override
     public void beforeJob(JobExecution jobExecution) {
@@ -34,16 +33,5 @@ public class LoggerContextJobListener implements JobExecutionListener, StepExecu
         MDC.remove(JOB_EXECUTION_ID);
         MDC.remove(JOB_INSTANCE_ID);
         MDC.remove(DATE_PARAMETER);
-    }
-
-    @Override
-    public void beforeStep(StepExecution stepExecution) {
-        MDC.put(STEP_NAME, stepExecution.getStepName());
-    }
-
-    @Override
-    public ExitStatus afterStep(StepExecution stepExecution) {
-        MDC.remove(STEP_NAME);
-        return null;
     }
 }

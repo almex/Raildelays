@@ -1,7 +1,8 @@
 package be.raildelays.batch.listener;
 
 import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.batch.processor.AggregateExpectedTimeProcessor;
+import be.raildelays.domain.entities.LineStop;
+import be.raildelays.domain.xls.ExcelRow;
 import be.raildelays.logging.Logger;
 import be.raildelays.logging.LoggerFactory;
 import org.springframework.batch.core.ItemProcessListener;
@@ -9,27 +10,38 @@ import org.springframework.batch.core.SkipListener;
 
 /**
  * This class logs skipped item via Slf4j.
- *
+  *
  * @author Almex
  */
 public class LogSkippedItemListener implements SkipListener<Object, BatchExcelRow>, ItemProcessListener<Object, Object> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("Ftr", LogSkippedItemListener.class);
+    private static final Logger READ = LoggerFactory.getLogger("RD", LogSkippedItemListener.class);
+
+    private static final Logger PROCESS = LoggerFactory.getLogger("PR", LogSkippedItemListener.class);
+
+    private static final Logger WRITE = LoggerFactory.getLogger("WR", LogSkippedItemListener.class);
 
 
     @Override
     public void onSkipInRead(Throwable t) {
-        LOGGER.info("[READ] Skipped item {}", t.getMessage());
+        READ.debug(t.getMessage(), (ExcelRow) null);
     }
 
     @Override
     public void onSkipInWrite(BatchExcelRow item, Throwable t) {
-        LOGGER.info("on_skip_write", item);
+        WRITE.info("on_skip_write", item);
     }
 
     @Override
     public void onSkipInProcess(Object item, Throwable t) {
-        LOGGER.info("on_skip_process", item);
+        if (item instanceof LineStop) {
+            PROCESS.info(t.getMessage(), (LineStop) item);
+        } else if (item instanceof ExcelRow) {
+            PROCESS.info(t.getMessage(), (ExcelRow) item);
+        } else {
+            PROCESS.info("unknown_type", (ExcelRow) null);
+            PROCESS.debug(t.getMessage(), (ExcelRow) null);
+        }
     }
 
     @Override
@@ -39,7 +51,7 @@ public class LogSkippedItemListener implements SkipListener<Object, BatchExcelRo
     @Override
     public void afterProcess(Object item, Object result) {
         if (item != null && result == null) {
-            LOGGER.info("filtering", item);
+            PROCESS.info("filtering", item);
         }
     }
 
