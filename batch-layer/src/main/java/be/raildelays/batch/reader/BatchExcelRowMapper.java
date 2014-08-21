@@ -246,6 +246,7 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
         return Language.valueOf(language.toUpperCase());
     }
 
+    @SuppressWarnings("unused")
     public void setValidateOutcomes(boolean validateOutcomes) {
         this.validateOutcomes = validateOutcomes;
     }

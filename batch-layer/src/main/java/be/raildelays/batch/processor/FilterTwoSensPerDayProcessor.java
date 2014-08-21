@@ -48,7 +48,7 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
             outputReader.open(executionContext);
 
             try {
-                BatchExcelRow matchingExcelRow = null;
+                BatchExcelRow matchingExcelRow;
                 do {
                     matchingExcelRow = outputReader.read();
 
