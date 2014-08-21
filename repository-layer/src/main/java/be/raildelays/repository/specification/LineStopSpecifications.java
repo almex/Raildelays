@@ -152,6 +152,22 @@ public class LineStopSpecifications {
     }
 
     /**
+     * Creates a specification used to find LineStop whose arrival delay is greater than the expected one.
+     *
+     * @param delay the expected delay
+     * @return a predicate
+     */
+    public static Specification<LineStop> arrivalDelayGreaterThanOrEqualTo(final Long delay) {
+
+        return new Specification<LineStop>() {
+            @Override
+            public Predicate toPredicate(Root<LineStop> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
+                return builder.greaterThanOrEqualTo(root.get(LineStop_.arrivalTime).get(TimestampDelay_.delay), delay);
+            }
+        };
+    }
+
+    /**
      * Creates a specification used to find LineStop whose departure time is not null.
      *
      * @return a predicate

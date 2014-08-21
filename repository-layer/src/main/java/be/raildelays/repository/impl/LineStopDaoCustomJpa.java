@@ -44,7 +44,7 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
                 .where(where(dateEquals(date))
                 .and(stationEquals(station))
                 .and(departureDelayIsNotNull())
-                .and(departureDelayGreaterThan(delayThreshold))
+                .and(arrivalDelayGreaterThanOrEqualTo(delayThreshold))
                 .toPredicate(root, query, builder));
 
         query.where(builder.or(
@@ -77,7 +77,7 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
                 .where(where(dateEquals(date))
                 .and(stationEquals(station))
                 .and(arrivalDelayIsNotNull())
-                .and(arrivalDelayGreaterThan(delayThreshold))
+                .and(arrivalDelayGreaterThanOrEqualTo(delayThreshold))
                 .toPredicate(notCanceledRoot, query, builder));
 
         query.where(builder.or(

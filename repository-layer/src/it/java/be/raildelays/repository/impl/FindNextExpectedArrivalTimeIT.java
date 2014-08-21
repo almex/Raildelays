@@ -32,8 +32,7 @@ import com.excilys.ebi.spring.dbunit.test.RollbackTransactionalDataSetTestExecut
         tearDownOperation = DBOperation.DELETE_ALL, dataSourceSpringName = "dataSource")
 public class FindNextExpectedArrivalTimeIT extends AbstractIT {
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(FindNextExpectedArrivalTimeIT.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(FindNextExpectedArrivalTimeIT.class);
 
 	@Resource
 	private LineStopDao lineStopDao;
@@ -41,15 +40,14 @@ public class FindNextExpectedArrivalTimeIT extends AbstractIT {
 	@Test
 	public void testFindNextExpectedArrivalTime() throws ParseException {
 		Station station = new Station("Bruxelles-Central");
-		Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-				.parse("2000-01-01 16:27:00");
+		Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2000-01-01 16:27:00");
 
 		LOGGER.info("size={}", lineStopDao.findAll().size());
 		for (LineStop lineStop : lineStopDao.findAll()) {
 			LOGGER.info(lineStop.toString());
 		}
-		List<LineStop> lineStops = lineStopDao.findNextExpectedArrivalTime(
-				station, date);
+
+		List<LineStop> lineStops = lineStopDao.findNextExpectedArrivalTime(station, date);
 
 		Assert.assertEquals(3, lineStops.size());
 		Assert.assertEquals("1715", lineStops.get(0).getTrain().getEnglishName());
