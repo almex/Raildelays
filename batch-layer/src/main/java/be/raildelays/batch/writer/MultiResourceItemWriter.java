@@ -7,9 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * In case of restart this writer retrieve the last resource given by the {@link be.raildelays.batch.support.ResourceLocator}.
+ *
  * @author Almex
  */
 public class MultiResourceItemWriter<T> extends AbstractItemCountingItemStreamItemWriter<T> {
@@ -27,9 +29,9 @@ public class MultiResourceItemWriter<T> extends AbstractItemCountingItemStreamIt
 
     private ExecutionContext executionContext;
 
-    final static private String RESOURCE_INDEX_KEY = "resource.index";
+    final static private String RESOURCE_KEY = "resource";
 
-    private int resourceIndex = 0;
+    private Resource resource;
 
     private boolean opened = false;
 
@@ -49,72 +51,86 @@ public class MultiResourceItemWriter<T> extends AbstractItemCountingItemStreamIt
             File file = setResourceToDelegate();
             // create only if write is called
             file.createNewFile();
-            resourceIndex++;
             Assert.state(file.canWrite(), "Output resource " + file.getAbsolutePath() + " must be writable");
             delegate.open(executionContext);
             opened = true;
+
+            LOGGER.debug("Forced delegate to open a new file");
         }
 
-        int beforeITemCount = -1;
+        int beforeItemCount = -1;
         if (delegate instanceof AbstractItemCountingItemStreamItemWriter) {
-            beforeITemCount = ((AbstractItemCountingItemStreamItemWriter) delegate).getCurrentItemCount();
+            beforeItemCount = ((AbstractItemCountingItemStreamItemWriter) delegate).getCurrentItemCount();
+
+            LOGGER.debug("beforeItemCount={}", beforeItemCount);
         }
 
         items.add(item);
         delegate.write(items);
 
-        int afterITemCount = 0;
+        int afterItemCount = 0;
         if (delegate instanceof AbstractItemCountingItemStreamItemWriter) {
-            afterITemCount = ((AbstractItemCountingItemStreamItemWriter) delegate).getCurrentItemCount();
+            afterItemCount = ((AbstractItemCountingItemStreamItemWriter) delegate).getCurrentItemCount();
+
+            LOGGER.debug("afterItemCount={}", afterItemCount);
         }
 
         if (delegate instanceof AbstractItemCountingItemStreamItemWriter ) {
-            if (((AbstractItemCountingItemStreamItemWriter) delegate).getCurrentItemCount() >=
-                    ((AbstractItemCountingItemStreamItemWriter) delegate).getMaxItemCount()) {
+            final int maxItemCount = ((AbstractItemCountingItemStreamItemWriter) delegate).getMaxItemCount();
+
+            if (afterItemCount >= maxItemCount) {
                 delegate.close();
                 delegate.update(executionContext);
                 opened = false;
+
+                LOGGER.debug("Closing stream because we have reached maxItemCount={}", maxItemCount);
             }
         }
 
-
-
-        return beforeITemCount < afterITemCount;
+        return beforeItemCount < afterItemCount;
     }
 
     /**
      * Create output resource (if necessary) and point the delegate to it.
      */
     private File setResourceToDelegate() throws IOException {
-        Resource localResource = resourceLocator.getResource(executionContext);
+        resource = resourceLocator.getResource(executionContext);
 
-        delegate.setResource(localResource);
+        delegate.setResource(resource);
 
-        return localResource.getFile();
+        LOGGER.debug("Setting resource={} to delegate", resource != null ? resource.getFile().getAbsolutePath() : "null");
+
+        return resource.getFile();
     }
 
     @Override
     protected void doOpen() throws Exception {
-        resourceIndex = executionContext.getInt(getExecutionContextKey(RESOURCE_INDEX_KEY), 0);
-
-        if (executionContext.containsKey(getExecutionContextKey(RESOURCE_INDEX_KEY))) {
+        if (executionContext.containsKey(getExecutionContextKey(RESOURCE_KEY))) {
+            resource = new FileSystemResource(executionContext.getString(getExecutionContextKey(RESOURCE_KEY), ""));
             // It's a restart
             delegate.open(executionContext);
+            delegate.setResource(resource);
             // We don't have to create the resource
             opened = true;
+
+            LOGGER.trace("Stream is opened");
         }
         else {
             opened = false;
+
+            LOGGER.trace("Stream is not opened yet");
         }
     }
 
     @Override
     protected void doClose() throws Exception {
-        resourceIndex = 0;
+        resource = null;
         setCurrentItemIndex(0);
         if (opened) {
             delegate.close();
             opened = false;
+
+            LOGGER.trace("Stream is closed");
         }
     }
 
@@ -124,7 +140,16 @@ public class MultiResourceItemWriter<T> extends AbstractItemCountingItemStreamIt
             if (opened) {
                 delegate.update(executionContext);
             }
-            executionContext.putInt(getExecutionContextKey(RESOURCE_INDEX_KEY), resourceIndex);
+
+            try {
+                if (resource != null) {
+                    executionContext.putString(getExecutionContextKey(RESOURCE_KEY), resource.getFile().getAbsolutePath());
+
+                    LOGGER.trace("We store the resource={} into the execution context", resource.getFile().getAbsolutePath());
+                }
+            } catch (IOException e) {
+                throw new ItemStreamException("Cannot get resource's absolute path", e);
+            }
         }
     }
 

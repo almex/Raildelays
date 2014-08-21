@@ -199,10 +199,28 @@ public class MultiResourceItemWriterTest {
         writer.open(executionContext);
         writer.write(items.subList(20, 40));
         writer.update(executionContext);
+
+        listener.beforeWrite(items.subList(40, 50));
+        writer.write(items.subList(40, 50));
+        writer.update(executionContext);
+
+        listener.beforeWrite(items.subList(50, 60));
+        writer.write(items.subList(50, 60));
+        writer.update(executionContext);
+
+        listener.beforeWrite(items.subList(60, 70));
+        writer.write(items.subList(60, 70));
+        writer.update(executionContext);
+
+        listener.beforeWrite(items.subList(70, 80));
+        writer.write(items.subList(70, 80));
+        writer.update(executionContext);
+
         writer.close();
 
-        Assert.assertEquals(1, getExcelFiles().length);
+        Assert.assertEquals(2, getExcelFiles().length);
         Assert.assertEquals(124416, getExcelFiles()[0].length());
+        Assert.assertEquals(124416, getExcelFiles()[1].length());
     }
 
     @Test

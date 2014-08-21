@@ -36,7 +36,7 @@ import java.util.*;
 @ContextConfiguration(locations = {
         "/jobs/main-job-context.xml"})
 @DataSet(value = "classpath:SearchDelaysIntoExcelSheetJobIT.xml", tearDownOperation = DBOperation.DELETE_ALL)
-public class MultiResourceItemWriterTestIT extends AbstractContextIT {
+public class MultiResourceItemWriterIT extends AbstractContextIT {
 
     /**
      * SUT.
