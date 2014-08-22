@@ -41,9 +41,6 @@ public class LineStopJpaDaoIT extends AbstractIT {
 
 	@Test
 	public void retrieveTest() {
-		// Assert.assertNull("No data should get back.",
-		// lineStopDao.retrieveLineStop("466", new java.sql.Date(new
-		// Date().getTime())));
 		Date date = new Date();
 		Train train = trainDao.saveAndFlush(new Train("466"));
 		LineStop expectedLineStop = lineStopDao.save(new LineStop.Builder().date(date)

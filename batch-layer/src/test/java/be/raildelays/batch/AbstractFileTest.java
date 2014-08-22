@@ -38,7 +38,7 @@ public class AbstractFileTest {
         Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
     }
 
-    private File[] getExcelFiles() {
+    protected File[] getExcelFiles() {
         final File directory = new File(CURRENT_PATH);
 
         File[] result = directory.listFiles(new FileFilter() {
