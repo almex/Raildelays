@@ -71,7 +71,6 @@ public class SearchNextTrainProcessor implements
         LineStop fastestLineStop = searchFastestTrain(item, candidates);
 
         if (fastestLineStop != null) {
-            //result = aggregate(item, searchDepartureLineStop(fastestTrain, item.getDepartureStation()), fastestTrain);
             ExcelRowMapperProcessor processor = new ExcelRowMapperProcessor();
 
             switch (lang) {
@@ -162,7 +161,7 @@ public class SearchNextTrainProcessor implements
             }
 
 
-            /**
+            /*
              * Do not take into account candidate which leaves after the item.
              */
             if (compareTimeAndDelay(candidateDeparture.getDepartureTime(), item.getEffectiveDepartureTime()) > 0) {
@@ -170,7 +169,7 @@ public class SearchNextTrainProcessor implements
                 continue; // candidate leaves after item
             }
 
-            /**
+            /*
              * A candidate is faster if its expected arrival time minus the actual item delay at departure
              * is before the expected arrival of the item. Or in other words, if the difference between the candidate expected arrival time
              * and the item expected arrival time is lower than the difference between the effective and the expected departure

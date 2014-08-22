@@ -7,20 +7,15 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
-import org.apache.log4j.PropertyConfigurator;
-import org.apache.logging.log4j.core.config.ConfigurationFactory;
-import org.apache.logging.log4j.core.config.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Assert;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -87,7 +82,7 @@ public class Bootstrap {
                 LOGGER.info("[Recovery activated]");
                 service.restartAllStoppedJobs();
                 service.markInconsistentJobsAsFailed();
-		service.restartAllFailedJobs();
+                service.restartAllFailedJobs();
             }
 
             //-- Launch one Job per date

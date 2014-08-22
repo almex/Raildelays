@@ -51,7 +51,13 @@ public class LogSkippedItemListener implements SkipListener<Object, BatchExcelRo
     @Override
     public void afterProcess(Object item, Object result) {
         if (item != null && result == null) {
-            PROCESS.info("filtering", item);
+            if (item instanceof LineStop) {
+                PROCESS.info("filtering", (LineStop) item);
+            } else if (item instanceof ExcelRow) {
+                PROCESS.info("filtering", (ExcelRow) item);
+            } else {
+                PROCESS.info("filtering_unknown", (ExcelRow) null);
+            }
         }
     }
 
