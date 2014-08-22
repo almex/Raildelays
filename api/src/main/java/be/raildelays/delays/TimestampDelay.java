@@ -36,6 +36,16 @@ public class TimestampDelay implements Serializable, Comparable<TimestampDelay> 
         this.delay = delay;
     }
 
+    /**
+     * Initialization constructor with 0 delay.
+     *
+     * @param expected time expected
+     */
+    public TimestampDelay(final Date expected) {
+        this.expected = (Date) (expected != null ? expected.clone() : null);
+        this.delay = 0L;
+    }
+
     @Override
     public String toString() {
         return expected != null ? expected.toString() + " +" + delay + "ms" : "null";

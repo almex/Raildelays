@@ -1,5 +1,7 @@
 package be.raildelays.delays;
 
+import com.sun.istack.internal.Nullable;
+
 import java.time.Duration;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -8,6 +10,14 @@ import java.util.Date;
 /**
  * This utility class make usage of JSR-310 from JDK 8 and allow comparison between {@link java.util.Date} and
  * {@link be.raildelays.delays.TimestampDelay}.
+ * <br>
+ * Example of comparisons:
+ * <p>
+ * <code>
+ *     15:15 == 15:00+15"
+ *     15:00 <  15:00+15"
+ * </code>
+ * </p>
  *
  * @author Almex
  */
@@ -20,118 +30,110 @@ public final class DelayUtils {
         // No instantiation is possible.
     }
 
-    public static long compareTimeAndDelay(TimestampDelay departureB, Date departureA) {
-        return -compareTimeAndDelay(departureA, departureB);
-    }
-
-    public static long compareTimeAndDelay(TimestampDelay departureA, TimestampDelay departureB) {
+    /**
+     * Compare two {@link be.raildelays.delays.TimestampDelay} and compute duration between those two
+     * (taking into account delays of both parameters).
+     *
+     * @param timestampA first {@link be.raildelays.delays.TimestampDelay}
+     * @param timestampB second {@link be.raildelays.delays.TimestampDelay}
+     * @return number of milliseconds between <code>timestampA</code> and <code>timestampB</code>
+     */
+    public static long compareTimeAndDelay(@Nullable TimestampDelay timestampA, @Nullable TimestampDelay timestampB) {
         long result = 0;
 
-        if (departureA != null && departureB != null) {
-            if (departureB.getExpected() != null && departureB.getExpected() != null) {
-                LocalTime start = departureA.getExpected()
+        if (timestampA != null && timestampB != null) {
+            if (timestampA.getExpected() != null && timestampB.getExpected() != null) {
+                LocalTime start = timestampA.getExpected()
                         .toInstant()
                         .atZone(ZoneId.systemDefault())
                         .toLocalTime();
-                LocalTime end = departureB.getExpected()
+                LocalTime end = timestampB.getExpected()
                         .toInstant()
                         .atZone(ZoneId.systemDefault())
                         .toLocalTime();
 
-                if (departureA.getDelay() != null) {
-                    end = end.plusMinutes(departureA.getDelay());
+                if (timestampA.getDelay() != null) {
+                    start = start.plusMinutes(timestampA.getDelay());
                 }
 
-                if (departureB.getDelay() != null) {
-                    end = end.plusMinutes(departureB.getDelay());
+                if (timestampB.getDelay() != null) {
+                    end = end.plusMinutes(timestampB.getDelay());
                 }
 
                 Duration duration = Duration.between(start, end);
 
                 result = -duration.toMillis(); // The result should be the opposite of a duration
-            } else {
-                if (departureA.getExpected() != null) {
-                    result = 1;
-                } else if (departureB.getExpected() != null) {
-                    result = -1;
-                }
-            }
-        } else {
-            if (departureA != null) {
+            } else if (timestampA.getExpected() != null) {
                 result = 1;
-            } else if (departureB != null) {
+            } else if (timestampB.getExpected() != null) {
                 result = -1;
             }
+        } else if (timestampA != null) {
+            result = 1;
+        } else if (timestampB != null) {
+            result = -1;
         }
 
         return result;
     }
 
-    public static long compareTimeAndDelay(Date departureA, TimestampDelay departureB) {
-        long result = 0;
-
-        if (departureA != null && departureB != null) {
-            if (departureB.getExpected() != null) {
-                LocalTime start = departureA.toInstant()
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalTime();
-                LocalTime end = departureB.getExpected()
-                        .toInstant()
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalTime();
-
-                if (departureB.getDelay() != null) {
-                    end = end.plusMinutes(departureB.getDelay());
-                }
-
-                Duration duration = Duration.between(start, end);
-
-                result = -duration.toMillis(); // The result should be the opposite of a duration
-            } else {
-                result = 1;
-            }
-        } else {
-            if (departureA != null) {
-                result = 1;
-            } else if (departureB != null) {
-                result = -1;
-            }
-        }
-
-        return result;
+    /**
+     * Compare two {@link be.raildelays.delays.TimestampDelay} and compute duration between those two
+     * (taking into account delay only from the <code>timestamp</code>).
+     *
+     * @param date a {@link java.util.Date}
+     * @param timestamp a {@link be.raildelays.delays.TimestampDelay}
+     * @return number of milliseconds between <code>date</code> and <code>timestamp</code>
+     */
+    public static long compareTimeAndDelay(@Nullable Date date, @Nullable TimestampDelay timestamp) {
+        return compareTimeAndDelay(new TimestampDelay(date), timestamp);
     }
 
-    public static long compareTime(TimestampDelay departureB, Date departureA) {
-        return -compareTime(departureA, departureB);
+    /**
+     * Compare two {@link be.raildelays.delays.TimestampDelay} and compute duration between those two
+     * (taking into account delay only from the <code>timestamp</code>).
+     *
+     * @param timestamp a {@link be.raildelays.delays.TimestampDelay}
+     * @param date a {@link java.util.Date}
+     * @return number of milliseconds between <code>timestamp</code> and <code>date</code>
+     */
+    public static long compareTimeAndDelay(@Nullable TimestampDelay timestamp, @Nullable Date date) {
+        return compareTimeAndDelay(timestamp, new TimestampDelay(date));
     }
 
-    public static long compareTime(Date departureA, TimestampDelay departureB) {
-        long result = 0;
+    /**
+     * Compare two {@link be.raildelays.delays.TimestampDelay} and compute duration between those two
+     * without taking into account delays of both parameters.
+     *
+     * @param timestampA first {@link be.raildelays.delays.TimestampDelay}
+     * @param timestampB second {@link be.raildelays.delays.TimestampDelay}
+     * @return number of milliseconds between <code>timestampA</code> and <code>timestampB</code>
+     */
+    public static long compareTime(@Nullable TimestampDelay timestampA, @Nullable TimestampDelay timestampB) {
+        return compareTimeAndDelay(timestampA != null ? new TimestampDelay(timestampA.getExpected()) : null, timestampB != null ? new TimestampDelay(timestampB.getExpected()) : null);
+    }
 
-        if (departureA != null && departureB != null) {
-            if (departureB.getExpected() != null) {
-                LocalTime start = departureA.toInstant()
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalTime();
-                LocalTime end = departureB.getExpected()
-                        .toInstant()
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalTime();
+    /**
+     * Compare two {@link be.raildelays.delays.TimestampDelay} and compute duration between those two
+     * without taking into account delay from <code>timestamp</code>.
+     *
+     * @param timestamp a {@link be.raildelays.delays.TimestampDelay}
+     * @param date a {@link java.util.Date}
+     * @return number of milliseconds between <code>timestamp</code> and <code>date</code>
+     */
+    public static long compareTime(@Nullable TimestampDelay timestamp, @Nullable Date date) {
+        return compareTimeAndDelay(timestamp != null ? new TimestampDelay(timestamp.getExpected()) : null, new TimestampDelay(date));
+    }
 
-                Duration duration = Duration.between(start, end);
-
-                result = -duration.toMillis(); // The result should be the opposite of a duration
-            } else {
-                result = 1;
-            }
-        } else {
-            if (departureA != null) {
-                result = 1;
-            } else if (departureB != null) {
-                result = -1;
-            }
-        }
-
-        return result;
+    /**
+     * Compare two {@link be.raildelays.delays.TimestampDelay} and compute duration between those two
+     * without taking into account delay from <code>timestamp</code>.
+     *
+     * @param date a {@link java.util.Date}
+     * @param timestamp a {@link be.raildelays.delays.TimestampDelay}
+     * @return number of milliseconds between <code>date</code> and <code>timestamp</code>
+     */
+    public static long compareTime(@Nullable Date date, @Nullable TimestampDelay timestamp) {
+        return compareTimeAndDelay(new TimestampDelay(date), timestamp != null ? new TimestampDelay(timestamp.getExpected()) : null);
     }
 }

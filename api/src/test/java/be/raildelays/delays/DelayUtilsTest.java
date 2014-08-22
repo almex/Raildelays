@@ -29,6 +29,14 @@ public class DelayUtilsTest {
     }
 
     @Test
+    public void testRevertedCompareTimeAndDelayEquals() throws Exception {
+        Date departureA = new SimpleDateFormat("hh:mm").parse("15:05");
+        TimestampDelay departureB = new TimestampDelay(new SimpleDateFormat("hh:mm").parse("15:00"), 5L);
+
+        Assert.assertThat(DelayUtils.compareTimeAndDelay(departureB, departureA), is(equalTo(0L)));
+    }
+
+    @Test
     public void testCompareTimeAndNullDelay() throws Exception {
         Date departureA = new Date();
         TimestampDelay departureB = new TimestampDelay(departureA, null);
@@ -61,6 +69,14 @@ public class DelayUtilsTest {
     }
 
     @Test
+    public void testCompareTimeWithoutDelaysEquals() throws Exception {
+        Date departureA = new SimpleDateFormat("hh:mm").parse("15:05");
+        TimestampDelay departureB = new TimestampDelay(new SimpleDateFormat("hh:mm").parse("15:00"), 5L);
+
+        Assert.assertThat(DelayUtils.compareTimeAndDelay(departureA, departureB), is(equalTo(0L)));
+    }
+
+    @Test
     public void testCompareTime() throws Exception {
         Date departureA = new Date();
         TimestampDelay departureB = new TimestampDelay(departureA, 0L);
@@ -86,7 +102,7 @@ public class DelayUtilsTest {
 
     @Test
     public void testCompareTimeEquals() throws Exception {
-        Date departureA = new SimpleDateFormat("hh:mm").parse("15:00");
+        TimestampDelay departureA = new TimestampDelay(new SimpleDateFormat("hh:mm").parse("15:00"), 15L);
         TimestampDelay departureB = new TimestampDelay(new SimpleDateFormat("hh:mm").parse("15:00"), 5L);
 
         Assert.assertThat(DelayUtils.compareTime(departureA, departureB), is(equalTo(0L)));
