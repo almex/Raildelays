@@ -1,5 +1,6 @@
 package be.raildelays.batch.writer;
 
+import be.raildelays.batch.AbstractFileTest;
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
 import be.raildelays.batch.reader.ExcelSheetItemReader;
@@ -29,18 +30,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RunWith(BlockJUnit4ClassRunner.class)
-public class SortedItemStreamWriterTest {
-
-    public static final String EXCEL_FILE_NAME = "retard_sncb 20140522.xls";
-
-    public static final String EXCEL_FILE_SOURCE_PATH = "." + File.separator  + "src"
-            + File.separator + "it" + File.separator + "resources" + File.separator + EXCEL_FILE_NAME;
+public class SortedItemStreamWriterTest extends AbstractFileTest {
 
     public static final String EXCEL_FILE_DESTINATION_PATH = "." + File.separator + "target" + File.separator + EXCEL_FILE_NAME;
 
     private SortedItemStreamWriter<BatchExcelRow> sortedItemStreamWriter;
-
-    private static final String BASE_DIRECTORY = "." + File.separator + "target" + File.separator;
 
     private List<BatchExcelRow> items = new ArrayList<>();
 
@@ -61,7 +55,7 @@ public class SortedItemStreamWriterTest {
         writer.setMaxItemCount(40);
         writer.setRowAggregator(new BatchExcelRowAggregator());
         writer.setTemplate(new ClassPathResource("template.xls"));
-        writer.setResource(new FileSystemResource(BASE_DIRECTORY));
+        writer.setResource(new FileSystemResource(CURRENT_PATH));
         writer.afterPropertiesSet();
 
         reader.setName("test");
@@ -69,7 +63,7 @@ public class SortedItemStreamWriterTest {
         reader.setRowsToSkip(21);
         reader.setMaxItemCount(40);
         reader.setRowMapper(new BatchExcelRowMapper());
-        reader.setResource(new FileSystemResource(BASE_DIRECTORY));
+        reader.setResource(new FileSystemResource(CURRENT_PATH));
         reader.afterPropertiesSet();
 
         sortedItemStreamWriter = new SortedItemStreamWriter<>();
@@ -128,11 +122,6 @@ public class SortedItemStreamWriterTest {
         Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
     }
 
-    public void deleteFile() throws IOException {
-        Path destination = Paths.get(EXCEL_FILE_DESTINATION_PATH);
-        Files.delete(destination);
-    }
-
     public void assertFile() {
         Path destination = Paths.get(EXCEL_FILE_DESTINATION_PATH);
         Path tempFile = Paths.get(EXCEL_FILE_DESTINATION_PATH+".tmp");
@@ -149,7 +138,7 @@ public class SortedItemStreamWriterTest {
 
     @After
     public void tearDown() throws Exception {
-        deleteFile();
+        cleanUp();
     }
 
     @Test

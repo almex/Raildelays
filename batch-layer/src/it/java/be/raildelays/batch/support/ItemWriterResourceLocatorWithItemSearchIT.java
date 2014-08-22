@@ -25,7 +25,7 @@ import java.util.Arrays;
 /**
  * @author Almex
  */
-public class ItemWriterResourceLocatorWithItemSearchTest extends AbstractFileTest {
+public class ItemWriterResourceLocatorWithItemSearchIT extends AbstractFileTest {
 
 
 

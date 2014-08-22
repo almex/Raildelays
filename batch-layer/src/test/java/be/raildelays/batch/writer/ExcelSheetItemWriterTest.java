@@ -1,5 +1,6 @@
 package be.raildelays.batch.writer;
 
+import be.raildelays.batch.AbstractFileTest;
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
@@ -22,15 +23,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RunWith(BlockJUnit4ClassRunner.class)
-public class ExcelSheetItemWriterTest {
+public class ExcelSheetItemWriterTest extends AbstractFileTest {
 
     private ExcelSheetItemWriter<BatchExcelRow> writer;
-
-    private static final String CURRENT_PATH = "." + File.separator + "target" + File.separator;
-
-    private static final String OPEN_XML_FILE_EXTENSION = ".xlsx";
-
-    private static final String EXCEL_FILE_EXTENSION = ".xls";
 
     private List<BatchExcelRow> items = new ArrayList<>();
 
@@ -50,7 +45,7 @@ public class ExcelSheetItemWriterTest {
         executionContext = MetaDataInstanceFactory.createStepExecution().getExecutionContext();
         writer = new ExcelSheetItemWriter<>();
         writer.setTemplate(new ClassPathResource("template.xls"));
-        writer.setResource(new FileSystemResource(CURRENT_PATH + "output" + EXCEL_FILE_EXTENSION));
+        writer.setResource(new FileSystemResource(CURRENT_PATH + "output.xls"));
         writer.setRowAggregator(new BatchExcelRowAggregator());
         writer.setName("test");
         writer.setRowsToSkip(21);
@@ -143,28 +138,8 @@ public class ExcelSheetItemWriterTest {
         Assert.assertEquals(117248, getExcelFiles()[0].length());
     }
 
-    private File[] getExcelFiles() {
-        final File directory = new File(CURRENT_PATH);
-
-        File[] result = directory.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return pathname.getName().endsWith(EXCEL_FILE_EXTENSION) || pathname.getName().endsWith(OPEN_XML_FILE_EXTENSION);
-            }
-        });
-
-        return result != null ? result : new File[0];
-    }
-
     @After
     public void tearDown() throws InterruptedException {
         cleanUp();
-    }
-
-    private void cleanUp() {
-        //-- We remove any result from the test
-        for (File file : getExcelFiles()) {
-            file.delete();
-        }
     }
 }

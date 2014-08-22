@@ -1,5 +1,6 @@
 package be.raildelays.batch.writer;
 
+import be.raildelays.batch.AbstractFileTest;
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.listener.ResourceLocatorListener;
 import be.raildelays.batch.poi.SimpleResourceItemSearch;
@@ -16,8 +17,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
@@ -35,16 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RunWith(BlockJUnit4ClassRunner.class)
-public class SortedItemStreamWriterTest2 {
-
-    public static final String EXCEL_FILE_NAME = "retard_sncb 20140522.xls";
-
-    public static final String EXCEL_FILE_SOURCE_PATH = "." + File.separator + "src"
-            + File.separator + "it" + File.separator + "resources" + File.separator + EXCEL_FILE_NAME;
-
-    public static final String EXCEL_FILE_DESTINATION_PATH = "." + File.separator + "target" + File.separator + EXCEL_FILE_NAME;
-
-    private static final String BASE_DIRECTORY = "." + File.separator + "target" + File.separator;
+public class SortedItemStreamWriterTest2 extends AbstractFileTest {
 
     private List<BatchExcelRow> items = new ArrayList<>();
 
@@ -62,7 +52,7 @@ public class SortedItemStreamWriterTest2 {
         ExcelSheetItemReader<BatchExcelRow> reader = new ExcelSheetItemReader<>();
         DateFormat timeFormat = new SimpleDateFormat("HH:mm");
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        FileSystemResource resource = new FileSystemResource(BASE_DIRECTORY + "retard_sncb.xls");
+        FileSystemResource resource = new FileSystemResource(CURRENT_PATH + "retard_sncb.xls");
         ExcelSheetItemWriter<BatchExcelRow> writer = new ExcelSheetItemWriter<>();
         SimpleResourceItemSearch resourceItemSearch = new SimpleResourceItemSearch();
         resourceLocator = new ItemWriterResourceLocator();
@@ -145,34 +135,14 @@ public class SortedItemStreamWriterTest2 {
         items.add(replace);
     }
 
-    public void deleteFile() throws IOException {
-        for (File file : getFiles()) {
-            file.delete();
-        }
-    }
-
     public void assertFile() {
-        Assert.assertEquals(1, getFiles().length);
+        Assert.assertEquals(1, getExcelFiles().length);
     }
 
-    public void copyFile() throws IOException {
-        Path source = new ClassPathResource(EXCEL_FILE_NAME).getFile().toPath();
-        Path destination = Paths.get(EXCEL_FILE_DESTINATION_PATH);
-        Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
-    }
-
-    File[] getFiles() {
-        return new File(BASE_DIRECTORY).listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return pathname.getName().endsWith(".xls") || pathname.getName().endsWith(".xlsx");
-            }
-        });
-    }
 
     @After
     public void tearDown() throws Exception {
-        deleteFile();
+        cleanUp();
     }
 
     @Test

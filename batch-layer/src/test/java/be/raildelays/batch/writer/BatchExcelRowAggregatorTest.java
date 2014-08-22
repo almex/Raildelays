@@ -1,5 +1,6 @@
 package be.raildelays.batch.writer;
 
+import be.raildelays.batch.AbstractFileTest;
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
 import be.raildelays.domain.entities.Station;

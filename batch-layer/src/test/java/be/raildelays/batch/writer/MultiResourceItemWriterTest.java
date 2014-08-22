@@ -1,5 +1,6 @@
 package be.raildelays.batch.writer;
 
+import be.raildelays.batch.AbstractFileTest;
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.bean.ExcelRowComparator;
 import be.raildelays.batch.listener.ResourceLocatorListener;
@@ -30,15 +31,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RunWith(BlockJUnit4ClassRunner.class)
-public class MultiResourceItemWriterTest {
+public class MultiResourceItemWriterTest extends AbstractFileTest {
 
     private MultiResourceItemWriter writer;
-
-    private static final String CURRENT_PATH = "." + File.separator + "target" + File.separator;
-
-    private static final String OPEN_XML_FILE_EXTENSION = ".xlsx";
-
-    private static final String EXCEL_FILE_EXTENSION = ".xls";
 
     private List<BatchExcelRow> items = new ArrayList<>();
 
@@ -235,30 +230,9 @@ public class MultiResourceItemWriterTest {
         Assert.assertEquals(0, getExcelFiles().length);
     }
 
-    private File[] getExcelFiles() {
-        final File directory = new File(CURRENT_PATH);
-
-        File[] result = directory.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return pathname.getName().endsWith(EXCEL_FILE_EXTENSION) || pathname.getName().endsWith(OPEN_XML_FILE_EXTENSION);
-            }
-        });
-
-        return result != null ? result : new File[0];
-    }
-
     @After
     public void tearDown() throws InterruptedException {
         cleanUp();
     }
 
-    private void cleanUp() {
-        //-- We remove any result from the test
-        for (File file : getExcelFiles()) {
-            if (!file.delete()) {
-                file.delete();
-            }
-        }
-    }
 }

@@ -1,5 +1,6 @@
-package be.raildelays.batch;
+package be.raildelays.batch.writer;
 
+import be.raildelays.batch.AbstractContextIT;
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.listener.ResourceLocatorListener;
 import be.raildelays.domain.Sens;
