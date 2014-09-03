@@ -19,12 +19,8 @@ public interface RaildelaysService {
 	 * Save served stops of a certain train for a certain date. Meaning that we
 	 * have a scheduled time and delays this stop.
 	 * 
-	 * @param train
+	 * @param routeLog
 	 *            for which the timetable apply
-	 * @param date
-	 *            for which the timetable apply
-	 * @param lineStop
-	 *            linked with others to follow a direction
 	 * @return the persisted {@link LineStop} linked with others to follow a
 	 *         direction
 	 */
@@ -91,4 +87,13 @@ public interface RaildelaysService {
 	 * @return a {@link LineStop} which does not contain effective time
 	 */
 	LineStop searchScheduledLine(Train train, Station station);
+
+    /**
+     * Search LineStop corresponding to a train id and for a date.
+     *
+     * @param trainId for which you do a look-up
+     * @param date for which correspond one LineStop
+     * @return null if not found or the expected LineStop
+     */
+    LineStop searchLineStopByTrain(Long trainId, Date date);
 }
