@@ -81,4 +81,6 @@ public interface LineStopDao extends JpaRepository<LineStop, Long>, LineStopDaoC
             + "WHERE o.date <= :before "
             + "ORDER BY o.date ASC")
     List<Date> findAllUniqueDates(@Param("before") Date lastDate);
+
+    List<LineStop> findByTrainAndDate(Train train, Date date);
 }
