@@ -4,6 +4,7 @@ import java.util.Date;
 
 /**
  * @author Almex
+ * @since 2.0
  */
 public class DelayMatcher {
 

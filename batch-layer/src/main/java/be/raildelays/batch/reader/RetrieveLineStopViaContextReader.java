@@ -12,7 +12,7 @@ import java.util.Date;
  * and consume it.
  *
  * @author Almex
- * @since 1.2.0
+ * @since 1.2
  * @see be.raildelays.batch.processor.FilterAndStoreProcessor
  */
 public class RetrieveLineStopViaContextReader implements ItemStreamReader<LineStop> {

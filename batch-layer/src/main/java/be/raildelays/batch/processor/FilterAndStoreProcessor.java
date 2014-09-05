@@ -23,7 +23,7 @@ import org.springframework.beans.factory.InitializingBean;
  * </p>
  *
  * @author Almex
- * @since 1.2.0
+ * @since 1.2
  * @see be.raildelays.batch.reader.RetrieveLineStopViaContextReader
  */
 public class FilterAndStoreProcessor implements ItemProcessor<BatchExcelRow, BatchExcelRow>, InitializingBean {

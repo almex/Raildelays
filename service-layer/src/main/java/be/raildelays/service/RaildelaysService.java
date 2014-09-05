@@ -93,7 +93,8 @@ public interface RaildelaysService {
      *
      * @param trainId for which you do a look-up
      * @param date for which correspond one LineStop
-     * @return null if not found or the expected LineStop
+     * @return null if not found or if one of its parameter is null otherwise return the expected LineStop
+     * @since 1.2
      */
     LineStop searchLineStopByTrain(Long trainId, Date date);
 }

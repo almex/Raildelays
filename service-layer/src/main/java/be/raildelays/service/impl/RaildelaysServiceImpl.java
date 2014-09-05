@@ -308,13 +308,6 @@ public class RaildelaysServiceImpl implements RaildelaysService {
         return result;
     }
 
-    /**
-     * Search LineStop corresponding to a train id and for a date.
-     *
-     * @param trainId for which you do a look-up
-     * @param date    for which correspond one LineStop
-     * @return null if not found or the expected LineStop
-     */
     @Override
     public LineStop searchLineStopByTrain(Long trainId, Date date) {
         LineStop result = null;

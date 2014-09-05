@@ -20,6 +20,7 @@ import java.util.Date;
  * </p>
  *
  * @author Almex
+ * @since 2.0
  */
 public final class DelayUtils {
 

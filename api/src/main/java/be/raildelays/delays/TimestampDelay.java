@@ -7,6 +7,7 @@ import java.util.Date;
  * Value object that express an arrival or departure time plus its delay.
  *
  * @author Almex
+ * @since 2.0
  */
 public class TimestampDelay implements Serializable, Comparable<TimestampDelay> {
 

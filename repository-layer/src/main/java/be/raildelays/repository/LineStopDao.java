@@ -20,31 +20,37 @@ import org.springframework.data.repository.query.Param;
  */
 public interface LineStopDao extends JpaRepository<LineStop, Long>, LineStopDaoCustom {
 
-	/**
-	 * Search a list of line stops that belong to a train for a certain day.
-	 * 
-	 * @param train
-	 *            train id in Railtime format.
-	 * @param date
-	 *            day of the year for which you do the search
-	 * @return a list of line stop
-	 */
-	LineStop findByTrainAndDateAndStation(Train train, Date date, Station station);
+    /**
+     * Search a list of line stops that belong to a train for a certain day.
+     *
+     * @param train train id in Railtime format.
+     * @param date  day of the year for which you do the search
+     * @return a list of line stop
+     */
+    LineStop findByTrainAndDateAndStation(Train train, Date date, Station station);
 
-	/**
-	 * Search a list of line stops that belong to a train for a certain day.
-	 * 
-	 * @param trainId
-	 *            train id coming from our internal respository.
-	 * @param date
-	 *            day of the year for which you do the search
-	 * @return a list of line stop
-	 */
+    /**
+     * Search a list of line stops that belong to a train for a certain day.
+     *
+     * @param trainId train id coming from our internal respository.
+     * @param date    day of the year for which you do the search
+     * @return a list of line stop
+     */
     @Query("SELECT o "
             + "FROM LineStop o "
             + "WHERE o.date = :date "
             + "AND o.train.id = :trainId ")
-	LineStop findByTrainIdAndDate(@Param("trainId") Long trainId, @Param("date") Date date);
+    LineStop findByTrainIdAndDate(@Param("trainId") Long trainId, @Param("date") Date date);
+
+
+    /**
+     * Search a list of line stops that belong to a train for a certain day.
+     *
+     * @param train  for which we match its names.
+     * @param date   day of the year for which you do the search
+     * @return a list of line stop
+     */
+    List<LineStop> findByTrainAndDate(Train train, Date date);
 
     /**
      * Search all dates containing a line stop already stored in the database.
@@ -81,6 +87,4 @@ public interface LineStopDao extends JpaRepository<LineStop, Long>, LineStopDaoC
             + "WHERE o.date <= :before "
             + "ORDER BY o.date ASC")
     List<Date> findAllUniqueDates(@Param("before") Date lastDate);
-
-    List<LineStop> findByTrainAndDate(Train train, Date date);
 }
