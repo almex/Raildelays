@@ -56,7 +56,7 @@ public class SearchNextTrainProcessor implements
     @Override
     public BatchExcelRow process(final BatchExcelRow item) throws Exception {
         BatchExcelRow result = item; // By default we return the item itself
-        List<LineStop> candidates = new ArrayList<>();
+        List<LineStop> candidates;
         LocalDate date = new LocalDate(item.getDate());
         LocalTime time = new LocalTime(item.getExpectedArrivalTime());
         DateTime dateTime = date.toDateTime(time);
@@ -133,9 +133,8 @@ public class SearchNextTrainProcessor implements
 		 * you don't know the effective arrival time.
 		 */
 
-        for (LineStop candidate : candidates) {
-            LineStop candidateDeparture = searchDepartureLineStop(candidate, item.getDepartureStation());
-            LineStop candidateArrival = candidate;
+        for (LineStop candidateArrival : candidates) {
+            LineStop candidateDeparture = searchDepartureLineStop(candidateArrival, item.getDepartureStation());
 
             LOGGER.debug("candidate_departure", candidateDeparture);
 
@@ -208,10 +207,6 @@ public class SearchNextTrainProcessor implements
         return compareTime(departureA, departureB.getExpected());
     }
 
-    public static long compareTime(Date departureA, TimestampDelay departureB) {
-        return -compareTime(departureA, departureB.getExpected());
-    }
-
     public static long compareTime(Date departureA, Date departureB) {
         long result = 0;
 
@@ -219,7 +214,7 @@ public class SearchNextTrainProcessor implements
             result = 1;
         } else if (departureA != null && departureB == null) {
             result = -1;
-        } else {
+        } else if (departureB != null) {
             LocalTime start = new LocalTime(departureA.getTime());
             LocalTime end = new LocalTime(departureB.getTime());
 
@@ -242,7 +237,7 @@ public class SearchNextTrainProcessor implements
             result = 1;
         } else if (departureA != null && departureB == null) {
             result = -1;
-        } else {
+        } else if (departureB != null) {
             LocalTime start = new LocalTime(departureA.getTime());
             LocalTime end = new LocalTime(departureB.getExpected()).plusMinutes(departureB.getDelay().intValue());
 
