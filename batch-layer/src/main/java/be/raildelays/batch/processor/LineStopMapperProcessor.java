@@ -21,7 +21,13 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
+ * Transform {@link be.raildelays.domain.railtime.TwoDirections} into one {@link be.raildelays.domain.entities.LineStop}.
+ * This processor also merge content of the {@link be.raildelays.domain.entities.Train} and the
+ * {@link be.raildelays.domain.entities.Station} (so only read access from the database are done in this processor
+ * and it does not interfere with the commit-interval).
+ *
  * @author Almex
+ * @since 1.1
  */
 public class LineStopMapperProcessor implements ItemProcessor<TwoDirections, LineStop>, InitializingBean {
 
@@ -157,6 +163,14 @@ public class LineStopMapperProcessor implements ItemProcessor<TwoDirections, Lin
 
     public void setLanguage(String language) {
         this.language = language;
+    }
+
+    public void setTrainDao(TrainDao trainDao) {
+        this.trainDao = trainDao;
+    }
+
+    public void setStationDao(StationDao stationDao) {
+        this.stationDao = stationDao;
     }
 }
 

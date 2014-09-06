@@ -20,8 +20,7 @@ import java.util.Locale;
  *
  * @author Almex
  */
-public class RouteLogMapperProcessor implements
-        ItemProcessor<TwoDirections, RouteLogDTO>, InitializingBean {
+public class RouteLogMapperProcessor implements ItemProcessor<TwoDirections, RouteLogDTO>, InitializingBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("RtL", RouteLogMapperProcessor.class);
 
