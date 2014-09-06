@@ -1,5 +1,6 @@
 package be.raildelays.domain.entities;
 
+import com.sun.istack.internal.Nullable;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -7,10 +8,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import javax.persistence.*;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
-import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
@@ -78,16 +77,6 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
         this.next = null;
     }
 
-    private LineStop(LineStop lineStop) {
-        this.id = lineStop.id;
-        this.date = (Date) (lineStop.date != null ? lineStop.date.clone() : null);
-        this.train = lineStop.train;
-        this.station = lineStop.station;
-        this.arrivalTime = lineStop.arrivalTime;
-        this.departureTime = lineStop.departureTime;
-        this.canceled = lineStop.canceled;
-    }
-
     private LineStop(Builder builder) {
         this.id = builder.id;
         this.date = (Date) (builder.date != null ? builder.date.clone() : null);
@@ -102,10 +91,8 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
     public String toString() {
         return new StringBuilder("LineStop: ")
                 //
-                .append("{ ")
-                        //
-                .append("id: " + id + ", ")
-                        //
+                .append("{ ") //
+                .append("id: ").append(id).append(", ")  //
                 .append("date: ")
                 .append(new SimpleDateFormat("dd/MM/yyyy").format(date))
                 .append(", ") //
@@ -115,44 +102,10 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
                 .append("}, ") //
                 .append("arrivalTime: {").append(arrivalTime).append("}, ") //
                 .append("departureTime: {").append(departureTime).append("}, ") //
-                .append("canceled: " + canceled + " ") //
-                .append("next: " + (next != null ? next.getId() : "N/A") + " ") //
-                .append("previous: " + (previous != null ? previous.getId() : "N/A") + " ") //
+                .append("canceled: ").append(canceled).append(" ") //
+                .append("next: ").append(next != null ? next.getId() : "N/A").append(" ") //
+                .append("previous: ").append(previous != null ? previous.getId() : "N/A").append(" ") //
                 .append("} ").toString();
-    }
-
-    public String toStringUntilDeparture() {
-        StringBuilder builder = new StringBuilder();
-
-        if (previous != null) {
-            builder.append(previous.toStringUntilDeparture());
-            builder.append(previous.toString());
-            builder.append("\n");
-        }
-
-        return builder.toString();
-    }
-
-    public String toStringUntilArrival() {
-        StringBuilder builder = new StringBuilder();
-
-        if (next != null) {
-            builder.append("\n");
-            builder.append(next.toString());
-            builder.append(next.toStringUntilArrival());
-        }
-
-        return builder.toString();
-    }
-
-    public String toStringAll() {
-        StringBuilder builder = new StringBuilder();
-
-        builder.append(toStringUntilDeparture());
-        builder.append("<<").append(toString()).append(">>");
-        builder.append(toStringUntilArrival());
-
-        return builder.toString();
     }
 
     @Override
@@ -187,12 +140,17 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
 
     @Override
     public LineStop clone() {
+        try {
+            super.clone();
+        } catch (CloneNotSupportedException e) {
+            // Swallow the Exception because it that case it means that does have to be involved in the cloning.
+        }
         return new Builder(this).build();
     }
 
     @Override
-    public int compareTo(LineStop lineStop) {
-        int result = 0;
+    public int compareTo(@Nullable LineStop lineStop) {
+        int result;
 
         if (lineStop == null) {
             result = -1;
@@ -222,10 +180,9 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
 
         private static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
-        private LineStop singleton;
+        private LineStop singleton = null;
 
         public Builder() {
-            singleton = null;
         }
 
         public Builder(LineStop lineStop) {
@@ -382,7 +339,7 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
         }
 
         public LineStop build() {
-            LineStop result = null;
+            LineStop result;
 
             try {
                 if (singleton == null) {
