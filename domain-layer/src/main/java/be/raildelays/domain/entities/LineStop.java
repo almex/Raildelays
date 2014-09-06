@@ -5,10 +5,15 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.ValidationException;
+import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Line stop determine a stop for train line.
@@ -215,6 +220,8 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
         private Builder previous;
         private Builder next;
 
+        private static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
         private LineStop singleton;
 
         public Builder() {
@@ -377,35 +384,65 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
         public LineStop build() {
             LineStop result = null;
 
-            if (singleton == null) {
-                result = singleton = new LineStop(this);
+            try {
+                if (singleton == null) {
+                    result = singleton = new LineStop(this);
+                    validate(result);
 
-                //-- Copy backward
-                LineStop backwardLineStop = result;
-                Builder previousBuilder = this.previous;
-                while (previousBuilder != null) {
-                    backwardLineStop.previous = new LineStop(previousBuilder);
-                    backwardLineStop.previous.next = backwardLineStop;
+                    //-- Copy backward
+                    LineStop backwardLineStop = result;
+                    Builder previousBuilder = this.previous;
+                    while (previousBuilder != null) {
+                        backwardLineStop.previous = new LineStop(previousBuilder);
+                        backwardLineStop.previous.next = backwardLineStop;
 
-                    previousBuilder = previousBuilder.previous;
-                    backwardLineStop = backwardLineStop.previous;
+                        validate(backwardLineStop.previous);
+
+                        previousBuilder = previousBuilder.previous;
+                        backwardLineStop = backwardLineStop.previous;
+                    }
+
+                    //-- Copy forward
+                    LineStop forwardLineStop = result;
+                    Builder nextBuilder = this.next;
+                    while (nextBuilder != null) {
+                        forwardLineStop.next = new LineStop(nextBuilder);
+                        forwardLineStop.next.previous = forwardLineStop;
+
+                        validate(forwardLineStop.next);
+
+                        nextBuilder = nextBuilder.next;
+                        forwardLineStop = forwardLineStop.next;
+                    }
+                } else {
+                    result = singleton;
                 }
+            } catch (IllegalArgumentException e) {
+                /*
+                 * We must not store an invalid bean as result of our singleton.
+                 */
+                singleton = null;
 
-                //-- Copy forward
-                LineStop forwardLineStop = result;
-                Builder nextBuilder = this.next;
-                while (nextBuilder != null) {
-                    forwardLineStop.next = new LineStop(nextBuilder);
-                    forwardLineStop.next.previous = forwardLineStop;
-
-                    nextBuilder = nextBuilder.next;
-                    forwardLineStop = forwardLineStop.next;
-                }
-            } else {
-                result = singleton;
+                throw e;
             }
 
             return result;
+        }
+
+        private static void validate(LineStop lineStop) throws IllegalArgumentException {
+            Set<ConstraintViolation<LineStop>> violations = validator.validate(lineStop);
+            if (!violations.isEmpty()) {
+                StringBuilder builder = new StringBuilder();
+
+                for (ConstraintViolation violation : violations) {
+                    builder.append("\n");
+                    builder.append(violation.getPropertyPath().toString());
+                    builder.append(' ');
+                    builder.append(violation.getMessage());
+                }
+
+                throw new IllegalArgumentException(builder.toString());
+            }
         }
 
         @Override
