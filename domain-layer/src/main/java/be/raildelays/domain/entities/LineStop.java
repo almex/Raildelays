@@ -1,6 +1,5 @@
 package be.raildelays.domain.entities;
 
-import com.sun.istack.internal.Nullable;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -16,9 +15,12 @@ import java.util.Set;
 
 /**
  * Line stop determine a stop for train line.
+ * To help building this entity and as the only way to do it
+ * we embedded a {@link be.raildelays.domain.entities.LineStop.Builder}.
  *
- * @author Almex *
+ * @author Almex
  * @see AbstractEntity
+ * @since 1.0
  */
 @Entity
 @Table(name = "LINE_STOP", uniqueConstraints = @UniqueConstraint(columnNames = {
@@ -89,8 +91,9 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
 
     @Override
     public String toString() {
-        return new StringBuilder("LineStop: ")
-                //
+        // I don't agree with that rule (it that case it's more efficient with a StringBuilder)
+        //noinspection StringBufferReplaceableByString
+        return new StringBuilder("LineStop: ") //
                 .append("{ ") //
                 .append("id: ").append(id).append(", ")  //
                 .append("date: ")
@@ -138,18 +141,57 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
                 .toHashCode();
     }
 
+    @SuppressWarnings("CloneDoesntDeclareCloneNotSupportedException")
+    // I want to expose the fact that this method does not throw CloneNotSupportedException
     @Override
     public LineStop clone() {
         try {
             super.clone();
         } catch (CloneNotSupportedException e) {
-            // Swallow the Exception because it that case it means that does have to be involved in the cloning.
+            // Swallow the Exception because in that case it means that super does
+            // not have to be involved in the cloning.
         }
         return new Builder(this).build();
     }
 
+    /**
+     * Compares this object with the specified object for order.  Returns a
+     * negative integer, zero, or a positive integer as this object is less
+     * than, equal to, or greater than the specified object.
+     *
+     * <p>The implementor must ensure <tt>sgn(x.compareTo(y)) ==
+     * -sgn(y.compareTo(x))</tt> for all <tt>x</tt> and <tt>y</tt>.  (This
+     * implies that <tt>x.compareTo(y)</tt> must throw an exception iff
+     * <tt>y.compareTo(x)</tt> throws an exception.)
+     *
+     * <p>The implementor must also ensure that the relation is transitive:
+     * <tt>(x.compareTo(y)&gt;0 &amp;&amp; y.compareTo(z)&gt;0)</tt> implies
+     * <tt>x.compareTo(z)&gt;0</tt>.
+     *
+     * <p>Finally, the implementor must ensure that <tt>x.compareTo(y)==0</tt>
+     * implies that <tt>sgn(x.compareTo(z)) == sgn(y.compareTo(z))</tt>, for
+     * all <tt>z</tt>.
+     *
+     * <p>It is strongly recommended, but <i>not</i> strictly required that
+     * <tt>(x.compareTo(y)==0) == (x.equals(y))</tt>.  Generally speaking, any
+     * class that implements the <tt>Comparable</tt> interface and violates
+     * this condition should clearly indicate this fact.  The recommended
+     * language is "Note: this class has a natural ordering that is
+     * inconsistent with equals."
+     *
+     * <p>In the foregoing description, the notation
+     * <tt>sgn(</tt><i>expression</i><tt>)</tt> designates the mathematical
+     * <i>signum</i> function, which is defined to return one of <tt>-1</tt>,
+     * <tt>0</tt>, or <tt>1</tt> according to whether the value of
+     * <i>expression</i> is negative, zero or positive.
+     *
+     * @param   lineStop the line stop to be compared.
+     * @return  a negative integer, zero, or a positive integer as this object
+     *          is less than, equal to, or greater than the specified object.
+     */
     @Override
-    public int compareTo(@Nullable LineStop lineStop) {
+    @SuppressWarnings("NullableProblems") // We handle it in our implemntation
+    public int compareTo(final LineStop lineStop) {
         int result;
 
         if (lineStop == null) {
@@ -167,6 +209,12 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
         return result;
     }
 
+    /**
+     * This builder is the only to get new instance of a {@link be.raildelays.domain.entities.LineStop}.
+     *
+     * @author Almex
+     * @since 1.0
+     */
     public static class Builder {
         private Long id;
         private Train train;
@@ -179,8 +227,6 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
         private Builder next;
 
         private static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-
-        private LineStop singleton = null;
 
         public Builder() {
         }
@@ -294,10 +340,6 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
             return this;
         }
 
-        public Builder getNext() {
-            return next;
-        }
-
         private static void head(Builder node, Builder head) {
             if (node.next == null) {
                 node.next = head;
@@ -324,10 +366,6 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
             return this;
         }
 
-        public Builder getPrevious() {
-            return previous;
-        }
-
         private static void tail(Builder node, Builder tail) {
             if (node.previous == null) {
                 node.previous = tail;
@@ -341,46 +379,33 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
         public LineStop build() {
             LineStop result;
 
-            try {
-                if (singleton == null) {
-                    result = singleton = new LineStop(this);
-                    validate(result);
+            result = new LineStop(this);
+            validate(result);
 
-                    //-- Copy backward
-                    LineStop backwardLineStop = result;
-                    Builder previousBuilder = this.previous;
-                    while (previousBuilder != null) {
-                        backwardLineStop.previous = new LineStop(previousBuilder);
-                        backwardLineStop.previous.next = backwardLineStop;
+            //-- Copy backward
+            LineStop backwardLineStop = result;
+            Builder previousBuilder = this.previous;
+            while (previousBuilder != null) {
+                backwardLineStop.previous = new LineStop(previousBuilder);
+                backwardLineStop.previous.next = backwardLineStop;
 
-                        validate(backwardLineStop.previous);
+                validate(backwardLineStop.previous);
 
-                        previousBuilder = previousBuilder.previous;
-                        backwardLineStop = backwardLineStop.previous;
-                    }
+                previousBuilder = previousBuilder.previous;
+                backwardLineStop = backwardLineStop.previous;
+            }
 
-                    //-- Copy forward
-                    LineStop forwardLineStop = result;
-                    Builder nextBuilder = this.next;
-                    while (nextBuilder != null) {
-                        forwardLineStop.next = new LineStop(nextBuilder);
-                        forwardLineStop.next.previous = forwardLineStop;
+            //-- Copy forward
+            LineStop forwardLineStop = result;
+            Builder nextBuilder = this.next;
+            while (nextBuilder != null) {
+                forwardLineStop.next = new LineStop(nextBuilder);
+                forwardLineStop.next.previous = forwardLineStop;
 
-                        validate(forwardLineStop.next);
+                validate(forwardLineStop.next);
 
-                        nextBuilder = nextBuilder.next;
-                        forwardLineStop = forwardLineStop.next;
-                    }
-                } else {
-                    result = singleton;
-                }
-            } catch (IllegalArgumentException e) {
-                /*
-                 * We must not store an invalid bean as result of our singleton.
-                 */
-                singleton = null;
-
-                throw e;
+                nextBuilder = nextBuilder.next;
+                forwardLineStop = forwardLineStop.next;
             }
 
             return result;
