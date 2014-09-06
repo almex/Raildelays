@@ -26,14 +26,10 @@ public class RetrieveLineStopViaContextReader implements ItemStreamReader<LineSt
     @Resource
     private RaildelaysService service;
 
+    private ExecutionContext executionContext;
+
     @Override
     public LineStop read() throws Exception {
-        return service.searchLineStopByTrain(trainId, date);
-    }
-
-
-    @Override
-    public void open(ExecutionContext executionContext) throws ItemStreamException {
         if (executionContext.containsKey(keyName)) {
             trainId = executionContext.getLong(keyName);
             /*
@@ -44,6 +40,14 @@ public class RetrieveLineStopViaContextReader implements ItemStreamReader<LineSt
         } else {
             trainId = null;
         }
+
+        return service.searchLineStopByTrain(trainId, date);
+    }
+
+
+    @Override
+    public void open(ExecutionContext executionContext) throws ItemStreamException {
+        this.executionContext = executionContext;
     }
 
     @Override

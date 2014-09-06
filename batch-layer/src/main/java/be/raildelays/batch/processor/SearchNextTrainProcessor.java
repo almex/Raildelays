@@ -146,7 +146,11 @@ public class SearchNextTrainProcessor implements
                 continue;
             }
 
-            // FIXME We must go recursively into getNext() to search any other cancellation.
+            /*
+             * Normally we don't need to go recursively into each LineStop of the chain to check cancellation.
+             * If our start point is not canceled and than our stop is ever then we can take this train.
+             * No matter if in between some stop are canceled.
+             */
             if (candidateDeparture.isCanceled() || candidateArrival.isCanceled()) {
                 LOGGER.trace("filter_canceled_departure", candidateDeparture);
                 LOGGER.trace("filter_canceled_arrival", candidateArrival);

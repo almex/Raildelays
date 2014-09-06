@@ -1,12 +1,13 @@
 package be.raildelays.domain.entities;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * @author Almex
  */
 @MappedSuperclass
-public abstract class AbstractEntity {
+public abstract class AbstractEntity implements Serializable {
 
     @Id
     @Column(name = "ID")
