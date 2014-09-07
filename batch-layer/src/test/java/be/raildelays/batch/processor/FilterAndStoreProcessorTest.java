@@ -40,13 +40,14 @@ public class FilterAndStoreProcessorTest {
         processor.beforeJob(jobExecution);
 
         input = new BatchExcelRow.Builder(new Date(), Sens.DEPARTURE)
-                .effectiveTrain1(RaildelaysTestUtils.generateTrain("dummy", Language.EN))
-                .delay(61L)
+                .expectedTrain1(RaildelaysTestUtils.generateTrain("dummy", Language.EN))
                 .build();
     }
 
     @Test
     public void testThatItemIsFiltered() throws Exception {
+        input.setDelay(61L);
+
         Assert.assertNull(processor.process(input));
     }
 
@@ -59,7 +60,9 @@ public class FilterAndStoreProcessorTest {
 
     @Test
     public void testThatTrainIdIsInTheContext() throws Exception {
+        input.setDelay(61L);
         processor.process(input);
+
         Assert.assertNotNull(jobExecution.getExecutionContext().getLong(KEY_NAME));
     }
 }

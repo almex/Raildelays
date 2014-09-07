@@ -68,11 +68,11 @@ public class FilterAndStoreProcessor implements ItemProcessor<BatchExcelRow, Bat
     }
 
     private void storeInContext(final BatchExcelRow item) {
-        if (item.getEffectiveTrain1() != null) {
+        if (item.getExpectedTrain1() != null) {
             /*
              * We can only have one train the same day having more than one hour of delay.
              */
-            context.putLong(keyName, item.getEffectiveTrain1().getId());
+            context.putLong(keyName, item.getExpectedTrain1().getId());
         }
     }
 
