@@ -8,7 +8,6 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.annotation.BeforeJob;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.beans.factory.InitializingBean;
 
 /**

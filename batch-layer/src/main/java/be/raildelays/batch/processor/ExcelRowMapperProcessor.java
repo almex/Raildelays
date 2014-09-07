@@ -17,8 +17,7 @@ import org.springframework.beans.factory.InitializingBean;
 
 import java.util.Date;
 
-public class ExcelRowMapperProcessor implements
-        ItemProcessor<LineStop, BatchExcelRow>, InitializingBean {
+public class ExcelRowMapperProcessor implements ItemProcessor<LineStop, BatchExcelRow>, InitializingBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("Xls", ExcelRowMapperProcessor.class);
 
@@ -37,7 +36,7 @@ public class ExcelRowMapperProcessor implements
 
     @Override
     public BatchExcelRow process(final LineStop item) throws Exception {
-        BatchExcelRow result = null;
+        BatchExcelRow result;
 
         LOGGER.trace("item", item);
 
@@ -56,8 +55,7 @@ public class ExcelRowMapperProcessor implements
 
         Sens sens = null;
 
-        LineStop departure = readPrevious(item.getPrevious(), stationA,
-                stationB);
+        LineStop departure = readPrevious(item.getPrevious(), stationA, stationB);
         LineStop arrival = readNext(item.getNext(), stationA, stationB);
 
         if (departure == null) {
@@ -69,18 +67,15 @@ public class ExcelRowMapperProcessor implements
         }
 
         if (arrival == departure) {
-            throw new ArrivalDepartureEqualsException(
-                    "Arrival must not be equal to departure");
+            throw new ArrivalDepartureEqualsException("Arrival must not be equal to departure");
         }
 
         LOGGER.debug("departure", departure);
         LOGGER.debug("arrival", arrival);
 
-        if (departure.getStation().equals(stationA)
-                && arrival.getStation().equals(stationB)) {
+        if (departure.getStation().equals(stationA) && arrival.getStation().equals(stationB)) {
             sens = Sens.DEPARTURE;
-        } else if (departure.getStation().equals(stationB)
-                && arrival.getStation().equals(stationA)) {
+        } else if (departure.getStation().equals(stationB) && arrival.getStation().equals(stationA)) {
             sens = Sens.ARRIVAL;
         }
 
@@ -96,8 +91,7 @@ public class ExcelRowMapperProcessor implements
             } else if (lineStop.getStation().equals(stationB)) {
                 result = lineStop;
             } else if (lineStop.getPrevious() != null) {
-                result = readPrevious(lineStop.getPrevious(), stationA,
-                        stationB);
+                result = readPrevious(lineStop.getPrevious(), stationA, stationB);
             }
         }
 
@@ -125,22 +119,17 @@ public class ExcelRowMapperProcessor implements
     }
 
     protected BatchExcelRow map(LineStop lineStopFrom, LineStop lineStopTo, Sens sens) {
-        Date effectiveDepartureTime = computeEffectiveTime(lineStopFrom
-                .getDepartureTime());
-        Date effectiveArrivalTime = computeEffectiveTime(lineStopTo
-                .getArrivalTime());
-
-        BatchExcelRow result = null;
+        Date effectiveDepartureTime = computeEffectiveTime(lineStopFrom.getDepartureTime());
+        Date effectiveArrivalTime = computeEffectiveTime(lineStopTo.getArrivalTime());
+        BatchExcelRow result;
 
         switch (sens) {
             case DEPARTURE:
                 result = new Builder(lineStopFrom.getDate(), sens) //
                         .departureStation(lineStopFrom.getStation()) //
                         .arrivalStation(lineStopTo.getStation()) //
-                        .expectedDepartureTime(
-                                lineStopFrom.getDepartureTime().getExpected()) //
-                        .expectedArrivalTime(
-                                lineStopTo.getArrivalTime().getExpected()) //
+                        .expectedDepartureTime(lineStopFrom.getDepartureTime().getExpected()) //
+                        .expectedArrivalTime(lineStopTo.getArrivalTime().getExpected()) //
                         .expectedTrain1(lineStopFrom.getTrain()) //
                         .effectiveDepartureTime(effectiveDepartureTime) //
                         .effectiveArrivalTime(effectiveArrivalTime) //
@@ -154,10 +143,8 @@ public class ExcelRowMapperProcessor implements
                 result = new Builder(lineStopFrom.getDate(), sens) //
                         .departureStation(lineStopFrom.getStation()) //
                         .arrivalStation(lineStopTo.getStation()) //
-                        .expectedDepartureTime(
-                                lineStopFrom.getDepartureTime().getExpected()) //
-                        .expectedArrivalTime(
-                                lineStopTo.getArrivalTime().getExpected()) //
+                        .expectedDepartureTime(lineStopFrom.getDepartureTime().getExpected()) //
+                        .expectedArrivalTime(lineStopTo.getArrivalTime().getExpected()) //
                         .expectedTrain1(lineStopFrom.getTrain()) //
                         .effectiveDepartureTime(effectiveDepartureTime) //
                         .effectiveArrivalTime(effectiveArrivalTime) //
@@ -180,8 +167,7 @@ public class ExcelRowMapperProcessor implements
         Date result = null;
 
         if (timestampDelay.getExpected() != null) {
-            result = DateUtils.addMinutes(timestampDelay.getExpected(),
-                    timestampDelay.getDelay().intValue());
+            result = DateUtils.addMinutes(timestampDelay.getExpected(), timestampDelay.getDelay().intValue());
         }
 
         return result;

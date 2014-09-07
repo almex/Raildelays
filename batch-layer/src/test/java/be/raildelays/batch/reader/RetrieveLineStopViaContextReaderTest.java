@@ -76,6 +76,17 @@ public class RetrieveLineStopViaContextReaderTest {
         EasyMock.verify(service);
     }
 
+    @Test
+    public void testEmptyContext() throws Exception {
+        EasyMock.expect(service.searchLineStopByTrain(null, now)).andReturn(null);
+        EasyMock.replay(service);
+
+        context.remove(KEY_NAME);
+        assertEquals(null, reader.read());
+
+        EasyMock.verify(service);
+    }
+
     @After
     public void tearDown() throws Exception {
         reader.close();

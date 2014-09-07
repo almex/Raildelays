@@ -127,6 +127,19 @@ public class AbstractI18nEntity extends AbstractEntity implements Serializable, 
         return dutchName;
     }
 
+    public String getName(Language language) {
+        switch (language) {
+            case EN :
+                return getEnglishName();
+            case NL:
+                return getDutchName();
+            case FR:
+                return getFrenchName();
+            default:
+                return "";
+        }
+    }
+
     @Override
     public int compareTo(@SuppressWarnings("NullableProblems") AbstractI18nEntity entity) {
         int result;
