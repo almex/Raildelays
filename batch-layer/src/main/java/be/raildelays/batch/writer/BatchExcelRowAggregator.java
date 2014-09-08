@@ -31,7 +31,11 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
+ * Simple {@link be.raildelays.batch.poi.RowAggregator} matching our use case to deal with
+ * {@link be.raildelays.batch.bean.BatchExcelRow}.
+ *
  * @author Almex
+ * @since  1.1
  */
 public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
 
@@ -42,15 +46,48 @@ public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
     private String language = Language.EN.name();
 
 
-    private interface CellFormatter<T> {
-        void setFormat(Cell cell, T value);
-    }
-
     public BatchExcelRowAggregator() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }
 
+    private static <T> void setFormat(Row row, int cellIndex, T value, CellFormatter<T> formatter) {
+        Cell cell = row.getCell(cellIndex);
+
+        if (cell != null) {
+            if (value != null) {
+                formatter.setFormat(cell, value);
+            } else {
+                cell.setCellType(Cell.CELL_TYPE_BLANK);
+            }
+        } else {
+            LOGGER.warn("Cannot aggregate rowIndex={} cellIndex={} this cell does not exists", row.getRowNum(), cellIndex);
+        }
+    }
+
+    private static String getStationName(Station station, Language lang) {
+        String result = "";
+
+        if (station != null) {
+            String stationName = station.getName(lang);
+
+            if (StringUtils.isNotBlank(stationName)) {
+                result = StringUtils.stripAccents(stationName.toUpperCase(Locale.UK));
+            }
+        }
+
+        return result;
+    }
+
+    private static String getTrainName(Train train, Language lang) {
+        String result = null;
+
+        if (train != null) {
+            result = train.getName(lang);
+        }
+
+        return result;
+    }
 
     @Override
     public BatchExcelRow aggregate(BatchExcelRow item, Workbook workbook, int sheetIndex, int rowIndex) throws Exception {
@@ -116,20 +153,6 @@ public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
         }
     }
 
-    private static <T> void setFormat(Row row, int cellIndex, T value, CellFormatter<T> formatter) {
-        Cell cell = row.getCell(cellIndex);
-
-        if (cell != null) {
-            if (value != null) {
-                formatter.setFormat(cell, value);
-            } else {
-                cell.setCellType(Cell.CELL_TYPE_BLANK);
-            }
-        } else {
-            LOGGER.warn("Cannot aggregate rowIndex={} cellIndex={} this cell does not exists", row.getRowNum(), cellIndex);
-        }
-    }
-
     private void setNumericFormat(Row row, int cellIndex, String number) {
         setFormat(row, cellIndex, number, new CellFormatter<String>() {
             NumberFormat numberFormat = new DecimalFormat("#");
@@ -174,17 +197,17 @@ public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
             @Override
             public void setFormat(Cell cell, Date date) {
                 switch (cell.getCellType()) {
-                    case Cell.CELL_TYPE_NUMERIC:
-                        cell.setCellValue(date.getTime());
                     case Cell.CELL_TYPE_BLANK:
+                    case Cell.CELL_TYPE_NUMERIC:
+                        cell.setCellValue(date);
+                        break;
                     case Cell.CELL_TYPE_STRING:
                     default:
-                        cell.setCellValue(date);
+                        cell.setCellValue(new SimpleDateFormat().format(date));
                 }
             }
         });
     }
-
 
     private void setTimeFormat(Row row, int cellIndex, Date time, final String format) {
         setFormat(row, cellIndex, time, new CellFormatter<Date>() {
@@ -210,7 +233,6 @@ public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
         });
     }
 
-
     private void setHHFormat(Row row, int cellIndex, Date time) {
         setTimeFormat(row, cellIndex, time, "HH");
     }
@@ -219,53 +241,11 @@ public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
         setTimeFormat(row, cellIndex, time, "mm");
     }
 
-    private static String getStationName(Station station, Language lang) {
-        String result = "";
-
-        if (station != null) {
-            String stationName = null;
-
-            switch (lang) {
-                case EN:
-                    stationName = station.getEnglishName();
-                    break;
-                case FR:
-                    stationName = station.getFrenchName();
-                    break;
-                case NL:
-                    stationName = station.getDutchName();
-                    break;
-            }
-
-            if (StringUtils.isNotBlank(stationName)) {
-                result = StringUtils.stripAccents(stationName.toUpperCase(Locale.UK));
-            }
-        }
-
-        return result;
-    }
-
-    private static String getTrainName(Train train, Language lang) {
-        String result = null;
-
-        if (train != null) {
-            switch (lang) {
-                case EN:
-                    result = train.getEnglishName();
-                    break;
-                case FR:
-                    result = train.getFrenchName();
-                    break;
-                case NL:
-                    result = train.getDutchName();
-                    break;
-            }
-        }
-
-        return result;
-    }
-
     public void setLanguage(String language) {
         this.language = language;
+    }
+
+    private interface CellFormatter<T> {
+        void setFormat(Cell cell, T value);
     }
 }

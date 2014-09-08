@@ -1,6 +1,5 @@
 package be.raildelays.batch.reader;
 
-import be.raildelays.domain.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.partition.support.Partitioner;
@@ -17,22 +16,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * This {@link org.springframework.batch.core.partition.support.Partitioner} is used to create one partition per train.
+ * Meaning that we will have dynamically one step per train. And depending on the
+ * {@link org.springframework.core.task.TaskExecutor} those steps can be executed concurrently.
  *
  * @author Almex
+ * @since 1.0
  */
 public class TrainIdPartitioner implements Partitioner {
 
-    private ItemStreamReader<String> trainListReader;
-	
-	private TrainIdPartitioner() {
-	
-	}
-	
-	public TrainIdPartitioner(ItemStreamReader<String> trainListReader) {
-		this.trainListReader = trainListReader;
-	}
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrainIdPartitioner.class);
 
-    static final private Logger LOGGER = LoggerFactory.getLogger(TrainIdPartitioner.class);
+    private ItemStreamReader<String> trainListReader;
 
     @Override
     public Map<String, ExecutionContext> partition(final int gridSize) {
@@ -43,37 +38,26 @@ public class TrainIdPartitioner implements Partitioner {
             RepeatTemplate template = new RepeatTemplate();
             template.iterate(new RepeatCallback() {
 
-                public RepeatStatus doInIteration(RepeatContext context) throws UnexpectedInputException, ParseException, Exception {
+                @Override
+                public RepeatStatus doInIteration(RepeatContext context) throws UnexpectedInputException, ParseException {
                     RepeatStatus result = RepeatStatus.CONTINUABLE;
-                    String trainId = trainListReader.read();
 
-                    if (trainId != null) {
-                        {   // English
+                    try {
+                        String trainId = trainListReader.read();
+
+                        if (trainId != null) {
                             ExecutionContext executionContext = new ExecutionContext();
                             int partitionId = partitions.size();
-                            executionContext.putInt("trainId", Integer.parseInt(trainId));
-//                            executionContext.putString("lang", Language.EN.name());
-                            partitions.put("partition" + partitionId, executionContext);
-                        }
 
-//                        {   // French
-//                            ExecutionContext executionContext = new ExecutionContext();
-//                            int partitionId = partitions.size();
-//                            executionContext.putInt("trainId", Integer.parseInt(trainId));
-//                            executionContext.putString("lang", Language.FR.name());
-//                            partitions.put("partition" + partitionId, executionContext);
-//                        }
-//
-//                        {   // Dutch
-//                            ExecutionContext executionContext = new ExecutionContext();
-//                            int partitionId = partitions.size();
-//                            executionContext.putInt("trainId", Integer.parseInt(trainId));
-//                            executionContext.putString("lang", Language.NL.name());
-//                            partitions.put("partition" + partitionId, executionContext);
-//                        }
-                    } else {
-                        result = RepeatStatus.FINISHED;
+                            executionContext.putInt("trainId", Integer.parseInt(trainId));
+                            partitions.put("partition" + partitionId, executionContext);
+                        } else {
+                            result = RepeatStatus.FINISHED;
+                        }
+                    } catch (Exception e) {
+                        throw new UnexpectedInputException("Error during reading list of train", e);
                     }
+
                     return result;
                 }
 
@@ -87,4 +71,7 @@ public class TrainIdPartitioner implements Partitioner {
         return partitions;
     }
 
+    public void setTrainListReader(ItemStreamReader<String> trainListReader) {
+        this.trainListReader = trainListReader;
+    }
 }

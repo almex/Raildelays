@@ -2,14 +2,10 @@ package be.raildelays.repository.specification;
 
 import be.raildelays.domain.entities.*;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.*;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * A class which is used to create {@link Specification} objects which are used

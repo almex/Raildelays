@@ -18,12 +18,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {
         "classpath:spring/repository/raildelays-repository-integration-test-context.xml",
-        "classpath:spring/test/raildelays-tx-context.xml" })
+        "classpath:spring/test/raildelays-tx-context.xml"})
 @TransactionConfiguration(transactionManager = "raildelaysTransactionManager", defaultRollback = true)
 @Transactional
-@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
+@TestExecutionListeners({DependencyInjectionTestExecutionListener.class,
         TransactionalTestExecutionListener.class,
-        RollbackTransactionalDataSetTestExecutionListener.class })
+        RollbackTransactionalDataSetTestExecutionListener.class})
 //@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD, hierarchyMode = DirtiesContext.HierarchyMode.EXHAUSTIVE) //Cannot any other solution when loading an in-memory database with Spring
 public abstract class AbstractIT {
 }

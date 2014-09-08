@@ -2,7 +2,6 @@ package be.raildelays.repository.impl;
 
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.repository.LineStopDao;
 import be.raildelays.repository.LineStopDaoCustom;
 import com.excilys.ebi.spring.dbunit.config.DBOperation;
 import com.excilys.ebi.spring.dbunit.test.DataSet;
@@ -21,22 +20,22 @@ import java.util.List;
         tearDownOperation = DBOperation.DELETE_ALL, dataSourceSpringName = "dataSource")
 public class FindArrivalDelaysIT extends AbstractIT {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(FindArrivalDelaysIT.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FindArrivalDelaysIT.class);
 
-	@Resource
-	private LineStopDaoCustom lineStopDao;
+    @Resource
+    private LineStopDaoCustom lineStopDao;
 
-	@Test
-	public void testFindArrivalDelays() throws ParseException {
-		Station station = new Station("Bruxelles-Central");
-		Date date = new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01");
+    @Test
+    public void testFindArrivalDelays() throws ParseException {
+        Station station = new Station("Bruxelles-Central");
+        Date date = new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01");
 
-		List<LineStop> lineStops = lineStopDao.findArrivalDelays(date, station, 15);
+        List<LineStop> lineStops = lineStopDao.findArrivalDelays(date, station, 15);
 
-		Assert.assertEquals(3, lineStops.size());
-		Assert.assertEquals("466", lineStops.get(0).getTrain().getEnglishName());
+        Assert.assertEquals(3, lineStops.size());
+        Assert.assertEquals("466", lineStops.get(0).getTrain().getEnglishName());
         Assert.assertEquals("477", lineStops.get(1).getTrain().getEnglishName());
         Assert.assertEquals("515", lineStops.get(2).getTrain().getEnglishName());
-	}
+    }
 
 }

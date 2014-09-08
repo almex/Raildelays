@@ -4,31 +4,23 @@ import be.raildelays.batch.AbstractFileTest;
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.listener.ResourceLocatorListener;
 import be.raildelays.batch.poi.Format;
-import be.raildelays.batch.poi.SimpleResourceItemSearch;
-import be.raildelays.batch.reader.BatchExcelRowMapper;
-import be.raildelays.batch.reader.ExcelSheetItemReader;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Arrays;
 
 /**
  * @author Almex
  */
 public class ItemWriterResourceLocatorTest extends AbstractFileTest {
-
 
 
     private ItemWriterResourceLocator resourceLocator;

@@ -27,6 +27,16 @@ public class ExcelRowMapperProcessor implements ItemProcessor<LineStop, BatchExc
 
     private String language = Language.EN.name();
 
+    protected static Date computeEffectiveTime(TimestampDelay timestampDelay) {
+        Date result = null;
+
+        if (timestampDelay.getExpected() != null) {
+            result = DateUtils.addMinutes(timestampDelay.getExpected(), timestampDelay.getDelay().intValue());
+        }
+
+        return result;
+    }
+
     @Override
     public void afterPropertiesSet() throws Exception {
         Validate.notNull(stationA, "Station A name is mandatory");
@@ -158,16 +168,6 @@ public class ExcelRowMapperProcessor implements ItemProcessor<LineStop, BatchExc
                 result = new Builder(lineStopFrom.getDate(), sens).build();
 
                 break;
-        }
-
-        return result;
-    }
-
-    protected static Date computeEffectiveTime(TimestampDelay timestampDelay) {
-        Date result = null;
-
-        if (timestampDelay.getExpected() != null) {
-            result = DateUtils.addMinutes(timestampDelay.getExpected(), timestampDelay.getDelay().intValue());
         }
 
         return result;

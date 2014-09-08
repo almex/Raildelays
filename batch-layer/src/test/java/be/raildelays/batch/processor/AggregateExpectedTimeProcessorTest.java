@@ -22,28 +22,19 @@ import java.util.List;
 public class AggregateExpectedTimeProcessorTest {
 
     public static final Train TRAIN = new Train("0");
-    private AggregateExpectedTimeProcessor processor;
-
-    private RaildelaysService raildelaysServiceMock;
-
     private static final SimpleDateFormat F = new SimpleDateFormat("HH:mm");
-
-    private LineStop item;
-
-    private LineStop expected;
-
-    private List<LineStop> nextLineStops;
-
     private static final Date TODAY = new Date();
-
     private static final Station DEPARTURE_STATION = new Station(
             "Liège-Guillemins");
-
     private static final Station INTERMEDIATE_STATION = new Station(
             "Bruxelles-Nord");
-
     private static final Station ARRIVAL_STATION = new Station(
             "Bruxelles-Central");
+    private AggregateExpectedTimeProcessor processor;
+    private RaildelaysService raildelaysServiceMock;
+    private LineStop item;
+    private LineStop expected;
+    private List<LineStop> nextLineStops;
 
     @Before
     public void setUp() throws ParseException {

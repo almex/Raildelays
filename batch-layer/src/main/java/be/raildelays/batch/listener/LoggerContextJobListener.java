@@ -1,7 +1,8 @@
 package be.raildelays.batch.listener;
 
 import org.slf4j.MDC;
-import org.springframework.batch.core.*;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobExecutionListener;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

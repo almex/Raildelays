@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <!--<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">-->
@@ -30,8 +30,8 @@
         <property name="persistenceUnitName" value="raildelays-repository"/>
         <property name="jpaVendorAdapter">
             <!--<bean class="org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter">-->
-                <!--<property name="databasePlatform" value="org.eclipse.persistence.platform.database.HSQLPlatform"/>-->
-                <!--<property name="showSql" value="true"/>-->
+            <!--<property name="databasePlatform" value="org.eclipse.persistence.platform.database.HSQLPlatform"/>-->
+            <!--<property name="showSql" value="true"/>-->
             <!--</bean>-->
             <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
                 <property name="database" value="HSQL"/>

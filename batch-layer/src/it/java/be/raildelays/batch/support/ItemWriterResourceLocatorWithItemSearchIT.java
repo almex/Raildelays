@@ -12,8 +12,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -26,7 +24,6 @@ import java.util.Arrays;
  * @author Almex
  */
 public class ItemWriterResourceLocatorWithItemSearchIT extends AbstractFileTest {
-
 
 
     private ItemWriterResourceLocator resourceLocator;

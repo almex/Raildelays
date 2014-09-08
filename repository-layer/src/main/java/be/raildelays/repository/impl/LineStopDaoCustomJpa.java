@@ -1,6 +1,9 @@
 package be.raildelays.repository.impl;
 
-import be.raildelays.domain.entities.*;
+import be.raildelays.domain.entities.LineStop;
+import be.raildelays.domain.entities.LineStop_;
+import be.raildelays.domain.entities.Station;
+import be.raildelays.domain.entities.Train;
 import be.raildelays.repository.LineStopDaoCustom;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specifications;
@@ -9,7 +12,10 @@ import org.springframework.data.jpa.repository.query.QueryUtils;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 import java.util.Date;
 import java.util.List;
 
@@ -36,16 +42,16 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 
         canceled.select(canceledRoot.get(LineStop_.id))
                 .where(where(dateEquals(date))
-                .and(stationEquals(station))
-                .and(isCanceled())
-                .toPredicate(root, query, builder));
+                        .and(stationEquals(station))
+                        .and(isCanceled())
+                        .toPredicate(root, query, builder));
 
         notCanceled.select(notCanceledRoot.get(LineStop_.id))
                 .where(where(dateEquals(date))
-                .and(stationEquals(station))
-                .and(departureDelayIsNotNull())
-                .and(arrivalDelayGreaterThanOrEqualTo(delayThreshold))
-                .toPredicate(root, query, builder));
+                        .and(stationEquals(station))
+                        .and(departureDelayIsNotNull())
+                        .and(arrivalDelayGreaterThanOrEqualTo(delayThreshold))
+                        .toPredicate(root, query, builder));
 
         query.where(builder.or(
                 builder.in(root.get(LineStop_.id)).value(canceled),
@@ -69,16 +75,16 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 
         canceled.select(canceledRoot.get(LineStop_.id))
                 .where(where(dateEquals(date))
-                .and(stationEquals(station))
-                .and(isCanceled())
-                .toPredicate(canceledRoot, query, builder));
+                        .and(stationEquals(station))
+                        .and(isCanceled())
+                        .toPredicate(canceledRoot, query, builder));
 
         notCanceled.select(notCanceledRoot.get(LineStop_.id))
                 .where(where(dateEquals(date))
-                .and(stationEquals(station))
-                .and(arrivalDelayIsNotNull())
-                .and(arrivalDelayGreaterThanOrEqualTo(delayThreshold))
-                .toPredicate(notCanceledRoot, query, builder));
+                        .and(stationEquals(station))
+                        .and(arrivalDelayIsNotNull())
+                        .and(arrivalDelayGreaterThanOrEqualTo(delayThreshold))
+                        .toPredicate(notCanceledRoot, query, builder));
 
         query.where(builder.or(
                 builder.in(root.get(LineStop_.id)).value(canceled),

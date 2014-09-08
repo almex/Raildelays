@@ -39,19 +39,15 @@ import java.util.*;
 @DataSet(value = "classpath:SearchDelaysIntoExcelSheetJobIT.xml", tearDownOperation = DBOperation.DELETE_ALL)
 public class MultiResourceItemWriterIT extends AbstractContextIT {
 
+    private static final String CURRENT_PATH = "." + File.separator + "target" + File.separator;
+    private static final String OPEN_XML_FILE_EXTENSION = ".xlsx";
+    private static final String EXCEL_FILE_EXTENSION = ".xls";
     /**
      * SUT.
      */
     @Autowired
     @Qualifier("multiResourceItemWriter")
     private ItemWriter<BatchExcelRow> writer;
-
-    private static final String CURRENT_PATH = "." + File.separator + "target" + File.separator;
-
-    private static final String OPEN_XML_FILE_EXTENSION = ".xlsx";
-
-    private static final String EXCEL_FILE_EXTENSION = ".xls";
-
     private List<BatchExcelRow> items = new ArrayList<>();
 
     private StepExecution stepExecution;
@@ -71,7 +67,6 @@ public class MultiResourceItemWriterIT extends AbstractContextIT {
         Iterator<Calendar> it = DateUtils.iterator(new SimpleDateFormat("dd/MM/yyyy").parse("01/01/2000"), DateUtils.RANGE_MONTH_MONDAY);
 
         for (int i = 0; i < 80 && it.hasNext(); i++) {
-            List<BatchExcelRow> excelRows = new ArrayList<>();
             Date date = it.next().getTime();
             BatchExcelRow from = new BatchExcelRow.Builder(date, Sens.DEPARTURE) //
                     .departureStation(new Station("Liège-Guillemins")) //

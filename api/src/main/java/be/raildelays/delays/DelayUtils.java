@@ -14,8 +14,8 @@ import java.util.Date;
  * Example of comparisons:
  * <p>
  * <code>
- *     15:15 == 15:00+15"
- *     15:00 <  15:00+15"
+ * 15:15 == 15:00+15"
+ * 15:00 <  15:00+15"
  * </code>
  * </p>
  *
@@ -82,7 +82,7 @@ public final class DelayUtils {
      * Compare two {@link be.raildelays.delays.TimestampDelay} and compute duration between those two
      * (taking into account delay only from the <code>timestamp</code>).
      *
-     * @param date a {@link java.util.Date}
+     * @param date      a {@link java.util.Date}
      * @param timestamp a {@link be.raildelays.delays.TimestampDelay}
      * @return number of milliseconds between <code>date</code> and <code>timestamp</code>
      */
@@ -95,7 +95,7 @@ public final class DelayUtils {
      * (taking into account delay only from the <code>timestamp</code>).
      *
      * @param timestamp a {@link be.raildelays.delays.TimestampDelay}
-     * @param date a {@link java.util.Date}
+     * @param date      a {@link java.util.Date}
      * @return number of milliseconds between <code>timestamp</code> and <code>date</code>
      */
     public static long compareTimeAndDelay(@Nullable TimestampDelay timestamp, @Nullable Date date) {
@@ -119,7 +119,7 @@ public final class DelayUtils {
      * without taking into account delay from <code>timestamp</code>.
      *
      * @param timestamp a {@link be.raildelays.delays.TimestampDelay}
-     * @param date a {@link java.util.Date}
+     * @param date      a {@link java.util.Date}
      * @return number of milliseconds between <code>timestamp</code> and <code>date</code>
      */
     public static long compareTime(@Nullable TimestampDelay timestamp, @Nullable Date date) {
@@ -130,7 +130,7 @@ public final class DelayUtils {
      * Compare two {@link be.raildelays.delays.TimestampDelay} and compute duration between those two
      * without taking into account delay from <code>timestamp</code>.
      *
-     * @param date a {@link java.util.Date}
+     * @param date      a {@link java.util.Date}
      * @param timestamp a {@link be.raildelays.delays.TimestampDelay}
      * @return number of milliseconds between <code>date</code> and <code>timestamp</code>
      */

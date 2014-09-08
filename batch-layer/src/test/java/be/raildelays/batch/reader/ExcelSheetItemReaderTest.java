@@ -16,18 +16,15 @@ import java.io.File;
 @RunWith(value = BlockJUnit4ClassRunner.class)
 public class ExcelSheetItemReaderTest {
 
-    private ExcelSheetItemReader<BatchExcelRow> reader;
-
     private static final String CURRENT_PATH = "." + File.separator + "target" + File.separator;
-
     private static final String OPEN_XML_FILE_EXTENSION = ".xlsx";
-
     private static final String EXCEL_FILE_EXTENSION = ".xls";
+    private ExcelSheetItemReader<BatchExcelRow> reader;
 
     @Before
     public void setUp() throws Exception {
         reader = new ExcelSheetItemReader<BatchExcelRow>();
-        reader.setResource(new ClassPathResource("retard_sncb 20140522"+EXCEL_FILE_EXTENSION));
+        reader.setResource(new ClassPathResource("retard_sncb 20140522" + EXCEL_FILE_EXTENSION));
         reader.setRowsToSkip(21);
         reader.setSheetIndex(0);
         reader.setMaxItemCount(40);

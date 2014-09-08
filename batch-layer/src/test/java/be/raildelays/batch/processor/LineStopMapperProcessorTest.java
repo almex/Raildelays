@@ -19,26 +19,18 @@ import java.util.Date;
 
 public class LineStopMapperProcessorTest {
 
+    private static final Date TODAY = new Date();
+    private static final String LANGUAGE = Language.EN.name();
+    private static final String DUMMY = "dummy";
+    private static final String DEPARTURE_STATION = "departure";
+    private static final String INTERMEDIATE_STATION = "intermediate";
+    private static final String ARRIVAL_STATION = "arrival";
     /*
      * The System Under Test
      */
     private LineStopMapperProcessor processor;
-
     private TwoDirections input;
-
     private LineStop expected;
-
-    private static final Date TODAY = new Date();
-
-    private static final String LANGUAGE = Language.EN.name();
-
-    private static final String DUMMY = "dummy";
-
-    private static final String DEPARTURE_STATION = "departure";
-
-    private static final String INTERMEDIATE_STATION = "intermediate";
-
-    private static final String ARRIVAL_STATION = "arrival";
 
     @Before
     public void setUp() throws Exception {

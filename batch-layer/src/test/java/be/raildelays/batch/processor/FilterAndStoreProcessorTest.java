@@ -15,15 +15,12 @@ import java.util.Date;
 
 public class FilterAndStoreProcessorTest {
 
+    private static String KEY_NAME = "key";
+    private static Language language = Language.EN;
     /*
      * The System Under Test.
      */
     private FilterAndStoreProcessor processor;
-
-    private static String KEY_NAME = "key";
-
-    private static Language language = Language.EN;
-
     private JobExecution jobExecution;
 
     private BatchExcelRow input;

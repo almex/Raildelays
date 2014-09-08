@@ -1,9 +1,9 @@
 package be.raildelays.batch.bean;
 
+import be.raildelays.batch.support.ItemIndexAware;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
-import be.raildelays.batch.support.ItemIndexAware;
 import be.raildelays.domain.xls.ExcelRow;
 import org.springframework.batch.item.ItemCountAware;
 
@@ -19,6 +19,27 @@ public class BatchExcelRow extends ExcelRow implements ItemIndexAware, ItemCount
         super(builder);
         this.canceled = builder.canceled;
         this.index = builder.index;
+    }
+
+    public boolean isCanceled() {
+        return canceled;
+    }
+
+    public void setCanceled(boolean canceled) {
+        this.canceled = canceled;
+    }
+
+    public Long getIndex() {
+        return index;
+    }
+
+    public void setIndex(Long index) {
+        this.index = index;
+    }
+
+    @Override
+    public void setItemCount(int count) {
+        setIndex(new Long(count));
     }
 
     public static class Builder extends ExcelRow.Builder {
@@ -119,26 +140,5 @@ public class BatchExcelRow extends ExcelRow implements ItemIndexAware, ItemCount
             this.index = index;
             return this;
         }
-    }
-
-    public boolean isCanceled() {
-        return canceled;
-    }
-
-    public void setCanceled(boolean canceled) {
-        this.canceled = canceled;
-    }
-
-    public Long getIndex() {
-        return index;
-    }
-
-    public void setIndex(Long index) {
-        this.index = index;
-    }
-
-    @Override
-    public void setItemCount(int count) {
-        setIndex(new Long(count));
     }
 }

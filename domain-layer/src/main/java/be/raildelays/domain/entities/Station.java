@@ -2,11 +2,14 @@ package be.raildelays.domain.entities;
 
 import be.raildelays.domain.Language;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.Table;
 
 /**
  * Immutable entity defining a train station.
- * <p/>
+ * <p>
  * Unicity of a train is done on the English name.
  *
  * @author Almex

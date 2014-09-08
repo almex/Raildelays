@@ -34,20 +34,13 @@ import java.util.*;
  */
 public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
-    protected ResourceAwareItemWriterItemStream<T> writer;
-
-    protected ResourceAwareItemReaderItemStream<T> reader;
-
-    protected Resource resource;
-
-    private Resource outputResource;
-
-    private ExecutionContext executionContext;
-
-    protected Comparator<? super T> comparator;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(SortedItemStreamWriter.class);
-
+    protected ResourceAwareItemWriterItemStream<T> writer;
+    protected ResourceAwareItemReaderItemStream<T> reader;
+    protected Resource resource;
+    protected Comparator<? super T> comparator;
+    private Resource outputResource;
+    private ExecutionContext executionContext;
     private boolean createBackupFile = false;
 
     @Override
@@ -140,7 +133,7 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
             reader.open(executionContext);
 
             int i = 0;
-            for (T item = reader.read() ; item != null; item = reader.read()) {
+            for (T item = reader.read(); item != null; item = reader.read()) {
                 Long index = null;
 
                 if (item instanceof ItemIndexAware) {
@@ -188,9 +181,9 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
             File backupFile = new File(directory, resource.getFilename() + ".bak");
 
             if (!outputFile.renameTo(backupFile)
-                || !tempFile.renameTo(outputFile)
-                || !backupFile.delete()
-                ) {
+                    || !tempFile.renameTo(outputFile)
+                    || !backupFile.delete()
+                    ) {
                 backupFile.renameTo(outputFile);
                 LOGGER.error("Commit failure: we were not able to delete the original file");
             }

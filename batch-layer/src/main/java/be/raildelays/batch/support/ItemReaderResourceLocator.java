@@ -10,9 +10,9 @@ import java.io.IOException;
 /**
  * We communicate through the {@link org.springframework.batch.item.ExecutionContext} the file name used to create a new file.
  * The actual resource is used to build the final of a new file.
- *
+ * <p>
  * MaxItemCount must be a dividend of chunk-size
- *
+ * <p>
  * original: path/filemane.extension
  * result: path/filename_suffix.extension
  *
@@ -27,12 +27,12 @@ public class ItemReaderResourceLocator extends AbstractItemResourceLocator {
         if (context.containsKey(FILE_PATH_KEY)) {
             result = new FileSystemResource(new File(context.getString(FILE_PATH_KEY)));
         } else {
-			File existingFile = getExistingFile();
-			
-			if (existingFile != null) {
-				result = new FileSystemResource(existingFile);
-			}
-		}
+            File existingFile = getExistingFile();
+
+            if (existingFile != null) {
+                result = new FileSystemResource(existingFile);
+            }
+        }
 
         return result;
     }

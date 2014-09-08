@@ -1,28 +1,23 @@
 package be.raildelays.batch.support;
 
-import org.springframework.batch.item.*;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.support.AbstractItemStreamItemWriter;
 import org.springframework.util.Assert;
 
 import java.util.List;
 
 /**
- *
- *
  * @author Almex
  */
 public abstract class AbstractItemCountingItemStreamItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 
-    private boolean saveState = true;
-
-    private int currentItemIndex = 0;
-
-    private int currentItemCount = 0;
-
-    private int maxItemCount = Integer.MAX_VALUE;
-
     private static final String WRITE_COUNT = "write.count";
     private static final String WRITE_COUNT_MAX = "write.count.max";
+    private boolean saveState = true;
+    private int currentItemIndex = 0;
+    private int currentItemCount = 0;
+    private int maxItemCount = Integer.MAX_VALUE;
 
     /**
      * Write item to a certain index.
@@ -77,8 +72,7 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
         currentItemIndex = 0;
         try {
             doClose();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new ItemStreamException("Error while closing item writer", e);
         }
     }
@@ -88,8 +82,7 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
         super.open(executionContext);
         try {
             doOpen();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new ItemStreamException("Failed to initialize the writer", e);
         }
         if (!isSaveState()) {
@@ -108,8 +101,7 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
             if (itemCount < maxItemCount) {
                 try {
                     jumpToItem(itemCount);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     throw new ItemStreamException("Could not move to stored position on restart", e);
                 }
             }
@@ -132,41 +124,19 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
     }
 
 
-
     public int getCurrentItemCount() {
         return currentItemCount;
     }
 
-
-
     /**
-     * The index of the item to start writing to. If the
-     * {@link org.springframework.batch.item.ExecutionContext} contains a key <code>[name].write.count</code>
-     * (where <code>[name]</code> is the name of this component) the value from
-     * the {@link org.springframework.batch.item.ExecutionContext} will be used in preference.
+     * The flag that determines whether to save internal state for restarts.
      *
-     * @see #setName(String)
-     *
-     * @param itemIndex the value of the current item index
+     * @return true if the flag was set
      */
-    public void setCurrentItemIndex(int itemIndex) {
-        this.currentItemIndex = itemIndex;
+    public boolean isSaveState() {
+        return saveState;
     }
 
-    /**
-     * The maximum number of the items to be write. If the
-     * {@link org.springframework.batch.item.ExecutionContext} contains a key
-     * <code>[name].read.count.max</code> (where <code>[name]</code> is the name
-     * of this component) the value from the {@link org.springframework.batch.item.ExecutionContext} will be
-     * used in preference.
-     *
-     * @see #setName(String)
-     *
-     * @param count the value of the maximum item count
-     */
-    public void setMaxItemCount(int count) {
-        this.maxItemCount = count;
-    }
     /**
      * Set the flag that determines whether to save internal data for
      * {@link ExecutionContext}. Only switch this to false if you don't want to
@@ -180,17 +150,38 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
         this.saveState = saveState;
     }
 
-    /**
-     * The flag that determines whether to save internal state for restarts.
-     * @return true if the flag was set
-     */
-    public boolean isSaveState() {
-        return saveState;
-    }
-
     public int getCurrentItemIndex() {
         return currentItemIndex;
     }
 
-    public int getMaxItemCount() { return maxItemCount; }
+    /**
+     * The index of the item to start writing to. If the
+     * {@link org.springframework.batch.item.ExecutionContext} contains a key <code>[name].write.count</code>
+     * (where <code>[name]</code> is the name of this component) the value from
+     * the {@link org.springframework.batch.item.ExecutionContext} will be used in preference.
+     *
+     * @param itemIndex the value of the current item index
+     * @see #setName(String)
+     */
+    public void setCurrentItemIndex(int itemIndex) {
+        this.currentItemIndex = itemIndex;
+    }
+
+    public int getMaxItemCount() {
+        return maxItemCount;
+    }
+
+    /**
+     * The maximum number of the items to be write. If the
+     * {@link org.springframework.batch.item.ExecutionContext} contains a key
+     * <code>[name].read.count.max</code> (where <code>[name]</code> is the name
+     * of this component) the value from the {@link org.springframework.batch.item.ExecutionContext} will be
+     * used in preference.
+     *
+     * @param count the value of the maximum item count
+     * @see #setName(String)
+     */
+    public void setMaxItemCount(int count) {
+        this.maxItemCount = count;
+    }
 }

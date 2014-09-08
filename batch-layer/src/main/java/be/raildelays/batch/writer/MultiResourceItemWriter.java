@@ -23,23 +23,16 @@ import java.util.List;
  */
 public class MultiResourceItemWriter<T> extends AbstractItemCountingItemStreamItemWriter<T> {
 
+    private final static String RESOURCE_KEY = "resource";
+    private static final Logger LOGGER = LoggerFactory.getLogger(MultiResourceItemWriter.class);
     protected ResourceLocator resourceLocator;
-
     private ResourceAwareItemWriterItemStream<? super T> delegate;
-
     private ExecutionContext executionContext;
-
-    final static private String RESOURCE_KEY = "resource";
-
     private Resource resource;
-
     private boolean opened = false;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MultiResourceItemWriter.class);
-
-
     @Override
-    public void open(ExecutionContext executionContext) throws ItemStreamException {
+    public void open(ExecutionContext executionContext) {
         this.executionContext = executionContext;
         super.open(executionContext);
     }
@@ -75,7 +68,7 @@ public class MultiResourceItemWriter<T> extends AbstractItemCountingItemStreamIt
             LOGGER.debug("afterItemCount={}", afterItemCount);
         }
 
-        if (delegate instanceof AbstractItemCountingItemStreamItemWriter ) {
+        if (delegate instanceof AbstractItemCountingItemStreamItemWriter) {
             final int maxItemCount = ((AbstractItemCountingItemStreamItemWriter) delegate).getMaxItemCount();
 
             if (afterItemCount >= maxItemCount) {
@@ -114,8 +107,7 @@ public class MultiResourceItemWriter<T> extends AbstractItemCountingItemStreamIt
             opened = true;
 
             LOGGER.trace("Stream is opened");
-        }
-        else {
+        } else {
             opened = false;
 
             LOGGER.trace("Stream is not opened yet");
@@ -135,7 +127,7 @@ public class MultiResourceItemWriter<T> extends AbstractItemCountingItemStreamIt
     }
 
     @Override
-    public void update(ExecutionContext executionContext) throws ItemStreamException {
+    public void update(ExecutionContext executionContext) {
         if (isSaveState()) {
             if (opened) {
                 delegate.update(executionContext);

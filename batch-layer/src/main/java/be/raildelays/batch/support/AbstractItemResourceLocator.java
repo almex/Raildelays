@@ -6,9 +6,6 @@ import be.raildelays.batch.poi.Format;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.ChunkListener;
-import org.springframework.batch.core.ItemWriteListener;
-import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -16,15 +13,13 @@ import org.springframework.core.io.Resource;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.List;
 
 /**
  * We communicate through the {@link org.springframework.batch.item.ExecutionContext} the file name used to create a new file.
  * The actual resource is used to build the final of a new file.
- *
+ * <p>
  * MaxItemCount must be a dividend of chunk-size
- *
+ * <p>
  * original: path/filemane.extension
  * result: path/filename_suffix.extension
  *
@@ -32,14 +27,10 @@ import java.util.List;
  */
 public abstract class AbstractItemResourceLocator implements ResourceLocator {
 
-    protected Resource resource;
-
-    private ResourceItemSearch<BatchExcelRow> resourceItemSearch;
-
     public static final String FILE_PATH_KEY = "resource.file.path";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractItemResourceLocator.class);
-
+    protected Resource resource;
+    private ResourceItemSearch<BatchExcelRow> resourceItemSearch;
 
     protected File getFileBasedOnSuffix(ExecutionContext context) throws IOException {
         String suffix = context.getString(ResourceLocatorListener.FILENAME_SUFFIX_KEY);

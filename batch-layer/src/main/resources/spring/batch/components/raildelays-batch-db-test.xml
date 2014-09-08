@@ -1,28 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
-	xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.1.xsd
-        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 
-	<!-- <jdbc:embedded-database id="batchDataSource" -->
-	<!-- type="HSQL"> -->
-	<!-- <jdbc:script location="classpath:spring-batch-schema-hsqldb.ddl" /> -->
-	<!-- </jdbc:embedded-database> -->
+    <!-- <jdbc:embedded-database id="batchDataSource" -->
+    <!-- type="HSQL"> -->
+    <!-- <jdbc:script location="classpath:spring-batch-schema-hsqldb.ddl" /> -->
+    <!-- </jdbc:embedded-database> -->
 
-	<bean id="jobExplorer"
-		class="org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean">
-		<property name="repositoryFactory" ref="&amp;jobRepository" />
-	</bean>
+    <bean id="jobExplorer"
+          class="org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean">
+        <property name="repositoryFactory" ref="&amp;jobRepository"/>
+    </bean>
 
-	<bean id="jobRepository"
-		class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
-		<property name="transactionManager" ref="batchTransactionManager" />
-	</bean>
+    <bean id="jobRepository"
+          class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+        <property name="transactionManager" ref="batchTransactionManager"/>
+    </bean>
 
-	<bean id="batchTransactionManager"
-		class="org.springframework.batch.support.transaction.ResourcelessTransactionManager">
-	</bean>
+    <bean id="batchTransactionManager"
+          class="org.springframework.batch.support.transaction.ResourcelessTransactionManager">
+    </bean>
 
 </beans>

@@ -111,7 +111,7 @@ public class LineStopBuilderTest {
                         .date(new Date()));
 
         Assert.assertNotNull(builder.build().getPrevious());
-        Assert.assertNotNull(builder.build().getPrevious().getPrevious() );
+        Assert.assertNotNull(builder.build().getPrevious().getPrevious());
     }
 
     @Test
@@ -132,6 +132,6 @@ public class LineStopBuilderTest {
                         .build());
 
         Assert.assertNotNull(builder.build().getPrevious());
-        Assert.assertNotNull(builder.build().getPrevious().getPrevious() );
+        Assert.assertNotNull(builder.build().getPrevious().getPrevious());
     }
 }

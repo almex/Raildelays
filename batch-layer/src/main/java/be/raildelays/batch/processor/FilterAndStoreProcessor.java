@@ -17,13 +17,13 @@ import org.springframework.beans.factory.InitializingBean;
  * </p>
  * <p>
  * <code>
- *     Long trainId = context.getLong(keyName);
+ * Long trainId = context.getLong(keyName);
  * </code>
  * </p>
  *
  * @author Almex
- * @since 1.2
  * @see be.raildelays.batch.reader.RetrieveLineStopViaContextReader
+ * @since 1.2
  */
 public class FilterAndStoreProcessor implements ItemProcessor<BatchExcelRow, BatchExcelRow>, InitializingBean {
 

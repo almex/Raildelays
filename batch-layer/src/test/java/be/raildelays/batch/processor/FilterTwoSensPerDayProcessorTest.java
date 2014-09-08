@@ -26,27 +26,22 @@ import java.util.List;
 
 @RunWith(value = BlockJUnit4ClassRunner.class)
 public class FilterTwoSensPerDayProcessorTest {
-    private List<BatchExcelRow> list;
-
-	/**
-	 * S.U.T.
-	 */
-	private FilterTwoSensPerDayProcessor processor;
-
-    private ResourceAwareItemReaderItemStream<BatchExcelRow> fakeReader;
-
-    private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
-
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
-
+    private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
+    private List<BatchExcelRow> list;
+    /**
+     * S.U.T.
+     */
+    private FilterTwoSensPerDayProcessor processor;
+    private ResourceAwareItemReaderItemStream<BatchExcelRow> fakeReader;
     private Station stationA;
 
     private Station stationB;
 
-	@Before
-	public void setUp() throws Exception {
-		stationA = new Station("A");
-		stationB = new Station("B");
+    @Before
+    public void setUp() throws Exception {
+        stationA = new Station("A");
+        stationB = new Station("B");
 
         fakeReader = new ResourceAwareItemReaderItemStream<BatchExcelRow>() {
             private Iterator<BatchExcelRow> iterator;
@@ -77,9 +72,9 @@ public class FilterTwoSensPerDayProcessorTest {
             }
         };
 
-		list = new ArrayList<>();
-		
-		list.add(new Builder(DATE_FORMAT.parse("01/01/2000"), Sens.DEPARTURE) //
+        list = new ArrayList<>();
+
+        list.add(new Builder(DATE_FORMAT.parse("01/01/2000"), Sens.DEPARTURE) //
                 .departureStation(stationA) //
                 .arrivalStation(stationB) //
                 .expectedTrain1(new Train("466")) //
@@ -105,18 +100,18 @@ public class FilterTwoSensPerDayProcessorTest {
                 .index(1L) //
                 .build());
 
-		list.add(new Builder(DATE_FORMAT.parse("02/01/2000"), Sens.DEPARTURE) //
-				.departureStation(stationA) //
-				.arrivalStation(stationB) //
-				.expectedTrain1(new Train("530")) //
-				.expectedArrivalTime(TIME_FORMAT.parse("08:00")) //
-				.expectedDepartureTime(TIME_FORMAT.parse("08:05")) //
-				.effectiveTrain1(new Train("466")) //
-				.effectiveDepartureTime(TIME_FORMAT.parse("08:03")) //
-				.effectiveArrivalTime(TIME_FORMAT.parse("08:15")) //
-				.delay(10L) //
+        list.add(new Builder(DATE_FORMAT.parse("02/01/2000"), Sens.DEPARTURE) //
+                .departureStation(stationA) //
+                .arrivalStation(stationB) //
+                .expectedTrain1(new Train("530")) //
+                .expectedArrivalTime(TIME_FORMAT.parse("08:00")) //
+                .expectedDepartureTime(TIME_FORMAT.parse("08:05")) //
+                .effectiveTrain1(new Train("466")) //
+                .effectiveDepartureTime(TIME_FORMAT.parse("08:03")) //
+                .effectiveArrivalTime(TIME_FORMAT.parse("08:15")) //
+                .delay(10L) //
                 .index(2L) //
-				.build());
+                .build());
 
         list.add(new Builder(DATE_FORMAT.parse("02/01/2000"), Sens.ARRIVAL) //
                 .departureStation(stationB) //
@@ -131,30 +126,30 @@ public class FilterTwoSensPerDayProcessorTest {
                 .index(3L) //
                 .build());
 
-		list.add(new Builder(DATE_FORMAT.parse("03/01/2000"), Sens.DEPARTURE) //
-				.departureStation(stationA) //
-				.arrivalStation(stationB) //
-				.expectedTrain1(new Train("531")) //
-				.expectedArrivalTime(TIME_FORMAT.parse("12:00")) //
-				.expectedDepartureTime(TIME_FORMAT.parse("12:05")) //
-				.effectiveTrain1(new Train("466")) //
-				.effectiveDepartureTime(TIME_FORMAT.parse("12:03")) //
-				.effectiveArrivalTime(TIME_FORMAT.parse("12:20")) //
-				.delay(15L) //
+        list.add(new Builder(DATE_FORMAT.parse("03/01/2000"), Sens.DEPARTURE) //
+                .departureStation(stationA) //
+                .arrivalStation(stationB) //
+                .expectedTrain1(new Train("531")) //
+                .expectedArrivalTime(TIME_FORMAT.parse("12:00")) //
+                .expectedDepartureTime(TIME_FORMAT.parse("12:05")) //
+                .effectiveTrain1(new Train("466")) //
+                .effectiveDepartureTime(TIME_FORMAT.parse("12:03")) //
+                .effectiveArrivalTime(TIME_FORMAT.parse("12:20")) //
+                .delay(15L) //
                 .index(4L) //
-				.build());
+                .build());
 
 
         StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution();
-		processor = new FilterTwoSensPerDayProcessor();
+        processor = new FilterTwoSensPerDayProcessor();
         stepExecution.getExecutionContext().putString("foo", "");
         processor.setOutputReader(fakeReader);
         processor.afterPropertiesSet();
-	}
+    }
 
-	@Test
-	public void testProcessReturnNew() throws Exception {
-		BatchExcelRow excelRow = processor.process(new Builder(DATE_FORMAT.parse("05/01/2000"), Sens.ARRIVAL) //
+    @Test
+    public void testProcessReturnNew() throws Exception {
+        BatchExcelRow excelRow = processor.process(new Builder(DATE_FORMAT.parse("05/01/2000"), Sens.ARRIVAL) //
                 .departureStation(stationB) //
                 .arrivalStation(stationA) //
                 .expectedTrain1(new Train("578")) //
@@ -166,12 +161,12 @@ public class FilterTwoSensPerDayProcessorTest {
                 .delay(5L) //
                 .build());
 
-		Assert.assertNotNull(excelRow);
+        Assert.assertNotNull(excelRow);
         Assert.assertNull(excelRow.getIndex());
-	}
-	
-	@Test
-	public void testProcessReturnReplace() throws Exception {
+    }
+
+    @Test
+    public void testProcessReturnReplace() throws Exception {
         BatchExcelRow excelRow = processor.process(new Builder(DATE_FORMAT.parse("02/01/2000"), Sens.ARRIVAL) //
                 .departureStation(stationB) //
                 .arrivalStation(stationA) //
@@ -186,10 +181,10 @@ public class FilterTwoSensPerDayProcessorTest {
 
         Assert.assertNotNull(excelRow);
         Assert.assertNotNull(excelRow.getIndex());
-	}
-	
-	@Test
-	public void testProcessReturnSkip() throws Exception {
+    }
+
+    @Test
+    public void testProcessReturnSkip() throws Exception {
         BatchExcelRow excelRow = processor.process(new Builder(DATE_FORMAT.parse("02/01/2000"), Sens.ARRIVAL) //
                 .departureStation(stationB) //
                 .arrivalStation(stationA) //
@@ -203,6 +198,6 @@ public class FilterTwoSensPerDayProcessorTest {
                 .build());
 
         Assert.assertNull(excelRow);
-	}
+    }
 
 }

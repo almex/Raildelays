@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:batch="http://www.springframework.org/schema/batch"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:util="http://www.springframework.org/schema/util"
+       xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
@@ -74,7 +74,7 @@
 
     <bean id="partitioner"
           class="be.raildelays.batch.reader.TrainIdPartitioner">
-        <constructor-arg ref="trainListReader"/>
+        <property name="trainListReader" ref="trainListReader"/>
     </bean>
 
     <bean id="taskExecutor"
@@ -281,11 +281,6 @@
     <!-- ================================================================================================== -->
     <!-- =====================================         WRITERS        ===================================== -->
     <!-- ================================================================================================== -->
-    <bean id="listIterateItemWriter"
-          class="be.raildelays.batch.writer.ListIterateItemWriter"
-          scope="step">
-        <property name="delegate" ref="jpaItemWriter"/>
-    </bean>
 
     <bean id="compositeItemWriter"
           class="org.springframework.batch.item.support.CompositeItemWriter"
@@ -351,11 +346,6 @@
         <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
         <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
         <property name="template" value="file:#{jobParameters['excel.input.template']}"/>
-    </bean>
-
-    <bean id="raildelaysServiceWriter"
-          class="be.raildelays.batch.writer.RaildelaysServiceWriter"
-          scope="step">
     </bean>
 
     <bean id="jpaItemWriter"

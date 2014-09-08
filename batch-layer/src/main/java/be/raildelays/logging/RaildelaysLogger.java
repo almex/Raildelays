@@ -64,7 +64,6 @@ public class RaildelaysLogger implements Logger {
     private static final String TIME_FORMAT = "HH:mm";
     private static final int TOTAL_LENGTH = ID_FORMAT.length() + DATE_FORMAT.length() + 2 * TRAIN_FORMAT.length() +
             2 * STATION_LENGTH + 4 * TIME_FORMAT.length() + 2 * ID_FORMAT.length() + 12;
-
     private org.slf4j.Logger delegate;
 
     private Marker marker;
@@ -72,252 +71,6 @@ public class RaildelaysLogger implements Logger {
     private char separator = ' ';
 
     private String type;
-
-    public RaildelaysLogger(String type, org.slf4j.Logger delegate) {
-        this.type = type;
-        this.delegate = delegate;
-    }
-
-    public RaildelaysLogger(String type, org.slf4j.Logger delegate, Marker marker) {
-        this.type = type;
-        this.delegate = delegate;
-        this.marker = marker;
-    }
-
-    private enum Level {DEBUG, TRACE, INFO}
-
-
-    private class LogLineBuilder {
-
-        private String message;
-        private Long id;
-        private Date date;
-        private Long expectedTrain;
-        private Long effectiveTrain;
-        private String departureStation;
-        private String arrivalStation;
-        private Date expectedDepartureTime;
-        private Date expectedArrivalTime;
-        private Date effectiveDepartureTime;
-        private Date effectiveArrivalTime;
-        private Long idPrevious;
-        private Long idNext;
-
-        public LogLineBuilder message(String message) {
-            this.message = message;
-
-            return this;
-        }
-
-        public LogLineBuilder id(Long id) {
-            this.id = id;
-
-            return this;
-        }
-
-        public LogLineBuilder idPrevious(Long idPrevious) {
-            this.idPrevious = idPrevious;
-
-            return this;
-        }
-
-        public LogLineBuilder idNext(Long idNext) {
-            this.idNext = idNext;
-
-            return this;
-        }
-
-        public LogLineBuilder date(Date date) {
-            this.date = date;
-
-            return this;
-        }
-
-        public LogLineBuilder expectedTrain(Long expectedTrain) {
-            this.expectedTrain = expectedTrain;
-
-            return this;
-        }
-
-        public LogLineBuilder effectiveTrain(Long effectiveTrain) {
-            this.effectiveTrain = effectiveTrain;
-
-            return this;
-        }
-
-        public LogLineBuilder arrivalStation(String arrivalStation) {
-            this.arrivalStation = arrivalStation;
-
-            return this;
-        }
-
-        public LogLineBuilder departureStation(String departureStation) {
-            this.departureStation = departureStation;
-
-            return this;
-        }
-
-        public LogLineBuilder expectedDepartureTime(Date expectedDepartureTime) {
-            this.expectedDepartureTime = expectedDepartureTime;
-
-            return this;
-        }
-
-        public LogLineBuilder expectedArrivalTime(Date expectedArrivalTime) {
-            this.expectedArrivalTime = expectedArrivalTime;
-
-            return this;
-        }
-
-        public LogLineBuilder effectiveDepartureTime(Date effectiveDepartureTime) {
-            this.effectiveDepartureTime = effectiveDepartureTime;
-
-            return this;
-        }
-
-        public LogLineBuilder effectiveArrivalTime(Date effectiveArrivalTime) {
-            this.effectiveArrivalTime = effectiveArrivalTime;
-
-            return this;
-        }
-
-
-        public String build() {
-            final StringBuilder builder = new StringBuilder();
-            final NumberFormat idFormat = new DecimalFormat(ID_FORMAT);
-            final NumberFormat trainFormat = new DecimalFormat(TRAIN_FORMAT);
-            final NumberFormat delayFormat = new DecimalFormat(DELAY_FORMAT);
-            final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-            final SimpleDateFormat timeFormat = new SimpleDateFormat(TIME_FORMAT);
-
-            if (expectedTrain != null ||
-                    departureStation != null ||
-                    expectedDepartureTime != null ||
-                    effectiveDepartureTime != null) {
-                builder.append(StringUtils.rightPad(id != null ? idFormat.format(id) : "null", ID_FORMAT.length()));
-                builder.append(separator);
-                builder.append(StringUtils.rightPad(date != null ? dateFormat.format(date) : "", DATE_FORMAT.length()));
-                builder.append(separator);
-                builder.append(StringUtils.rightPad(expectedTrain != null ? trainFormat.format(expectedTrain) : "", TRAIN_FORMAT.length()));
-                builder.append(separator);
-                builder.append(StringUtils.rightPad(effectiveTrain != null ? trainFormat.format(effectiveTrain) : "", TRAIN_FORMAT.length()));
-                builder.append(separator);
-                builder.append(StringUtils.rightPad(departureStation != null ? substringCenter(departureStation, STATION_LENGTH, '~') : "", STATION_LENGTH));
-                builder.append(separator);
-                builder.append(StringUtils.rightPad(arrivalStation != null ? substringCenter(arrivalStation, STATION_LENGTH, '~') : "", STATION_LENGTH));
-                builder.append(separator);
-                builder.append(StringUtils.rightPad(expectedDepartureTime != null ? timeFormat.format(expectedDepartureTime) : "null", TIME_FORMAT.length()));
-                builder.append(separator);
-                builder.append(StringUtils.rightPad(expectedArrivalTime != null ? timeFormat.format(expectedArrivalTime) : "null", TIME_FORMAT.length()));
-                builder.append(separator);
-                builder.append(StringUtils.rightPad(effectiveDepartureTime != null ? timeFormat.format(effectiveDepartureTime) : "", TIME_FORMAT.length()));
-                builder.append(separator);
-                builder.append(StringUtils.rightPad(effectiveArrivalTime != null ? timeFormat.format(effectiveArrivalTime) : "", TIME_FORMAT.length()));
-                builder.append(separator);
-                builder.append(delayFormat.format(computeDelay()));
-                builder.append(separator);
-                builder.append(StringUtils.rightPad(idPrevious != null ? idFormat.format(idPrevious) : "", ID_FORMAT.length()));
-                builder.append(separator);
-                builder.append(StringUtils.rightPad(idNext != null ? idFormat.format(idNext) : "", ID_FORMAT.length()));
-            } else {
-                builder.append(StringUtils.rightPad("null", TOTAL_LENGTH));
-            }
-            builder.append(separator);
-
-
-            return builder.toString();
-        }
-
-        public String substringCenter(String characters, int length, char centerCharacter) {
-            String result = null;
-
-
-            if (characters != null) {
-                StringBuilder builder = new StringBuilder(length);
-
-                if (characters.length() <= length) {
-                    result = characters;
-                } else {
-                    builder.append(characters.substring(0, length - 4));
-                    builder.append(centerCharacter);
-                    builder.append(characters.substring(characters.length() - 3));
-                    result = builder.toString();
-                }
-            }
-
-            return result;
-        }
-
-        private Long computeDelay() {
-            Long result = 0L;
-
-            if (expectedArrivalTime != null && effectiveArrivalTime != null) {
-                LocalTime expected = new LocalTime(expectedArrivalTime);
-                LocalTime effective = new LocalTime(effectiveArrivalTime);
-                Duration duration = new Duration(expected.toDateTimeToday(), effective.toDateTimeToday());
-
-                result = duration.getStandardMinutes();
-            }
-
-            return result;
-        }
-
-    }
-
-    private abstract class Delegator<T> {
-
-        public abstract String logLine(String message, T object);
-
-        public void log(String message, Level level, T object) {
-            final StringBuilder builder = new StringBuilder();
-
-            builder.append(separator);
-            builder.append(StringUtils.rightPad(type != null ? "[" + StringUtils.substring(type, 0, PREFIX_LENGTH) + "]" : "", PREFIX_LENGTH + 2));
-            builder.append(separator);
-            builder.append(StringUtils.rightPad(message != null ? StringUtils.substring(message, 0, MESSAGE_LENGTH) : "", MESSAGE_LENGTH));
-            builder.append(separator);
-
-            if (object != null) {
-                builder.append(logLine(message, object));
-            } else {
-                builder.append(StringUtils.rightPad("null", TOTAL_LENGTH));
-            }
-
-            switch (level) {
-                case DEBUG:
-                    delegate.debug(builder.toString());
-                    break;
-                case INFO:
-                    delegate.info(builder.toString());
-                    break;
-                case TRACE:
-                    delegate.trace(builder.toString());
-                    break;
-            }
-
-        }
-
-        public void log(String message, Level level, List<? extends T> objects) {
-            if (objects != null) {
-                for (int i = 0; i < objects.size(); i++) {
-                    T object = objects.get(i);
-                    log(message + "[" + i + "]", level, object);
-                }
-            }
-        }
-    }
-
-    private static Date computeEffectiveTime(TimestampDelay timestampDelay) {
-        Date result = null;
-
-        if (timestampDelay.getExpected() != null) {
-            result = DateUtils.addMinutes(timestampDelay.getExpected(),
-                    timestampDelay.getDelay().intValue());
-        }
-
-        return result;
-    }
-
     private Delegator<Direction> directionDelegator = new Delegator<Direction>() {
         @Override
         public String logLine(String message, Direction object) {
@@ -329,7 +82,6 @@ public class RaildelaysLogger implements Logger {
                     .build();
         }
     };
-
     private Delegator<Step> stepDelegator = new Delegator<Step>() {
         @Override
         public String logLine(String message, Step object) {
@@ -341,7 +93,6 @@ public class RaildelaysLogger implements Logger {
                     .build();
         }
     };
-
     private Delegator<LineStop> lineStopDelegator = new Delegator<LineStop>() {
         @Override
         public String logLine(String message, LineStop object) {
@@ -360,7 +111,6 @@ public class RaildelaysLogger implements Logger {
                     .build();
         }
     };
-
     private Delegator<ExcelRow> excelRowDelegator = new Delegator<ExcelRow>() {
         @Override
         public String logLine(String message, ExcelRow object) {
@@ -379,6 +129,51 @@ public class RaildelaysLogger implements Logger {
                     .build();
         }
     };
+    private Delegator<RouteLogDTO> routeLogDTODelegator = new Delegator<RouteLogDTO>() {
+        @Override
+        public String logLine(String message, RouteLogDTO object) {
+            return new LogLineBuilder()
+                    .message(message)
+                    .date(object.getDate())
+                    .expectedTrain(object.getTrainId() != null ? Long.parseLong(object.getTrainId()) : null)
+                    .build();
+        }
+    };
+    private Delegator<ServedStopDTO> servedStopDTODelegator = new Delegator<ServedStopDTO>() {
+        @Override
+        public String logLine(String message, ServedStopDTO object) {
+            return new LogLineBuilder()
+                    .message(message)
+                    .departureStation(object.getStationName())
+                    .expectedDepartureTime(object.getArrivalTime())
+                    .expectedArrivalTime(object.getDepartureTime())
+                    .effectiveDepartureTime(computeEffectiveTime(new TimestampDelay(object.getArrivalTime(), object.getArrivalDelay())))
+                    .effectiveArrivalTime(computeEffectiveTime(new TimestampDelay(object.getDepartureTime(), object.getDepartureDelay())))
+                    .build();
+        }
+    };
+
+    public RaildelaysLogger(String type, org.slf4j.Logger delegate) {
+        this.type = type;
+        this.delegate = delegate;
+    }
+
+    public RaildelaysLogger(String type, org.slf4j.Logger delegate, Marker marker) {
+        this.type = type;
+        this.delegate = delegate;
+        this.marker = marker;
+    }
+
+    private static Date computeEffectiveTime(TimestampDelay timestampDelay) {
+        Date result = null;
+
+        if (timestampDelay.getExpected() != null) {
+            result = DateUtils.addMinutes(timestampDelay.getExpected(),
+                    timestampDelay.getDelay().intValue());
+        }
+
+        return result;
+    }
 
     private static Long getTrainId(be.raildelays.domain.entities.Train train) {
         Long result = null;
@@ -429,32 +224,6 @@ public class RaildelaysLogger implements Logger {
 
         return result;
     }
-
-    private Delegator<RouteLogDTO> routeLogDTODelegator = new Delegator<RouteLogDTO>() {
-        @Override
-        public String logLine(String message, RouteLogDTO object) {
-            return new LogLineBuilder()
-                    .message(message)
-                    .date(object.getDate())
-                    .expectedTrain(object.getTrainId() != null ? Long.parseLong(object.getTrainId()) : null)
-                    .build();
-        }
-    };
-
-    private Delegator<ServedStopDTO> servedStopDTODelegator = new Delegator<ServedStopDTO>() {
-        @Override
-        public String logLine(String message, ServedStopDTO object) {
-            return new LogLineBuilder()
-                    .message(message)
-                    .departureStation(object.getStationName())
-                    .expectedDepartureTime(object.getArrivalTime())
-                    .expectedArrivalTime(object.getDepartureTime())
-                    .effectiveDepartureTime(computeEffectiveTime(new TimestampDelay(object.getArrivalTime(), object.getArrivalDelay())))
-                    .effectiveArrivalTime(computeEffectiveTime(new TimestampDelay(object.getDepartureTime(), object.getDepartureDelay())))
-                    .build();
-        }
-    };
-
 
     @Override
     public void info(String message, LineStop lineStop) {
@@ -566,7 +335,6 @@ public class RaildelaysLogger implements Logger {
             }
         }
     }
-
 
     public void setDelegate(org.slf4j.Logger logger) {
         this.delegate = logger;
@@ -879,5 +647,227 @@ public class RaildelaysLogger implements Logger {
     @Override
     public void error(Marker marker, String msg, Throwable t) {
         delegate.error(marker, msg, t);
+    }
+
+    private enum Level {DEBUG, TRACE, INFO}
+
+    private class LogLineBuilder {
+
+        private String message;
+        private Long id;
+        private Date date;
+        private Long expectedTrain;
+        private Long effectiveTrain;
+        private String departureStation;
+        private String arrivalStation;
+        private Date expectedDepartureTime;
+        private Date expectedArrivalTime;
+        private Date effectiveDepartureTime;
+        private Date effectiveArrivalTime;
+        private Long idPrevious;
+        private Long idNext;
+
+        public LogLineBuilder message(String message) {
+            this.message = message;
+
+            return this;
+        }
+
+        public LogLineBuilder id(Long id) {
+            this.id = id;
+
+            return this;
+        }
+
+        public LogLineBuilder idPrevious(Long idPrevious) {
+            this.idPrevious = idPrevious;
+
+            return this;
+        }
+
+        public LogLineBuilder idNext(Long idNext) {
+            this.idNext = idNext;
+
+            return this;
+        }
+
+        public LogLineBuilder date(Date date) {
+            this.date = date;
+
+            return this;
+        }
+
+        public LogLineBuilder expectedTrain(Long expectedTrain) {
+            this.expectedTrain = expectedTrain;
+
+            return this;
+        }
+
+        public LogLineBuilder effectiveTrain(Long effectiveTrain) {
+            this.effectiveTrain = effectiveTrain;
+
+            return this;
+        }
+
+        public LogLineBuilder arrivalStation(String arrivalStation) {
+            this.arrivalStation = arrivalStation;
+
+            return this;
+        }
+
+        public LogLineBuilder departureStation(String departureStation) {
+            this.departureStation = departureStation;
+
+            return this;
+        }
+
+        public LogLineBuilder expectedDepartureTime(Date expectedDepartureTime) {
+            this.expectedDepartureTime = expectedDepartureTime;
+
+            return this;
+        }
+
+        public LogLineBuilder expectedArrivalTime(Date expectedArrivalTime) {
+            this.expectedArrivalTime = expectedArrivalTime;
+
+            return this;
+        }
+
+        public LogLineBuilder effectiveDepartureTime(Date effectiveDepartureTime) {
+            this.effectiveDepartureTime = effectiveDepartureTime;
+
+            return this;
+        }
+
+        public LogLineBuilder effectiveArrivalTime(Date effectiveArrivalTime) {
+            this.effectiveArrivalTime = effectiveArrivalTime;
+
+            return this;
+        }
+
+
+        public String build() {
+            final StringBuilder builder = new StringBuilder();
+            final NumberFormat idFormat = new DecimalFormat(ID_FORMAT);
+            final NumberFormat trainFormat = new DecimalFormat(TRAIN_FORMAT);
+            final NumberFormat delayFormat = new DecimalFormat(DELAY_FORMAT);
+            final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+            final SimpleDateFormat timeFormat = new SimpleDateFormat(TIME_FORMAT);
+
+            if (expectedTrain != null ||
+                    departureStation != null ||
+                    expectedDepartureTime != null ||
+                    effectiveDepartureTime != null) {
+                builder.append(StringUtils.rightPad(id != null ? idFormat.format(id) : "null", ID_FORMAT.length()));
+                builder.append(separator);
+                builder.append(StringUtils.rightPad(date != null ? dateFormat.format(date) : "", DATE_FORMAT.length()));
+                builder.append(separator);
+                builder.append(StringUtils.rightPad(expectedTrain != null ? trainFormat.format(expectedTrain) : "", TRAIN_FORMAT.length()));
+                builder.append(separator);
+                builder.append(StringUtils.rightPad(effectiveTrain != null ? trainFormat.format(effectiveTrain) : "", TRAIN_FORMAT.length()));
+                builder.append(separator);
+                builder.append(StringUtils.rightPad(departureStation != null ? substringCenter(departureStation, STATION_LENGTH, '~') : "", STATION_LENGTH));
+                builder.append(separator);
+                builder.append(StringUtils.rightPad(arrivalStation != null ? substringCenter(arrivalStation, STATION_LENGTH, '~') : "", STATION_LENGTH));
+                builder.append(separator);
+                builder.append(StringUtils.rightPad(expectedDepartureTime != null ? timeFormat.format(expectedDepartureTime) : "null", TIME_FORMAT.length()));
+                builder.append(separator);
+                builder.append(StringUtils.rightPad(expectedArrivalTime != null ? timeFormat.format(expectedArrivalTime) : "null", TIME_FORMAT.length()));
+                builder.append(separator);
+                builder.append(StringUtils.rightPad(effectiveDepartureTime != null ? timeFormat.format(effectiveDepartureTime) : "", TIME_FORMAT.length()));
+                builder.append(separator);
+                builder.append(StringUtils.rightPad(effectiveArrivalTime != null ? timeFormat.format(effectiveArrivalTime) : "", TIME_FORMAT.length()));
+                builder.append(separator);
+                builder.append(delayFormat.format(computeDelay()));
+                builder.append(separator);
+                builder.append(StringUtils.rightPad(idPrevious != null ? idFormat.format(idPrevious) : "", ID_FORMAT.length()));
+                builder.append(separator);
+                builder.append(StringUtils.rightPad(idNext != null ? idFormat.format(idNext) : "", ID_FORMAT.length()));
+            } else {
+                builder.append(StringUtils.rightPad("null", TOTAL_LENGTH));
+            }
+            builder.append(separator);
+
+
+            return builder.toString();
+        }
+
+        public String substringCenter(String characters, int length, char centerCharacter) {
+            String result = null;
+
+
+            if (characters != null) {
+                StringBuilder builder = new StringBuilder(length);
+
+                if (characters.length() <= length) {
+                    result = characters;
+                } else {
+                    builder.append(characters.substring(0, length - 4));
+                    builder.append(centerCharacter);
+                    builder.append(characters.substring(characters.length() - 3));
+                    result = builder.toString();
+                }
+            }
+
+            return result;
+        }
+
+        private Long computeDelay() {
+            Long result = 0L;
+
+            if (expectedArrivalTime != null && effectiveArrivalTime != null) {
+                LocalTime expected = new LocalTime(expectedArrivalTime);
+                LocalTime effective = new LocalTime(effectiveArrivalTime);
+                Duration duration = new Duration(expected.toDateTimeToday(), effective.toDateTimeToday());
+
+                result = duration.getStandardMinutes();
+            }
+
+            return result;
+        }
+
+    }
+
+    private abstract class Delegator<T> {
+
+        public abstract String logLine(String message, T object);
+
+        public void log(String message, Level level, T object) {
+            final StringBuilder builder = new StringBuilder();
+
+            builder.append(separator);
+            builder.append(StringUtils.rightPad(type != null ? "[" + StringUtils.substring(type, 0, PREFIX_LENGTH) + "]" : "", PREFIX_LENGTH + 2));
+            builder.append(separator);
+            builder.append(StringUtils.rightPad(message != null ? StringUtils.substring(message, 0, MESSAGE_LENGTH) : "", MESSAGE_LENGTH));
+            builder.append(separator);
+
+            if (object != null) {
+                builder.append(logLine(message, object));
+            } else {
+                builder.append(StringUtils.rightPad("null", TOTAL_LENGTH));
+            }
+
+            switch (level) {
+                case DEBUG:
+                    delegate.debug(builder.toString());
+                    break;
+                case INFO:
+                    delegate.info(builder.toString());
+                    break;
+                case TRACE:
+                    delegate.trace(builder.toString());
+                    break;
+            }
+
+        }
+
+        public void log(String message, Level level, List<? extends T> objects) {
+            if (objects != null) {
+                for (int i = 0; i < objects.size(); i++) {
+                    T object = objects.get(i);
+                    log(message + "[" + i + "]", level, object);
+                }
+            }
+        }
     }
 }

@@ -37,26 +37,55 @@ import java.util.List;
 @Service(value = "raildelaysService")
 public class RaildelaysServiceImpl implements RaildelaysService {
 
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(RaildelaysServiceImpl.class);
     @Resource
     private LineStopDao lineStopDao;
-
     @Resource
     private RailtimeTrainDao railtimeTrainDao;
-
     @Resource
     private TrainDao trainDao;
-
     @Resource
     private StationDao stationDao;
-
     @Resource
     private Mapper mapper;
-
     @Resource
     private Validator validator;
 
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(RaildelaysServiceImpl.class);
+    static private LineStop removeEffectiveInformation(LineStop lineStop) {
+        LineStop result = lineStop;
+
+        result.setArrivalTime(removeDelay(lineStop.getArrivalTime()));
+        result.setDepartureTime(removeDelay(lineStop.getDepartureTime()));
+
+        //-- Modify backward
+        LineStop previous = lineStop.getPrevious();
+        while (previous != null) {
+            previous.setArrivalTime(removeDelay(previous.getArrivalTime()));
+            previous.setDepartureTime(removeDelay(previous.getDepartureTime()));
+            previous = previous.getPrevious();
+        }
+
+        //-- Modify forward
+        LineStop next = lineStop.getNext();
+        while (next != null) {
+            next.setArrivalTime(removeDelay(next.getArrivalTime()));
+            next.setDepartureTime(removeDelay(next.getDepartureTime()));
+            next = next.getNext();
+        }
+
+        return result;
+    }
+
+    static private TimestampDelay removeDelay(TimestampDelay timestamp) {
+        TimestampDelay result = null;
+
+        if (timestamp != null) {
+            result = new TimestampDelay(timestamp.getExpected(), 0L);
+        }
+
+        return result;
+    }
 
     @Override
     @Transactional
@@ -196,6 +225,21 @@ public class RaildelaysServiceImpl implements RaildelaysService {
         return result;
     }
 
+//    private RailtimeTrain saveOrRetrieveRailtimeTrain(RailtimeTrain train) {
+//        RailtimeTrain result = null;
+//        RailtimeTrain persistedTrain = railtimeTrainDao.findByRailtimeId(train
+//                .getRailtimeId());
+//
+//        if (persistedTrain == null) {
+//            validator.validate(train);
+//            result = railtimeTrainDao.save(train);
+//        } else {
+//            result = persistedTrain;
+//        }
+//
+//        return result;
+//    }
+
     @Override
     @Transactional(readOnly = true)
     public List<Date> searchAllDates(Date from, Date to) {
@@ -223,21 +267,6 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 
         return result;
     }
-
-//    private RailtimeTrain saveOrRetrieveRailtimeTrain(RailtimeTrain train) {
-//        RailtimeTrain result = null;
-//        RailtimeTrain persistedTrain = railtimeTrainDao.findByRailtimeId(train
-//                .getRailtimeId());
-//
-//        if (persistedTrain == null) {
-//            validator.validate(train);
-//            result = railtimeTrainDao.save(train);
-//        } else {
-//            result = persistedTrain;
-//        }
-//
-//        return result;
-//    }
 
     private Train saveOrRetrieveTrain(Train train) {
         Train result = null;
@@ -314,41 +343,6 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 
         if (trainId != null && date != null) {
             result = lineStopDao.findByTrainIdAndDate(trainId, date);
-        }
-
-        return result;
-    }
-
-    static private LineStop removeEffectiveInformation(LineStop lineStop) {
-        LineStop result = lineStop;
-
-        result.setArrivalTime(removeDelay(lineStop.getArrivalTime()));
-        result.setDepartureTime(removeDelay(lineStop.getDepartureTime()));
-
-        //-- Modify backward
-        LineStop previous = lineStop.getPrevious();
-        while (previous != null) {
-            previous.setArrivalTime(removeDelay(previous.getArrivalTime()));
-            previous.setDepartureTime(removeDelay(previous.getDepartureTime()));
-            previous = previous.getPrevious();
-        }
-
-        //-- Modify forward
-        LineStop next = lineStop.getNext();
-        while (next != null) {
-            next.setArrivalTime(removeDelay(next.getArrivalTime()));
-            next.setDepartureTime(removeDelay(next.getDepartureTime()));
-            next = next.getNext();
-        }
-
-        return result;
-    }
-
-    static private TimestampDelay removeDelay(TimestampDelay timestamp) {
-        TimestampDelay result = null;
-
-        if (timestamp != null) {
-            result = new TimestampDelay(timestamp.getExpected(), 0L);
         }
 
         return result;

@@ -6,18 +6,18 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
-* Created by soumagn on 31/05/2014.
-*/
+ * Created by soumagn on 31/05/2014.
+ */
 public abstract class WorkbookAction<T> {
-    protected abstract T doWithHSSFWorkbook(HSSFWorkbook workbook);
-
-    protected abstract T doWithXSSFWorkbook(XSSFWorkbook workbook);
-
     protected Workbook internalWorkbook;
 
     public WorkbookAction(Workbook workbook) {
         this.internalWorkbook = workbook;
     }
+
+    protected abstract T doWithHSSFWorkbook(HSSFWorkbook workbook);
+
+    protected abstract T doWithXSSFWorkbook(XSSFWorkbook workbook);
 
     public T execute() throws InvalidFormatException {
         if (internalWorkbook instanceof HSSFWorkbook) {

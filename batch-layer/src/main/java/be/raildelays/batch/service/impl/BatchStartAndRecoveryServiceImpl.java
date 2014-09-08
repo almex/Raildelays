@@ -1,7 +1,6 @@
 package be.raildelays.batch.service.impl;
 
 import be.raildelays.batch.service.BatchStartAndRecoveryService;
-import org.apache.logging.log4j.ThreadContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.*;
@@ -137,7 +136,7 @@ public class BatchStartAndRecoveryServiceImpl
             List<Long> jobInstanceIds = getJobInstances(jobName, start, count);
 
             LOGGER.debug("Number of jobInstanceIds={} start={} count={}.",
-                    new Object[] { jobInstanceIds.size(), start, count });
+                    new Object[]{jobInstanceIds.size(), start, count});
 
             if (jobInstanceIds.size() == 0) {
                 return;
@@ -202,6 +201,7 @@ public class BatchStartAndRecoveryServiceImpl
     public JobExecution start(String jobName, JobParameters jobParameters) throws JobInstanceAlreadyExistsException, NoSuchJobException, JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
         return start(jobName, jobParameters, false);
     }
+
     public JobExecution start(String jobName, JobParameters jobParameters, boolean newInstance) throws JobInstanceAlreadyExistsException, NoSuchJobException, JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
         LOGGER.info("Checking status of job with name=" + jobName);
 
@@ -279,7 +279,7 @@ public class BatchStartAndRecoveryServiceImpl
         BatchStatus status = jobExecution.getStatus();
 
         if (!(status == BatchStatus.STARTED || status == BatchStatus.STARTING)) {
-            throw new JobExecutionNotRunningException("JobExecution must be running so that it can be stopped: "+jobExecution);
+            throw new JobExecutionNotRunningException("JobExecution must be running so that it can be stopped: " + jobExecution);
         }
 
         jobExecution.setStatus(BatchStatus.STOPPING);

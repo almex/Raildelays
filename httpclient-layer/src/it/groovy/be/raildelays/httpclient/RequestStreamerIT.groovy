@@ -1,39 +1,38 @@
 package be.raildelays.httpclient
 
-import static org.junit.Assert.assertNotNull
-
+import be.raildelays.httpclient.impl.RailtimeRequestStreamer
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 
-import be.raildelays.httpclient.impl.RailtimeRequestStreamer
+import static org.junit.Assert.assertNotNull
 
 class RequestStreamerIT {
 
-	/**
-	 * S.U.T.
-	 */
-	private RequestStreamer streamer;
-		
-	@Test(timeout=15000L)
-	void testGetTrainList() {
-		assertNotNull("The request should return a result", streamer.getTrainList('Bruxelles-Central','Liège-Guillemins', new Date(),0))
-	}
-	
-	@Test(timeout=15000L)
-	@Ignore
-	void testGetStationList() {
-		assertNotNull("The request should return a result", streamer.getStationList())
-	}
-	
-	@Test(timeout=15000L)
-	void testGetDelays() {
-		assertNotNull("The request should return a result", streamer.getDelays('466', new Date()))
-	}
-	
-	@Before
-	void setUp() {
-		streamer = new RailtimeRequestStreamer()
-	}
-	
+    /**
+     * S.U.T.
+     */
+    private RequestStreamer streamer;
+
+    @Test(timeout = 15000L)
+    void testGetTrainList() {
+        assertNotNull("The request should return a result", streamer.getTrainList('Bruxelles-Central', 'Liège-Guillemins', new Date(), 0))
+    }
+
+    @Test(timeout = 15000L)
+    @Ignore
+    void testGetStationList() {
+        assertNotNull("The request should return a result", streamer.getStationList())
+    }
+
+    @Test(timeout = 15000L)
+    void testGetDelays() {
+        assertNotNull("The request should return a result", streamer.getDelays('466', new Date()))
+    }
+
+    @Before
+    void setUp() {
+        streamer = new RailtimeRequestStreamer()
+    }
+
 }

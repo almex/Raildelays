@@ -23,7 +23,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
+ * Simple {@link be.raildelays.batch.poi.RowMapper} matching our use case to deal with our
+ * {@link be.raildelays.batch.bean.BatchExcelRow}.
+ *
  * @author Almex
+ * @since 1.1
  */
 public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, InitializingBean {
 
@@ -35,6 +39,23 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
 
     private String language = Language.EN.name();
 
+    private static <T> T getValue(Row row, int cellIndex, CellParser<T> parser) {
+        T result = null;
+
+        Cell cell = row.getCell(cellIndex);
+
+        if (cell != null) {
+            if (cell.getCellType() != Cell.CELL_TYPE_BLANK) {
+                result = parser.getValue(cell);
+            } // Otherwise we must return null
+        } else {
+            LOGGER.warn("Cannot map rowIndex={} cellIndex={} this cell does not exists", row.getRowNum(), cellIndex);
+        }
+
+
+        return result;
+    }
+
     @Override
     public void afterPropertiesSet() throws Exception {
         if (validateOutcomes) {
@@ -43,11 +64,6 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
         }
 
         Assert.notNull(language, "You must set language before using this bean");
-    }
-
-
-    private interface CellParser<T> {
-        T getValue(Cell cell);
     }
 
     @Override
@@ -98,23 +114,6 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
         if (StringUtils.isNotBlank(stationName)) {
             result = new Station(stationName, getLanguage());
         }
-
-        return result;
-    }
-
-    private static <T> T getValue(Row row, int cellIndex, CellParser<T> parser) {
-        T result = null;
-
-        Cell cell = row.getCell(cellIndex);
-
-        if (cell != null) {
-            if (cell.getCellType() != Cell.CELL_TYPE_BLANK) {
-                result = parser.getValue(cell);
-            } // Otherwise we must return null
-        } else {
-            LOGGER.warn("Cannot map rowIndex={} cellIndex={} this cell does not exists", row.getRowNum(), cellIndex);
-        }
-
 
         return result;
     }
@@ -246,12 +245,16 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
         return Language.valueOf(language.toUpperCase());
     }
 
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
     @SuppressWarnings("unused")
     public void setValidateOutcomes(boolean validateOutcomes) {
         this.validateOutcomes = validateOutcomes;
     }
 
-    public void setLanguage(String language) {
-        this.language = language;
+    private interface CellParser<T> {
+        T getValue(Cell cell);
     }
 }

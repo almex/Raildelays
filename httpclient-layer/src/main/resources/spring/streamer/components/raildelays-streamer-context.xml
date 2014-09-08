@@ -1,31 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<!-- Streamer -->
-	<bean id="streamer" class="be.raildelays.httpclient.impl.RailtimeRequestStreamer">
-		<property name="proxyHost" value="${proxy.host}" />
-		<property name="proxyPort" value="${proxy.port}" />
-		<property name="username" value="${proxy.username}" />
-		<property name="password" value="${proxy.password}" />
-		<property name="userAgent" value="${user-agent}" />
-	</bean>
+    <!-- Streamer -->
+    <bean id="streamer" class="be.raildelays.httpclient.impl.RailtimeRequestStreamer">
+        <property name="proxyHost" value="${proxy.host}"/>
+        <property name="proxyPort" value="${proxy.port}"/>
+        <property name="username" value="${proxy.username}"/>
+        <property name="password" value="${proxy.password}"/>
+        <property name="userAgent" value="${user-agent}"/>
+    </bean>
 
-	<bean
-		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="properties">
-			<props>
-				<prop key="proxy.host"></prop>
-				<prop key="proxy.port"></prop>
-				<prop key="proxy.username"></prop>
-				<prop key="proxy.password"></prop>
-				<prop key="user-agent"></prop>
-			</props>
-		</property>
+    <bean
+            class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="properties">
+            <props>
+                <prop key="proxy.host"></prop>
+                <prop key="proxy.port"></prop>
+                <prop key="proxy.username"></prop>
+                <prop key="proxy.password"></prop>
+                <prop key="user-agent"></prop>
+            </props>
+        </property>
 
-	</bean>
+    </bean>
 
 </beans>

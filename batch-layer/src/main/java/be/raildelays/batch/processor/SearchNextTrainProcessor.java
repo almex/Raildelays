@@ -38,6 +38,52 @@ public class SearchNextTrainProcessor implements
 
     private String language = Language.EN.name();
 
+    public static long compareTime(TimestampDelay departureB, Date departureA) {
+        return compareTime(departureA, departureB.getExpected());
+    }
+
+    public static long compareTime(Date departureA, Date departureB) {
+        long result = 0;
+
+        if (departureA == null && departureB != null) {
+            result = 1;
+        } else if (departureA != null && departureB == null) {
+            result = -1;
+        } else if (departureB != null) {
+            LocalTime start = new LocalTime(departureA.getTime());
+            LocalTime end = new LocalTime(departureB.getTime());
+
+            Duration duration = new Duration(start.toDateTimeToday(), end.toDateTimeToday());
+
+            result = -duration.getMillis(); // A comparison is the opposite of a duration
+        }
+
+        return result;
+    }
+
+    public static long compareTimeAndDelay(TimestampDelay departureB, Date departureA) {
+        return -compareTimeAndDelay(departureA, departureB);
+    }
+
+    public static long compareTimeAndDelay(Date departureA, TimestampDelay departureB) {
+        long result = 0;
+
+        if (departureA == null && departureB != null) {
+            result = 1;
+        } else if (departureA != null && departureB == null) {
+            result = -1;
+        } else if (departureB != null) {
+            LocalTime start = new LocalTime(departureA.getTime());
+            LocalTime end = new LocalTime(departureB.getExpected()).plusMinutes(departureB.getDelay().intValue());
+
+            Duration duration = new Duration(start.toDateTimeToday(), end.toDateTimeToday());
+
+            result = -duration.getMillis(); // A comparison is an opposite of a duration
+        }
+
+        return result;
+    }
+
     @Override
     public void afterPropertiesSet() throws Exception {
 
@@ -125,11 +171,11 @@ public class SearchNextTrainProcessor implements
 
     private LineStop searchFastestTrain(BatchExcelRow item,
                                         List<LineStop> candidates) {
-        LineStop fastestTrain = null;		
+        LineStop fastestTrain = null;
 
 		/*
-         * The only delay that we can take into account is the one from the 
-		 * departure station. When you have to decide to take another train 
+         * The only delay that we can take into account is the one from the
+		 * departure station. When you have to decide to take another train
 		 * you don't know the effective arrival time.
 		 */
 
@@ -198,52 +244,6 @@ public class SearchNextTrainProcessor implements
             } else if (lineStop.getPrevious() != null) {
                 result = searchDepartureLineStop(lineStop.getPrevious(), departureStation);
             }
-        }
-
-        return result;
-    }
-
-    public static long compareTime(TimestampDelay departureB, Date departureA) {
-        return compareTime(departureA, departureB.getExpected());
-    }
-
-    public static long compareTime(Date departureA, Date departureB) {
-        long result = 0;
-
-        if (departureA == null && departureB != null) {
-            result = 1;
-        } else if (departureA != null && departureB == null) {
-            result = -1;
-        } else if (departureB != null) {
-            LocalTime start = new LocalTime(departureA.getTime());
-            LocalTime end = new LocalTime(departureB.getTime());
-
-            Duration duration = new Duration(start.toDateTimeToday(), end.toDateTimeToday());
-
-            result = -duration.getMillis(); // A comparison is the opposite of a duration
-        }
-
-        return result;
-    }
-
-    public static long compareTimeAndDelay(TimestampDelay departureB, Date departureA) {
-        return -compareTimeAndDelay(departureA, departureB);
-    }
-
-    public static long compareTimeAndDelay(Date departureA, TimestampDelay departureB) {
-        long result = 0;
-
-        if (departureA == null && departureB != null) {
-            result = 1;
-        } else if (departureA != null && departureB == null) {
-            result = -1;
-        } else if (departureB != null) {
-            LocalTime start = new LocalTime(departureA.getTime());
-            LocalTime end = new LocalTime(departureB.getExpected()).plusMinutes(departureB.getDelay().intValue());
-
-            Duration duration = new Duration(start.toDateTimeToday(), end.toDateTimeToday());
-
-            result = -duration.getMillis(); // A comparison is an opposite of a duration
         }
 
         return result;

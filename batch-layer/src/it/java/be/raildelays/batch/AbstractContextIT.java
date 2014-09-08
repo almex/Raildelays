@@ -12,10 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {
-        "/spring/batch/raildelays-batch-integration-test-context.xml" })
+        "/spring/batch/raildelays-batch-integration-test-context.xml"})
 @TransactionConfiguration(defaultRollback = false)
-@TestExecutionListeners( { DependencyInjectionTestExecutionListener.class,
-        StepScopeTestExecutionListener.class })
+@TestExecutionListeners({DependencyInjectionTestExecutionListener.class,
+        StepScopeTestExecutionListener.class})
 @Transactional
 public abstract class AbstractContextIT extends
         AbstractJUnit4SpringContextTests {

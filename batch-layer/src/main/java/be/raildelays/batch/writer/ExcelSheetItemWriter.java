@@ -18,32 +18,32 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
-import org.springframework.util.ClassUtils;
 
 import java.io.*;
 
 public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemWriter<T> implements ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
-    protected RowAggregator<T> rowAggregator;
-
-    protected Resource resource;
-
-    protected Resource template;
-
-    protected OutputStream outputStream;
-
-    protected Workbook workbook;
-
-    private boolean shouldDeleteIfExists = false;
-
-    protected int rowsToSkip = 0;
-
-    protected int sheetIndex = 0;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ExcelSheetItemWriter.class);
-
     private static final String ROW_TO_SKIP_KEY = "row.to.skip.key";
     private static final String SHEET_INDEX_KEY = "sheet.index.key";
+    protected RowAggregator<T> rowAggregator;
+    protected Resource resource;
+    protected Resource template;
+    protected OutputStream outputStream;
+    protected Workbook workbook;
+    protected int rowsToSkip = 0;
+    protected int sheetIndex = 0;
+    private boolean shouldDeleteIfExists = false;
+
+    private static boolean isValidExcelFile(File file) throws IOException {
+        InputStream inputStream = new PushbackInputStream(new FileInputStream(file), 8);
+
+        try {
+            return POIFSFileSystem.hasPOIFSHeader(inputStream) || POIXMLDocument.hasOOXMLHeader(inputStream);
+        } finally {
+            inputStream.close();
+        }
+    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -75,7 +75,7 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
             File outputFile = resource.getFile();
 
             boolean deleted = true;
-            if ( outputFile.exists() && (shouldDeleteIfExists || !isValidExcelFile(outputFile))) {
+            if (outputFile.exists() && (shouldDeleteIfExists || !isValidExcelFile(outputFile))) {
                 deleted = outputFile.delete();
 
                 LOGGER.debug("Output file '{}' deleted:{}", outputFile.getAbsolutePath(), deleted);
@@ -123,16 +123,6 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
 
         } catch (IOException | InvalidFormatException e) {
             throw new ItemStreamException("I/O when opening Excel template", e);
-        }
-    }
-
-    private static boolean isValidExcelFile(File file) throws IOException {
-        InputStream inputStream = new PushbackInputStream(new FileInputStream(file), 8);
-
-        try {
-            return POIFSFileSystem.hasPOIFSHeader(inputStream) || POIXMLDocument.hasOOXMLHeader(inputStream);
-        } finally {
-            inputStream.close();
         }
     }
 

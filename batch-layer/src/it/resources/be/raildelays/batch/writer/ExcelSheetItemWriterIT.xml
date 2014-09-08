@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="excelSheetItemWriter" class="be.raildelays.batch.writer.ExcelSheetItemWriter">
-		<property name="input">
-			<bean class="java.io.FileInputStream">
-				<constructor-arg index="0" type="java.lang.String"
-					value="target/test-classes/template.xlsx" />
-			</bean>
-		</property>
-		<property name="output">
-			<bean class="java.io.FileOutputStream">
-				<constructor-arg index="0" type="java.lang.String"
-					value="output.xlsx" />
-			</bean>
-		</property>
-	</bean>
+    <bean id="excelSheetItemWriter" class="be.raildelays.batch.writer.ExcelSheetItemWriter">
+        <property name="input">
+            <bean class="java.io.FileInputStream">
+                <constructor-arg index="0" type="java.lang.String"
+                                 value="target/test-classes/template.xlsx"/>
+            </bean>
+        </property>
+        <property name="output">
+            <bean class="java.io.FileOutputStream">
+                <constructor-arg index="0" type="java.lang.String"
+                                 value="output.xlsx"/>
+            </bean>
+        </property>
+    </bean>
 </beans>

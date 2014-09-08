@@ -15,7 +15,6 @@ import org.springframework.batch.item.support.AbstractItemCountingItemStreamItem
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 import java.io.*;
 
@@ -24,19 +23,23 @@ import java.io.*;
  */
 public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements IndexedResourceAwareItemStreamReader<T>, InitializingBean {
 
+    private static Logger LOGGER = LoggerFactory.getLogger(ExcelSheetItemReader.class);
     private RowMapper<T> rowMapper;
-
     private Resource resource;
-
     private Workbook workbook;
-
     private boolean noInput = false;
-
     private int rowsToSkip = 0;
-
     private int sheetIndex = 0;
 
-    private static Logger LOGGER = LoggerFactory.getLogger(ExcelSheetItemReader.class);
+    private static boolean isValidExcelFile(File file) throws IOException {
+        InputStream inputStream = new PushbackInputStream(new FileInputStream(file), 8);
+
+        try {
+            return POIFSFileSystem.hasPOIFSHeader(inputStream) || POIXMLDocument.hasOOXMLHeader(inputStream);
+        } finally {
+            inputStream.close();
+        }
+    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -71,7 +74,7 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
             throw new ReaderNotOpenException("Reader must be open before it can be read.");
         }
 
-        result =  workbook.getSheetAt(sheetIndex).getRow(getCurrentIndex());
+        result = workbook.getSheetAt(sheetIndex).getRow(getCurrentIndex());
         if (result == null) {
             noInput = true;
         }
@@ -94,7 +97,7 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
             return;
         }
 
-        if (!isValidExcelFile(resource.getFile()))    {
+        if (!isValidExcelFile(resource.getFile())) {
             LOGGER.warn("Input resource is neither an OLE2 file, nor an OOXML file {}", resource.getDescription());
             return;
         }
@@ -117,16 +120,6 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
 
         noInput = false;
         jumpToItem(0);
-    }
-
-    private static boolean isValidExcelFile(File file) throws IOException {
-        InputStream inputStream = new PushbackInputStream(new FileInputStream(file), 8);
-
-        try {
-            return POIFSFileSystem.hasPOIFSHeader(inputStream) || POIXMLDocument.hasOOXMLHeader(inputStream);
-        } finally {
-            inputStream.close();
-        }
     }
 
     @Override

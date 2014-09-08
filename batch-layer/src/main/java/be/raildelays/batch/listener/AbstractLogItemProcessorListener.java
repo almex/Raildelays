@@ -10,10 +10,9 @@ import org.springframework.batch.core.annotation.BeforeProcess;
  */
 public abstract class AbstractLogItemProcessorListener<I, O> {
 
-    protected Logger logger;
-
     private static final String HEADER = "|=====|====================|======|==========|====|====|============|============|=====|=====|=====|=====|==|======|======|";
     private static final String FOOTER = "|=====|====================|======|==========|====|====|============|============|=====|=====|=====|=====|==|======|======|";
+    protected Logger logger;
 
     public AbstractLogItemProcessorListener() {
         logger = LoggerFactory.getLogger("xXx", this.getClass(), '|');

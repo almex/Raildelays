@@ -1,8 +1,8 @@
 package be.raildelays.batch.reader;
 
 import be.raildelays.domain.entities.LineStop;
-import be.raildelays.domain.entities.Train;
 import be.raildelays.domain.entities.Station;
+import be.raildelays.domain.entities.Train;
 import be.raildelays.service.RaildelaysService;
 import org.easymock.EasyMock;
 import org.junit.After;
@@ -13,18 +13,14 @@ import org.springframework.batch.test.MetaDataInstanceFactory;
 
 import java.util.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class RetrieveLineStopViaContextReaderTest {
 
-    private RetrieveLineStopViaContextReader reader;
-
-    private Date now;
-
     private static String KEY_NAME = "foo";
-
     private static Long TRAIN_ID = 1L;
-
+    private RetrieveLineStopViaContextReader reader;
+    private Date now;
     private ExecutionContext context;
 
     private RaildelaysService service;

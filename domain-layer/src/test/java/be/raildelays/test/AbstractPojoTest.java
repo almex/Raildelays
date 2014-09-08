@@ -1,15 +1,15 @@
 package be.raildelays.test;
 
-import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-
 import org.junit.Before;
 import org.junit.experimental.theories.DataPoint;
 import org.junit.experimental.theories.Theories;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 /**
  * <p>
@@ -21,9 +21,8 @@ import org.slf4j.LoggerFactory;
  * <p>
  * <i>It's advised to only log tests that respect assumptions.</i>
  * </p>
- * 
+ *
  * @author Alexis SOUMAGNE.
- * 
  * @see DataPoint
  * @see Theories
  */
@@ -49,20 +48,20 @@ public abstract class AbstractPojoTest {
     /**
      * Use reflection trick to use the <code>setId(T id)</code> method that is
      * private in your entity.
-     * 
-     * @param <K> type of the id
+     *
+     * @param <K>    type of the id
      * @param entity to modify
-     * @param id to set
+     * @param id     to set
      * @return the <code>obj</code> parameter
      * @throws IllegalArgumentException if the method <code>setId(T id)</code>
-     *             does not exists or is not accessible
-     * @throws RuntimeException for unexpected errors
+     *                                  does not exists or is not accessible
+     * @throws RuntimeException         for unexpected errors
      */
     protected static <K> Object setIdFor(final Object entity, final K id) {
         try {
             final Method method = entity.getClass()
-                .getDeclaredMethod("setId",
-                            new Class[] { id.getClass() });
+                    .getDeclaredMethod("setId",
+                            new Class[]{id.getClass()});
 
             // doPrivileged block
             AccessController.doPrivileged(new PrivilegedAction<Object>() {
@@ -71,7 +70,7 @@ public abstract class AbstractPojoTest {
                     return null;
                 }
             });
-            method.invoke(entity, new Object[] { id });
+            method.invoke(entity, new Object[]{id});
 
             return entity;
         } catch (RuntimeException e) {
@@ -81,10 +80,10 @@ public abstract class AbstractPojoTest {
             LOGGER.error("Method setId(T id) does not exists.", e);
             throw new IllegalArgumentException("Method setId(T id) does not"
                     + " exists.",
-                e);
+                    e);
         }
     }
-    
+
     /**
      * Override this method to provide initialize your data points.
      */

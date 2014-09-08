@@ -10,6 +10,13 @@ public class RaildelaysTestUtils {
 
     private static long SEQUENCE = 0;
 
+    public static Train generateTrain(String name, Language language) {
+        TrainTest train = new TrainTest(name, language);
+        train.setId(SEQUENCE++);
+
+        return train;
+    }
+
     private static class TrainTest extends Train {
 
         public TrainTest(String name, Language language) {
@@ -19,12 +26,5 @@ public class RaildelaysTestUtils {
         public void setId(Long id) {
             this.id = id;
         }
-    }
-
-    public static Train generateTrain(String name, Language language) {
-        TrainTest train = new TrainTest(name, language);
-        train.setId(SEQUENCE++);
-
-        return train;
     }
 }

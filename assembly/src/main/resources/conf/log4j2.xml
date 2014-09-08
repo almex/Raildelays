@@ -200,11 +200,11 @@
             <appender-ref ref="step1Processor"/>
         </logger>
         <logger name="org.springframework.batch.item.database.JpaItemWriter" level="trace" additivity="false">
-        <appender-ref ref="step1Writer"/>
+            <appender-ref ref="step1Writer"/>
         </logger>
 
         <logger name="be.raildelays.repository" level="trace" additivity="false">
-        <appender-ref ref="step2Reader"/>
+            <appender-ref ref="step2Reader"/>
         </logger>
         <logger name="be.raildelays.service" level="trace" additivity="false">
             <appender-ref ref="step2Reader"/>

@@ -27,7 +27,16 @@ public class MdcThreadPoolTaskExecutor extends ExecutorConfigurationSupport
     private boolean allowCoreThreadTimeOut = false;
 
     private int queueCapacity = Integer.MAX_VALUE;
+    private ThreadPoolExecutor threadPoolExecutor;
 
+    /**
+     * Return the ThreadPoolExecutor's core pool size.
+     */
+    public int getCorePoolSize() {
+        synchronized (this.poolSizeMonitor) {
+            return this.corePoolSize;
+        }
+    }
 
     /**
      * Set the ThreadPoolExecutor's core pool size.
@@ -44,11 +53,11 @@ public class MdcThreadPoolTaskExecutor extends ExecutorConfigurationSupport
     }
 
     /**
-     * Return the ThreadPoolExecutor's core pool size.
+     * Return the ThreadPoolExecutor's maximum pool size.
      */
-    public int getCorePoolSize() {
+    public int getMaxPoolSize() {
         synchronized (this.poolSizeMonitor) {
-            return this.corePoolSize;
+            return this.maxPoolSize;
         }
     }
 
@@ -67,11 +76,11 @@ public class MdcThreadPoolTaskExecutor extends ExecutorConfigurationSupport
     }
 
     /**
-     * Return the ThreadPoolExecutor's maximum pool size.
+     * Return the ThreadPoolExecutor's keep-alive seconds.
      */
-    public int getMaxPoolSize() {
+    public int getKeepAliveSeconds() {
         synchronized (this.poolSizeMonitor) {
-            return this.maxPoolSize;
+            return this.keepAliveSeconds;
         }
     }
 
@@ -86,15 +95,6 @@ public class MdcThreadPoolTaskExecutor extends ExecutorConfigurationSupport
             if (this.threadPoolExecutor != null) {
                 this.threadPoolExecutor.setKeepAliveTime(keepAliveSeconds, TimeUnit.SECONDS);
             }
-        }
-    }
-
-    /**
-     * Return the ThreadPoolExecutor's keep-alive seconds.
-     */
-    public int getKeepAliveSeconds() {
-        synchronized (this.poolSizeMonitor) {
-            return this.keepAliveSeconds;
         }
     }
 
@@ -167,7 +167,6 @@ public class MdcThreadPoolTaskExecutor extends ExecutorConfigurationSupport
         return this.threadPoolExecutor.getActiveCount();
     }
 
-
     @Override
     public void execute(Runnable task) {
         Executor executor = getThreadPoolExecutor();
@@ -234,8 +233,6 @@ public class MdcThreadPoolTaskExecutor extends ExecutorConfigurationSupport
     public boolean prefersShortLivedTasks() {
         return true;
     }
-
-    private ThreadPoolExecutor threadPoolExecutor;
 
     @Override
     protected ExecutorService initializeExecutor(ThreadFactory threadFactory, RejectedExecutionHandler rejectedExecutionHandler) {

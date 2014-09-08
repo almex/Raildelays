@@ -17,6 +17,11 @@ import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguratio
 @Configuration
 public class SpringBootApplicationInitializer {
 
+    public static void main(String[] args) {
+        ApplicationContext ctx = SpringApplication.run(new Object[]{SpringBootApplicationInitializer.class, ApplicationConfig.class, RepositoryRestMvcConfiguration.class}, args);
+
+    }
+
     @Bean
     public EmbeddedServletContainerFactory servletContainer() {
         TomcatEmbeddedServletContainerFactory containerFactory = new TomcatEmbeddedServletContainerFactory(8080);
@@ -25,11 +30,6 @@ public class SpringBootApplicationInitializer {
         containerFactory.setContextPath("/admin-presentation");
 
         return containerFactory;
-    }
-
-    public static void main(String[] args) {
-        ApplicationContext ctx = SpringApplication.run(new Object[]{SpringBootApplicationInitializer.class, ApplicationConfig.class, RepositoryRestMvcConfiguration.class}, args);
-
     }
 
 }

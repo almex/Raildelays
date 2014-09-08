@@ -78,7 +78,7 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, L
             }
         }
 
-         LOGGER.trace("result", result);
+        LOGGER.trace("result", result);
 
         return result;
     }
@@ -88,7 +88,7 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, L
         boolean result = false;
 
         if (item != null) {
-            LineStop  previous = item;
+            LineStop previous = item;
             LineStop next = item;
 
             while (!result && previous != null) {
@@ -106,7 +106,6 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, L
     }
 
 
-
     public LineStop.Builder fetchScheduling(LineStop item) throws Exception {
         LineStop.Builder result = new LineStop.Builder(item, false, false);
         LineStop candidate = service.searchScheduledLine(item.getTrain(), item.getStation());
@@ -120,7 +119,7 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, L
             LOGGER.debug("candidate", candidate);
         }
 
-         final TimestampDelay departureTime = new TimestampDelay(candidate.getDepartureTime().getExpected(), 0L);
+        final TimestampDelay departureTime = new TimestampDelay(candidate.getDepartureTime().getExpected(), 0L);
         final TimestampDelay arrivalTime = new TimestampDelay(candidate.getArrivalTime().getExpected(), 0L);
 
         result.departureTime(departureTime) //

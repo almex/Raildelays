@@ -2,7 +2,9 @@ package be.raildelays.batch.reader;
 
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.service.RaildelaysService;
-import org.springframework.batch.item.*;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.ItemStreamReader;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -12,8 +14,8 @@ import java.util.Date;
  * and consume it.
  *
  * @author Almex
- * @since 1.2
  * @see be.raildelays.batch.processor.FilterAndStoreProcessor
+ * @since 1.2
  */
 public class RetrieveLineStopViaContextReader implements ItemStreamReader<LineStop> {
 
@@ -55,7 +57,7 @@ public class RetrieveLineStopViaContextReader implements ItemStreamReader<LineSt
 
     }
 
-     @Override
+    @Override
     public void close() throws ItemStreamException {
 
     }

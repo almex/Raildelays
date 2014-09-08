@@ -99,118 +99,6 @@ public class ExcelRow implements Comparable<ExcelRow> {
     @Column(name = "SENS")
     private Sens sens;
 
-    @Override
-    public int compareTo(ExcelRow excelRow) {
-        int result = 0;
-
-        if (excelRow == null) {
-            result = -1;
-        } else {
-            // We give only a chronologic order based on expected time        
-            result = new CompareToBuilder()
-                    .append(this.getDate(), excelRow.getDate())
-                    .append(this.getExpectedDepartureTime(), excelRow.getExpectedDepartureTime())
-                    .append(this.getExpectedArrivalTime(), excelRow.getExpectedArrivalTime())
-                    .toComparison();
-        }
-
-        return result;
-    }
-
-    public static class Builder {
-
-        protected final Date date;
-        protected Station arrivalStation;
-        protected Station departureStation;
-        protected Station linkStation;
-        protected Date expectedDepartureTime;
-        protected Date expectedArrivalTime;
-        protected Train expectedTrain1;
-        protected Train expectedTrain2;
-        protected Date effectiveDepartureTime;
-        protected Date effectiveArrivalTime;
-        protected Train effectiveTrain1;
-        protected Train effectiveTrain2;
-        protected Long delay;
-        protected final Sens sens;
-
-        public Builder(final Date date, final Sens sens) {
-            this.date = (Date) (date != null ? date.clone() : null);
-            this.sens = sens;
-        }
-
-        public Builder arrivalStation(final Station arrivalStation) {
-            this.arrivalStation = arrivalStation;
-            return this;
-        }
-
-        public Builder departureStation(final Station departureStation) {
-            this.departureStation = departureStation;
-            return this;
-        }
-
-        public Builder linkStation(final Station linkStation) {
-            this.linkStation = linkStation;
-            return this;
-        }
-
-        public Builder expectedDepartureTime(
-                final Date expectedDepartureTime) {
-            this.expectedDepartureTime = expectedDepartureTime;
-            return this;
-        }
-
-        public Builder expectedArrivalTime(
-                final Date expectedArrivalTime) {
-            this.expectedArrivalTime = expectedArrivalTime;
-            return this;
-        }
-
-        public Builder expectedTrain1(final Train expectedTrain1) {
-            this.expectedTrain1 = expectedTrain1;
-            return this;
-        }
-
-        public Builder expectedTrain2(final Train expectedTrain2) {
-            this.expectedTrain2 = expectedTrain2;
-            return this;
-        }
-
-        public Builder effectiveDepartureTime(
-                final Date effectiveDepartureTime) {
-            this.effectiveDepartureTime = (Date) (effectiveDepartureTime != null ? effectiveDepartureTime
-                    .clone() : null);
-            return this;
-        }
-
-        public Builder effectiveArrivalTime(
-                final Date effectiveArrivalTime) {
-            this.effectiveArrivalTime = (Date) (effectiveArrivalTime != null ? effectiveArrivalTime
-                    .clone() : null);
-            return this;
-        }
-
-        public Builder effectiveTrain1(final Train effectiveTrain1) {
-            this.effectiveTrain1 = effectiveTrain1;
-            return this;
-        }
-
-        public Builder effectiveTrain2(final Train effectiveTrain2) {
-            this.effectiveTrain2 = effectiveTrain2;
-            return this;
-        }
-
-        public Builder delay(final Long delay) {
-            this.delay = delay;
-            return this;
-        }
-
-        public ExcelRow build() {
-            return new ExcelRow(this);
-        }
-
-    }
-
     protected ExcelRow(final Builder builder) {
         this.date = builder.date;
         this.arrivalStation = builder.arrivalStation;
@@ -226,6 +114,50 @@ public class ExcelRow implements Comparable<ExcelRow> {
         this.effectiveTrain2 = builder.effectiveTrain2;
         this.delay = builder.delay;
         this.sens = builder.sens;
+    }
+
+    protected static String notNullToString(AbstractI18nEntity entity) {
+        String result = "";
+
+        if (entity != null) {
+            if (StringUtils.isNotBlank(entity.getEnglishName())) {
+                result = entity.getEnglishName();
+            } else if (StringUtils.isNotBlank(entity.getFrenchName())) {
+                result = entity.getFrenchName();
+            } else if (StringUtils.isNotBlank(entity.getDutchName())) {
+                result = entity.getDutchName();
+            }
+        }
+
+        return result;
+    }
+
+    protected static String notNullToString(Object obj) {
+        String result = "";
+
+        if (obj != null) {
+            result = StringUtils.trimToEmpty(obj.toString());
+        }
+
+        return result;
+    }
+
+    @Override
+    public int compareTo(ExcelRow excelRow) {
+        int result = 0;
+
+        if (excelRow == null) {
+            result = -1;
+        } else {
+            // We give only a chronologic order based on expected time
+            result = new CompareToBuilder()
+                    .append(this.getDate(), excelRow.getDate())
+                    .append(this.getExpectedDepartureTime(), excelRow.getExpectedDepartureTime())
+                    .append(this.getExpectedArrivalTime(), excelRow.getExpectedArrivalTime())
+                    .toComparison();
+        }
+
+        return result;
     }
 
     public Date getDate() {
@@ -415,30 +347,98 @@ public class ExcelRow implements Comparable<ExcelRow> {
         return builder.toString();
     }
 
-    protected static String notNullToString(AbstractI18nEntity entity) {
-        String result = "";
+    public static class Builder {
 
-        if (entity != null) {
-            if (StringUtils.isNotBlank(entity.getEnglishName())) {
-                result = entity.getEnglishName();
-            } else if (StringUtils.isNotBlank(entity.getFrenchName())) {
-                result = entity.getFrenchName();
-            } else if (StringUtils.isNotBlank(entity.getDutchName())) {
-                result = entity.getDutchName();
-            }
+        protected final Date date;
+        protected final Sens sens;
+        protected Station arrivalStation;
+        protected Station departureStation;
+        protected Station linkStation;
+        protected Date expectedDepartureTime;
+        protected Date expectedArrivalTime;
+        protected Train expectedTrain1;
+        protected Train expectedTrain2;
+        protected Date effectiveDepartureTime;
+        protected Date effectiveArrivalTime;
+        protected Train effectiveTrain1;
+        protected Train effectiveTrain2;
+        protected Long delay;
+
+        public Builder(final Date date, final Sens sens) {
+            this.date = (Date) (date != null ? date.clone() : null);
+            this.sens = sens;
         }
 
-        return result;
-    }
-
-    protected static String notNullToString(Object obj) {
-        String result = "";
-
-        if (obj != null) {
-            result = StringUtils.trimToEmpty(obj.toString());
+        public Builder arrivalStation(final Station arrivalStation) {
+            this.arrivalStation = arrivalStation;
+            return this;
         }
 
-        return result;
+        public Builder departureStation(final Station departureStation) {
+            this.departureStation = departureStation;
+            return this;
+        }
+
+        public Builder linkStation(final Station linkStation) {
+            this.linkStation = linkStation;
+            return this;
+        }
+
+        public Builder expectedDepartureTime(
+                final Date expectedDepartureTime) {
+            this.expectedDepartureTime = expectedDepartureTime;
+            return this;
+        }
+
+        public Builder expectedArrivalTime(
+                final Date expectedArrivalTime) {
+            this.expectedArrivalTime = expectedArrivalTime;
+            return this;
+        }
+
+        public Builder expectedTrain1(final Train expectedTrain1) {
+            this.expectedTrain1 = expectedTrain1;
+            return this;
+        }
+
+        public Builder expectedTrain2(final Train expectedTrain2) {
+            this.expectedTrain2 = expectedTrain2;
+            return this;
+        }
+
+        public Builder effectiveDepartureTime(
+                final Date effectiveDepartureTime) {
+            this.effectiveDepartureTime = (Date) (effectiveDepartureTime != null ? effectiveDepartureTime
+                    .clone() : null);
+            return this;
+        }
+
+        public Builder effectiveArrivalTime(
+                final Date effectiveArrivalTime) {
+            this.effectiveArrivalTime = (Date) (effectiveArrivalTime != null ? effectiveArrivalTime
+                    .clone() : null);
+            return this;
+        }
+
+        public Builder effectiveTrain1(final Train effectiveTrain1) {
+            this.effectiveTrain1 = effectiveTrain1;
+            return this;
+        }
+
+        public Builder effectiveTrain2(final Train effectiveTrain2) {
+            this.effectiveTrain2 = effectiveTrain2;
+            return this;
+        }
+
+        public Builder delay(final Long delay) {
+            this.delay = delay;
+            return this;
+        }
+
+        public ExcelRow build() {
+            return new ExcelRow(this);
+        }
+
     }
 
 }

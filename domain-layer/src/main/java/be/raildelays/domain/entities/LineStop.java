@@ -158,36 +158,36 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
      * Compares this object with the specified object for order.  Returns a
      * negative integer, zero, or a positive integer as this object is less
      * than, equal to, or greater than the specified object.
-     *
+     * <p>
      * <p>The implementor must ensure <tt>sgn(x.compareTo(y)) ==
      * -sgn(y.compareTo(x))</tt> for all <tt>x</tt> and <tt>y</tt>.  (This
      * implies that <tt>x.compareTo(y)</tt> must throw an exception iff
      * <tt>y.compareTo(x)</tt> throws an exception.)
-     *
+     * <p>
      * <p>The implementor must also ensure that the relation is transitive:
      * <tt>(x.compareTo(y)&gt;0 &amp;&amp; y.compareTo(z)&gt;0)</tt> implies
      * <tt>x.compareTo(z)&gt;0</tt>.
-     *
+     * <p>
      * <p>Finally, the implementor must ensure that <tt>x.compareTo(y)==0</tt>
      * implies that <tt>sgn(x.compareTo(z)) == sgn(y.compareTo(z))</tt>, for
      * all <tt>z</tt>.
-     *
+     * <p>
      * <p>It is strongly recommended, but <i>not</i> strictly required that
      * <tt>(x.compareTo(y)==0) == (x.equals(y))</tt>.  Generally speaking, any
      * class that implements the <tt>Comparable</tt> interface and violates
      * this condition should clearly indicate this fact.  The recommended
      * language is "Note: this class has a natural ordering that is
      * inconsistent with equals."
-     *
+     * <p>
      * <p>In the foregoing description, the notation
      * <tt>sgn(</tt><i>expression</i><tt>)</tt> designates the mathematical
      * <i>signum</i> function, which is defined to return one of <tt>-1</tt>,
      * <tt>0</tt>, or <tt>1</tt> according to whether the value of
      * <i>expression</i> is negative, zero or positive.
      *
-     * @param   lineStop the line stop to be compared.
-     * @return  a negative integer, zero, or a positive integer as this object
-     *          is less than, equal to, or greater than the specified object.
+     * @param lineStop the line stop to be compared.
+     * @return a negative integer, zero, or a positive integer as this object
+     * is less than, equal to, or greater than the specified object.
      */
     @Override
     @SuppressWarnings("NullableProblems") // We handle it in our implemntation
@@ -209,6 +209,80 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
         return result;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public TimestampDelay getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public void setArrivalTime(TimestampDelay arrivalTime) {
+        this.arrivalTime = arrivalTime;
+    }
+
+    public TimestampDelay getDepartureTime() {
+        return departureTime;
+    }
+
+    public void setDepartureTime(TimestampDelay departureTime) {
+        this.departureTime = departureTime;
+    }
+
+    public Train getTrain() {
+        return train;
+    }
+
+    public void setTrain(Train train) {
+        this.train = train;
+    }
+
+    public Station getStation() {
+        return station;
+    }
+
+    public void setStation(Station station) {
+        this.station = station;
+    }
+
+    public Date getDate() {
+        return (Date) (date != null ? date.clone() : null);
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public boolean isCanceled() {
+        return canceled;
+    }
+
+    public void setCanceled(boolean canceled) {
+        this.canceled = canceled;
+    }
+
+    public LineStop getPrevious() {
+        return previous;
+    }
+
+    public void setPrevious(LineStop previous) {
+        if (previous != null) {
+            previous.next = this;
+        }
+        this.previous = previous;
+    }
+
+    public LineStop getNext() {
+        return next;
+    }
+
+    public void setNext(LineStop next) {
+        if (next != null) {
+            next.previous = this;
+        }
+        this.next = next;
+    }
+
     /**
      * This builder is the only to get new instance of a {@link be.raildelays.domain.entities.LineStop}.
      *
@@ -216,6 +290,7 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
      * @since 1.0
      */
     public static class Builder {
+        private static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
         private Long id;
         private Train train;
         private Station station;
@@ -225,8 +300,6 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
         private TimestampDelay departureTime;
         private Builder previous;
         private Builder next;
-
-        private static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
         public Builder() {
         }
@@ -281,6 +354,41 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
             }
         }
 
+        private static void head(Builder node, Builder head) {
+            if (node.next == null) {
+                node.next = head;
+                head.previous = node;
+                head.next = null;
+            } else {
+                head(node.next, head);
+            }
+        }
+
+        private static void tail(Builder node, Builder tail) {
+            if (node.previous == null) {
+                node.previous = tail;
+                tail.next = node;
+                tail.previous = null;
+            } else {
+                tail(node.previous, tail);
+            }
+        }
+
+        private static void validate(LineStop lineStop) throws IllegalArgumentException {
+            Set<ConstraintViolation<LineStop>> violations = validator.validate(lineStop);
+            if (!violations.isEmpty()) {
+                StringBuilder builder = new StringBuilder();
+
+                for (ConstraintViolation violation : violations) {
+                    builder.append("\n");
+                    builder.append(violation.getPropertyPath().toString());
+                    builder.append(' ');
+                    builder.append(violation.getMessage());
+                }
+
+                throw new IllegalArgumentException(builder.toString());
+            }
+        }
 
         public Builder id(Long id) {
             this.id = id;
@@ -340,16 +448,6 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
             return this;
         }
 
-        private static void head(Builder node, Builder head) {
-            if (node.next == null) {
-                node.next = head;
-                head.previous = node;
-                head.next = null;
-            } else {
-                head(node.next, head);
-            }
-        }
-
         public Builder addPrevious(Builder previous) {
             if (previous != null) {
                 tail(this, previous);
@@ -364,16 +462,6 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
             }
 
             return this;
-        }
-
-        private static void tail(Builder node, Builder tail) {
-            if (node.previous == null) {
-                node.previous = tail;
-                tail.next = node;
-                tail.previous = null;
-            } else {
-                tail(node.previous, tail);
-            }
         }
 
         public LineStop build() {
@@ -411,100 +499,10 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
             return result;
         }
 
-        private static void validate(LineStop lineStop) throws IllegalArgumentException {
-            Set<ConstraintViolation<LineStop>> violations = validator.validate(lineStop);
-            if (!violations.isEmpty()) {
-                StringBuilder builder = new StringBuilder();
-
-                for (ConstraintViolation violation : violations) {
-                    builder.append("\n");
-                    builder.append(violation.getPropertyPath().toString());
-                    builder.append(' ');
-                    builder.append(violation.getMessage());
-                }
-
-                throw new IllegalArgumentException(builder.toString());
-            }
-        }
-
         @Override
         public String toString() {
             return build().toString();
         }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public TimestampDelay getArrivalTime() {
-        return arrivalTime;
-    }
-
-    public TimestampDelay getDepartureTime() {
-        return departureTime;
-    }
-
-    public Train getTrain() {
-        return train;
-    }
-
-    public Station getStation() {
-        return station;
-    }
-
-    public Date getDate() {
-        return (Date) (date != null ? date.clone() : null);
-    }
-
-    public boolean isCanceled() {
-        return canceled;
-    }
-
-    public LineStop getPrevious() {
-        return previous;
-    }
-
-    public LineStop getNext() {
-        return next;
-    }
-
-    public void setPrevious(LineStop previous) {
-        if (previous != null) {
-            previous.next = this;
-        }
-        this.previous = previous;
-    }
-
-    public void setNext(LineStop next) {
-        if (next != null) {
-            next.previous = this;
-        }
-        this.next = next;
-    }
-
-    public void setTrain(Train train) {
-        this.train = train;
-    }
-
-    public void setStation(Station station) {
-        this.station = station;
-    }
-
-    public void setCanceled(boolean canceled) {
-        this.canceled = canceled;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public void setArrivalTime(TimestampDelay arrivalTime) {
-        this.arrivalTime = arrivalTime;
-    }
-
-    public void setDepartureTime(TimestampDelay departureTime) {
-        this.departureTime = departureTime;
     }
 
 }

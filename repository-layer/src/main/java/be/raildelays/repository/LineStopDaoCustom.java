@@ -3,13 +3,11 @@ package be.raildelays.repository;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 
 import java.util.Date;
 import java.util.List;
 
-public interface LineStopDaoCustom  {
+public interface LineStopDaoCustom {
 
     /**
      * Search a list of arrival delayed line stops that belong departure or

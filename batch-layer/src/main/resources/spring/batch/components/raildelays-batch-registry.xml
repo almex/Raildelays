@@ -1,29 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:batch="http://www.springframework.org/schema/batch"
-	xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
 
-	<bean id="jobRegistryBeanPostProcessor"
-		class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
-		<property name="jobRegistry" ref="jobRegistry" />
-	</bean>
+    <bean id="jobRegistryBeanPostProcessor"
+          class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
+        <property name="jobRegistry" ref="jobRegistry"/>
+    </bean>
 
-	<bean
-		class="org.springframework.batch.core.configuration.support.AutomaticJobRegistrar">
-		<property name="applicationContextFactories">
-			<bean
-				class="org.springframework.batch.core.configuration.support.ClasspathXmlApplicationContextsFactoryBean">
-				<property name="resources" value="classpath:/jobs/**/*job-context.xml" />
-			</bean>
-		</property>
-		<property name="jobLoader">
-			<bean
-				class="org.springframework.batch.core.configuration.support.DefaultJobLoader">
-				<property name="jobRegistry" ref="jobRegistry" />
-			</bean>
-		</property>
-	</bean>
+    <bean
+            class="org.springframework.batch.core.configuration.support.AutomaticJobRegistrar">
+        <property name="applicationContextFactories">
+            <bean
+                    class="org.springframework.batch.core.configuration.support.ClasspathXmlApplicationContextsFactoryBean">
+                <property name="resources" value="classpath:/jobs/**/*job-context.xml"/>
+            </bean>
+        </property>
+        <property name="jobLoader">
+            <bean
+                    class="org.springframework.batch.core.configuration.support.DefaultJobLoader">
+                <property name="jobRegistry" ref="jobRegistry"/>
+            </bean>
+        </property>
+    </bean>
 </beans>

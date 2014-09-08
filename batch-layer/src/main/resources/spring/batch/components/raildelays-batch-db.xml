@@ -1,55 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xmlns:batch="http://www.springframework.org/schema/batch"
-	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
 		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
 
-	<!--<bean id="batchDataSource" class="org.apache.commons.dbcp.BasicDataSource"-->
-	<!--destroy-method="close">-->
-	<!--<property name="driverClassName" value="org.apache.derby.jdbc.EmbeddedDriver" />-->
-	<!--<property name="username" value="" />-->
-	<!--<property name="password" value="" />-->
-	<!--<property name="url" value="jdbc:derby:data/batch;create=true" />-->
-	<!--</bean>-->
+    <!--<bean id="batchDataSource" class="org.apache.commons.dbcp.BasicDataSource"-->
+    <!--destroy-method="close">-->
+    <!--<property name="driverClassName" value="org.apache.derby.jdbc.EmbeddedDriver" />-->
+    <!--<property name="username" value="" />-->
+    <!--<property name="password" value="" />-->
+    <!--<property name="url" value="jdbc:derby:data/batch;create=true" />-->
+    <!--</bean>-->
 
-	<bean id="batchDataSource" class="org.apache.commons.dbcp.BasicDataSource"
+    <bean id="batchDataSource" class="org.apache.commons.dbcp.BasicDataSource"
           destroy-method="close">
-		<property name="driverClassName" value="org.hsqldb.jdbc.JDBCDriver"/>
-		<property name="username" value="sa"/>
-		<property name="password" value=""/>
-		<property name="url" value="jdbc:hsqldb:file:data/batch"/>
-	</bean>
+        <property name="driverClassName" value="org.hsqldb.jdbc.JDBCDriver"/>
+        <property name="username" value="sa"/>
+        <property name="password" value=""/>
+        <property name="url" value="jdbc:hsqldb:file:data/batch"/>
+    </bean>
 
-	<batch:job-repository id="jobRepository"
-		data-source="batchDataSource" transaction-manager="batchTransactionManager"
-		isolation-level-for-create="DEFAULT" table-prefix="BATCH_"
-		max-varchar-length="1000" />
+    <batch:job-repository id="jobRepository"
+                          data-source="batchDataSource" transaction-manager="batchTransactionManager"
+                          isolation-level-for-create="DEFAULT" table-prefix="BATCH_"
+                          max-varchar-length="1000"/>
 
-	<bean id="jobExplorer"
-		class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean">
-		<property name="dataSource" ref="batchDataSource" />
-		<property name="tablePrefix" value="BATCH_" />
-	</bean>
+    <bean id="jobExplorer"
+          class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean">
+        <property name="dataSource" ref="batchDataSource"/>
+        <property name="tablePrefix" value="BATCH_"/>
+    </bean>
 
-	<!--<bean id="batchDatabaseLoader" class="be.raildelays.repository.LoadDatabase">
-		<property name="dataSource" ref="batchDataSource" />
-		<property name="initScriptPath" value="spring-batch-schema-derby.ddl" />
-		<property name="initScriptPath" value="org/springframework/batch/core/schema-hsqldb.sql" />
-	</bean>-->
+    <!--<bean id="batchDatabaseLoader" class="be.raildelays.repository.LoadDatabase">
+        <property name="dataSource" ref="batchDataSource" />
+        <property name="initScriptPath" value="spring-batch-schema-derby.ddl" />
+        <property name="initScriptPath" value="org/springframework/batch/core/schema-hsqldb.sql" />
+    </bean>-->
 
-	<jdbc:initialize-database data-source="batchDataSource" ignore-failures="ALL">
-		<jdbc:script location="classpath:org/springframework/batch/core/schema-hsqldb.sql"/>
-	</jdbc:initialize-database>
+    <jdbc:initialize-database data-source="batchDataSource" ignore-failures="ALL">
+        <jdbc:script location="classpath:org/springframework/batch/core/schema-hsqldb.sql"/>
+    </jdbc:initialize-database>
 
-	<alias name="raildelaysTransactionManager" alias="batchTransactionManager" />
+    <alias name="raildelaysTransactionManager" alias="batchTransactionManager"/>
 
-	<bean id="transactionTemplate"
-		class="org.springframework.transaction.support.TransactionTemplate">
-		<property name="transactionManager" ref="batchTransactionManager" />
-	</bean>
+    <bean id="transactionTemplate"
+          class="org.springframework.transaction.support.TransactionTemplate">
+        <property name="transactionManager" ref="batchTransactionManager"/>
+    </bean>
 
 </beans>

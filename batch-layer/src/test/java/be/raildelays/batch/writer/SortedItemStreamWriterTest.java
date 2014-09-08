@@ -124,11 +124,11 @@ public class SortedItemStreamWriterTest extends AbstractFileTest {
 
     public void assertFile() {
         Path destination = Paths.get(EXCEL_FILE_DESTINATION_PATH);
-        Path tempFile = Paths.get(EXCEL_FILE_DESTINATION_PATH+".tmp");
-        Path backupFile = Paths.get(EXCEL_FILE_DESTINATION_PATH+".bak");
+        Path tempFile = Paths.get(EXCEL_FILE_DESTINATION_PATH + ".tmp");
+        Path backupFile = Paths.get(EXCEL_FILE_DESTINATION_PATH + ".bak");
 
-        Path newPAth =  Paths.get(".");
-        System.out.println("path="+newPAth.toFile().getAbsolutePath());
+        Path newPAth = Paths.get(".");
+        System.out.println("path=" + newPAth.toFile().getAbsolutePath());
 
         Assert.assertTrue(destination.toFile().exists());
         Assert.assertTrue(destination.toFile().isFile());

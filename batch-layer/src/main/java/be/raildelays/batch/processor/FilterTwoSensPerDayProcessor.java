@@ -21,10 +21,8 @@ import org.springframework.beans.factory.InitializingBean;
  */
 public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow, BatchExcelRow>, InitializingBean {
 
-    private ResourceAwareItemReaderItemStream<BatchExcelRow> outputReader;
-
     private static final Logger LOGGER = LoggerFactory.getLogger("2Ss", AggregateExpectedTimeProcessor.class);
-
+    private ResourceAwareItemReaderItemStream<BatchExcelRow> outputReader;
     private ExecutionContext executionContext;
 
     @BeforeStep
