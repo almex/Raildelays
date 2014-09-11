@@ -70,6 +70,10 @@ public class Bootstrap {
             final String textOutputPath = configuration.getProperty("text.output.path");
             final String excelOutputPath = configuration.getProperty("excel.output.path");
             final String language = configuration.getProperty("language");
+            final String mailAccountUsername = configuration.getProperty("mail.account.username");
+            final String mailAccountPassword = configuration.getProperty("mail.account.password");
+            final String mailServerHost = configuration.getProperty("mail.server.host");
+            final String mailServerPort = configuration.getProperty("mail.server.port");
 
             Assert.notNull(departure, "You must add a 'departure' property into the ./conf/raildelays.properties");
             Assert.notNull(arrival, "You must add a 'arrival' property into the ./conf/raildelays.properties");
@@ -77,6 +81,10 @@ public class Bootstrap {
             Assert.notNull(textOutputPath, "You must add a 'text.output.path' property into the ./conf/raildelays.properties");
             Assert.notNull(excelOutputPath, "You must add a 'excel.output.path' property into the ./conf/raildelays.properties");
             Assert.notNull(language, "You must add a 'language' property into the ./conf/raildelays.properties");
+            Assert.notNull(mailAccountUsername, "You must add a 'mail.account.username' property into the ./conf/raildelays.properties");
+            Assert.notNull(mailAccountPassword, "You must add a 'mail.account.password' property into the ./conf/raildelays.properties");
+            Assert.notNull(mailServerHost, "You must add a 'mail.server.host' property into the ./conf/raildelays.properties");
+            Assert.notNull(mailServerPort, "You must add a 'mail.server.port' property into the ./conf/raildelays.properties");
 
             if (recovery) {
                 LOGGER.info("[Recovery activated]");
@@ -96,6 +104,10 @@ public class Bootstrap {
                 parameters.put("excel.output.path", new JobParameter(excelOutputPath));
                 parameters.put("output.file.path", new JobParameter(textOutputPath));
                 parameters.put("lang", new JobParameter(language));
+                parameters.put("mail.account.username", new JobParameter(mailAccountUsername));
+                parameters.put("mail.account.password", new JobParameter(mailAccountPassword));
+                parameters.put("mail.server.host", new JobParameter(mailServerHost));
+                parameters.put("mail.server.port", new JobParameter(mailServerPort));
 
                 JobParameters jobParameters = new JobParameters(parameters);
 
