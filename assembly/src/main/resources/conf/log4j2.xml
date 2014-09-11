@@ -233,13 +233,14 @@
         <logger name="org.springframework.batch.item.file.FlatFileItemWriter" level="trace" additivity="false">
             <appender-ref ref="step2Writer"/>
         </logger>
-        <logger name="be.raildelays.batch.writer.ExcelSheetItemWriter" level="trace" additivity="false">
+        <logger name="org.springframework.batch.item.file.ExcelSheetItemWriter" level="trace" additivity="false">
             <appender-ref ref="step2Writer"/>
         </logger>
-        <logger name="be.raildelays.batch.writer.MultiResourceItemWriter" level="trace" additivity="false">
+        <logger name="org.springframework.batch.item.file.MultiResourceSupportItemWriter" level="trace"
+                additivity="false">
             <appender-ref ref="step2Writer"/>
         </logger>
-        <logger name="be.raildelays.batch.writer.SortedItemStreamWriter" level="trace" additivity="false">
+        <logger name="org.springframework.batch.item.support.SortedItemStreamWriter" level="trace" additivity="false">
             <appender-ref ref="step2Writer"/>
         </logger>
         <logger name="be.raildelays.batch.listener.LogSkippedItemListener" level="trace" additivity="false">

@@ -43,8 +43,8 @@
                 </batch:step>
             </batch:partition>
         </batch:step>
-        <batch:step id="step2">
-            <batch:tasklet transaction-manager="batchTransactionManager" allow-start-if-complete="true">
+        <batch:step id="step2" next="step3">
+            <batch:tasklet transaction-manager="batchTransactionManager">
                 <batch:chunk reader="delaysItemReader"
                              processor="chainedProcessorsForDelays"
                              writer="compositeItemWriter"
@@ -67,8 +67,25 @@
                 <batch:listener ref="loggerContextStepListener"/>
             </batch:listeners>
         </batch:step>
+        <batch:step id="step3">
+            <batch:tasklet transaction-manager="batchTransactionManager">
+                <batch:chunk reader="retrieveLineStopViaContextReader"
+                             processor="chainedProcessorsForMoreThanOneHourDelay"
+                             writer="compositeItemWriter"
+                             commit-interval="1" skip-limit="1">
+                    <batch:skippable-exception-classes>
+                        <batch:include class="org.springframework.batch.item.validator.ValidationException"/>
+                        <batch:include class="be.raildelays.batch.exception.ArrivalDepartureEqualsException"/>
+                    </batch:skippable-exception-classes>
+                    <batch:listeners merge="true">
+                        <batch:listener ref="logSkippedItemListener"/>
+                    </batch:listeners>
+                </batch:chunk>
+            </batch:tasklet>
+        </batch:step>
         <batch:listeners merge="true">
             <batch:listener ref="loggerContextJobListener"/>
+            <batch:listener ref="filterMoreThanOneHourDelayProcessor"/>
         </batch:listeners>
     </batch:job>
 
@@ -176,6 +193,13 @@
         </property>
     </bean>
 
+    <bean id="retrieveLineStopViaContextReader"
+          class="be.raildelays.batch.reader.RetrieveLineStopViaContextReader"
+          scope="step">
+        <property name="keyName" value="moreThanOneHourDelay"/>
+        <property name="date" value="#{jobParameters['date']}"/>
+    </bean>
+
     <!-- ================================================================================================== -->
     <!-- =====================================       PROCESSORS       ===================================== -->
     <!-- ================================================================================================== -->
@@ -184,8 +208,6 @@
           class="org.springframework.batch.item.support.CompositeItemProcessor">
         <property name="delegates">
             <list>
-                <!--<ref bean="routeLogMapperProcessor"/>-->
-                <!--<ref bean="validatorProcessor"/>-->
                 <ref bean="lineStopMapperProcessor"/>
                 <ref bean="validatorProcessor"/>
             </list>
@@ -202,16 +224,25 @@
                 <ref bean="searchNextTrainProcessor"/>
                 <ref bean="filterTwoSensPerDayProcessor"/>
                 <ref bean="filterSmallDelaysProcessor"/>
+                <ref bean="filterMoreThanOneHourDelayProcessor"/>
                 <ref bean="validatorProcessor"/>
             </list>
         </property>
     </bean>
 
-    <bean id="routeLogMapperProcessor"
-          class="be.raildelays.batch.processor.RouteLogMapperProcessor"
-          scope="step">
-        <property name="date" value="#{jobParameters[date]}"/>
-        <property name="language" value="#{jobParameters['lang']}"/>
+    <bean id="chainedProcessorsForMoreThanOneHourDelay"
+          class="org.springframework.batch.item.support.CompositeItemProcessor">
+        <property name="delegates">
+            <list>
+                <ref bean="aggregateExpectedTimeProcessor"/>
+                <ref bean="excelRowMapperProcessor"/>
+                <ref bean="validatorProcessor"/>
+                <ref bean="searchNextTrainProcessor"/>
+                <ref bean="filterTwoSensPerDayProcessor"/>
+                <ref bean="validatorProcessor"/>
+                <ref bean="batchExcelRowToSimpleMailMessageProcessor"/>
+            </list>
+        </property>
     </bean>
 
     <bean id="lineStopMapperProcessor"
@@ -254,9 +285,9 @@
           class="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor"
           scope="step">
         <property name="outputReader">
-            <bean class="be.raildelays.batch.reader.MultiResourceAwareItemReader">
+            <bean class="org.springframework.batch.item.file.MultiResourceAwareItemReader">
                 <property name="delegate">
-                    <bean class="be.raildelays.batch.reader.ExcelSheetItemReader">
+                    <bean class="org.springframework.batch.item.file.ExcelSheetItemReader">
                         <property name="name" value="excelSheetItemReader1"/>
                         <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
                         <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
@@ -276,6 +307,21 @@
     <bean id="filterSmallDelaysProcessor"
           class="be.raildelays.batch.processor.FilterSmallDelaysProcessor">
         <property name="threshold" value="${excel.item.delay.threshold}"/>
+    </bean>
+
+    <bean id="filterMoreThanOneHourDelayProcessor"
+          class="be.raildelays.batch.processor.FilterAndStoreProcessor"
+          scope="step">
+        <property name="threshold" value="60"/>
+        <property name="keyName" value="moreThanOneHourDelay"/>
+    </bean>
+
+    <bean id="batchExcelRowToSimpleMailMessageProcessor"
+          class="be.raildelays.batch.processor.BatchExcelRowToSimpleMailMessageProcessor"
+          scope="step">
+        <property name="from" value="#{jobParameters['mail.account.address']}"/>
+        <property name="to" value="#{jobParameters['mail.account.address']}"/>
+        <property name="subject" value="[SNCB/NMBS] Retard de plus d'une heure"/>
     </bean>
 
     <!-- ================================================================================================== -->
@@ -306,7 +352,7 @@
     </bean>
 
     <bean id="multiResourceItemWriter"
-          class="be.raildelays.batch.writer.MultiResourceItemWriter"
+          class="org.springframework.batch.item.file.MultiResourceSupportItemWriter"
           scope="step">
         <property name="delegate" ref="sortedItemWriter"/>
         <property name="name" value="multiResourceItemWriter"/>
@@ -314,10 +360,10 @@
     </bean>
 
     <bean id="sortedItemWriter"
-          class="be.raildelays.batch.writer.SortedItemStreamWriter"
+          class="org.springframework.batch.item.support.SortedItemStreamWriter"
           scope="step">
         <property name="reader">
-            <bean class="be.raildelays.batch.reader.ExcelSheetItemReader">
+            <bean class="org.springframework.batch.item.file.ExcelSheetItemReader">
                 <property name="name" value="excelSheetItemReader2"/>
                 <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
                 <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
@@ -333,7 +379,7 @@
     </bean>
 
     <bean id="excelSheetItemWriter"
-          class="be.raildelays.batch.writer.ExcelSheetItemWriter"
+          class="org.springframework.batch.item.file.ExcelSheetItemWriter"
           scope="step">
         <property name="rowAggregator">
             <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator"
@@ -352,6 +398,20 @@
           class="org.springframework.batch.item.database.JpaItemWriter"
           scope="step">
         <property name="entityManagerFactory" ref="raildelaysEntityManagerFactory"/>
+    </bean>
+
+    <bean id="emailWriter" class="org.springframework.batch.item.mail.SimpleMailMessageItemWriter">
+        <property name="mailSender">
+            <bean class="org.springframework.mail.javamail.JavaMailSenderImpl">
+                <property name="host" value="#{jobParameters['mail.server.host']}"/>
+                <property name="port" value="#{jobParameters['mail.server.port']}"/>
+                <property name="password" value="#{jobParameters['mail.account.password']}"/>
+                <property name="username" value="#{jobParameters['mail.account.username']}"/>
+            </bean>
+        </property>
+        <property name="mailErrorHandler">
+            <bean class="org.springframework.batch.item.mail.DefaultMailErrorHandler"/>
+        </property>
     </bean>
 
     <!-- ================================================================================================== -->
@@ -402,10 +462,10 @@
     </bean>
 
     <bean id="resourceItemSearch"
-          class="be.raildelays.batch.poi.SimpleResourceItemSearch"
+          class="be.raildelays.batch.support.SimpleResourceItemSearch"
           scope="step">
         <property name="reader">
-            <bean class="be.raildelays.batch.reader.ExcelSheetItemReader">
+            <bean class="org.springframework.batch.item.file.ExcelSheetItemReader">
                 <property name="name" value="excelSheetItemReader3"/>
                 <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
                 <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
