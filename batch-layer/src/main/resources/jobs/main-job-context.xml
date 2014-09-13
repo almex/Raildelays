@@ -400,7 +400,9 @@
         <property name="entityManagerFactory" ref="raildelaysEntityManagerFactory"/>
     </bean>
 
-    <bean id="emailWriter" class="org.springframework.batch.item.mail.SimpleMailMessageItemWriter">
+    <bean id="emailWriter" 
+          class="org.springframework.batch.item.mail.SimpleMailMessageItemWriter"
+          scope="step">
         <property name="mailSender">
             <bean class="org.springframework.mail.javamail.JavaMailSenderImpl">
                 <property name="host" value="#{jobParameters['mail.server.host']}"/>
