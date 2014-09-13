@@ -1,12 +1,11 @@
-package be.raildelays.batch.writer;
+package org.springframework.batch.item.file;
 
-import be.raildelays.batch.support.AbstractItemCountingItemStreamItemWriter;
-import be.raildelays.batch.support.ResourceLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
+import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemWriter;
+import org.springframework.batch.item.support.ResourceLocator;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -17,14 +16,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * In case of restart this writer retrieve the last resource given by the {@link be.raildelays.batch.support.ResourceLocator}.
+ * In case of restart this writer retrieve the last resource given by the {@link org.springframework.batch.item.support.ResourceLocator}.
  *
  * @author Almex
  */
-public class MultiResourceItemWriter<T> extends AbstractItemCountingItemStreamItemWriter<T> {
+public class MultiResourceSupportItemWriter<T> extends AbstractItemCountingItemStreamItemWriter<T> {
 
     private final static String RESOURCE_KEY = "resource";
-    private static final Logger LOGGER = LoggerFactory.getLogger(MultiResourceItemWriter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MultiResourceSupportItemWriter.class);
     protected ResourceLocator resourceLocator;
     private ResourceAwareItemWriterItemStream<? super T> delegate;
     private ExecutionContext executionContext;

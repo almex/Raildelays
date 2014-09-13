@@ -1,6 +1,4 @@
-package be.raildelays.batch.support;
-
-import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
+package org.springframework.batch.item.file;
 
 /**
  * @author Almex

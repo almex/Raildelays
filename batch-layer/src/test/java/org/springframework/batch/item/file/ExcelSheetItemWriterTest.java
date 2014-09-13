@@ -1,7 +1,8 @@
-package be.raildelays.batch.writer;
+package org.springframework.batch.item.file;
 
 import be.raildelays.batch.AbstractFileTest;
 import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.batch.writer.BatchExcelRowAggregator;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;

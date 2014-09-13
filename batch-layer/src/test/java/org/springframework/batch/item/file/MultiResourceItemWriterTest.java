@@ -1,13 +1,13 @@
-package be.raildelays.batch.writer;
+package org.springframework.batch.item.file;
 
 import be.raildelays.batch.AbstractFileTest;
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.bean.ExcelRowComparator;
 import be.raildelays.batch.listener.ResourceLocatorListener;
-import be.raildelays.batch.poi.SimpleResourceItemSearch;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
-import be.raildelays.batch.reader.ExcelSheetItemReader;
 import be.raildelays.batch.support.ItemWriterResourceLocator;
+import be.raildelays.batch.support.SimpleResourceItemSearch;
+import be.raildelays.batch.writer.BatchExcelRowAggregator;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
@@ -32,7 +32,7 @@ import java.util.*;
 @RunWith(BlockJUnit4ClassRunner.class)
 public class MultiResourceItemWriterTest extends AbstractFileTest {
 
-    private MultiResourceItemWriter writer;
+    private MultiResourceSupportItemWriter writer;
 
     private List<BatchExcelRow> items = new ArrayList<>();
 
@@ -61,7 +61,7 @@ public class MultiResourceItemWriterTest extends AbstractFileTest {
         SimpleResourceItemSearch resourceItemSearch = new SimpleResourceItemSearch();
         resourceLocator = new ItemWriterResourceLocator();
         executionContext = stepExecution.getExecutionContext();
-        writer = new MultiResourceItemWriter();
+        writer = new MultiResourceSupportItemWriter();
         listener = new ResourceLocatorListener();
 
 

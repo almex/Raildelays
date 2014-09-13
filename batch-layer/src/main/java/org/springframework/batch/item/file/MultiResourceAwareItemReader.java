@@ -1,10 +1,9 @@
-package be.raildelays.batch.reader;
+package org.springframework.batch.item.file;
 
-import be.raildelays.batch.support.ResourceLocator;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
+import org.springframework.batch.item.support.ResourceLocator;
 import org.springframework.core.io.Resource;
 
 /**

@@ -1,4 +1,4 @@
-package be.raildelays.batch.support;
+package org.springframework.batch.item;
 
 /**
  * @author Almex

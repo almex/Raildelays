@@ -1,6 +1,7 @@
-package be.raildelays.batch.reader;
+package org.springframework.batch.item.file;
 
 import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.batch.reader.BatchExcelRowMapper;
 import be.raildelays.domain.xls.ExcelRow;
 import org.junit.After;
 import org.junit.Assert;

@@ -1,16 +1,13 @@
-package be.raildelays.batch.writer;
+package org.springframework.batch.item.support;
 
-import be.raildelays.batch.support.ItemIndexAware;
 import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemCountAware;
-import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.*;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import java.io.File;
@@ -155,7 +152,7 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
 
     private void initializeStreams() throws Exception {
         if (createBackupFile) {
-            outputResource = resource.createRelative(resource.getFilename() + ".tmp");
+            outputResource = new FileSystemResource(File.createTempFile(resource.getFilename(), ".tmp", resource.getFile().getParentFile()));
         } else {
             outputResource = resource;
         }

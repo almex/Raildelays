@@ -1,4 +1,4 @@
-package be.raildelays.batch.support;
+package org.springframework.batch.item.support;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.io.Resource;

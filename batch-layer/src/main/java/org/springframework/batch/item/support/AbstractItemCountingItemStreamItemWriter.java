@@ -1,8 +1,8 @@
-package be.raildelays.batch.support;
+package org.springframework.batch.item.support;
 
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemIndexAware;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.support.AbstractItemStreamItemWriter;
 import org.springframework.util.Assert;
 
 import java.util.List;
