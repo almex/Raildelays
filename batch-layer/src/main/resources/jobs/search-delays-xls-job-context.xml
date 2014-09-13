@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:batch="http://www.springframework.org/schema/batch" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:context="http://www.springframework.org/schema/context"
        xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
@@ -55,7 +56,7 @@
     </bean>
 
     <bean id="excelSheetItemReader"
-          class="be.raildelays.batch.reader.ExcelSheetItemReader"
+          class="org.springframework.batch.item.file.ExcelSheetItemReader"
           scope="step">
         <property name="name" value="excelSheetItemReader"/>
         <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
@@ -115,7 +116,7 @@
     </bean>
 
     <bean id="multiResourceItemWriter"
-          class="be.raildelays.batch.writer.MultiResourceItemWriter"
+          class="org.springframework.batch.item.file.MultiResourceSupportItemWriter"
           scope="step">
         <property name="name" value="multiResourceItemWriter"/>
         <property name="delegate" ref="excelSheetItemWriter"/>
@@ -124,7 +125,7 @@
     </bean>
 
     <bean id="excelSheetItemWriter"
-          class="be.raildelays.batch.writer.ExcelSheetItemWriter"
+          class="org.springframework.batch.item.file.ExcelSheetItemWriter"
           scope="step">
         <property name="rowAggregator">
             <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator"/>
@@ -151,9 +152,9 @@
         <property name="resourceItemSearch" ref="resourceItemSearch"/>
     </bean>
 
-    <bean id="resourceItemSearch" class="be.raildelays.batch.poi.SimpleResourceItemSearch">
+    <bean id="resourceItemSearch" class="be.raildelays.batch.support.SimpleResourceItemSearch">
         <property name="reader">
-            <bean class="be.raildelays.batch.reader.ExcelSheetItemReader">
+            <bean class="org.springframework.batch.item.file.ExcelSheetItemReader">
                 <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
                 <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
                 <property name="rowMapper">

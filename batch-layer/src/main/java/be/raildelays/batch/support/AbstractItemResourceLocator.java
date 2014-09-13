@@ -2,17 +2,19 @@ package be.raildelays.batch.support;
 
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.listener.ResourceLocatorListener;
-import be.raildelays.batch.poi.Format;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.support.ResourceLocator;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+
+import static org.springframework.batch.item.file.ExcelSheetItemWriter.Format;
 
 /**
  * We communicate through the {@link org.springframework.batch.item.ExecutionContext} the file name used to create a new file.

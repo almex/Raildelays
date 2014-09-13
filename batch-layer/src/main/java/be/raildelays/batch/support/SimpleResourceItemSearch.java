@@ -1,8 +1,7 @@
-package be.raildelays.batch.poi;
+package be.raildelays.batch.support;
 
-import be.raildelays.batch.support.IndexedResourceAwareItemStreamReader;
-import be.raildelays.batch.support.ResourceItemSearch;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.file.IndexedResourceAwareItemStreamReader;
 import org.springframework.core.io.Resource;
 
 import java.util.Comparator;

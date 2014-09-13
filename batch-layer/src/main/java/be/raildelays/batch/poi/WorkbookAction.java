@@ -6,7 +6,12 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
- * Created by soumagn on 31/05/2014.
+ * In order to deal with the two format of an Excel File (e.g: OLE2 and OXML),
+ * this class allow to define what do to when you have a {@link org.apache.poi.hssf.usermodel.HSSFWorkbook}
+ * and what to do when you have a {@link org.apache.poi.xssf.usermodel.XSSFWorkbook}.
+ *
+ * @author Almex
+ * @since 1.1
  */
 public abstract class WorkbookAction<T> {
     protected Workbook internalWorkbook;

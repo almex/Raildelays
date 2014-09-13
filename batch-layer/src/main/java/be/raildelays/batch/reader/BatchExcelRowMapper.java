@@ -1,7 +1,6 @@
 package be.raildelays.batch.reader;
 
 import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.batch.poi.RowMapper;
 import be.raildelays.domain.Language;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
@@ -10,9 +9,12 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.item.file.RowMapper;
+import org.springframework.batch.item.file.RowMappingException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -21,9 +23,10 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Set;
 
 /**
- * Simple {@link be.raildelays.batch.poi.RowMapper} matching our use case to deal with our
+ * Simple {@link org.springframework.batch.item.file.RowMapper} matching our use case to deal with our
  * {@link be.raildelays.batch.bean.BatchExcelRow}.
  *
  * @author Almex
@@ -67,7 +70,7 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
     }
 
     @Override
-    public BatchExcelRow mapRow(Row row, int rowIndex) throws Exception {
+    public BatchExcelRow mapRow(Row row, int rowIndex) throws RowMappingException {
         BatchExcelRow result = null;
 
         if (row.getCell(2) != null) {
@@ -88,11 +91,28 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
                     .build();
         } //-- If the first cell contains nothing we return null
 
-        if (validateOutcomes && !validator.validate(result).isEmpty()) {
-            result = null;
+        if (validateOutcomes) {
+            validate(row, rowIndex, result);
         }
 
         return result;
+    }
+
+    private void validate(Row row, int rowIndex, BatchExcelRow result) {
+        Set<ConstraintViolation<BatchExcelRow>> constraintViolations = validator.validate(result);
+
+        if (!constraintViolations.isEmpty()) {
+            StringBuilder builder = new StringBuilder();
+
+            for (ConstraintViolation<BatchExcelRow> constraintViolation : constraintViolations) {
+                builder.append("Constraints violations occured:\n");
+                builder.append(constraintViolation.getPropertyPath());
+                builder.append(' ');
+                builder.append(constraintViolation.getMessage());
+            }
+
+            throw new RowMappingException(builder.toString(), row, rowIndex);
+        }
     }
 
     private Train getTrain(Row row, int cellIndex) {

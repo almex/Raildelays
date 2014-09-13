@@ -3,7 +3,7 @@
        xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="excelSheetItemWriter" class="be.raildelays.batch.writer.ExcelSheetItemWriter">
+    <bean id="excelSheetItemWriter" class="org.springframework.batch.item.file.ExcelSheetItemWriter">
         <property name="input">
             <bean class="java.io.FileInputStream">
                 <constructor-arg index="0" type="java.lang.String"

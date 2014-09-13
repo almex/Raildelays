@@ -1,7 +1,6 @@
 package be.raildelays.batch.writer;
 
 import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.batch.poi.RowAggregator;
 import be.raildelays.batch.poi.WorkbookAction;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
 import be.raildelays.domain.Language;
@@ -19,6 +18,7 @@ import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.item.file.RowAggregator;
 
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -31,11 +31,11 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * Simple {@link be.raildelays.batch.poi.RowAggregator} matching our use case to deal with
+ * Simple {@link org.springframework.batch.item.file.RowAggregator} matching our use case to deal with
  * {@link be.raildelays.batch.bean.BatchExcelRow}.
  *
  * @author Almex
- * @since  1.1
+ * @since 1.1
  */
 public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
 

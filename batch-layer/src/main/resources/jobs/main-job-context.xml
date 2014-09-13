@@ -15,7 +15,7 @@
     <import resource="parent-job-context.xml"/>
 
     <batch:job id="mainJob" parent="parentJob">
-        <batch:step id="step1" next="step2">
+        <batch:step id="retrieveDataFromRailtime" next="generateExcelFiles">
             <batch:partition partitioner="partitioner">
                 <batch:handler task-executor="taskExecutor"/>
                 <batch:step>
@@ -43,7 +43,7 @@
                 </batch:step>
             </batch:partition>
         </batch:step>
-        <batch:step id="step2" next="step3">
+        <batch:step id="generateExcelFiles" next="handleDelayMoreThanOneHour">
             <batch:tasklet transaction-manager="batchTransactionManager">
                 <batch:chunk reader="delaysItemReader"
                              processor="chainedProcessorsForDelays"
@@ -67,7 +67,7 @@
                 <batch:listener ref="loggerContextStepListener"/>
             </batch:listeners>
         </batch:step>
-        <batch:step id="step3">
+        <batch:step id="handleDelayMoreThanOneHour">
             <batch:tasklet transaction-manager="batchTransactionManager">
                 <batch:chunk reader="retrieveLineStopViaContextReader"
                              processor="chainedProcessorsForMoreThanOneHourDelay"

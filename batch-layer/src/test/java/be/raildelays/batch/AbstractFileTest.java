@@ -1,6 +1,5 @@
 package be.raildelays.batch;
 
-import be.raildelays.batch.poi.Format;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
@@ -13,6 +12,8 @@ import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import static org.springframework.batch.item.file.ExcelSheetItemWriter.Format;
 
 /**
  * @author Almex

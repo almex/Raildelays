@@ -3,7 +3,6 @@ package be.raildelays.batch.support;
 import be.raildelays.batch.AbstractFileTest;
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.listener.ResourceLocatorListener;
-import be.raildelays.batch.poi.Format;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -16,6 +15,8 @@ import org.springframework.core.io.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+
+import static org.springframework.batch.item.file.ExcelSheetItemWriter.Format;
 
 /**
  * @author Almex
