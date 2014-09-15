@@ -107,6 +107,24 @@
         <jdk.version>1.7</jdk.version>
         <forkCount>1</forkCount>
         <reuseForks>true</reuseForks>
+        
+        <!-- The destination file for the code coverage report has to be set
+            to the same value in the parent pom and in each module pom. Then JaCoCo will
+            add up information in the same report, so that, it will give the cross-module
+            code coverage. -->
+        <sonar.jacoco.itReportPath>${jacoco.it.destFile}</sonar.jacoco.itReportPath>
+        <sonar.jacoco.reportPath>${jacoco.test.destFile}</sonar.jacoco.reportPath>
+        <sonar.surefire.reportsPath>${basedir}/target/surefire-reports</sonar.surefire.reportsPath>
+        <sonar.junit.reportsPath>${sonar.surefire.reportsPath}</sonar.junit.reportsPath>
+        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+        <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+        <sonar.language>java</sonar.language>
+        <!-- groupId allow concurrent analyze -->
+        <!--jacoco.test.destFile>${java.io.tmpdir}/${project.groupId}/jacoco-test.exec</jacoco.test.destFile -->
+        <jacoco.test.destFile>../target/jacoco-test.exec</jacoco.test.destFile>
+        <jacoco.it.destFile>../target/jacoco-it.exec</jacoco.it.destFile>
+        <it.source.path>src/it/java</it.source.path>
+        <it.resources.path>src/it/resources</it.resources.path>
     </properties>
 
 
@@ -711,7 +729,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>1.8</version>
+                    <version>1.9.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -761,7 +779,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.7.0.201403182114</version>
+                    <version>0.7.1.201405082137</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.groovy</groupId>
@@ -935,7 +953,7 @@
                 <dependency>
                     <groupId>org.codehaus.sonar-plugins.java</groupId>
                     <artifactId>sonar-jacoco-listeners</artifactId>
-                    <version>1.2</version>
+                    <version>2.4</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -1042,17 +1060,6 @@
             </build>
 
             <properties>
-                <!-- groupId allow concurrent analyze -->
-                <!--jacoco.test.destFile>${java.io.tmpdir}/${project.groupId}/jacoco-test.exec</jacoco.test.destFile -->
-                <jacoco.test.destFile>../target/jacoco-test.exec</jacoco.test.destFile>
-                <jacoco.it.destFile>../target/jacoco-it.exec</jacoco.it.destFile>
-                <!-- The destination file for the code coverage report has to be set
-                    to the same value in the parent pom and in each module pom. Then JaCoCo will
-                    add up information in the same report, so that, it will give the cross-module
-                    code coverage. -->
-                <sonar.jacoco.itReportPath>${jacoco.it.destFile}</sonar.jacoco.itReportPath>
-                <sonar.jacoco.reportPath>${jacoco.test.destFile}</sonar.jacoco.reportPath>
-                <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
             </properties>
 
         </profile>
@@ -1081,27 +1088,33 @@
                 </dependency>
 
             </dependencies>
-
+            
             <build>
                 <plugins>
+                
+                    <!-- Build Helper plugin: configured to add source and resources path for integration tests -->
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>build-helper-maven-plugin</artifactId>
                         <executions>
                             <execution>
                                 <id>add-it-source</id>
+                                <!-- We must do it before generate-sources to be taken into
+                                    account by the maven-eclipse-plugin -->
                                 <phase>generate-sources</phase>
                                 <goals>
                                     <goal>add-test-source</goal>
                                 </goals>
                                 <configuration>
                                     <sources>
-                                        <source>src/it/java</source>
+                                        <source>${it.source.path}</source>
                                     </sources>
                                 </configuration>
                             </execution>
                             <execution>
                                 <id>add-it-resource</id>
+                                <!-- We must do it before generate-sources to be taken into
+                                    account by the maven-eclipse-plugin -->
                                 <phase>generate-resources</phase>
                                 <goals>
                                     <goal>add-test-resource</goal>
@@ -1109,19 +1122,158 @@
                                 <configuration>
                                     <resources>
                                         <resource>
-                                            <directory>src/it/resources</directory>
-                                            <!-- Removed to avoid issue with *.xlsx files in batch-layer -->
-                                            <!-- <filtering>true</filtering> -->
-                                        </resource>
+                                            <directory>${it.resources.path}</directory>
+                                            <filtering>true</filtering>
+                                        </resource>         
                                     </resources>
                                 </configuration>
                             </execution>
                         </executions>
-                    </plugin>
+                    </plugin>   
                 </plugins>
             </build>
         </profile>
 
+        <!-- Compute code coverage before Sonar execution (This profile must be activated in Bamboo for the Sonar plan) -->
+        <profile>
+            <id>code-coverage</id>   
+
+            <build>
+                <plugins>
+                                                            
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>    
+                            <skipTests>false</skipTests> <!-- If you want code coverage you must run tests -->   
+                            <reportFormat>xml</reportFormat> <!-- required format for Sonar -->   
+                            <testFailureIgnore>true</testFailureIgnore> <!-- We want to count the number of failed tests -->                 
+                        </configuration> 
+                        <executions>
+                            <execution>
+                                <id>default-test</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>test</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>false</skip>
+                                    <forkCount>1</forkCount> <!-- fork mode must be enable with JaCoCo (1 thread per CPU Core) -->  
+                                    <reuseForks>true</reuseForks>
+                                    <!-- coverage.test.argLine is the link with JaCoCo plug-in -->
+                                    <argLine>${coverage.test.argLine} -Xmx256m -Xms128m -XX:MaxPermSize=128m -XX:PermSize=64m</argLine>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    
+                    <plugin>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <sources>
+                                <source>${it.source.path}</source>
+                            </sources>     
+                            <skipTests>false</skipTests> <!-- If you want code coverage you must run tests -->
+                            <reportFormat>xml</reportFormat> <!-- required format for Sonar -->   
+                            <testFailureIgnore>true</testFailureIgnore> <!-- We want to count the number of failed tests -->     
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>integration-tests</id>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>false</skip>
+                                    <forkCount>1</forkCount> <!-- fork mode must be enable with JaCoCo (1 thread per CPU Core) --> 
+                                    <reuseForks>true</reuseForks> 
+                                    <!-- coverage.it.argLine is the link with JaCoCo plug-in -->
+                                    <argLine>${coverage.it.argLine} -Xmx512m -Xms256m -XX:MaxPermSize=256m -XX:PermSize=128m</argLine>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>integration-tests-verify</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+         
+                    <!-- To compute Code Coverage for integration tests seperataly from unit tests -->
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>prepare-surefire-argLine</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <configuration>
+                                    <propertyName>coverage.test.argLine</propertyName>
+                                    <destFile>${jacoco.test.destFile}</destFile>
+                                    <append>true</append>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>prepare-failsafe-argLine</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <configuration>
+                                    <propertyName>coverage.it.argLine</propertyName>
+                                    <destFile>${jacoco.it.destFile}</destFile>
+                                    <append>true</append>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin> 
+                    
+                </plugins>
+            </build>
+        </profile>
+        
+        <!-- Instrument code coverage per tests during Sonar execution (This profile must be activated in Bamboo for the Sonar plan) -->
+        <profile>
+            <id>coverage-per-test</id>  
+            
+            <!-- Add a link to Sonar dashboard between unit test and source code  -->
+            <dependencies>        
+                <dependency>          
+                    <groupId>org.codehaus.sonar-plugins.java</groupId>          
+                    <artifactId>sonar-jacoco-listeners</artifactId>          
+                    <version>2.4</version>          
+                    <scope>test</scope>        
+                </dependency>     
+            </dependencies>  
+
+            <build>
+                <plugins>
+                                                            
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>    
+                            <skipTests>false</skipTests> <!-- If you want code coverage you must run tests -->   
+                            <reportFormat>xml</reportFormat> <!-- required format for Sonar -->   
+                            <testFailureIgnore>true</testFailureIgnore> <!-- We want to count the number of failed tests -->      
+                            <!-- Add a link to Sonar dashboard between unit test and source code  -->
+                            <properties>                
+                                <property>                  
+                                    <name>listener</name>                  
+                                    <value>org.sonar.java.jacoco.JUnitListener</value>                
+                                </property>              
+                            </properties>            
+                        </configuration>
+                    </plugin>
+                    
+                </plugins>
+            </build>
+        </profile>
+        
         <profile>
             <id>jdk8</id>
             <activation>
