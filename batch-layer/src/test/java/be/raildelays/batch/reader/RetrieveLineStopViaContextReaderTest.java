@@ -8,6 +8,7 @@ import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 
@@ -46,7 +47,9 @@ public class RetrieveLineStopViaContextReaderTest {
 
         context.putLong(KEY_NAME, TRAIN_ID);
 
-        reader.open(context);
+        JobExecution jobExecution = MetaDataInstanceFactory.createJobExecution();
+        jobExecution.setExecutionContext(context);
+        reader.beforeJob(jobExecution);
     }
 
     @Test
@@ -81,10 +84,5 @@ public class RetrieveLineStopViaContextReaderTest {
         assertEquals(null, reader.read());
 
         EasyMock.verify(service);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        reader.close();
     }
 }

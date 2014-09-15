@@ -2,9 +2,10 @@ package be.raildelays.batch.reader;
 
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.service.RaildelaysService;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.annotation.BeforeJob;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ItemStreamReader;
+import org.springframework.batch.item.ItemReader;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -17,9 +18,7 @@ import java.util.Date;
  * @see be.raildelays.batch.processor.FilterAndStoreProcessor
  * @since 1.2
  */
-public class RetrieveLineStopViaContextReader implements ItemStreamReader<LineStop> {
-
-    private Long trainId;
+public class RetrieveLineStopViaContextReader implements ItemReader<LineStop> {
 
     private String keyName;
 
@@ -30,8 +29,16 @@ public class RetrieveLineStopViaContextReader implements ItemStreamReader<LineSt
 
     private ExecutionContext executionContext;
 
+    @BeforeJob
+    public void beforeJob(JobExecution jobExecution) {
+        executionContext = jobExecution.getExecutionContext();
+    }
+
+
     @Override
     public LineStop read() throws Exception {
+        Long trainId = null;
+
         if (executionContext.containsKey(keyName)) {
             trainId = executionContext.getLong(keyName);
             /*
@@ -39,27 +46,9 @@ public class RetrieveLineStopViaContextReader implements ItemStreamReader<LineSt
              * Then on next iteration the next read will return null and terminate the process.
              */
             executionContext.remove(keyName);
-        } else {
-            trainId = null;
         }
 
         return service.searchLineStopByTrain(trainId, date);
-    }
-
-
-    @Override
-    public void open(ExecutionContext executionContext) throws ItemStreamException {
-        this.executionContext = executionContext;
-    }
-
-    @Override
-    public void update(ExecutionContext executionContext) throws ItemStreamException {
-
-    }
-
-    @Override
-    public void close() throws ItemStreamException {
-
     }
 
     public void setKeyName(String keyName) {

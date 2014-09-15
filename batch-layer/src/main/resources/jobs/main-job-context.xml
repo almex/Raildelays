@@ -71,7 +71,7 @@
             <batch:tasklet transaction-manager="batchTransactionManager">
                 <batch:chunk reader="retrieveLineStopViaContextReader"
                              processor="chainedProcessorsForMoreThanOneHourDelay"
-                             writer="compositeItemWriter"
+                             writer="emailWriter"
                              commit-interval="1" skip-limit="1">
                     <batch:skippable-exception-classes>
                         <batch:include class="org.springframework.batch.item.validator.ValidationException"/>
@@ -86,6 +86,7 @@
         <batch:listeners merge="true">
             <batch:listener ref="loggerContextJobListener"/>
             <batch:listener ref="filterMoreThanOneHourDelayProcessor"/>
+            <batch:listener ref="retrieveLineStopViaContextReader"/>
         </batch:listeners>
     </batch:job>
 

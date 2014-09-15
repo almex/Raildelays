@@ -74,6 +74,7 @@ public class Bootstrap {
             final String mailAccountPassword = configuration.getProperty("mail.account.password");
             final String mailServerHost = configuration.getProperty("mail.server.host");
             final String mailServerPort = configuration.getProperty("mail.server.port");
+            final String mailAccountAddress = configuration.getProperty("mail.account.address");
 
             Assert.notNull(departure, "You must add a 'departure' property into the ./conf/raildelays.properties");
             Assert.notNull(arrival, "You must add a 'arrival' property into the ./conf/raildelays.properties");
@@ -85,6 +86,7 @@ public class Bootstrap {
             Assert.notNull(mailAccountPassword, "You must add a 'mail.account.password' property into the ./conf/raildelays.properties");
             Assert.notNull(mailServerHost, "You must add a 'mail.server.host' property into the ./conf/raildelays.properties");
             Assert.notNull(mailServerPort, "You must add a 'mail.server.port' property into the ./conf/raildelays.properties");
+            Assert.notNull(mailAccountAddress, "You must add a 'mail.account.address' property into the ./conf/raildelays.properties");
 
             if (recovery) {
                 LOGGER.info("[Recovery activated]");
@@ -108,6 +110,8 @@ public class Bootstrap {
                 parameters.put("mail.account.password", new JobParameter(mailAccountPassword));
                 parameters.put("mail.server.host", new JobParameter(mailServerHost));
                 parameters.put("mail.server.port", new JobParameter(mailServerPort));
+                parameters.put("mail.account.address", new JobParameter(mailAccountAddress));
+
 
                 JobParameters jobParameters = new JobParameters(parameters);
 

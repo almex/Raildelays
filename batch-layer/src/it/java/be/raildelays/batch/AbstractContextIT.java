@@ -1,7 +1,9 @@
 package be.raildelays.batch;
 
 import org.junit.runner.RunWith;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.StepScopeTestExecutionListener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
@@ -17,4 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public abstract class AbstractContextIT extends AbstractJUnit4SpringContextTests {
 
+    @Autowired
+    private JobLauncherTestUtils jobLauncherTestUtils;
+
+    public JobLauncherTestUtils getJobLauncherTestUtils() {
+        return jobLauncherTestUtils;
+    }
 }
