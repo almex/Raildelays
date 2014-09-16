@@ -31,27 +31,19 @@ public class SearchDelaysIntoExcelSheetJobIT extends AbstractContextIT {
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Test
-    public void testGrabLineStop() {
+    public void testGrabLineStop() throws Exception {
         BatchStatus batchStatus;
+        Map<String, JobParameter> parameters = new HashMap<>();
 
-        try {
-            Map<String, JobParameter> parameters = new HashMap<>();
+        parameters.put("input.file.path", new JobParameter("train-list.properties"));
+        parameters.put("date", new JobParameter(new SimpleDateFormat("dd/MM/yyyy").parse("01/01/2000")));
+        parameters.put("station.a.name", new JobParameter("Liège-Guillemins"));
+        parameters.put("station.b.name", new JobParameter("Brussels (Bruxelles)-Central"));
+        parameters.put("excel.output.path", new JobParameter("./output.xls"));
+        parameters.put("excel.input.template", new JobParameter(new ClassPathResource("template.xls").getFile().getAbsolutePath()));
 
-            parameters.put("input.file.path", new JobParameter("train-list.properties"));
-            parameters.put("date", new JobParameter(new SimpleDateFormat("dd/MM/yyyy").parse("01/01/2000")));
-            parameters.put("station.a.name", new JobParameter("Liège-Guillemins"));
-            parameters.put("station.b.name", new JobParameter("Brussels (Bruxelles)-Central"));
-            parameters.put("excel.output.path", new JobParameter("./output.xls"));
-            parameters.put("excel.input.template", new JobParameter(new ClassPathResource("template.xls").getFile().getAbsolutePath()));
+        batchStatus = jobLauncherTestUtils.launchJob(new JobParameters(parameters)).getStatus();
 
-            batchStatus = jobLauncherTestUtils.launchJob(new JobParameters(parameters)).getStatus();
-
-            Assert.assertFalse(batchStatus.isUnsuccessful());
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail("Your batch job has failed due to an exception.");
-        }
-
-
+        Assert.assertFalse(batchStatus.isUnsuccessful());
     }
 }
