@@ -1123,7 +1123,7 @@
                                     <resources>
                                         <resource>
                                             <directory>${it.resources.path}</directory>
-                                            <filtering>true</filtering>
+                                            <filtering>false</filtering>
                                         </resource>         
                                     </resources>
                                 </configuration>
