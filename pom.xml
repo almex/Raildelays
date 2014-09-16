@@ -939,82 +939,41 @@
             </build>
         </profile>
 
+        <!-- Integration tests profile : execution -->
         <profile>
             <id>it</id>
-
+            
+            <!-- automaticaly enable this profile during a release (see FRA-3575) -->
             <activation>
                 <property>
                     <name>performRelease</name>
                 </property>
             </activation>
-
-            <dependencies>
-                <!-- To support unit tests tracking with Sonar -->
-                <dependency>
-                    <groupId>org.codehaus.sonar-plugins.java</groupId>
-                    <artifactId>sonar-jacoco-listeners</artifactId>
-                    <version>2.4</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-
+         
             <build>
                 <plugins>
-                    <plugin>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <!-- To support unit tests tracking with Sonar -->
-                        <configuration>
-                            <forkCount>${forkCount}</forkCount>
-                            <reuseForks>${reuseForks}</reuseForks>
-                            <properties>
-                                <property>
-                                    <name>listener</name>
-                                    <value>org.sonar.java.jacoco.JUnitListener</value>
-                                </property>
-                            </properties>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>default-test</id>
-                                <phase>test</phase>
-                                <goals>
-                                    <goal>test</goal>
-                                </goals>
-                                <configuration>
-                                    <skip>false</skip>
-                                    <argLine>${coverage.test.argLine} -Xmx256m -Xms128m
-                                        -XX:MaxPermSize=128m -XX:PermSize=64m
-                                    </argLine>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-
+                         
+                    <!-- Failsafe plugin: configured to run integration tests -->
                     <plugin>
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
                             <sources>
-                                <source>src/it/java</source>
-                            </sources>
-                            <forkCount>${forkCount}</forkCount>
-                            <reuseForks>${reuseForks}</reuseForks>
+                                <source>${it.source.path}</source>
+                            </sources>     
                         </configuration>
                         <executions>
                             <execution>
-                                <id>failsafe-test</id>
+                                <id>integration-tests</id>
                                 <phase>integration-test</phase>
                                 <goals>
                                     <goal>integration-test</goal>
                                 </goals>
-                                <configuration>
-                                    <skip>false</skip>
-                                    <argLine>${coverage.it.argLine} -Xmx512m -Xms256m
-                                        -XX:MaxPermSize=256m -XX:PermSize=128m
-                                    </argLine>
+                                <configuration>                                    
+                                    <argLine>-Xmx512m -Xms256m -XX:MaxPermSize=256m -XX:PermSize=128m</argLine>
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>failsafe-verify</id>
+                                <id>integration-tests-verify</id>
                                 <phase>post-integration-test</phase>
                                 <goals>
                                     <goal>verify</goal>
@@ -1022,46 +981,10 @@
                             </execution>
                         </executions>
                     </plugin>
-
-                    <plugin>
-                        <groupId>org.jacoco</groupId>
-                        <artifactId>jacoco-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>compute-surefire-argLine</id>
-                                <phase>generate-test-resources</phase>
-                                <goals>
-                                    <goal>prepare-agent</goal>
-                                </goals>
-                                <configuration>
-                                    <propertyName>coverage.test.argLine</propertyName>
-                                    <destFile>${jacoco.test.destFile}</destFile>
-                                    <skip>false</skip>
-                                    <append>true</append>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>compute-failsafe-argLine</id>
-                                <phase>pre-integration-test</phase>
-                                <goals>
-                                    <goal>prepare-agent</goal>
-                                </goals>
-                                <configuration>
-                                    <propertyName>coverage.it.argLine</propertyName>
-                                    <destFile>${jacoco.it.destFile}</destFile>
-                                    <skip>false</skip>
-                                    <append>true</append>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-
+         
                 </plugins>
             </build>
-
-            <properties>
-            </properties>
-
+         
         </profile>
 
         <profile>
