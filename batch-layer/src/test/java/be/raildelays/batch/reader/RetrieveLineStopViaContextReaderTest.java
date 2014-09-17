@@ -5,7 +5,6 @@ import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
 import be.raildelays.service.RaildelaysService;
 import org.easymock.EasyMock;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
@@ -20,7 +19,7 @@ public class RetrieveLineStopViaContextReaderTest {
 
     private static String KEY_NAME = "foo";
     private static Long TRAIN_ID = 1L;
-    private RetrieveLineStopViaContextReader reader;
+    private ByTrainIdAndDateLineStopReader reader;
     private Date now;
     private ExecutionContext context;
 
@@ -33,7 +32,7 @@ public class RetrieveLineStopViaContextReaderTest {
         now = new Date();
         context = MetaDataInstanceFactory.createStepExecution()
                 .getExecutionContext();
-        reader = new RetrieveLineStopViaContextReader();
+        reader = new ByTrainIdAndDateLineStopReader();
         service = EasyMock.createMock(RaildelaysService.class);
         expected = new LineStop.Builder()
                 .id(1l)
@@ -42,14 +41,8 @@ public class RetrieveLineStopViaContextReaderTest {
                 .station(new Station("bar"))
                 .build();
         reader.setDate(now);
-        reader.setKeyName(KEY_NAME);
         reader.setService(service);
-
-        context.putLong(KEY_NAME, TRAIN_ID);
-
-        JobExecution jobExecution = MetaDataInstanceFactory.createJobExecution();
-        jobExecution.setExecutionContext(context);
-        reader.beforeJob(jobExecution);
+        reader.setTrainId(TRAIN_ID);
     }
 
     @Test
@@ -65,7 +58,6 @@ public class RetrieveLineStopViaContextReaderTest {
     @Test
     public void testTwoRead() throws Exception {
         EasyMock.expect(service.searchLineStopByTrain(TRAIN_ID, now)).andReturn(expected);
-        EasyMock.expect(service.searchLineStopByTrain(null, now)).andReturn(null);
         EasyMock.replay(service);
 
         reader.read();
@@ -80,7 +72,8 @@ public class RetrieveLineStopViaContextReaderTest {
         EasyMock.expect(service.searchLineStopByTrain(null, now)).andReturn(null);
         EasyMock.replay(service);
 
-        context.remove(KEY_NAME);
+        reader.setTrainId(null);
+
         assertEquals(null, reader.read());
 
         EasyMock.verify(service);

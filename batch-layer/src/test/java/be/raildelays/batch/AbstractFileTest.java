@@ -18,7 +18,7 @@ import static org.springframework.batch.item.file.ExcelSheetItemWriter.Format;
 /**
  * @author Almex
  */
-public class AbstractFileTest {
+public class  AbstractFileTest {
     protected static final String CURRENT_PATH = "." + File.separator + "target" + File.separator;
     protected static final String EXCEL_FILE_PREFIX = "retard_sncb";
     protected static final String EXCEL_FILE_NAME = EXCEL_FILE_PREFIX + " 20140522" + Format.OLE2.getFileExtension();

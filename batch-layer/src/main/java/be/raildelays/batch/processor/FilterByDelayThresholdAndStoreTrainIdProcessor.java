@@ -4,8 +4,8 @@ import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.logging.Logger;
 import be.raildelays.logging.LoggerFactory;
 import org.apache.commons.lang.Validate;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.annotation.BeforeJob;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
@@ -22,12 +22,12 @@ import org.springframework.beans.factory.InitializingBean;
  * </p>
  *
  * @author Almex
- * @see be.raildelays.batch.reader.RetrieveLineStopViaContextReader
+ * @see be.raildelays.batch.reader.ByTrainIdAndDateLineStopReader
  * @since 1.2
  */
-public class FilterAndStoreProcessor implements ItemProcessor<BatchExcelRow, BatchExcelRow>, InitializingBean {
+public class FilterByDelayThresholdAndStoreTrainIdProcessor implements ItemProcessor<BatchExcelRow, BatchExcelRow>, InitializingBean {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("Fas", FilterAndStoreProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("Fas", FilterByDelayThresholdAndStoreTrainIdProcessor.class);
 
     private Long threshold;
 
@@ -35,9 +35,9 @@ public class FilterAndStoreProcessor implements ItemProcessor<BatchExcelRow, Bat
 
     private String keyName;
 
-    @BeforeJob
-    public void beforeJob(JobExecution jobExecution) {
-        this.context = jobExecution.getExecutionContext();
+    @BeforeStep
+    public void beforeStep(StepExecution stepExecution) {
+        this.context = stepExecution.getExecutionContext();
     }
 
     @Override

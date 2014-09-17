@@ -57,6 +57,15 @@
                         <batch:listener ref="logSkippedItemListener"/>
                         <batch:listener ref="resourceLocatorListener"/>
                         <batch:listener ref="logStep2ItemProcessorListener"/>
+                        <batch:listener>
+                            <bean class="org.springframework.batch.core.listener.ExecutionContextPromotionListener">
+                                <property name="keys">
+                                    <array>
+                                        <value>moreThanOneHourDelay</value>
+                                    </array>
+                                </property>
+                            </bean>
+                        </batch:listener>
                     </batch:listeners>
                 </batch:chunk>
                 <batch:transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
@@ -64,6 +73,7 @@
             <batch:listeners merge="true">
                 <batch:listener ref="delaysItemReader"/>
                 <batch:listener ref="filterTwoSensPerDayProcessor"/>
+                <batch:listener ref="filterMoreThanOneHourDelayProcessor"/>
                 <batch:listener ref="loggerContextStepListener"/>
             </batch:listeners>
         </batch:step>
@@ -85,8 +95,6 @@
         </batch:step>
         <batch:listeners merge="true">
             <batch:listener ref="loggerContextJobListener"/>
-            <batch:listener ref="filterMoreThanOneHourDelayProcessor"/>
-            <batch:listener ref="retrieveLineStopViaContextReader"/>
         </batch:listeners>
     </batch:job>
 
@@ -195,9 +203,9 @@
     </bean>
 
     <bean id="retrieveLineStopViaContextReader"
-          class="be.raildelays.batch.reader.RetrieveLineStopViaContextReader"
+          class="be.raildelays.batch.reader.ByTrainIdAndDateLineStopReader"
           scope="step">
-        <property name="keyName" value="moreThanOneHourDelay"/>
+        <property name="trainId" value="#{jobExecutionContext['moreThanOneHourDelay']}"/>
         <property name="date" value="#{jobParameters['date']}"/>
     </bean>
 
@@ -311,7 +319,7 @@
     </bean>
 
     <bean id="filterMoreThanOneHourDelayProcessor"
-          class="be.raildelays.batch.processor.FilterAndStoreProcessor"
+          class="be.raildelays.batch.processor.FilterByDelayThresholdAndStoreTrainIdProcessor"
           scope="step">
         <property name="threshold" value="60"/>
         <property name="keyName" value="moreThanOneHourDelay"/>
