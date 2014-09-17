@@ -35,7 +35,7 @@
             <!--</bean>-->
             <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
                 <property name="database" value="HSQL"/>
-                <property name="showSql" value="true"/>
+                <property name="showSql" value="false"/>
                 <property name="databasePlatform" value="org.hibernate.dialect.HSQLDialect"/>
             </bean>
             <!--<bean class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter">
