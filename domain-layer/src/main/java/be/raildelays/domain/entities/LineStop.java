@@ -465,10 +465,17 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
         }
 
         public LineStop build() {
+            return build(true);
+        }
+
+        public LineStop build(boolean validate) {
             LineStop result;
 
             result = new LineStop(this);
-            validate(result);
+
+            if (validate) {
+                validate(result);
+            }
 
             //-- Copy backward
             LineStop backwardLineStop = result;
