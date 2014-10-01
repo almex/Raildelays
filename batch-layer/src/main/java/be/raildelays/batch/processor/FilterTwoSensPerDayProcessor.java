@@ -50,7 +50,7 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
                 do {
                     matchingExcelRow = outputReader.read();
 
-                    if (matchingExcelRow != null) {
+                    if (matchingExcelRow != null && !BatchExcelRow.EMPTY.equals(matchingExcelRow)) {
                         if (new CompareToBuilder().append(item.getDate(), matchingExcelRow.getDate())
                                 .append(item.getDepartureStation(), matchingExcelRow.getDepartureStation())
                                 .append(item.getArrivalStation(), matchingExcelRow.getArrivalStation())

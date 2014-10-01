@@ -21,9 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.file.RowAggregator;
 import org.springframework.batch.item.file.RowMappingException;
 
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -42,16 +39,12 @@ public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchExcelRowAggregator.class);
 
-    private final Validator validator;
-
     private String language = Language.EN.name();
 
     private BatchExcelRowMapper batchExcelRowMapper;
 
 
     public BatchExcelRowAggregator() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
         batchExcelRowMapper = new BatchExcelRowMapper();
         batchExcelRowMapper.setValidateOutcomes(true);
         batchExcelRowMapper.afterPropertiesSet();
