@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.ReaderNotOpenException;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
@@ -78,8 +79,8 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
             try {
                 result = rowMapper.mapRow(row, getCurrentIndex());
             } catch (Exception ex) {
-                throw new RowMappingException("Parsing error at line: " + getCurrentIndex() + " in resource=["
-                        + resource.getDescription() + "], input=[" + row + "]", ex, row, getCurrentIndex());
+                throw new ParseException("Parsing error at line: " + getCurrentIndex() + " in resource=["
+                        + resource.getDescription() + "], input=[" + row + "]", ex);
             }
         }
 

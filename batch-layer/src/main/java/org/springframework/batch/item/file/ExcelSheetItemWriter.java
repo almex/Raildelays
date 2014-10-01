@@ -12,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.ItemWriterException;
+import org.springframework.batch.item.WriteFailedException;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
@@ -124,7 +126,7 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
             try {
                 previousRow = rowAggregator.aggregate(item, workbook, sheetIndex, getCurrentItemIndex());
             } catch (Exception e) {
-                LOGGER.error("We were not able to write in the Excel file", e);
+                throw new WriteFailedException("We were not able to write in the Excel file", e);
             }
         }
 

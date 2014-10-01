@@ -19,6 +19,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.file.RowAggregator;
+import org.springframework.batch.item.file.RowMappingException;
 
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -45,10 +46,15 @@ public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
 
     private String language = Language.EN.name();
 
+    private BatchExcelRowMapper batchExcelRowMapper;
+
 
     public BatchExcelRowAggregator() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
+        batchExcelRowMapper = new BatchExcelRowMapper();
+        batchExcelRowMapper.setValidateOutcomes(true);
+        batchExcelRowMapper.afterPropertiesSet();
     }
 
     private static <T> void setFormat(Row row, int cellIndex, T value, CellFormatter<T> formatter) {
@@ -96,9 +102,13 @@ public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
         Language lang = Language.valueOf(language.toUpperCase());
 
         if (row != null && row.getCell(2) != null) {
-            previousRow = new BatchExcelRowMapper().mapRow(row, rowIndex);
+            try {
+                previousRow = batchExcelRowMapper.mapRow(row, rowIndex);
+            } catch (RowMappingException e) {
+                previousRow = null;
+            }
 
-            if (!validator.validate(previousRow).isEmpty()) {
+            if (BatchExcelRow.EMPTY.equals(previousRow)) {
                 previousRow = null;
             }
 

@@ -13,6 +13,8 @@ public class BatchExcelRow extends ExcelRow implements ItemIndexAware, ItemCount
 
     private boolean canceled;
 
+    public static final BatchExcelRow EMPTY = new Builder(null, null).delay(0L).build();
+
     private Long index;
 
     private BatchExcelRow(Builder builder) {

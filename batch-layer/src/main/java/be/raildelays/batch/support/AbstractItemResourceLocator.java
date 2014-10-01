@@ -72,7 +72,8 @@ public abstract class AbstractItemResourceLocator implements ResourceLocator {
                     }
                 })) {
                     try {
-                        int currentRowIndex = resourceItemSearch.indexOf(new BatchExcelRow.Builder(null, null).delay(0L).build(), new FileSystemResource(file));
+                        //-- We search the first empty Row
+                        int currentRowIndex = resourceItemSearch.indexOf(BatchExcelRow.EMPTY, new FileSystemResource(file));
 
                         if (currentRowIndex != -1) {
                             result = file;

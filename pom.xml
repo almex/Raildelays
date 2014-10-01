@@ -72,7 +72,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
-        <version.spring>4.0.6.RELEASE</version.spring>
+        <version.spring>4.1.1.RELEASE</version.spring>
         <version.spring.batch>3.0.1.RELEASE</version.spring.batch>
         <version.spring.data>1.6.2.RELEASE</version.spring.data>
         <version.spring.data.rest>2.0.1.RELEASE</version.spring.data.rest>
@@ -84,7 +84,7 @@
         <version.openjpa>2.2.2</version.openjpa>
         <version.hibernate.validator>5.0.1.Final</version.hibernate.validator>
         <version.querydsl>3.4.2</version.querydsl>
-        <version.spring.boot>0.5.0.M7</version.spring.boot>
+        <version.spring.boot>1.1.7.RELEASE</version.spring.boot>
         <version.validation.api>1.1.0.Final</version.validation.api>
         <version.javax.el-api>2.2.4</version.javax.el-api>
         <version.hsqldb>2.3.2</version.hsqldb>

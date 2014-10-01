@@ -13,18 +13,18 @@ public class RowMappingException extends ParseException {
     private int lineNumber;
 
     public RowMappingException(String message, Row row) {
-        super(message);
+        super("Mapping error: '" + message + " at row=" + row);
         this.row = row;
     }
 
     public RowMappingException(String message, Row row, int lineNumber) {
-        super(message);
+        super("Mapping error: '" + message + "' at line=" + lineNumber + ", row=" + row);
         this.row = row;
         this.lineNumber = lineNumber;
     }
 
     public RowMappingException(String message, Throwable cause, Row row, int lineNumber) {
-        super(message, cause);
+        super("Mapping error: '" + message + "' at line=" + lineNumber + ", row=" + row, cause);
         this.row = row;
         this.lineNumber = lineNumber;
     }

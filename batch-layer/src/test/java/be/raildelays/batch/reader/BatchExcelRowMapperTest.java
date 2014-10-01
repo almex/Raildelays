@@ -68,7 +68,7 @@ public class BatchExcelRowMapperTest {
         BatchExcelRow batchExcelRow = mapper.mapRow(row, 0);
 
         Assert.assertNotNull(batchExcelRow);
-        Assert.assertEquals(DELAY, batchExcelRow.getDelay());
+        Assert.assertEquals(DELAY, batchExcelRow.getDelay().longValue());
         Assert.assertEquals(format.format(TRAIN1), batchExcelRow.getEffectiveTrain1().getEnglishName());
     }
 

@@ -256,7 +256,7 @@ public class ExcelRow implements Comparable<ExcelRow> {
         this.effectiveTrain2 = effectiveTrain2;
     }
 
-    public long getDelay() {
+    public Long getDelay() {
         return delay;
     }
 
