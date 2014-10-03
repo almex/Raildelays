@@ -150,12 +150,14 @@ public class ExcelRow implements Comparable<ExcelRow>, Serializable {
 
     @Override
     public int compareTo(ExcelRow excelRow) {
-        int result = 0;
+        int result;
 
-        if (excelRow == null) {
+        if (excelRow == this) {
+            result = 0;
+        } else if (excelRow == null) {
             result = -1;
         } else {
-            // We give only a chronologic order based on expected time
+            // We give only a chronological order based on expected time
             result = new CompareToBuilder()
                     .append(this.getDate(), excelRow.getDate())
                     .append(this.getExpectedDepartureTime(), excelRow.getExpectedDepartureTime())

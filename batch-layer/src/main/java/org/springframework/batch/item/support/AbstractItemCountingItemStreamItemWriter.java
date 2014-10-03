@@ -1,5 +1,7 @@
 package org.springframework.batch.item.support;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemIndexAware;
 import org.springframework.batch.item.ItemStreamException;
@@ -12,6 +14,7 @@ import java.util.List;
  */
 public abstract class AbstractItemCountingItemStreamItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractItemCountingItemStreamItemWriter.class);
     private static final String WRITE_COUNT = "write.count";
     private static final String WRITE_COUNT_MAX = "write.count.max";
     private boolean saveState = true;
@@ -62,7 +65,11 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
                 }
                 currentItemIndex++;
             }
+
+            LOGGER.trace("[currentItemCount={}, currentItemIndex={}]", currentItemCount, currentItemIndex);
         }
+
+        LOGGER.debug("Written {} items", items);
     }
 
     @Override

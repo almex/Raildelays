@@ -1,10 +1,10 @@
 package be.raildelays.batch.processor;
 
 import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.batch.bean.StationBasedBatchExcelRowComparator;
 import be.raildelays.logging.Logger;
 import be.raildelays.logging.LoggerFactory;
 import org.apache.commons.lang.Validate;
-import org.apache.commons.lang.builder.CompareToBuilder;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ExecutionContext;
@@ -57,10 +57,7 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
                  */
                 for (BatchExcelRow matchingExcelRow = outputReader.read(); matchingExcelRow != null; matchingExcelRow = outputReader.read()) {
                     if (!isEmpty(matchingExcelRow)) {
-                        if (new CompareToBuilder().append(item.getDate(), matchingExcelRow.getDate())
-                                .append(item.getDepartureStation(), matchingExcelRow.getDepartureStation())
-                                .append(item.getArrivalStation(), matchingExcelRow.getArrivalStation())
-                                .toComparison() == 0) {
+                        if (new StationBasedBatchExcelRowComparator().compare(item, matchingExcelRow) == 0) {
                             /**
                              * Here we know that we have a collision: we match the same date and the same sens.
                              * If the delay of the item is not greater than the one in the Excel sheet then we skip it.

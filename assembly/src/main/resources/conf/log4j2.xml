@@ -146,7 +146,7 @@
                                  fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/step2Writer.log"
                                  filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/step2Writer-%d{MM-dd-yyyy}-%i.log.gz"
                                  append="true">
-                        <PatternLayout pattern="%d{DATE} %m%n"/>
+                        <PatternLayout pattern="%c{1} %m%n"/>
                         <Policies>
                             <TimeBasedTriggeringPolicy/>
                             <SizeBasedTriggeringPolicy size="1 MB"/>
@@ -247,6 +247,10 @@
         <logger name="org.springframework.batch.item.support.SortedItemStreamWriter" level="trace" additivity="false">
             <appender-ref ref="step2Writer"/>
         </logger>
+        <logger name="be.raildelays.batch.writer.BatchExcelRowAggregator" level="trace" additivity="false">
+            <appender-ref ref="step2Writer"/>
+        </logger>
+
         <logger name="be.raildelays.batch.listener.LogSkippedItemListener" level="trace" additivity="false">
             <appender-ref ref="step2SkippedItems"/>
         </logger>

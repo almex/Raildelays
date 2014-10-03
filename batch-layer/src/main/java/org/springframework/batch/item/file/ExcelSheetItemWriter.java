@@ -124,6 +124,8 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
         if (item != null) {
             try {
                 previousRow = rowAggregator.aggregate(item, workbook, sheetIndex, getCurrentItemIndex());
+
+                LOGGER.trace("Previous row={}", previousRow);
             } catch (Exception e) {
                 throw new WriteFailedException("We were not able to write in the Excel file", e);
             }
