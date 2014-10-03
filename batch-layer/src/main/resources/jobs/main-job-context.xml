@@ -291,7 +291,6 @@
                         <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
                         <property name="rowMapper">
                             <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
-                                <property name="validateOutcomes" value="false"/>
                                 <property name="language" value="#{jobParameters['lang']}"/>
                             </bean>
                         </property>
@@ -378,7 +377,6 @@
                 <property name="rowMapper">
                     <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
                         <property name="language" value="#{jobParameters['lang']}"/>
-                        <property name="validateOutcomes" value="true"/>
                     </bean>
                 </property>
             </bean>

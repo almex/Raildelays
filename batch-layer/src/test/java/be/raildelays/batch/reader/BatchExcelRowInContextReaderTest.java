@@ -43,7 +43,7 @@ public class BatchExcelRowInContextReaderTest {
                 .effectiveTrain1(new Train("529")) //
                 .effectiveTrain2(new Train("516")) //
                 .delay(10L) //
-                .build();
+                .build(false);
         reader.setKeyName(KEY_NAME);
         context.put(KEY_NAME, expected);
     }
