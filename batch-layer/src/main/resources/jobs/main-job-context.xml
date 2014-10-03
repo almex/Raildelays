@@ -57,22 +57,15 @@
                         <batch:listener ref="logSkippedItemListener"/>
                         <batch:listener ref="resourceLocatorListener"/>
                         <batch:listener ref="logStep2ItemProcessorListener"/>
-                        <batch:listener>
-                            <bean class="org.springframework.batch.core.listener.ExecutionContextPromotionListener">
-                                <property name="keys">
-                                    <array>
-                                        <value>moreThanOneHourDelay</value>
-                                    </array>
-                                </property>
-                            </bean>
-                        </batch:listener>
+                        <batch:listener ref="promoteContextListener"/>
                     </batch:listeners>
                 </batch:chunk>
                 <batch:transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
             </batch:tasklet>
             <batch:listeners merge="true">
                 <batch:listener ref="delaysItemReader"/>
-                <batch:listener ref="filterTwoSensPerDayProcessor"/>
+                <batch:listener ref="filterTwoSensPerDayXlsProcessor"/>
+                <batch:listener ref="filterTwoSensPerDayContextProcessor"/>
                 <batch:listener ref="filterMoreThanOneHourDelayProcessor"/>
                 <batch:listener ref="loggerContextStepListener"/>
             </batch:listeners>
@@ -159,7 +152,7 @@
         <property name="stationB" value="#{jobParameters['station.b.name']}"/>
         <property name="language" value="#{jobParameters['lang']}"/>
         <property name="date" value="#{jobParameters['date']}"/>
-        <property name="threshold" value="${excel.item.delay.threshold}"/>
+        <property name="threshold" value="${excel.item.delay.min.threshold}"/>
     </bean>
 
     <bean id="delaysFromDepartureItemReader"
@@ -172,7 +165,7 @@
             <list>
                 <value>#{jobParameters['date']}</value>
                 <value>#{jobParameters['station.a.name']}</value>
-                <value>${excel.item.delay.threshold}</value>
+                <value>${excel.item.delay.min.threshold}</value>
             </list>
         </property>
         <property name="sort">
@@ -192,7 +185,7 @@
             <list>
                 <value>#{jobParameters['date']}</value>
                 <value>#{jobParameters['station.b.name']}</value>
-                <value>${excel.item.delay.threshold}</value>
+                <value>${excel.item.delay.min.threshold}</value>
             </list>
         </property>
         <property name="sort">
@@ -203,10 +196,9 @@
     </bean>
 
     <bean id="retrieveLineStopViaContextReader"
-          class="be.raildelays.batch.reader.ByTrainIdAndDateLineStopReader"
+          class="be.raildelays.batch.reader.BatchExcelRowInContextReader"
           scope="step">
-        <property name="trainId" value="#{jobExecutionContext['moreThanOneHourDelay']}"/>
-        <property name="date" value="#{jobParameters['date']}"/>
+        <property name="keyName" value="${excel.item.max.key}"/>
     </bean>
 
     <!-- ================================================================================================== -->
@@ -228,13 +220,15 @@
         <property name="delegates">
             <list>
                 <ref bean="aggregateExpectedTimeProcessor"/>
+                <ref bean="validatorProcessor"/>
                 <ref bean="excelRowMapperProcessor"/>
                 <ref bean="validatorProcessor"/>
                 <ref bean="searchNextTrainProcessor"/>
-                <ref bean="filterTwoSensPerDayProcessor"/>
+                <ref bean="validatorProcessor"/>
+                <ref bean="filterTwoSensPerDayContextProcessor"/>
+                <ref bean="filterTwoSensPerDayXlsProcessor"/>
                 <ref bean="filterSmallDelaysProcessor"/>
                 <ref bean="filterMoreThanOneHourDelayProcessor"/>
-                <ref bean="validatorProcessor"/>
             </list>
         </property>
     </bean>
@@ -243,11 +237,6 @@
           class="org.springframework.batch.item.support.CompositeItemProcessor">
         <property name="delegates">
             <list>
-                <ref bean="aggregateExpectedTimeProcessor"/>
-                <ref bean="excelRowMapperProcessor"/>
-                <ref bean="validatorProcessor"/>
-                <ref bean="searchNextTrainProcessor"/>
-                <ref bean="filterTwoSensPerDayProcessor"/>
                 <ref bean="validatorProcessor"/>
                 <ref bean="batchExcelRowToSimpleMailMessageProcessor"/>
             </list>
@@ -290,7 +279,7 @@
         </property>
     </bean>
 
-    <bean id="filterTwoSensPerDayProcessor"
+    <bean id="filterTwoSensPerDayXlsProcessor"
           class="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor"
           scope="step">
         <property name="outputReader">
@@ -302,7 +291,7 @@
                         <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
                         <property name="rowMapper">
                             <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
-                                <property name="validateOutcomes" value="true"/>
+                                <property name="validateOutcomes" value="false"/>
                                 <property name="language" value="#{jobParameters['lang']}"/>
                             </bean>
                         </property>
@@ -313,16 +302,26 @@
         </property>
     </bean>
 
+    <bean id="filterTwoSensPerDayContextProcessor"
+          class="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor"
+          scope="step">
+        <property name="outputReader">
+            <bean class="be.raildelays.batch.reader.BatchExcelRowInContextReader">
+                <property name="keyName" value="${excel.item.max.key}"/>
+            </bean>
+        </property>
+    </bean>
+
     <bean id="filterSmallDelaysProcessor"
           class="be.raildelays.batch.processor.FilterSmallDelaysProcessor">
-        <property name="threshold" value="${excel.item.delay.threshold}"/>
+        <property name="threshold" value="${excel.item.delay.min.threshold}"/>
     </bean>
 
     <bean id="filterMoreThanOneHourDelayProcessor"
-          class="be.raildelays.batch.processor.FilterByDelayThresholdAndStoreTrainIdProcessor"
+          class="be.raildelays.batch.processor.FilterByDelayMaxAndStoreInContextProcessor"
           scope="step">
-        <property name="threshold" value="60"/>
-        <property name="keyName" value="moreThanOneHourDelay"/>
+        <property name="threshold" value="${excel.item.delay.max.threshold}"/>
+        <property name="keyName" value="${excel.item.max.key}"/>
     </bean>
 
     <bean id="batchExcelRowToSimpleMailMessageProcessor"
@@ -409,7 +408,7 @@
         <property name="entityManagerFactory" ref="raildelaysEntityManagerFactory"/>
     </bean>
 
-    <bean id="emailWriter" 
+    <bean id="emailWriter"
           class="org.springframework.batch.item.mail.SimpleMailMessageItemWriter"
           scope="step">
         <property name="mailSender">
@@ -453,6 +452,15 @@
           class="be.raildelays.batch.listener.LoggerContextStepListener"
           scope="step"/>
 
+    <bean id="promoteContextListener"
+          class="org.springframework.batch.core.listener.ExecutionContextPromotionListener"
+          scope="step">
+        <property name="keys">
+            <array>
+                <value>${excel.item.max.key}</value>
+            </array>
+        </property>
+    </bean>
 
     <!-- ================================================================================================== -->
     <!-- =====================================        RESOURCES       ===================================== -->

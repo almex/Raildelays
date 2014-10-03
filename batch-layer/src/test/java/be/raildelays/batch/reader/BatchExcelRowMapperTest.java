@@ -74,8 +74,8 @@ public class BatchExcelRowMapperTest {
 
     @Test
     public void testRoundTrip() throws Exception {
-        DateFormat timeFormat = new SimpleDateFormat("HH:mm");
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        final DateFormat timeFormat = new SimpleDateFormat("HH:mm");
+        final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
         BatchExcelRow expected = new BatchExcelRow.Builder(dateFormat.parse("01/01/2000"), null) //
                 .departureStation(new Station("BRUXELLES-CENTRAL")) //

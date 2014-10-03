@@ -19,9 +19,9 @@ import static org.springframework.batch.item.file.ExcelSheetItemWriter.Format;
 /**
  * We communicate through the {@link org.springframework.batch.item.ExecutionContext} the file name used to create a new file.
  * The actual resource is used to build the final of a new file.
- * <p>
+ * <p/>
  * MaxItemCount must be a dividend of chunk-size
- * <p>
+ * <p/>
  * original: path/filemane.extension
  * result: path/filename_suffix.extension
  *
@@ -64,28 +64,22 @@ public abstract class AbstractItemResourceLocator implements ResourceLocator {
         File result = null;
 
         if (directory != null) {
-            try {
-                for (File file : directory.listFiles(new FileFilter() {
-                    @Override
-                    public boolean accept(File pathname) {
-                        return pathname.getName().endsWith(Format.OLE2.getFileExtension()) || pathname.getName().endsWith(Format.OOXML.getFileExtension());
-                    }
-                })) {
-                    try {
-                        //-- We search the first empty Row
-                        int currentRowIndex = resourceItemSearch.indexOf(BatchExcelRow.EMPTY, new FileSystemResource(file));
-
-                        if (currentRowIndex != -1) {
-                            result = file;
-                        }
-                    } catch (InvalidFormatException e) {
-                        LOGGER.error("Excel format not supported for this workbook!", e);
-                    } catch (IOException e) {
-                        LOGGER.error("Error when opening an Excel workbook", e);
-                    }
+            for (File file : directory.listFiles(new FileFilter() {
+                @Override
+                public boolean accept(File pathname) {
+                    return pathname.getName().endsWith(Format.OLE2.getFileExtension()) || pathname.getName().endsWith(Format.OOXML.getFileExtension());
                 }
-            } catch (Exception e) {
-                throw new IOException("Cannot find content in your Excel file", e);
+            })) {
+                try {
+                    //-- We search the first empty Row
+                    if (resourceItemSearch.indexOf(BatchExcelRow.EMPTY, new FileSystemResource(file)) != ResourceItemSearch.EOF) {
+                        result = file;
+                    }
+                } catch (InvalidFormatException e) {
+                    throw new IOException("Excel format not supported for this workbook!", e);
+                } catch (Exception e) {
+                    throw new IOException("Cannot find content in your Excel file", e);
+                }
             }
         }
 

@@ -65,7 +65,7 @@ public class ItemWriterResourceLocatorWithItemSearchIT extends AbstractFileTest 
         StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution();
 
         listener.beforeStep(stepExecution);
-        listener.beforeWrite(Arrays.asList(new BatchExcelRow[]{new BatchExcelRow.Builder(DATE, null).build()}));
+        listener.beforeWrite(Arrays.asList(new BatchExcelRow[]{new BatchExcelRow.Builder(DATE, null).build(false)}));
         Resource resource = resourceLocator.getResource(stepExecution.getExecutionContext());
 
         Assert.assertNotNull(resource);
@@ -79,7 +79,7 @@ public class ItemWriterResourceLocatorWithItemSearchIT extends AbstractFileTest 
         reader.setMaxItemCount(1);
 
         listener.beforeStep(stepExecution);
-        listener.beforeWrite(Arrays.asList(new BatchExcelRow[]{new BatchExcelRow.Builder(DATE, null).build()}));
+        listener.beforeWrite(Arrays.asList(new BatchExcelRow[]{new BatchExcelRow.Builder(DATE, null).build(false)}));
         Resource resource = resourceLocator.getResource(stepExecution.getExecutionContext());
 
         Assert.assertNotNull(resource);

@@ -22,12 +22,12 @@ import org.springframework.beans.factory.InitializingBean;
  * </p>
  *
  * @author Almex
- * @see be.raildelays.batch.reader.ByTrainIdAndDateLineStopReader
+ * @see be.raildelays.batch.reader.BatchExcelRowInContextReader
  * @since 1.2
  */
-public class FilterByDelayThresholdAndStoreTrainIdProcessor implements ItemProcessor<BatchExcelRow, BatchExcelRow>, InitializingBean {
+public class FilterByDelayMaxAndStoreInContextProcessor implements ItemProcessor<BatchExcelRow, BatchExcelRow>, InitializingBean {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("Fas", FilterByDelayThresholdAndStoreTrainIdProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("Fas", FilterByDelayMaxAndStoreInContextProcessor.class);
 
     private Long threshold;
 
@@ -68,12 +68,10 @@ public class FilterByDelayThresholdAndStoreTrainIdProcessor implements ItemProce
     }
 
     private void storeInContext(final BatchExcelRow item) {
-        if (item.getExpectedTrain1() != null) {
-            /*
-             * We can only have one train the same day having more than one hour of delay.
-             */
-            context.putLong(keyName, item.getExpectedTrain1().getId());
-        }
+        /*
+         * We can only have one train the same day having more than one hour of delay.
+         */
+        context.put(keyName, item);
     }
 
     public void setThreshold(Long threshold) {

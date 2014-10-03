@@ -14,8 +14,8 @@ import org.springframework.batch.item.file.RowMappingException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
+import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.text.DecimalFormat;
@@ -23,7 +23,6 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Set;
 
 /**
  * Simple {@link org.springframework.batch.item.file.RowMapper} matching our use case to deal with our
@@ -34,7 +33,6 @@ import java.util.Set;
  */
 public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, InitializingBean {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BatchExcelRowMapper.class);
     public static final int DATE_INDEX = 2;
     public static final int DEPARTURE_STATION_INDEX = 12;
     public static final int ARRIVAL_STATION_INDEX = 18;
@@ -52,7 +50,7 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
     public static final int EFFECTIVE_DEPARTURE_MM_INDEX = 44;
     public static final int EFFECTIVE_ARRIVAL_HH_INDEX = 45;
     public static final int EFFECTIVE_ARRIVAL_MM_INDEX = 47;
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(BatchExcelRowMapper.class);
     private boolean validateOutcomes = false;
 
     private Validator validator;
@@ -86,10 +84,8 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
 
     @Override
     public BatchExcelRow mapRow(Row row, int rowIndex) throws RowMappingException {
-        BatchExcelRow result = null;
-
-        if (!isEmpty(row)) {
-            result = new BatchExcelRow.Builder(getDate(row, DATE_INDEX), null)
+        try {
+            BatchExcelRow result = new BatchExcelRow.Builder(getDate(row, DATE_INDEX), null)
                     .departureStation(getStation(row, DEPARTURE_STATION_INDEX))
                     .arrivalStation(getStation(row, ARRIVAL_STATION_INDEX))
                     .linkStation(getStation(row, LINK_STATION_INDEX))
@@ -103,38 +99,14 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
                     .effectiveTrain2(getTrain(row, EFFECTIVE_TRAIN2_INDEX))
                     .delay(getLong(row, DELAY_INDEX))
                     .index((long) row.getRowNum())
-                    .build();
+                    .build(validateOutcomes);
 
-            if (validateOutcomes) {
-                validate(row, rowIndex, result);
-            }
-        } else {
-            /*
-             * If the first cell contains nothing we return an empty bean.
-             * If we return null then it will be interpreted as EOF by any user of an ItemReader.
-             */
-            result = BatchExcelRow.EMPTY;
-        }
-
-        return result;
-    }
-
-    private void validate(Row row, int rowIndex, BatchExcelRow result) {
-        Set<ConstraintViolation<BatchExcelRow>> constraintViolations = validator.validate(result);
-
-        if (!constraintViolations.isEmpty()) {
-            StringBuilder builder = new StringBuilder();
-
-            for (ConstraintViolation<BatchExcelRow> constraintViolation : constraintViolations) {
-                builder.append("\nConstraints violations occurred: ");
-                builder.append(constraintViolation.getPropertyPath());
-                builder.append(' ');
-                builder.append(constraintViolation.getMessage());
-            }
-
-            throw new RowMappingException(builder.toString(), row, rowIndex);
+            return result;
+        } catch (ValidationException e) {
+            throw new RowMappingException(e.getMessage(), row, rowIndex);
         }
     }
+
 
     private Train getTrain(Row row, int cellIndex) {
         NumberFormat numberFormat = new DecimalFormat("#");
@@ -154,37 +126,6 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
         String stationName = getString(row, cellIndex);
         if (StringUtils.isNotBlank(stationName)) {
             result = new Station(stationName, getLanguage());
-        }
-
-        return result;
-    }
-
-    private boolean isEmpty(Row row) {
-        boolean result = true;
-
-        if (row != null) {
-            result = isEmpty(row.getCell(DATE_INDEX))
-                    && isEmpty(row.getCell(DEPARTURE_STATION_INDEX))
-                    && isEmpty(row.getCell(ARRIVAL_STATION_INDEX))
-                    && isEmpty(row.getCell(EXPECTED_TRAIN1_INDEX))
-                    && isEmpty(row.getCell(EFFECTIVE_TRAIN1_INDEX));
-        }
-
-        return result;
-    }
-
-    private boolean isEmpty(Cell cell) {
-        boolean result = true;
-
-        if (cell != null) {
-            switch (cell.getCellType()) {
-                case Cell.CELL_TYPE_STRING:
-                case Cell.CELL_TYPE_NUMERIC:
-                case Cell.CELL_TYPE_BOOLEAN:
-                case Cell.CELL_TYPE_FORMULA:
-                    result = false;
-                    break;
-            }
         }
 
         return result;

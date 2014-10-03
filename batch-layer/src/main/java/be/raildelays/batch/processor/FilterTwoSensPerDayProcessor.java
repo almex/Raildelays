@@ -10,7 +10,7 @@ import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
+import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.beans.factory.InitializingBean;
 
 /**
@@ -22,14 +22,17 @@ import org.springframework.beans.factory.InitializingBean;
 public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow, BatchExcelRow>, InitializingBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("2Ss", AggregateExpectedTimeProcessor.class);
-    private ResourceAwareItemReaderItemStream<BatchExcelRow> outputReader;
+    private ItemStreamReader<BatchExcelRow> outputReader;
     private ExecutionContext executionContext;
+
+    private static boolean isEmpty(Object object) {
+        return object == null;
+    }
 
     @BeforeStep
     public void beforeStep(StepExecution stepExecution) {
         this.executionContext = stepExecution.getExecutionContext();
     }
-
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -38,7 +41,10 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
 
     @Override
     public BatchExcelRow process(final BatchExcelRow item) throws Exception {
-        BatchExcelRow result = null;
+        /*
+         * By default we return the item itself
+         */
+        BatchExcelRow result = item;
 
         LOGGER.trace("item", item);
 
@@ -46,11 +52,11 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
             outputReader.open(executionContext);
 
             try {
-                BatchExcelRow matchingExcelRow;
-                do {
-                    matchingExcelRow = outputReader.read();
-
-                    if (matchingExcelRow != null && !BatchExcelRow.EMPTY.equals(matchingExcelRow)) {
+                /*
+                 * If we reach the End Of File we still return the item (The Writer should append a new line).
+                 */
+                for (BatchExcelRow matchingExcelRow = outputReader.read(); matchingExcelRow != null; matchingExcelRow = outputReader.read()) {
+                    if (!isEmpty(matchingExcelRow)) {
                         if (new CompareToBuilder().append(item.getDate(), matchingExcelRow.getDate())
                                 .append(item.getDepartureStation(), matchingExcelRow.getDepartureStation())
                                 .append(item.getArrivalStation(), matchingExcelRow.getArrivalStation())
@@ -74,6 +80,8 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
                                     throw new IllegalArgumentException("We don't know the current index of this Excel row. We cannot replace it!");
                                 }
                             } else {
+                                result = null;
+
                                 LOGGER.trace("not_replace_matching", matchingExcelRow);
                             }
 
@@ -84,6 +92,8 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
 
                             break;
                         } else if (item.getDate().before(matchingExcelRow.getDate())) {
+                            result = null;
+
                             /**
                              * We stop searching. We expect that the content of the Excel file is sorted by date.
                              * This clause should never happen if the data read are also sorted by date.
@@ -104,7 +114,7 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
 
                         break;
                     }
-                } while (matchingExcelRow != null);
+                }
             } finally {
                 outputReader.close();
             }
@@ -118,7 +128,21 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
         return result;
     }
 
-    public void setOutputReader(ResourceAwareItemReaderItemStream<BatchExcelRow> outputReader) {
+    private boolean isEmpty(BatchExcelRow row) {
+        boolean result = true;
+
+        if (row != null) {
+            result = isEmpty(row.getDate())
+                    && isEmpty(row.getDepartureStation())
+                    && isEmpty(row.getArrivalStation())
+                    && isEmpty(row.getExpectedTrain1())
+                    && isEmpty(row.getEffectiveTrain1());
+        }
+
+        return result;
+    }
+
+    public void setOutputReader(ItemStreamReader<BatchExcelRow> outputReader) {
         this.outputReader = outputReader;
     }
 }

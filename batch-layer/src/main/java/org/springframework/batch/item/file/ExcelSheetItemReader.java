@@ -64,6 +64,16 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
         }
     }
 
+    /**
+     * Checking that the returned row is not null should validate if we have not reached the End Of File.
+     *
+     * @param row
+     * @return
+     */
+    private static boolean isEof(final Row row) {
+        return row == null;
+    }
+
     @Override
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(rowMapper, "rowMapper is required");
@@ -71,17 +81,21 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
 
     @Override
     protected T doRead() throws Exception {
-        T result = null;
+        T result;
 
         Row row = readRow();
 
-        if (row != null) {
+        if (!isEof(row)) {
             try {
                 result = rowMapper.mapRow(row, getCurrentIndex());
             } catch (Exception ex) {
                 throw new ParseException("Parsing error at line: " + getCurrentIndex() + " in resource=["
                         + resource.getDescription() + "], input=[" + row + "]", ex);
             }
+        } else {
+            noInput = true;
+            //-- In order to full-fil ItemReader contract we must return null
+            result = null;
         }
 
         return result;
@@ -164,13 +178,22 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
 
     @Override
     public int getCurrentIndex() {
-        int result = -1;
+        int result;
 
-        if (!noInput) {
+        if (isEof()) {
+            result = -1;
+        } else {
             result = getCurrentItemCount() + rowsToSkip - 1;
         }
 
         return result;
+    }
+
+    /**
+     * @return true if we have reached the end of file false otherwise
+     */
+    public boolean isEof() {
+        return noInput;
     }
 
     @Override

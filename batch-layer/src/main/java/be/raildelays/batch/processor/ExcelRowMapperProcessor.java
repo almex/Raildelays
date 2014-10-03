@@ -146,7 +146,7 @@ public class ExcelRowMapperProcessor implements ItemProcessor<LineStop, BatchExc
                         .effectiveTrain1(lineStopTo.getTrain()) //
                         .delay(lineStopTo.getArrivalTime().getDelay()) //
                         .canceled(lineStopTo.isCanceled() || lineStopFrom.isCanceled())
-                        .build();
+                        .build(false);
 
                 break;
             case ARRIVAL:
@@ -161,7 +161,7 @@ public class ExcelRowMapperProcessor implements ItemProcessor<LineStop, BatchExc
                         .effectiveTrain1(lineStopTo.getTrain()) //
                         .delay(lineStopTo.getArrivalTime().getDelay()) //
                         .canceled(lineStopTo.isCanceled() || lineStopFrom.isCanceled())
-                        .build();
+                        .build(false);
 
                 break;
             default:

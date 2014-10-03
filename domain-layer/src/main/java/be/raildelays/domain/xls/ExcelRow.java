@@ -10,11 +10,17 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.ValidationException;
+import javax.validation.Validator;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Describe a row in the delays Excel workbook.
@@ -24,7 +30,7 @@ import java.util.Date;
 @Entity
 @Table(name = "EXCEL_ROW", uniqueConstraints = @UniqueConstraint(columnNames = {
         "DATE", "SENS"}))
-public class ExcelRow implements Comparable<ExcelRow> {
+public class ExcelRow implements Comparable<ExcelRow>, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
@@ -349,6 +355,7 @@ public class ExcelRow implements Comparable<ExcelRow> {
 
     public static class Builder {
 
+        private static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
         protected final Date date;
         protected final Sens sens;
         protected Station arrivalStation;
@@ -436,9 +443,35 @@ public class ExcelRow implements Comparable<ExcelRow> {
         }
 
         public ExcelRow build() {
-            return new ExcelRow(this);
+            return build(true);
         }
 
+        public ExcelRow build(boolean validate) {
+            ExcelRow result = new ExcelRow(this);
+
+            if (validate) {
+                validate(result);
+            }
+
+            return result;
+        }
+
+        protected void validate(ExcelRow row) {
+            Set<ConstraintViolation<ExcelRow>> constraintViolations = validator.validate(row);
+
+            if (!constraintViolations.isEmpty()) {
+                StringBuilder builder = new StringBuilder();
+
+                for (ConstraintViolation<? extends ExcelRow> constraintViolation : constraintViolations) {
+                    builder.append("\nConstraints violations occurred: ");
+                    builder.append(constraintViolation.getPropertyPath());
+                    builder.append(' ');
+                    builder.append(constraintViolation.getMessage());
+                }
+
+                throw new ValidationException(builder.toString());
+            }
+        }
     }
 
 }

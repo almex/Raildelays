@@ -8,20 +8,19 @@ import be.raildelays.test.RaildelaysTestUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 
 import java.util.Date;
 
-public class FilterByDelayThresholdAndStoreTrainIdProcessorTest {
+public class FilterByDelayMaxAndStoreInContextProcessorTest {
 
     private static String KEY_NAME = "key";
     private static Language language = Language.EN;
     /*
      * The System Under Test.
      */
-    private FilterByDelayThresholdAndStoreTrainIdProcessor processor;
+    private FilterByDelayMaxAndStoreInContextProcessor processor;
     private StepExecution stepbExecution;
 
     private BatchExcelRow input;
@@ -32,14 +31,14 @@ public class FilterByDelayThresholdAndStoreTrainIdProcessorTest {
 
         stepbExecution = MetaDataInstanceFactory.createStepExecution();
 
-        processor = new FilterByDelayThresholdAndStoreTrainIdProcessor();
+        processor = new FilterByDelayMaxAndStoreInContextProcessor();
         processor.setKeyName(KEY_NAME);
         processor.setThreshold(60L);
         processor.beforeStep(stepbExecution);
 
         input = new BatchExcelRow.Builder(new Date(), Sens.DEPARTURE)
                 .expectedTrain1(RaildelaysTestUtils.generateTrain("dummy", Language.EN))
-                .build();
+                .build(false);
     }
 
     @Test
@@ -61,6 +60,6 @@ public class FilterByDelayThresholdAndStoreTrainIdProcessorTest {
         input.setDelay(61L);
         processor.process(input);
 
-        Assert.assertEquals(input.getExpectedTrain1().getId().longValue(), stepbExecution.getExecutionContext().getLong(KEY_NAME));
+        Assert.assertEquals(input, stepbExecution.getExecutionContext().get(KEY_NAME));
     }
 }

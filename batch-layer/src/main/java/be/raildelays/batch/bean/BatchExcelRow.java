@@ -11,10 +11,8 @@ import java.util.Date;
 
 public class BatchExcelRow extends ExcelRow implements ItemIndexAware, ItemCountAware {
 
+    public static final BatchExcelRow EMPTY = new Builder(null, null).delay(0L).build(false);
     private boolean canceled;
-
-    public static final BatchExcelRow EMPTY = new Builder(null, null).delay(0L).build();
-
     private Long index;
 
     private BatchExcelRow(Builder builder) {
@@ -60,7 +58,18 @@ public class BatchExcelRow extends ExcelRow implements ItemIndexAware, ItemCount
 
         @Override
         public BatchExcelRow build() {
-            return new BatchExcelRow(this);
+            return build(true);
+        }
+
+        @Override
+        public BatchExcelRow build(boolean validate) {
+            BatchExcelRow result = new BatchExcelRow(this);
+
+            if (validate) {
+                super.validate(result);
+            }
+
+            return result;
         }
 
         @Override
