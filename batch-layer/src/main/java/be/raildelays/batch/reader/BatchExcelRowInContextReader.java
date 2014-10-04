@@ -6,11 +6,11 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamReader;
 
 /**
- * Retrieve LineStop corresponding to the train id/date parameters.
- * This implementation can only be ran once.
+ * Get the {@link be.raildelays.batch.bean.BatchExcelRow} retrieved from the <code>Step</code>
+ * {@link org.springframework.batch.item.ExecutionContext}. This implementation can only read one item.
  *
  * @author Almex
- * @see be.raildelays.batch.processor.FilterByDelayMaxAndStoreInContextProcessor
+ * @see be.raildelays.batch.processor.StoreDelayGreaterThanThresholdInContextProcessor
  * @since 1.2
  */
 public class BatchExcelRowInContextReader implements ItemStreamReader<BatchExcelRow> {
@@ -24,7 +24,7 @@ public class BatchExcelRowInContextReader implements ItemStreamReader<BatchExcel
     public BatchExcelRow read() throws Exception {
         BatchExcelRow result = singleton;
 
-        singleton = null; //-- We consume it then next time we return null to promote EOF
+        singleton = null; // We consume it then next time we return null to promote EOF
 
         return result;
     }

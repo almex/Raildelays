@@ -26,6 +26,7 @@
                                      commit-interval="10" skip-limit="10" retry-limit="3">
                             <batch:retryable-exception-classes>
                                 <batch:include class="java.io.IOException"/>
+                                <batch:include class="org.springframework.dao.OptimisticLockingFailureException"/>
                             </batch:retryable-exception-classes>
                             <batch:skippable-exception-classes>
                                 <batch:include class="org.springframework.batch.item.validator.ValidationException"/>
@@ -43,7 +44,7 @@
                 </batch:step>
             </batch:partition>
         </batch:step>
-        <batch:step id="generateExcelFiles" next="handleDelayMoreThanOneHour">
+        <batch:step id="generateExcelFiles">
             <batch:tasklet transaction-manager="batchTransactionManager">
                 <batch:chunk reader="delaysItemReader"
                              processor="chainedProcessorsForDelays"
@@ -61,13 +62,15 @@
                 </batch:chunk>
                 <batch:transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
             </batch:tasklet>
+            <batch:next on="COMPLETED_WITH_60M_DELAY" to="handleDelayMoreThanOneHour"/>
+            <batch:end on="*"/>
             <batch:listeners merge="true">
                 <batch:listener ref="delaysItemReader"/>
                 <batch:listener ref="filterTwoSensPerDayXlsProcessor"/>
-                <batch:listener ref="filterTwoSensPerDayContextProcessor"/>
-                <batch:listener ref="filterMoreThanOneHourDelayProcessor"/>
+                <batch:listener ref="storeInContextMoreThanOneHourDelayProcessor"/>
                 <batch:listener ref="loggerContextStepListener"/>
                 <batch:listener ref="promoteContextListener"/>
+                <batch:listener ref="decisionFlowListener"/>
             </batch:listeners>
         </batch:step>
         <batch:step id="handleDelayMoreThanOneHour">
@@ -81,7 +84,7 @@
                     </batch:listeners>
                 </batch:chunk>
             </batch:tasklet>
-            <batch:listeners>
+            <batch:listeners merge="true">
                 <batch:listener ref="demoteContextListener"/>
             </batch:listeners>
         </batch:step>
@@ -226,7 +229,7 @@
                 <ref bean="validatorProcessor"/>
                 <ref bean="filterTwoSensPerDayXlsProcessor"/>
                 <ref bean="filterSmallDelaysProcessor"/>
-                <ref bean="filterMoreThanOneHourDelayProcessor"/>
+                <ref bean="storeInContextMoreThanOneHourDelayProcessor"/>
             </list>
         </property>
     </bean>
@@ -299,23 +302,13 @@
         </property>
     </bean>
 
-    <bean id="filterTwoSensPerDayContextProcessor"
-          class="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor"
-          scope="step">
-        <property name="outputReader">
-            <bean class="be.raildelays.batch.reader.BatchExcelRowInContextReader">
-                <property name="keyName" value="${excel.item.max.key}"/>
-            </bean>
-        </property>
-    </bean>
-
     <bean id="filterSmallDelaysProcessor"
           class="be.raildelays.batch.processor.FilterSmallDelaysProcessor">
         <property name="threshold" value="${excel.item.delay.min.threshold}"/>
     </bean>
 
-    <bean id="filterMoreThanOneHourDelayProcessor"
-          class="be.raildelays.batch.processor.FilterByDelayMaxAndStoreInContextProcessor"
+    <bean id="storeInContextMoreThanOneHourDelayProcessor"
+          class="be.raildelays.batch.processor.StoreDelayGreaterThanThresholdInContextProcessor"
           scope="step">
         <property name="threshold" value="${excel.item.delay.max.threshold}"/>
         <property name="keyName" value="${excel.item.max.key}"/>
@@ -449,12 +442,23 @@
           class="be.raildelays.batch.listener.LoggerContextStepListener"
           scope="step"/>
 
+    <bean id="decisionFlowListener"
+          class="be.raildelays.batch.listener.MoreThanOneHourDecisionFlowListener"
+          scope="step">
+        <property name="keyName" value="${excel.item.max.key}"/>
+    </bean>
+
     <bean id="promoteContextListener"
           class="org.springframework.batch.core.listener.ExecutionContextPromotionListener"
           scope="step">
         <property name="keys">
             <array>
                 <value>${excel.item.max.key}</value>
+            </array>
+        </property>
+        <property name="statuses">
+            <array>
+                <value>COMPLETED_WITH_60M_DELAY</value>
             </array>
         </property>
     </bean>
@@ -468,7 +472,6 @@
             </array>
         </property>
     </bean>
-
 
 
     <!-- ================================================================================================== -->
