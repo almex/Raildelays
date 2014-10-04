@@ -35,7 +35,7 @@ public class BatchExcelRowInContextReader implements ItemStreamReader<BatchExcel
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
-        singleton = (BatchExcelRow) executionContext.remove(keyName);
+        singleton = (BatchExcelRow) executionContext.get(keyName);
     }
 
     @Override

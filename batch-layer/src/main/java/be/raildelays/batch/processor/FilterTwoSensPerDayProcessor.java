@@ -58,7 +58,7 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
                 for (BatchExcelRow matchingExcelRow = outputReader.read(); matchingExcelRow != null; matchingExcelRow = outputReader.read()) {
                     if (!isEmpty(matchingExcelRow)) {
                         if (new StationBasedBatchExcelRowComparator().compare(item, matchingExcelRow) == 0) {
-                            /**
+                            /*
                              * Here we know that we have a collision: we match the same date and the same sens.
                              * If the delay of the item is not greater than the one in the Excel sheet then we skip it.
                              */
@@ -68,7 +68,7 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
                                 if (matchingExcelRow.getIndex() != null) {
                                     result.setIndex(matchingExcelRow.getIndex());
 
-                                    /**
+                                    /*
                                      * Here, the delay of the item is greater than the matching Excel row.
                                      * We must replace the row currently in the Excel sheet with our item.
                                      */
@@ -82,7 +82,7 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
                                 LOGGER.trace("not_replace_matching", matchingExcelRow);
                             }
 
-                            /**
+                            /*
                              * We stop searching here. Either the result is found or we have to skip this item.
                              */
                             LOGGER.debug("stop_searching", result);
@@ -91,7 +91,7 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
                         } else if (item.getDate().before(matchingExcelRow.getDate())) {
                             result = null;
 
-                            /**
+                            /*
                              * We stop searching. We expect that the content of the Excel file is sorted by date.
                              * This clause should never happen if the data read are also sorted by date.
                              */
@@ -103,7 +103,7 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
                         result = item;
                         result.setIndex(null);
 
-                        /**
+                        /*
                          * In that case we reach the first empty row without matching any previous data.
                          * So, we have to add a new row to the Excel sheet.
                          */

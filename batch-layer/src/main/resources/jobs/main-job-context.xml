@@ -57,7 +57,6 @@
                         <batch:listener ref="logSkippedItemListener"/>
                         <batch:listener ref="resourceLocatorListener"/>
                         <batch:listener ref="logStep2ItemProcessorListener"/>
-                        <batch:listener ref="promoteContextListener"/>
                     </batch:listeners>
                 </batch:chunk>
                 <batch:transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
@@ -68,6 +67,7 @@
                 <batch:listener ref="filterTwoSensPerDayContextProcessor"/>
                 <batch:listener ref="filterMoreThanOneHourDelayProcessor"/>
                 <batch:listener ref="loggerContextStepListener"/>
+                <batch:listener ref="promoteContextListener"/>
             </batch:listeners>
         </batch:step>
         <batch:step id="handleDelayMoreThanOneHour">
@@ -75,16 +75,15 @@
                 <batch:chunk reader="retrieveLineStopViaContextReader"
                              processor="chainedProcessorsForMoreThanOneHourDelay"
                              writer="emailWriter"
-                             commit-interval="1" skip-limit="1">
-                    <batch:skippable-exception-classes>
-                        <batch:include class="org.springframework.batch.item.validator.ValidationException"/>
-                        <batch:include class="be.raildelays.batch.exception.ArrivalDepartureEqualsException"/>
-                    </batch:skippable-exception-classes>
+                             commit-interval="1">
                     <batch:listeners merge="true">
                         <batch:listener ref="logSkippedItemListener"/>
                     </batch:listeners>
                 </batch:chunk>
             </batch:tasklet>
+            <batch:listeners>
+                <batch:listener ref="demoteContextListener"/>
+            </batch:listeners>
         </batch:step>
         <batch:listeners merge="true">
             <batch:listener ref="loggerContextJobListener"/>
@@ -225,7 +224,6 @@
                 <ref bean="validatorProcessor"/>
                 <ref bean="searchNextTrainProcessor"/>
                 <ref bean="validatorProcessor"/>
-                <ref bean="filterTwoSensPerDayContextProcessor"/>
                 <ref bean="filterTwoSensPerDayXlsProcessor"/>
                 <ref bean="filterSmallDelaysProcessor"/>
                 <ref bean="filterMoreThanOneHourDelayProcessor"/>
@@ -460,6 +458,18 @@
             </array>
         </property>
     </bean>
+
+    <bean id="demoteContextListener"
+          class="org.springframework.batch.core.listener.ExecutionContextDemotionListener"
+          scope="step">
+        <property name="keys">
+            <array>
+                <value>${excel.item.max.key}</value>
+            </array>
+        </property>
+    </bean>
+
+
 
     <!-- ================================================================================================== -->
     <!-- =====================================        RESOURCES       ===================================== -->
