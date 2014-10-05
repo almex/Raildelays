@@ -23,7 +23,7 @@ public class StationBasedBatchExcelRowComparator implements Comparator<ExcelRow>
     @Override
     public int compare(ExcelRow lho, ExcelRow rho) {
         int result;
-        Language lang = Language.valueOf(language);
+        Language lang = Language.valueOf(language.toUpperCase());
 
 
         if (lho == rho) {

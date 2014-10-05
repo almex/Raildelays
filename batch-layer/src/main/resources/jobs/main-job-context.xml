@@ -392,7 +392,7 @@
         <property name="keyName" value="${excel.item.max.key}"/>
         <property name="comparator">
             <bean class="be.raildelays.batch.bean.StationBasedBatchExcelRowComparator">
-                <property name="language" value="#{jobParameters['lang']}"/>
+                <constructor-arg value="#{jobParameters['lang']}"/>
             </bean>
         </property>
     </bean>
