@@ -183,6 +183,7 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
         if (isEof()) {
             result = -1;
         } else {
+            // it's a zero-based index ()
             result = getCurrentItemCount() + rowsToSkip - 1;
         }
 

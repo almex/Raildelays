@@ -2,6 +2,7 @@ package be.raildelays.batch.processor;
 
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.bean.StationBasedBatchExcelRowComparator;
+import be.raildelays.domain.Language;
 import be.raildelays.logging.Logger;
 import be.raildelays.logging.LoggerFactory;
 import org.apache.commons.lang.Validate;
@@ -24,6 +25,7 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
     private static final Logger LOGGER = LoggerFactory.getLogger("2Ss", AggregateExpectedTimeProcessor.class);
     private ItemStreamReader<BatchExcelRow> outputReader;
     private ExecutionContext executionContext;
+    private String language = Language.EN.name();
 
     private static boolean isEmpty(Object object) {
         return object == null;
@@ -45,6 +47,7 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
          * By default we return the item itself
          */
         BatchExcelRow result = item;
+        final StationBasedBatchExcelRowComparator comparator = new StationBasedBatchExcelRowComparator(language);
 
         LOGGER.trace("item", item);
 
@@ -57,7 +60,7 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
                  */
                 for (BatchExcelRow matchingExcelRow = outputReader.read(); matchingExcelRow != null; matchingExcelRow = outputReader.read()) {
                     if (!isEmpty(matchingExcelRow)) {
-                        if (new StationBasedBatchExcelRowComparator().compare(item, matchingExcelRow) == 0) {
+                        if (comparator.compare(item, matchingExcelRow) == 0) {
                             /*
                              * Here we know that we have a collision: we match the same date and the same sens.
                              * If the delay of the item is not greater than the one in the Excel sheet then we skip it.
@@ -137,6 +140,10 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
         }
 
         return result;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 
     public void setOutputReader(ItemStreamReader<BatchExcelRow> outputReader) {

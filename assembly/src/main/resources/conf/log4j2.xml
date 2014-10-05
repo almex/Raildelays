@@ -255,6 +255,10 @@
             <appender-ref ref="step2SkippedItems"/>
         </logger>
 
+        <logger name="be.raildelays.batch.processor.FilterItemInContextProcessor" level="trace" additivity="false">
+            <appender-ref ref="step2SkippedItems"/>
+        </logger>
+
         <logger name="org.springframework.batch" level="debug" additivity="false">
             <appender-ref ref="springbatch"/>
         </logger>

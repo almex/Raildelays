@@ -81,7 +81,7 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
 
             boolean created = false;
             if (!outputFile.exists()) {
-                FileUtils.setUpOutputFile(outputFile, false, true, false);
+                FileUtils.setUpOutputFile(outputFile, false, true, shouldDeleteIfExists);
                 created = outputFile.exists();
                 jumpToItem(0);
 

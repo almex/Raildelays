@@ -56,6 +56,7 @@
                     </batch:skippable-exception-classes>
                     <batch:listeners merge="true">
                         <batch:listener ref="logSkippedItemListener"/>
+                        <!-- To compute file name of the Excel file after filtering -->
                         <batch:listener ref="resourceLocatorListener"/>
                         <batch:listener ref="logStep2ItemProcessorListener"/>
                     </batch:listeners>
@@ -71,6 +72,7 @@
                 <batch:listener ref="filterTwoSensPerDayXlsProcessor"/>
                 <!-- Because this processor need access to the StepExecutionContext -->
                 <batch:listener ref="storeInContextMoreThanOneHourDelayProcessor"/>
+                <!-- Feed Logger MDC with some properties from StepContext -->
                 <batch:listener ref="loggerContextStepListener"/>
                 <!-- To transfer some information for next steps -->
                 <batch:listener ref="promoteContextListener"/>
@@ -84,6 +86,7 @@
                              writer="emailWriter"
                              commit-interval="1">
                     <batch:listeners merge="true">
+                        <!-- Put in a log file skipped items -->
                         <batch:listener ref="logSkippedItemListener"/>
                     </batch:listeners>
                 </batch:chunk>
@@ -100,21 +103,24 @@
                              writer="excelSheetItemWriter2"
                              commit-interval="${excel.sheet0.maxitemcount}">
                     <batch:listeners merge="true">
+                        <!-- Put in a log file skipped items -->
                         <batch:listener ref="logSkippedItemListener"/>
                     </batch:listeners>
                 </batch:chunk>
             </batch:tasklet>
             <batch:listeners merge="true">
-                <!-- Get back some information from previous step -->
-                <batch:listener ref="demoteContextListener"/>
+                <!-- To transfer some information for next steps -->
+                <batch:listener ref="promoteContextListener"/>
                 <!-- Because this processor need access to the StepExecutionContext -->
                 <batch:listener ref="filterItemInContextProcessor"/>
                 <!-- To compute file name of the Excel file after filtering (we could have removed the first row) -->
                 <batch:listener ref="resourceLocatorListener"/>
-                <!-- To transfer some information for next steps -->
-                <batch:listener ref="promoteContextListener"/>
                 <!-- Because this bean need access to the StepExecutionContext -->
                 <batch:listener ref="temporaryFileResource"/>
+                <!-- Put in a log file skipped items -->
+                <batch:listener ref="logSkippedItemListener"/>
+                <!-- Get back some information from previous step -->
+                <batch:listener ref="demoteContextListener"/>
             </batch:listeners>
         </batch:step>
         <batch:step id="renameFile">
@@ -131,6 +137,7 @@
             </batch:listeners>
         </batch:step>
         <batch:listeners merge="true">
+            <!-- Feed Logger MDC with some properties from JobContext -->
             <batch:listener ref="loggerContextJobListener"/>
         </batch:listeners>
     </batch:job>
@@ -339,6 +346,7 @@
     <bean id="filterTwoSensPerDayXlsProcessor"
           class="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor"
           scope="step">
+        <property name="language" value="#{jobParameters['lang']}"/>
         <property name="outputReader">
             <bean class="org.springframework.batch.item.file.MultiResourceAwareItemReader">
                 <property name="delegate">
@@ -382,6 +390,11 @@
           class="be.raildelays.batch.processor.FilterItemInContextProcessor"
           scope="step">
         <property name="keyName" value="${excel.item.max.key}"/>
+        <property name="comparator">
+            <bean class="be.raildelays.batch.bean.StationBasedBatchExcelRowComparator">
+                <property name="language" value="#{jobParameters['lang']}"/>
+            </bean>
+        </property>
     </bean>
 
     <!-- ================================================================================================== -->
@@ -597,11 +610,12 @@
         </property>
     </bean>
 
-    <bean id="temporaryFileResource" class="org.springframework.batch.item.support.ResourceLocatorAdapter">
+    <bean id="temporaryFileResource"
+          class="org.springframework.batch.item.support.ResourceLocatorAdapter"
+          scope="step">
         <property name="resourceLocator">
-            <bean class="be.raildelays.batch.support.TemporaryFileResourceLocator"
-                  scope="step">
-                <property name="resource" value="file:#{stepExecutionContext['${excel.resource.key}']}"/>
+            <bean class="be.raildelays.batch.support.TemporaryFileResourceLocator">
+            <property name="resource" value="file:#{stepExecutionContext['${excel.resource.key}']}"/>
                 <property name="relativePathAndFileName" value="tmp/moreThanOneHour.xls"/>
                 <property name="keyName" value="excel.tmp.file.path.key"/>
             </bean>

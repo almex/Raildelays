@@ -7,6 +7,8 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
+import java.util.Comparator;
+
 /**
  * @author Almex
  * @since 1.2
@@ -15,6 +17,7 @@ public class FilterItemInContextProcessor<T> implements ItemProcessor<T, T>, Ini
 
     private String keyName;
     private ExecutionContext executionContext;
+    private Comparator<T> comparator;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -31,7 +34,7 @@ public class FilterItemInContextProcessor<T> implements ItemProcessor<T, T>, Ini
         T result = item;
 
         if (executionContext.containsKey(keyName)) {
-            if (executionContext.get(keyName).equals(item)) {
+            if (comparator.compare((T) executionContext.get(keyName), item) == 0) {
                 result = null;
             }
         }
@@ -41,5 +44,9 @@ public class FilterItemInContextProcessor<T> implements ItemProcessor<T, T>, Ini
 
     public void setKeyName(String keyName) {
         this.keyName = keyName;
+    }
+
+    public void setComparator(Comparator<T> comparator) {
+        this.comparator = comparator;
     }
 }
