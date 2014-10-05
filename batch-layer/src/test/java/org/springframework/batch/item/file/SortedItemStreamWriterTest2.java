@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.item.support.MultiResourceSupportItemWriter;
 import org.springframework.batch.item.support.SortedItemStreamWriter;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -76,6 +77,7 @@ public class SortedItemStreamWriterTest2 extends AbstractFileTest {
 
         resourceLocator.setResource(resource);
         resourceLocator.setResourceItemSearch(resourceItemSearch);
+        resourceLocator.setKeyName("foo");
 
         stepExecution = MetaDataInstanceFactory.createStepExecution();
         delegate.setReader(reader);

@@ -3,12 +3,12 @@ package be.raildelays.batch.processor;
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.logging.Logger;
 import be.raildelays.logging.LoggerFactory;
-import org.apache.commons.lang.Validate;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 
 /**
  * Filter delay greater than a certain threshold and store the {@link be.raildelays.batch.bean.BatchExcelRow}
@@ -44,7 +44,7 @@ public class StoreDelayGreaterThanThresholdInContextProcessor implements ItemPro
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Validate.notNull(threshold, "Threshold must be set");
+        Assert.notNull(threshold, "The 'threshold' property must be provided");
     }
 
     @Override

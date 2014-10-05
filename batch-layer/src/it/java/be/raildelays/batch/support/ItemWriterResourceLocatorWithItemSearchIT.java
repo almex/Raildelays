@@ -57,6 +57,7 @@ public class ItemWriterResourceLocatorWithItemSearchIT extends AbstractFileTest 
         resourceLocator = new ItemWriterResourceLocator();
         resourceLocator.setResourceItemSearch(itemSearch);
         resourceLocator.setResource(new FileSystemResource(CURRENT_PATH + EXCEL_FILE_PREFIX + Format.OLE2.getFileExtension()));
+        resourceLocator.setKeyName("foo");
     }
 
 

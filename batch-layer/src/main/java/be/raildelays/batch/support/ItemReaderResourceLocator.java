@@ -24,8 +24,8 @@ public class ItemReaderResourceLocator extends AbstractItemResourceLocator {
     public Resource getResource(ExecutionContext context) throws IOException {
         Resource result = resource;
 
-        if (context.containsKey(FILE_PATH_KEY)) {
-            result = new FileSystemResource(new File(context.getString(FILE_PATH_KEY)));
+        if (context.containsKey(keyName)) {
+            result = new FileSystemResource(new File(context.getString(keyName)));
         } else {
             File existingFile = getExistingFile();
 

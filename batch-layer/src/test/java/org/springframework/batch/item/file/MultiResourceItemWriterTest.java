@@ -20,6 +20,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.support.MultiResourceSupportItemWriter;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
@@ -78,6 +79,7 @@ public class MultiResourceItemWriterTest extends AbstractFileTest {
 
         resourceLocator.setResource(resource);
         resourceLocator.setResourceItemSearch(resourceItemSearch);
+        resourceLocator.setKeyName("foo");
 
         delegate.setName("test2");
         delegate.setTemplate(new ClassPathResource("template.xls"));

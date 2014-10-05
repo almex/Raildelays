@@ -240,7 +240,7 @@
         <logger name="org.springframework.batch.item.file.ExcelSheetItemWriter" level="trace" additivity="false">
             <appender-ref ref="step2Writer"/>
         </logger>
-        <logger name="org.springframework.batch.item.file.MultiResourceSupportItemWriter" level="trace"
+        <logger name="org.springframework.batch.item.support.MultiResourceSupportItemWriter" level="trace"
                 additivity="false">
             <appender-ref ref="step2Writer"/>
         </logger>

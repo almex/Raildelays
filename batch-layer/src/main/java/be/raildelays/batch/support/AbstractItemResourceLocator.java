@@ -29,10 +29,10 @@ import static org.springframework.batch.item.file.ExcelSheetItemWriter.Format;
  */
 public abstract class AbstractItemResourceLocator implements ResourceLocator {
 
-    public static final String FILE_PATH_KEY = "resource.file.path";
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractItemResourceLocator.class);
     protected Resource resource;
     private ResourceItemSearch<BatchExcelRow> resourceItemSearch;
+    public String keyName;
 
     protected File getFileBasedOnSuffix(ExecutionContext context) throws IOException {
         String suffix = context.getString(ResourceLocatorListener.FILENAME_SUFFIX_KEY);
@@ -88,5 +88,9 @@ public abstract class AbstractItemResourceLocator implements ResourceLocator {
 
     public void setResourceItemSearch(ResourceItemSearch<BatchExcelRow> resourceItemSearch) {
         this.resourceItemSearch = resourceItemSearch;
+    }
+
+    public void setKeyName(String keyName) {
+        this.keyName = keyName;
     }
 }

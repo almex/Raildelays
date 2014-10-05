@@ -65,15 +65,19 @@
             <batch:next on="COMPLETED_WITH_60M_DELAY" to="handleDelayMoreThanOneHour"/>
             <batch:end on="*"/>
             <batch:listeners merge="true">
+                <!-- Because this reader need access to the StepExecutionContext -->
                 <batch:listener ref="delaysItemReader"/>
+                <!-- Because this processor need access to the StepExecutionContext -->
                 <batch:listener ref="filterTwoSensPerDayXlsProcessor"/>
+                <!-- Because this processor need access to the StepExecutionContext -->
                 <batch:listener ref="storeInContextMoreThanOneHourDelayProcessor"/>
                 <batch:listener ref="loggerContextStepListener"/>
+                <!-- To transfer some information for next steps -->
                 <batch:listener ref="promoteContextListener"/>
                 <batch:listener ref="decisionFlowListener"/>
             </batch:listeners>
         </batch:step>
-        <batch:step id="handleDelayMoreThanOneHour">
+        <batch:step id="handleDelayMoreThanOneHour" next="removeDelayMoreThanOneHour">
             <batch:tasklet transaction-manager="batchTransactionManager">
                 <batch:chunk reader="retrieveLineStopViaContextReader"
                              processor="chainedProcessorsForMoreThanOneHourDelay"
@@ -85,6 +89,44 @@
                 </batch:chunk>
             </batch:tasklet>
             <batch:listeners merge="true">
+                <!-- Get back some information from previous step -->
+                <batch:listener ref="demoteContextListener"/>
+            </batch:listeners>
+        </batch:step>
+        <batch:step id="removeDelayMoreThanOneHour" next="renameFile">
+            <batch:tasklet transaction-manager="batchTransactionManager">
+                <batch:chunk reader="excelSheetItemReader4"
+                             processor="filterItemInContextProcessor"
+                             writer="excelSheetItemWriter2"
+                             commit-interval="${excel.sheet0.maxitemcount}">
+                    <batch:listeners merge="true">
+                        <batch:listener ref="logSkippedItemListener"/>
+                    </batch:listeners>
+                </batch:chunk>
+            </batch:tasklet>
+            <batch:listeners merge="true">
+                <!-- Get back some information from previous step -->
+                <batch:listener ref="demoteContextListener"/>
+                <!-- Because this processor need access to the StepExecutionContext -->
+                <batch:listener ref="filterItemInContextProcessor"/>
+                <!-- To compute file name of the Excel file after filtering (we could have removed the first row) -->
+                <batch:listener ref="resourceLocatorListener"/>
+                <!-- To transfer some information for next steps -->
+                <batch:listener ref="promoteContextListener"/>
+                <!-- Because this bean need access to the StepExecutionContext -->
+                <batch:listener ref="temporaryFileResource"/>
+            </batch:listeners>
+        </batch:step>
+        <batch:step id="renameFile">
+            <batch:tasklet transaction-manager="batchTransactionManager">
+                <bean class="be.raildelays.batch.tasklet.MoveFileTasklet"
+                      scope="step">
+                    <property name="source" value="file:#{stepExecutionContext['${excel.resource.key}']}.tmp"/>
+                    <property name="destination" value="file:#{stepExecutionContext['excel.tmp.file.path.key']}"/>
+                </bean>
+            </batch:tasklet>
+            <batch:listeners merge="true">
+                <!-- Get back some information from previous step -->
                 <batch:listener ref="demoteContextListener"/>
             </batch:listeners>
         </batch:step>
@@ -201,6 +243,20 @@
           class="be.raildelays.batch.reader.BatchExcelRowInContextReader"
           scope="step">
         <property name="keyName" value="${excel.item.max.key}"/>
+    </bean>
+
+    <bean id="excelSheetItemReader4"
+          class="org.springframework.batch.item.file.ExcelSheetItemReader"
+          scope="step">
+        <property name="name" value="excelSheetItemReader4"/>
+        <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
+        <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
+        <property name="rowMapper">
+            <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
+                <property name="language" value="#{jobParameters['lang']}"/>
+            </bean>
+        </property>
+        <property name="resource" value="file:#{stepExecutionContext['${excel.resource.key}']}"/>
     </bean>
 
     <!-- ================================================================================================== -->
@@ -322,6 +378,12 @@
         <property name="subject" value="[SNCB/NMBS] Retard de plus d'une heure"/>
     </bean>
 
+    <bean id="filterItemInContextProcessor"
+          class="be.raildelays.batch.processor.FilterItemInContextProcessor"
+          scope="step">
+        <property name="keyName" value="${excel.item.max.key}"/>
+    </bean>
+
     <!-- ================================================================================================== -->
     <!-- =====================================         WRITERS        ===================================== -->
     <!-- ================================================================================================== -->
@@ -350,7 +412,7 @@
     </bean>
 
     <bean id="multiResourceItemWriter"
-          class="org.springframework.batch.item.file.MultiResourceSupportItemWriter"
+          class="org.springframework.batch.item.support.MultiResourceSupportItemWriter"
           scope="step">
         <property name="delegate" ref="sortedItemWriter"/>
         <property name="name" value="multiResourceItemWriter"/>
@@ -414,6 +476,23 @@
         </property>
     </bean>
 
+    <bean id="excelSheetItemWriter2"
+          class="org.springframework.batch.item.file.ExcelSheetItemWriter"
+          scope="step">
+        <property name="rowAggregator">
+            <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator"
+                  scope="step">
+                <property name="language" value="#{jobParameters['lang']}"/>
+            </bean>
+        </property>
+        <property name="name" value="excelSheetItemWriter2"/>
+        <property name="shouldDeleteIfExists" value="true"/>
+        <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
+        <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
+        <property name="template" value="file:#{jobParameters['excel.input.template']}"/>
+        <property name="resource" ref="temporaryFileResource"/>
+    </bean>
+
     <!-- ================================================================================================== -->
     <!-- =====================================        LISTENERS       ===================================== -->
     <!-- ================================================================================================== -->
@@ -454,6 +533,8 @@
         <property name="keys">
             <array>
                 <value>${excel.item.max.key}</value>
+                <value>${excel.resource.key}</value>
+                <value>excel.tmp.file.path.key</value>
             </array>
         </property>
         <property name="statuses">
@@ -469,6 +550,8 @@
         <property name="keys">
             <array>
                 <value>${excel.item.max.key}</value>
+                <value>${excel.resource.key}</value>
+                <value>excel.tmp.file.path.key</value>
             </array>
         </property>
     </bean>
@@ -483,6 +566,7 @@
           scope="step">
         <property name="resource" value="file:#{jobParameters['excel.output.path']}"/>
         <property name="resourceItemSearch" ref="resourceItemSearch"/>
+        <property name="keyName" value="${excel.resource.key}"/>
     </bean>
 
     <bean id="itemWriterResourceLocator"
@@ -490,6 +574,7 @@
           scope="step">
         <property name="resource" value="file:#{jobParameters['excel.output.path']}"/>
         <property name="resourceItemSearch" ref="resourceItemSearch"/>
+        <property name="keyName" value="${excel.resource.key}"/>
     </bean>
 
     <bean id="resourceItemSearch"
@@ -511,5 +596,17 @@
             <bean class="be.raildelays.batch.bean.ExcelRowComparator"/>
         </property>
     </bean>
+
+    <bean id="temporaryFileResource" class="org.springframework.batch.item.support.ResourceLocatorAdapter">
+        <property name="resourceLocator">
+            <bean class="be.raildelays.batch.support.TemporaryFileResourceLocator"
+                  scope="step">
+                <property name="resource" value="file:#{stepExecutionContext['${excel.resource.key}']}"/>
+                <property name="relativePathAndFileName" value="tmp/moreThanOneHour.xls"/>
+                <property name="keyName" value="excel.tmp.file.path.key"/>
+            </bean>
+        </property>
+    </bean>
+
 
 </beans>

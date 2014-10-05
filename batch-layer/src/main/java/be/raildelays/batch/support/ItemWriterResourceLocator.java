@@ -32,7 +32,7 @@ public class ItemWriterResourceLocator extends AbstractItemResourceLocator {
             file = getFileBasedOnSuffix(context);
         }
 
-        context.putString(FILE_PATH_KEY, file.getAbsolutePath());
+        context.putString(keyName, file.getAbsolutePath());
 
         return new FileSystemResource(file);
     }
