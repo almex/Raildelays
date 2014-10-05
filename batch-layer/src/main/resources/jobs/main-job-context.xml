@@ -92,6 +92,8 @@
                 </batch:chunk>
             </batch:tasklet>
             <batch:listeners merge="true">
+                <!-- To transfer some information for next steps -->
+                <batch:listener ref="promoteContextListener"/>
                 <!-- Get back some information from previous step -->
                 <batch:listener ref="demoteContextListener"/>
             </batch:listeners>
@@ -614,14 +616,15 @@
     <bean id="temporaryFileResource"
           class="org.springframework.batch.item.support.ResourceLocatorAdapter"
           scope="step">
-        <property name="resourceLocator">
-            <bean class="be.raildelays.batch.support.TemporaryFileResourceLocator"
-                  scope="step">
-                <property name="resource" value="file:#{stepExecutionContext['${excel.resource.key}']}"/>
-                <property name="relativePathAndFileName" value="tmp/moreThanOneHour.xls"/>
-                <property name="keyName" value="excel.tmp.file.path.key"/>
-            </bean>
-        </property>
+        <property name="resourceLocator" ref="temporaryFileResourceLocator"/>
+    </bean>
+
+    <bean id="temporaryFileResourceLocator"
+          class="be.raildelays.batch.support.TemporaryFileResourceLocator"
+          scope="step">
+        <property name="resource" value="file:#{stepExecutionContext['${excel.resource.key}']}"/>
+        <property name="relativePathAndFileName" value="tmp/moreThanOneHour.xls"/>
+        <property name="keyName" value="excel.tmp.file.path.key"/>
     </bean>
 
 
