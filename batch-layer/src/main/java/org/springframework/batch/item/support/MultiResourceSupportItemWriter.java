@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
+import org.springframework.batch.item.util.FileUtils;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -61,8 +62,7 @@ public class MultiResourceSupportItemWriter<T> extends AbstractItemCountingItemS
         List<T> items = new ArrayList<>();
         if (!opened) {
             File file = setResourceToDelegate();
-            // TODO use FileUtils.setUpOutputFile() instead
-            file.createNewFile();
+            FileUtils.setUpOutputFile(file, false, true, false);
             Assert.state(file.canWrite(), "Output resource " + file.getAbsolutePath() + " must be writable");
             delegate.open(executionContext);
             opened = true;
@@ -124,6 +124,7 @@ public class MultiResourceSupportItemWriter<T> extends AbstractItemCountingItemS
             delegate.setResource(resource);
             // We don't have to create the resource
             opened = true;
+
 
             LOGGER.trace("Stream is opened");
         } else {
