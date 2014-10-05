@@ -121,8 +121,8 @@
             <batch:tasklet transaction-manager="batchTransactionManager">
                 <bean class="be.raildelays.batch.tasklet.MoveFileTasklet"
                       scope="step">
-                    <property name="source" value="file:#{stepExecutionContext['${excel.resource.key}']}.tmp"/>
-                    <property name="destination" value="file:#{stepExecutionContext['excel.tmp.file.path.key']}"/>
+                    <property name="source" value="file:#{stepExecutionContext['excel.tmp.file.path.key']}"/>
+                    <property name="destination" value="file:#{stepExecutionContext['${excel.resource.key}']}"/>
                 </bean>
             </batch:tasklet>
             <batch:listeners merge="true">

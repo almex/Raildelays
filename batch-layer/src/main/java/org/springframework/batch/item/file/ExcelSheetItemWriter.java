@@ -14,6 +14,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.WriteFailedException;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemWriter;
+import org.springframework.batch.item.util.FileUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 
@@ -80,7 +81,8 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
 
             boolean created = false;
             if (!outputFile.exists()) {
-                created = outputFile.createNewFile();
+                FileUtils.setUpOutputFile(outputFile, false, true, false);
+                created = outputFile.exists();
                 jumpToItem(0);
 
                 LOGGER.debug("Output file '{}' created:{}", outputFile.getAbsolutePath(), created);
