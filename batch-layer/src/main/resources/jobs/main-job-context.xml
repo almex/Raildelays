@@ -500,6 +500,7 @@
         </property>
         <property name="name" value="excelSheetItemWriter2"/>
         <property name="shouldDeleteIfExists" value="true"/>
+        <property name="useItemIndex" value="false"/>
         <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
         <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
         <property name="template" value="file:#{jobParameters['excel.input.template']}"/>
@@ -614,8 +615,9 @@
           class="org.springframework.batch.item.support.ResourceLocatorAdapter"
           scope="step">
         <property name="resourceLocator">
-            <bean class="be.raildelays.batch.support.TemporaryFileResourceLocator">
-            <property name="resource" value="file:#{stepExecutionContext['${excel.resource.key}']}"/>
+            <bean class="be.raildelays.batch.support.TemporaryFileResourceLocator"
+                  scope="step">
+                <property name="resource" value="file:#{stepExecutionContext['${excel.resource.key}']}"/>
                 <property name="relativePathAndFileName" value="tmp/moreThanOneHour.xls"/>
                 <property name="keyName" value="excel.tmp.file.path.key"/>
             </bean>
