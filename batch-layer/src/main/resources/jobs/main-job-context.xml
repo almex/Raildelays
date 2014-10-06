@@ -556,6 +556,7 @@
         <property name="statuses">
             <array>
                 <value>COMPLETED_WITH_60M_DELAY</value>
+                <value>COMPLETED</value>
             </array>
         </property>
     </bean>
