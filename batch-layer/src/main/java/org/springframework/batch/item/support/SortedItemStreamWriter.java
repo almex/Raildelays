@@ -39,7 +39,6 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
     private Resource outputResource;
     private ExecutionContext executionContext;
     private boolean createBackupFile = false;
-    private boolean reverseOrder = false;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -80,15 +79,7 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
     }
 
     private void sort(List<T> allItems) {
-        final Comparator<? super T> orderAwareComparator;
-
-        if (reverseOrder) {
-            orderAwareComparator = Collections.reverseOrder(comparator);
-        } else {
-            orderAwareComparator = comparator;
-        }
-
-        Collections.sort(allItems, orderAwareComparator);
+        Collections.sort(allItems, comparator);
         indexItems(allItems);
 
         LOGGER.trace("Items sorted={}", allItems.size());
@@ -235,7 +226,7 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
         this.reader = reader;
     }
 
-    public void setReverseOrder(boolean reverseOrder) {
-        this.reverseOrder = reverseOrder;
+    public void setComparator(Comparator<? super T> comparator) {
+        this.comparator = comparator;
     }
 }

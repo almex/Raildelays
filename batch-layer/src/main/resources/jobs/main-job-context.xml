@@ -437,7 +437,6 @@
     <bean id="sortedItemWriter"
           class="org.springframework.batch.item.support.SortedItemStreamWriter"
           scope="step">
-        <property name="reverseOrder" value="true"/>
         <property name="reader">
             <bean class="org.springframework.batch.item.file.ExcelSheetItemReader">
                 <property name="name" value="excelSheetItemReader2"/>
@@ -449,6 +448,9 @@
                     </bean>
                 </property>
             </bean>
+        </property>
+        <property name="comparator">
+            <bean class="be.raildelays.batch.bean.TimeBasedBatchExcelRowComparator"/>
         </property>
         <property name="writer" ref="excelSheetItemWriter"/>
     </bean>

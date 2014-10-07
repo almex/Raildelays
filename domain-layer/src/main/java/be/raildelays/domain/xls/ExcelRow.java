@@ -155,7 +155,7 @@ public class ExcelRow implements Comparable<ExcelRow>, Serializable {
         if (excelRow == this) {
             result = 0;
         } else if (excelRow == null) {
-            result = -1;
+            result = 1;
         } else {
             // We give only a chronological order based on expected time
             result = new CompareToBuilder()
