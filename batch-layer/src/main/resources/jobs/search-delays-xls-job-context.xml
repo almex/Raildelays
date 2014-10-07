@@ -116,7 +116,7 @@
     </bean>
 
     <bean id="multiResourceItemWriter"
-          class="org.springframework.batch.item.file.MultiResourceSupportItemWriter"
+          class="org.springframework.batch.item.support.MultiResourceSupportItemWriter"
           scope="step">
         <property name="name" value="multiResourceItemWriter"/>
         <property name="delegate" ref="excelSheetItemWriter"/>

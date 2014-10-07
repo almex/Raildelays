@@ -43,10 +43,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>raildelays-batch</artifactId>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>admin-presentation</artifactId>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>

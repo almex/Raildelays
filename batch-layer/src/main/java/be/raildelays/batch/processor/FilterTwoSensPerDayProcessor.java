@@ -1,16 +1,17 @@
 package be.raildelays.batch.processor;
 
 import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.batch.bean.StationBasedBatchExcelRowComparator;
+import be.raildelays.domain.Language;
 import be.raildelays.logging.Logger;
 import be.raildelays.logging.LoggerFactory;
 import org.apache.commons.lang.Validate;
-import org.apache.commons.lang.builder.CompareToBuilder;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
+import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.beans.factory.InitializingBean;
 
 /**
@@ -22,14 +23,18 @@ import org.springframework.beans.factory.InitializingBean;
 public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow, BatchExcelRow>, InitializingBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("2Ss", AggregateExpectedTimeProcessor.class);
-    private ResourceAwareItemReaderItemStream<BatchExcelRow> outputReader;
+    private ItemStreamReader<BatchExcelRow> outputReader;
     private ExecutionContext executionContext;
+    private String language = Language.EN.name();
+
+    private static boolean isEmpty(Object object) {
+        return object == null;
+    }
 
     @BeforeStep
     public void beforeStep(StepExecution stepExecution) {
         this.executionContext = stepExecution.getExecutionContext();
     }
-
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -38,7 +43,11 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
 
     @Override
     public BatchExcelRow process(final BatchExcelRow item) throws Exception {
-        BatchExcelRow result = null;
+        /*
+         * By default we return the item itself
+         */
+        BatchExcelRow result = item;
+        final StationBasedBatchExcelRowComparator comparator = new StationBasedBatchExcelRowComparator(language);
 
         LOGGER.trace("item", item);
 
@@ -46,16 +55,13 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
             outputReader.open(executionContext);
 
             try {
-                BatchExcelRow matchingExcelRow;
-                do {
-                    matchingExcelRow = outputReader.read();
-
-                    if (matchingExcelRow != null) {
-                        if (new CompareToBuilder().append(item.getDate(), matchingExcelRow.getDate())
-                                .append(item.getDepartureStation(), matchingExcelRow.getDepartureStation())
-                                .append(item.getArrivalStation(), matchingExcelRow.getArrivalStation())
-                                .toComparison() == 0) {
-                            /**
+                /*
+                 * If we reach the End Of File we still return the item (The Writer should append a new line).
+                 */
+                for (BatchExcelRow matchingExcelRow = outputReader.read(); matchingExcelRow != null; matchingExcelRow = outputReader.read()) {
+                    if (!isEmpty(matchingExcelRow)) {
+                        if (comparator.compare(item, matchingExcelRow) == 0) {
+                            /*
                              * Here we know that we have a collision: we match the same date and the same sens.
                              * If the delay of the item is not greater than the one in the Excel sheet then we skip it.
                              */
@@ -65,7 +71,7 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
                                 if (matchingExcelRow.getIndex() != null) {
                                     result.setIndex(matchingExcelRow.getIndex());
 
-                                    /**
+                                    /*
                                      * Here, the delay of the item is greater than the matching Excel row.
                                      * We must replace the row currently in the Excel sheet with our item.
                                      */
@@ -74,17 +80,21 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
                                     throw new IllegalArgumentException("We don't know the current index of this Excel row. We cannot replace it!");
                                 }
                             } else {
+                                result = null;
+
                                 LOGGER.trace("not_replace_matching", matchingExcelRow);
                             }
 
-                            /**
+                            /*
                              * We stop searching here. Either the result is found or we have to skip this item.
                              */
                             LOGGER.debug("stop_searching", result);
 
                             break;
                         } else if (item.getDate().before(matchingExcelRow.getDate())) {
-                            /**
+                            result = null;
+
+                            /*
                              * We stop searching. We expect that the content of the Excel file is sorted by date.
                              * This clause should never happen if the data read are also sorted by date.
                              */
@@ -96,7 +106,7 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
                         result = item;
                         result.setIndex(null);
 
-                        /**
+                        /*
                          * In that case we reach the first empty row without matching any previous data.
                          * So, we have to add a new row to the Excel sheet.
                          */
@@ -104,7 +114,7 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
 
                         break;
                     }
-                } while (matchingExcelRow != null);
+                }
             } finally {
                 outputReader.close();
             }
@@ -118,7 +128,25 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
         return result;
     }
 
-    public void setOutputReader(ResourceAwareItemReaderItemStream<BatchExcelRow> outputReader) {
+    private boolean isEmpty(BatchExcelRow row) {
+        boolean result = true;
+
+        if (row != null) {
+            result = isEmpty(row.getDate())
+                    && isEmpty(row.getDepartureStation())
+                    && isEmpty(row.getArrivalStation())
+                    && isEmpty(row.getExpectedTrain1())
+                    && isEmpty(row.getEffectiveTrain1());
+        }
+
+        return result;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public void setOutputReader(ItemStreamReader<BatchExcelRow> outputReader) {
         this.outputReader = outputReader;
     }
 }

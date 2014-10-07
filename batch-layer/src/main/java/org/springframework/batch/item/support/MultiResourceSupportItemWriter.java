@@ -1,11 +1,11 @@
-package org.springframework.batch.item.file;
+package org.springframework.batch.item.support;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemWriter;
-import org.springframework.batch.item.support.ResourceLocator;
+import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
+import org.springframework.batch.item.util.FileUtils;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -16,10 +16,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * In case of restart this writer retrieve the last resource given by the {@link org.springframework.batch.item.support.ResourceLocator}.
+ * This implementation extends {@link org.springframework.batch.item.support.AbstractItemCountingItemStreamItemWriter}
+ * and handle change of resource when we reach the <code>maxItemCount</code> and delegate to a
+ * {@link org.springframework.batch.item.file.ResourceAwareItemWriterItemStream} the effective writing. The logic
+ * to locate the resource is resolved by the {@link org.springframework.batch.item.support.ResourceLocator}.
+ * <p>
+ *   Subsequently to that, if the delegate is also an
+ *   {@link org.springframework.batch.item.support.AbstractItemCountingItemStreamItemWriter} then it must have a
+ *   <code>maxItemCount</code> lower than the one configured in this writer.
+ *   <ul>
+ *       <li><code>MultiResourceSupportItemWriter.maxItemCount</code> : is the max total number of items among all
+ *       resources</li>
+ *       <li><code>delegate.maxItemCount</code> : is the max number of items for one specific resource</li>
+ *   </ul>
+ * </p>
+ * <p>
+ *     If the {@link org.springframework.core.io.Resource} does not exists, it will be created by this writer.
+ * </p>
+ * <p>
+ *   In case of restart this writer retrieve the last resource given by the last call to
+ *   {@link org.springframework.batch.item.support.ResourceLocator#getResource(org.springframework.batch.item.ExecutionContext)}.
+ * </p>
  *
  * @author Almex
  */
+//FIXME If the delegate is not an AbstractItemCountingItemStreamItemWriter then we should change resource upon this.maxItemCount
 public class MultiResourceSupportItemWriter<T> extends AbstractItemCountingItemStreamItemWriter<T> {
 
     private final static String RESOURCE_KEY = "resource";
@@ -41,8 +62,7 @@ public class MultiResourceSupportItemWriter<T> extends AbstractItemCountingItemS
         List<T> items = new ArrayList<>();
         if (!opened) {
             File file = setResourceToDelegate();
-            // create only if write is called
-            file.createNewFile();
+            FileUtils.setUpOutputFile(file, false, true, false);
             Assert.state(file.canWrite(), "Output resource " + file.getAbsolutePath() + " must be writable");
             delegate.open(executionContext);
             opened = true;
@@ -104,6 +124,7 @@ public class MultiResourceSupportItemWriter<T> extends AbstractItemCountingItemS
             delegate.setResource(resource);
             // We don't have to create the resource
             opened = true;
+
 
             LOGGER.trace("Stream is opened");
         } else {

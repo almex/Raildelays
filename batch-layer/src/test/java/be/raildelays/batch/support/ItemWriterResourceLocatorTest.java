@@ -43,6 +43,7 @@ public class ItemWriterResourceLocatorTest extends AbstractFileTest {
         listener = new ResourceLocatorListener();
         resourceLocator = new ItemWriterResourceLocator();
         resourceLocator.setResource(new FileSystemResource(CURRENT_PATH + EXCEL_FILE_PREFIX + Format.OLE2.getFileExtension()));
+        resourceLocator.setKeyName("foo");
     }
 
     @Test
@@ -57,7 +58,7 @@ public class ItemWriterResourceLocatorTest extends AbstractFileTest {
         });
 
         listener.beforeStep(stepExecution);
-        listener.beforeWrite(Arrays.asList(new BatchExcelRow[]{new BatchExcelRow.Builder(DATE, null).build()}));
+        listener.beforeWrite(Arrays.asList(new BatchExcelRow[]{new BatchExcelRow.Builder(DATE, null).build(false)}));
         Resource resource = resourceLocator.getResource(stepExecution.getExecutionContext());
 
         Assert.assertNotNull(resource);
@@ -76,7 +77,7 @@ public class ItemWriterResourceLocatorTest extends AbstractFileTest {
         });
 
         listener.beforeStep(stepExecution);
-        listener.beforeWrite(Arrays.asList(new BatchExcelRow[]{new BatchExcelRow.Builder(DATE, null).build()}));
+        listener.beforeWrite(Arrays.asList(new BatchExcelRow[]{new BatchExcelRow.Builder(DATE, null).build(false)}));
         Resource resource = resourceLocator.getResource(stepExecution.getExecutionContext());
 
         Assert.assertNotNull(resource);

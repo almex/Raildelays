@@ -1,5 +1,7 @@
 package org.springframework.batch.item.support;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemIndexAware;
 import org.springframework.batch.item.ItemStreamException;
@@ -12,17 +14,19 @@ import java.util.List;
  */
 public abstract class AbstractItemCountingItemStreamItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractItemCountingItemStreamItemWriter.class);
     private static final String WRITE_COUNT = "write.count";
     private static final String WRITE_COUNT_MAX = "write.count.max";
     private boolean saveState = true;
     private int currentItemIndex = 0;
     private int currentItemCount = 0;
     private int maxItemCount = Integer.MAX_VALUE;
+    private boolean useItemIndex = true;
 
     /**
      * Write item to a certain index.
      *
-     * @return true if it's a new item, false if it has replaced something
+     * @return <code>true</code> if it's a new item, <code>false</code> if it has replaced something
      * @throws Exception
      */
     protected abstract boolean doWrite(T item) throws Exception;
@@ -38,9 +42,7 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
     protected abstract void doClose() throws Exception;
 
     /**
-     * Move to the given item index. Subclasses should override this method if
-     * there is a more efficient way of moving to given index than re-reading
-     * the input using {@link #doWrite(T)}.
+     * Move to the given item index.
      */
     protected void jumpToItem(int itemIndex) throws Exception {
         this.currentItemIndex = itemIndex;
@@ -49,7 +51,7 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
     @Override
     public void write(List<? extends T> items) throws Exception {
         for (T item : items) {
-            if (item instanceof ItemIndexAware) {
+            if (item instanceof ItemIndexAware && useItemIndex) {
                 Long index = ((ItemIndexAware) item).getIndex();
                 if (index != null) {
                     jumpToItem(index.intValue());
@@ -62,7 +64,11 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
                 }
                 currentItemIndex++;
             }
+
+            LOGGER.trace("[currentItemCount={}, currentItemIndex={}]", currentItemCount, currentItemIndex);
         }
+
+        LOGGER.debug("Written {} items", items);
     }
 
     @Override
@@ -183,5 +189,20 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
      */
     public void setMaxItemCount(int count) {
         this.maxItemCount = count;
+    }
+
+    /**
+     * In case we have items implementing {@link org.springframework.batch.item.ItemIndexAware} you can decide if its
+     * index should be used or not during the writing process.
+     * <p>
+     * It's a common usage to set it to <code>false</code> when you have an
+     * {@link org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader} as input and filter items
+     * in between then you don't want to skip a row in the output file (filling the gap left by the filtered item).
+     * </p>
+     *
+     * @param useItemIndex <code>true</code> if you want to use it, <code>false</code> otherwise.
+     */
+    public void setUseItemIndex(boolean useItemIndex) {
+        this.useItemIndex = useItemIndex;
     }
 }

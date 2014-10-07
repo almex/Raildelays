@@ -12,9 +12,11 @@ public class ExcelRowComparator implements Comparator<ExcelRow> {
 
     @Override
     public int compare(ExcelRow lho, ExcelRow rho) {
-        int result = 0;
+        int result;
 
-        if (lho == null) {
+        if (lho == rho) {
+            result = 0;
+        } else if (lho == null) {
             result = rho == null ? 0 : 1;
         } else if (rho == null) {
             result = -1;

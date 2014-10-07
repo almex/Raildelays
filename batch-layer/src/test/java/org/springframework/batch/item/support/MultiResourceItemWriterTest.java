@@ -1,4 +1,4 @@
-package org.springframework.batch.item.file;
+package org.springframework.batch.item.support;
 
 import be.raildelays.batch.AbstractFileTest;
 import be.raildelays.batch.bean.BatchExcelRow;
@@ -20,6 +20,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.file.ExcelSheetItemReader;
+import org.springframework.batch.item.file.ExcelSheetItemWriter;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
@@ -78,6 +80,7 @@ public class MultiResourceItemWriterTest extends AbstractFileTest {
 
         resourceLocator.setResource(resource);
         resourceLocator.setResourceItemSearch(resourceItemSearch);
+        resourceLocator.setKeyName("foo");
 
         delegate.setName("test2");
         delegate.setTemplate(new ClassPathResource("template.xls"));
@@ -97,7 +100,6 @@ public class MultiResourceItemWriterTest extends AbstractFileTest {
         Iterator<Calendar> it = DateUtils.iterator(new SimpleDateFormat("dd/MM/yyyy").parse("01/01/2000"), DateUtils.RANGE_MONTH_MONDAY);
 
         for (int i = 0; i < 80 && it.hasNext(); i++) {
-            List<BatchExcelRow> excelRows = new ArrayList<>();
             Date date = it.next().getTime();
             BatchExcelRow from = new BatchExcelRow.Builder(date, Sens.DEPARTURE) //
                     .departureStation(new Station("Liège-Guillemins")) //

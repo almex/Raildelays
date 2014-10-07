@@ -1,4 +1,4 @@
-package be.raildelays.batch.writer;
+package be.raildelays.batch.support;
 
 import be.raildelays.batch.AbstractContextIT;
 import be.raildelays.batch.bean.BatchExcelRow;

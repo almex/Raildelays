@@ -133,7 +133,7 @@ public class SearchNextTrainProcessorTest {
 
         Assert.assertNotNull(result);
         Assert.assertEquals(new Train("0"), result.getEffectiveTrain1());
-        Assert.assertEquals(90, result.getDelay());
+        Assert.assertEquals(90, result.getDelay().longValue());
 
         EasyMock.verify(raildelaysServiceMock);
     }
@@ -168,7 +168,7 @@ public class SearchNextTrainProcessorTest {
 
         Assert.assertNotNull(result);
         Assert.assertEquals(new Train("1"), result.getEffectiveTrain1());
-        Assert.assertEquals(90, result.getDelay());
+        Assert.assertEquals(90, result.getDelay().longValue());
 
         EasyMock.verify(raildelaysServiceMock);
     }
@@ -200,7 +200,7 @@ public class SearchNextTrainProcessorTest {
 
         Assert.assertNotNull(result);
         Assert.assertEquals(new Train("0"), result.getEffectiveTrain1());
-        Assert.assertEquals(60, result.getDelay());
+        Assert.assertEquals(60, result.getDelay().longValue());
 
         EasyMock.verify(raildelaysServiceMock);
     }
@@ -228,7 +228,7 @@ public class SearchNextTrainProcessorTest {
 
         Assert.assertNotNull(result);
         Assert.assertEquals(new Train("y"), result.getEffectiveTrain1());
-        Assert.assertEquals(0, result.getDelay());
+        Assert.assertEquals(0, result.getDelay().longValue());
 
         EasyMock.verify(raildelaysServiceMock);
     }
@@ -259,7 +259,7 @@ public class SearchNextTrainProcessorTest {
 
         Assert.assertNotNull(result);
         Assert.assertEquals(new Train("y"), result.getEffectiveTrain1());
-        Assert.assertEquals(90, result.getDelay());
+        Assert.assertEquals(90, result.getDelay().longValue());
 
         EasyMock.verify(raildelaysServiceMock);
     }

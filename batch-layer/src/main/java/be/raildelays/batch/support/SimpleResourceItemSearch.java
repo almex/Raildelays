@@ -31,23 +31,18 @@ public class SimpleResourceItemSearch<T extends Comparable<? super T>> implement
     }
 
     public int indexOf(T item, Resource resource) throws Exception {
-        int result = -1;
+        int result = EOF;
 
         this.reader.setResource(resource);
         reader.open(new ExecutionContext());
 
         try {
-            T object = null;
-
-            do {
-                object = reader.read();
-
+            for (T object = reader.read(); object != null; object = reader.read()) {
                 if (item == null ? object == null : comparator.compare(item, object) == 0) {
                     result = reader.getCurrentIndex();
                     break;
                 }
-            } while (object != null);
-
+            }
         } finally {
             reader.close();
         }

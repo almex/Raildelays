@@ -14,8 +14,8 @@ import org.springframework.batch.item.file.RowMappingException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
+import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.text.DecimalFormat;
@@ -23,7 +23,6 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Set;
 
 /**
  * Simple {@link org.springframework.batch.item.file.RowMapper} matching our use case to deal with our
@@ -34,8 +33,24 @@ import java.util.Set;
  */
 public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, InitializingBean {
 
+    public static final int DATE_INDEX = 2;
+    public static final int DEPARTURE_STATION_INDEX = 12;
+    public static final int ARRIVAL_STATION_INDEX = 18;
+    public static final int LINK_STATION_INDEX = 25;
+    public static final int EXPECTED_DEPARTURE_HH_INDEX = 30;
+    public static final int EXPECTED_DEPARTURE_MM_INDEX = 32;
+    public static final int EFFECTIVE_TRAIN1_INDEX = 48;
+    public static final int EFFECTIVE_TRAIN2_INDEX = 51;
+    public static final int DELAY_INDEX = 54;
+    public static final int EXPECTED_TRAIN1_INDEX = 36;
+    public static final int EXPECTED_TRAIN2_INDEX = 39;
+    public static final int EXPECTED_ARRIVAL_HH_INDEX = 33;
+    public static final int EXPECTED_ARRIVAL_MM_INDEX = 35;
+    public static final int EFFECTIVE_DEPARTURE_HH_INDEX = 42;
+    public static final int EFFECTIVE_DEPARTURE_MM_INDEX = 44;
+    public static final int EFFECTIVE_ARRIVAL_HH_INDEX = 45;
+    public static final int EFFECTIVE_ARRIVAL_MM_INDEX = 47;
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchExcelRowMapper.class);
-
     private boolean validateOutcomes = false;
 
     private Validator validator;
@@ -60,60 +75,38 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-        if (validateOutcomes) {
-            ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-            validator = factory.getValidator();
-        }
+    public void afterPropertiesSet() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
 
         Assert.notNull(language, "You must set language before using this bean");
     }
 
     @Override
     public BatchExcelRow mapRow(Row row, int rowIndex) throws RowMappingException {
-        BatchExcelRow result = null;
-
-        if (row.getCell(2) != null) {
-            result = new BatchExcelRow.Builder(getDate(row, 2), null)
-                    .departureStation(getStation(row, 12))
-                    .arrivalStation(getStation(row, 18))
-                    .linkStation(getStation(row, 25))
-                    .expectedDepartureTime(getHHMM(row, 30, 32))
-                    .expectedArrivalTime(getHHMM(row, 33, 35))
-                    .expectedTrain1(getTrain(row, 36))
-                    .expectedTrain2(getTrain(row, 39))
-                    .effectiveDepartureTime(getHHMM(row, 42, 44))
-                    .effectiveArrivalTime(getHHMM(row, 45, 47))
-                    .effectiveTrain1(getTrain(row, 48))
-                    .effectiveTrain2(getTrain(row, 51))
-                    .delay(getLong(row, 54))
+        try {
+            BatchExcelRow result = new BatchExcelRow.Builder(getDate(row, DATE_INDEX), null)
+                    .departureStation(getStation(row, DEPARTURE_STATION_INDEX))
+                    .arrivalStation(getStation(row, ARRIVAL_STATION_INDEX))
+                    .linkStation(getStation(row, LINK_STATION_INDEX))
+                    .expectedDepartureTime(getHHMM(row, EXPECTED_DEPARTURE_HH_INDEX, EXPECTED_DEPARTURE_MM_INDEX))
+                    .expectedArrivalTime(getHHMM(row, EXPECTED_ARRIVAL_HH_INDEX, EXPECTED_ARRIVAL_MM_INDEX))
+                    .expectedTrain1(getTrain(row, EXPECTED_TRAIN1_INDEX))
+                    .expectedTrain2(getTrain(row, EXPECTED_TRAIN2_INDEX))
+                    .effectiveDepartureTime(getHHMM(row, EFFECTIVE_DEPARTURE_HH_INDEX, EFFECTIVE_DEPARTURE_MM_INDEX))
+                    .effectiveArrivalTime(getHHMM(row, EFFECTIVE_ARRIVAL_HH_INDEX, EFFECTIVE_ARRIVAL_MM_INDEX))
+                    .effectiveTrain1(getTrain(row, EFFECTIVE_TRAIN1_INDEX))
+                    .effectiveTrain2(getTrain(row, EFFECTIVE_TRAIN2_INDEX))
+                    .delay(getLong(row, DELAY_INDEX))
                     .index((long) row.getRowNum())
-                    .build();
-        } //-- If the first cell contains nothing we return null
+                    .build(validateOutcomes);
 
-        if (validateOutcomes) {
-            validate(row, rowIndex, result);
-        }
-
-        return result;
-    }
-
-    private void validate(Row row, int rowIndex, BatchExcelRow result) {
-        Set<ConstraintViolation<BatchExcelRow>> constraintViolations = validator.validate(result);
-
-        if (!constraintViolations.isEmpty()) {
-            StringBuilder builder = new StringBuilder();
-
-            for (ConstraintViolation<BatchExcelRow> constraintViolation : constraintViolations) {
-                builder.append("Constraints violations occured:\n");
-                builder.append(constraintViolation.getPropertyPath());
-                builder.append(' ');
-                builder.append(constraintViolation.getMessage());
-            }
-
-            throw new RowMappingException(builder.toString(), row, rowIndex);
+            return result;
+        } catch (ValidationException e) {
+            throw new RowMappingException(e.getMessage(), row, rowIndex);
         }
     }
+
 
     private Train getTrain(Row row, int cellIndex) {
         NumberFormat numberFormat = new DecimalFormat("#");

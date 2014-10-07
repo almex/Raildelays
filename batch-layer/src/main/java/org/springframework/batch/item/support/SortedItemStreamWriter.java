@@ -39,6 +39,7 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
     private Resource outputResource;
     private ExecutionContext executionContext;
     private boolean createBackupFile = false;
+    private boolean reverseOrder = false;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -79,8 +80,18 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
     }
 
     private void sort(List<T> allItems) {
-        Collections.sort(allItems, comparator);
+        final Comparator<? super T> orderAwareComparator;
+
+        if (reverseOrder) {
+            orderAwareComparator = Collections.reverseOrder(comparator);
+        } else {
+            orderAwareComparator = comparator;
+        }
+
+        Collections.sort(allItems, orderAwareComparator);
         indexItems(allItems);
+
+        LOGGER.trace("Items sorted={}", allItems.size());
     }
 
     private List<T> replaceItems(Map<Long, T> content, List<? extends T> items) {
@@ -97,14 +108,18 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
 
             if (index != null) {
                 /**
-                 * We know here that expect to replace a item and we must do it before sorting.
+                 * We know here that expect to replace an item and we must do it before sorting.
                  */
                 if (content.containsKey(index)) {
                     allItems.remove(content.get(index));
+
+                    LOGGER.debug("Removed item on index={}", index);
                 }
             }
 
             allItems.add(item);
+
+            LOGGER.trace("Item added: {}", item);
         }
 
         return allItems;
@@ -113,7 +128,11 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
     private void indexItems(List<T> items) {
         for (T item : items) {
             if (item instanceof ItemCountAware) {
-                ((ItemCountAware) item).setItemCount(items.indexOf(item));
+                final int index = items.indexOf(item);
+
+                ((ItemCountAware) item).setItemCount(index);
+
+                LOGGER.trace("Indexed item to={}", index);
             } else {
                 /**
                  * Optimization: do not need to loop over all items if one of them is not of the good type
@@ -135,13 +154,19 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
 
                 if (item instanceof ItemIndexAware) {
                     index = ((ItemIndexAware) item).getIndex();
+
+                    LOGGER.trace("Retrieving existing index={}", index);
                 }
 
                 if (index == null) {
                     index = new Long(i++);
+
+                    LOGGER.trace("Setting new index={}", index);
                 }
 
                 result.put(index, item);
+
+                LOGGER.debug("Read content : line={}, item={}", index, item);
             }
         } finally {
             reader.close();
@@ -165,6 +190,8 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
         try {
             writer.open(executionContext);
             writer.write(items);
+
+            LOGGER.debug("Written {} items", items.size());
         } finally {
             writer.close();
         }
@@ -206,5 +233,9 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
 
     public void setReader(ResourceAwareItemReaderItemStream<T> reader) {
         this.reader = reader;
+    }
+
+    public void setReverseOrder(boolean reverseOrder) {
+        this.reverseOrder = reverseOrder;
     }
 }

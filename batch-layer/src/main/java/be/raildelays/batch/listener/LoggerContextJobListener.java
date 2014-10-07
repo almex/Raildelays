@@ -9,7 +9,7 @@ import java.util.Date;
 
 /**
  * Add jobExecutionId to {@link org.apache.logging.log4j.ThreadContext} to be able to create
- * log direction based on that number.
+ * log directory based on that number.
  *
  * @author Almex
  */

@@ -139,6 +139,8 @@ public class FilterTwoSensPerDayProcessorTest {
                 .index(4L) //
                 .build());
 
+        list.add(BatchExcelRow.EMPTY);
+
 
         StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution();
         processor = new FilterTwoSensPerDayProcessor();
@@ -163,6 +165,24 @@ public class FilterTwoSensPerDayProcessorTest {
 
         Assert.assertNotNull(excelRow);
         Assert.assertNull(excelRow.getIndex());
+    }
+
+    @Test
+    public void testProcessReachEof() throws Exception {
+        BatchExcelRow expected = new Builder(DATE_FORMAT.parse("02/01/2000"), Sens.ARRIVAL) //
+                .departureStation(stationB) //
+                .arrivalStation(stationA) //
+                .expectedTrain1(new Train("578")) //
+                .expectedArrivalTime(TIME_FORMAT.parse("17:00")) //
+                .expectedDepartureTime(TIME_FORMAT.parse("17:05")) //
+                .effectiveTrain1(new Train("578")) //
+                .effectiveDepartureTime(TIME_FORMAT.parse("16:03")) //
+                .effectiveArrivalTime(TIME_FORMAT.parse("16:10")) //
+                .delay(25L) //
+                .build();
+        BatchExcelRow excelRow = processor.process(expected);
+
+        Assert.assertEquals(expected, excelRow);
     }
 
     @Test
