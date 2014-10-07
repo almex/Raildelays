@@ -43,7 +43,7 @@
                 </batch:step>
             </batch:partition>
         </batch:step>
-        <batch:step id="generateExcelFiles">
+        <batch:step id="generateExcelFiles" next="handleDelayMoreThanOneHour">
             <batch:tasklet transaction-manager="batchTransactionManager">
                 <batch:chunk reader="delaysItemReader"
                              processor="chainedProcessorsForDelays"
@@ -52,15 +52,11 @@
                     <batch:skippable-exception-classes>
                         <batch:include class="org.springframework.batch.item.validator.ValidationException"/>
                         <batch:include class="be.raildelays.batch.exception.ArrivalDepartureEqualsException"/>
-                        <batch:include class="be.raildelays.batch.processor.SkipDelayGreaterThanException"/>
                     </batch:skippable-exception-classes>
                     <batch:listeners merge="true">
                         <batch:listener ref="logSkippedItemListener"/>
-                        <batch:listener ref="logStep2ItemProcessorListener"/>
                         <batch:listener ref="resourceLocatorListener"/>
-                        <!-- We intercept the SkipDelayGreaterThanException and store item ids in the step execution context -->
-                        <batch:listener ref="skipDelayGreaterThanListener"/>
-                        <!-- We promote what is in the step execution context to the job execution context -->
+                        <batch:listener ref="logStep2ItemProcessorListener"/>
                         <batch:listener>
                             <bean class="org.springframework.batch.core.listener.ExecutionContextPromotionListener">
                                 <property name="keys">
@@ -74,7 +70,6 @@
                 </batch:chunk>
                 <batch:transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
             </batch:tasklet>
-            <batch:next on="COMPLETED WITH DELAY GREATER THAN" to="handleDelayMoreThanOneHour"/> 
             <batch:listeners merge="true">
                 <batch:listener ref="delaysItemReader"/>
                 <batch:listener ref="filterTwoSensPerDayProcessor"/>
@@ -208,9 +203,10 @@
     </bean>
 
     <bean id="retrieveLineStopViaContextReader"
-          class="be.raildelays.batch.reader.LineStopInContextReader"
+          class="be.raildelays.batch.reader.ByTrainIdAndDateLineStopReader"
           scope="step">
-        <property name="lineStopIds"  value="#{jobExecutionContext['moreThanOneHourDelay']}"/>
+        <property name="trainId" value="#{jobExecutionContext['moreThanOneHourDelay']}"/>
+        <property name="date" value="#{jobParameters['date']}"/>
     </bean>
 
     <!-- ================================================================================================== -->
@@ -251,6 +247,7 @@
                 <ref bean="excelRowMapperProcessor"/>
                 <ref bean="validatorProcessor"/>
                 <ref bean="searchNextTrainProcessor"/>
+                <ref bean="filterTwoSensPerDayProcessor"/>
                 <ref bean="validatorProcessor"/>
                 <ref bean="batchExcelRowToSimpleMailMessageProcessor"/>
             </list>
@@ -322,9 +319,10 @@
     </bean>
 
     <bean id="filterMoreThanOneHourDelayProcessor"
-          class="be.raildelays.batch.processor.SkipDelayGreaterThanProcessor"
+          class="be.raildelays.batch.processor.FilterByDelayThresholdAndStoreTrainIdProcessor"
           scope="step">
-        <property name="threshold" value="30"/>
+        <property name="threshold" value="60"/>
+        <property name="keyName" value="moreThanOneHourDelay"/>
     </bean>
 
     <bean id="batchExcelRowToSimpleMailMessageProcessor"
@@ -411,7 +409,7 @@
         <property name="entityManagerFactory" ref="raildelaysEntityManagerFactory"/>
     </bean>
 
-    <bean id="emailWriter"
+    <bean id="emailWriter" 
           class="org.springframework.batch.item.mail.SimpleMailMessageItemWriter"
           scope="step">
         <property name="mailSender">
@@ -454,12 +452,6 @@
     <bean id="loggerContextStepListener"
           class="be.raildelays.batch.listener.LoggerContextStepListener"
           scope="step"/>
-
-    <bean id="skipDelayGreaterThanListener"
-          class="be.raildelays.batch.listener.SkipDelayGreaterThanListener"
-          scope="step">
-        <property name="keyName" value="moreThanOneHourDelay" />
-    </bean>
 
 
     <!-- ================================================================================================== -->

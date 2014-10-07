@@ -4,6 +4,8 @@ import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.logging.Logger;
 import be.raildelays.logging.LoggerFactory;
 import org.apache.commons.lang.Validate;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
@@ -20,15 +22,23 @@ import org.springframework.beans.factory.InitializingBean;
  * </p>
  *
  * @author Almex
- * @see be.raildelays.batch.reader.LineStopInContextReader
- * @see be.raildelays.batch.listener.SkipDelayGreaterThanListener
+ * @see be.raildelays.batch.reader.ByTrainIdAndDateLineStopReader
  * @since 1.2
  */
-public class SkipDelayGreaterThanProcessor implements ItemProcessor<BatchExcelRow, BatchExcelRow>, InitializingBean {
+public class FilterByDelayThresholdAndStoreTrainIdProcessor implements ItemProcessor<BatchExcelRow, BatchExcelRow>, InitializingBean {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("Fas", SkipDelayGreaterThanProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("Fas", FilterByDelayThresholdAndStoreTrainIdProcessor.class);
 
     private Long threshold;
+
+    private ExecutionContext context;
+
+    private String keyName;
+
+    @BeforeStep
+    public void beforeStep(StepExecution stepExecution) {
+        this.context = stepExecution.getExecutionContext();
+    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -36,8 +46,8 @@ public class SkipDelayGreaterThanProcessor implements ItemProcessor<BatchExcelRo
     }
 
     @Override
-    public BatchExcelRow process(final BatchExcelRow item) throws SkipDelayGreaterThanException {
-        BatchExcelRow result;
+    public BatchExcelRow process(final BatchExcelRow item) throws Exception {
+        BatchExcelRow result = null;
 
         LOGGER.trace("item", item);
 
@@ -46,17 +56,31 @@ public class SkipDelayGreaterThanProcessor implements ItemProcessor<BatchExcelRo
 
             LOGGER.debug("keep_delay<" + threshold, item);
         } else {
-            LOGGER.debug("keep_delay>=" + threshold, item);
+            storeInContext(item);
 
-            throw new SkipDelayGreaterThanException(item, threshold);
+            LOGGER.debug("store_in_context", item);
         }
+
 
         LOGGER.trace("result", result);
 
         return result; // To apply the ItemReader contract
     }
 
+    private void storeInContext(final BatchExcelRow item) {
+        if (item.getExpectedTrain1() != null) {
+            /*
+             * We can only have one train the same day having more than one hour of delay.
+             */
+            context.putLong(keyName, item.getExpectedTrain1().getId());
+        }
+    }
+
     public void setThreshold(Long threshold) {
         this.threshold = threshold;
+    }
+
+    public void setKeyName(String keyName) {
+        this.keyName = keyName;
     }
 }
