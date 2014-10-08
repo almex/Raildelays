@@ -30,11 +30,15 @@
                             </batch:retryable-exception-classes>
                             <batch:skippable-exception-classes>
                                 <batch:include class="org.springframework.batch.item.validator.ValidationException"/>
+                                <batch:include class="javax.persistence.PersistenceException"/>
                             </batch:skippable-exception-classes>
                             <batch:listeners merge="true">
                                 <batch:listener ref="logStep1ItemProcessorListener"/>
                             </batch:listeners>
                         </batch:chunk>
+                        <batch:no-rollback-exception-classes>
+                            <batch:include class="org.springframework.batch.item.validator.ValidationException"/>
+                        </batch:no-rollback-exception-classes>
                         <batch:transaction-attributes
                                 isolation="DEFAULT" propagation="REQUIRED"/>
                     </batch:tasklet>
