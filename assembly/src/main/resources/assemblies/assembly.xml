@@ -13,42 +13,43 @@
             <useProjectArtifact>true</useProjectArtifact>
             <scope>runtime</scope>
             <excludes>
-                <exclude>be.raildelays:raildelays-batch</exclude>
+                <exclude>be.raildelays:raildelays-assembly-descriptor</exclude>
             </excludes>
+            <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
         </dependencySet>
-        <dependencySet>
+        <!--dependencySet>
             <outputDirectory>/lib</outputDirectory>
             <includes>
                 <include>be.raildelays:raildelays-batch</include>
             </includes>
             <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
-        </dependencySet>
+        </dependencySet-->
     </dependencySets>
     <files>
         <file>
-            <source>${project.build.directory}/classes/run.bat</source>
+            <source>src/main/resources/run.bat</source>
             <outputDirectory/>
             <filtered>true</filtered>
         </file>
         <file>
-            <source>${project.build.directory}/classes/runDebug.bat</source>
+            <source>src/main/resources/runDebug.bat</source>
             <outputDirectory/>
             <filtered>true</filtered>
         </file>
         <file>
-            <source>${project.build.directory}/classes/run.sh</source>
+            <source>src/main/resources/run.sh</source>
             <outputDirectory/>
             <filtered>true</filtered>
         </file>
         <file>
-            <source>${project.build.directory}/classes/startServer.bat</source>
+            <source>src/main/resources/startServer.bat</source>
             <outputDirectory/>
             <filtered>true</filtered>
         </file>
     </files>
     <fileSets>
         <fileSet>
-            <directory>${project.build.directory}/classes</directory>
+            <directory>src/main/resources</directory>
             <outputDirectory/>
             <includes>
                 <include>**</include>

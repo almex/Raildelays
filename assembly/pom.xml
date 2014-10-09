@@ -5,6 +5,7 @@
 
     <artifactId>raildelays-assembly-descriptor</artifactId>
     <name>Shared Assembly Descriptor</name>
+    <packaging>pom</packaging>
 
     <parent>
         <groupId>be.raildelays</groupId>
@@ -14,6 +15,13 @@
     </parent>
 
     <build>
+        <directory>${project.basedir}/../target</directory>
+        <outputDirectory>${project.build.directory}/classes</outputDirectory>
+        <finalName>${project.artifactId}-${project.version}</finalName>
+        <testOutputDirectory>${project.build.directory}/test-classes</testOutputDirectory>
+        <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+        <scriptSourceDirectory>${project.basedir}/src/main/scripts</scriptSourceDirectory>
+        <testSourceDirectory>${project.basedir}/src/test/java</testSourceDirectory>
         <plugins>
 
             <plugin>
