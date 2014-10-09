@@ -23,6 +23,8 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <mainClass>be.raildelays.batch.Bootstrap</mainClass>
+                            <classpathLayoutType>custom</classpathLayoutType>
+                            <customClasspathLayout>${artifact.artifactId}.${artifact.extension}</customClasspathLayout>
                         </manifest>
                     </archive>
                 </configuration>
