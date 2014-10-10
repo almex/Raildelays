@@ -24,7 +24,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "LINE_STOP", uniqueConstraints = @UniqueConstraint(columnNames = {
-        "TRAIN_ID", "DATE", "STATION_ID"}))
+        "TRAIN_ID", "DATE", "STATION_ID"}, name ="LineStopUniqueBusinessKeyConstraint"))
 public class LineStop extends AbstractEntity implements Comparable<LineStop> {
 
     private static final long serialVersionUID = 7142886242889314414L;
@@ -284,7 +284,7 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
     }
 
     /**
-     * This builder is the only to get new instance of a {@link be.raildelays.domain.entities.LineStop}.
+     * This builder is the only way to get a new instance of a {@link be.raildelays.domain.entities.LineStop}.
      *
      * @author Almex
      * @since 1.0

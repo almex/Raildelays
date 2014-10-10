@@ -23,7 +23,8 @@
                         <batch:chunk reader="compositeRailtimeItemReader"
                                      processor="chainedProcessorsForRailtime"
                                      writer="jpaItemWriter"
-                                     commit-interval="10" skip-limit="10" retry-limit="3">
+                                     commit-interval="10" skip-limit="10" retry-limit="3"
+                                     skip-policy="compositeSkipPolicy">
                             <batch:retryable-exception-classes>
                                 <batch:include class="java.io.IOException"/>
                                 <batch:include class="org.springframework.dao.OptimisticLockingFailureException"/>
@@ -159,6 +160,22 @@
         <property name="maxPoolSize" value="4"/>
         <property name="allowCoreThreadTimeOut" value="true"/>
         <property name="waitForTasksToCompleteOnShutdown" value="true"/>
+    </bean>
+
+    <bean id="compositeSkipPolicy" class="org.springframework.batch.core.step.skip.CompositeSkipPolicy">
+        <property name="skipPolicies">
+            <array>
+                <bean class="org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy">
+                    <property name="skipLimit" value="10"/>
+                    <property name="skippableExceptionMap">
+                        <map>
+                            <entry key="org.springframework.batch.item.validator.ValidationException" value="true"/>
+                        </map>
+                    </property>
+                </bean>
+                <bean class="be.raildelays.batch.skip.SkipUniqueKeyViolationPolicy"/>
+            </array>
+        </property>
     </bean>
 
     <!-- ================================================================================================== -->
