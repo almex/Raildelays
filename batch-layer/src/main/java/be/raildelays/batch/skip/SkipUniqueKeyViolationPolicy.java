@@ -19,7 +19,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
  */
 public class SkipUniqueKeyViolationPolicy implements SkipPolicy {
 
-    private static final String CONSTRAINT_NAME = "LineStopUniqueBusinessKeyConstraint";
+    private static final String CONSTRAINT_NAME = "LineStopUniqueBusinessKeyConstraint".toUpperCase();
 
     private static Class<? extends Throwable>[] expecteds = new Class[]{ConstraintViolationException.class,
             SQLIntegrityConstraintViolationException.class,
@@ -30,7 +30,7 @@ public class SkipUniqueKeyViolationPolicy implements SkipPolicy {
     public boolean shouldSkip(Throwable t, int skipCount) throws SkipLimitExceededException {
         boolean result = true;
 
-        if (skipCount > 0) {
+        if (skipCount < 0) {
             if (isExpectedException(t) && !isExpectedViolation(t)) {
                 result = false;
             }
@@ -56,9 +56,9 @@ public class SkipUniqueKeyViolationPolicy implements SkipPolicy {
         boolean result = false;
 
         if (e instanceof ConstraintViolationException) {
-            result = ((ConstraintViolationException) e).getConstraintName().equals(CONSTRAINT_NAME);
+            result = ((ConstraintViolationException) e).getConstraintName().toUpperCase().equals(CONSTRAINT_NAME);
         } else if (e instanceof SQLIntegrityConstraintViolationException) {
-            result = e.getMessage().contains(CONSTRAINT_NAME);
+            result = e.getMessage().toUpperCase().contains(CONSTRAINT_NAME);
         } else if (e.getCause() != null) {
             result = isExpectedViolation(e.getCause());
         }
