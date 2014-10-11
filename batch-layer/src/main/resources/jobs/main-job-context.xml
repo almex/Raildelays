@@ -23,16 +23,17 @@
                         <batch:chunk reader="compositeRailtimeItemReader"
                                      processor="chainedProcessorsForRailtime"
                                      writer="jpaItemWriter"
-                                     commit-interval="10" skip-limit="10" retry-limit="3"
-                                     skip-policy="compositeSkipPolicy">
-                            <batch:retryable-exception-classes>
-                                <batch:include class="java.io.IOException"/>
-                                <batch:include class="org.springframework.dao.OptimisticLockingFailureException"/>
-                            </batch:retryable-exception-classes>
-                            <batch:skippable-exception-classes>
-                                <batch:include class="org.springframework.batch.item.validator.ValidationException"/>
-                                <batch:include class="javax.persistence.PersistenceException"/>
-                            </batch:skippable-exception-classes>
+                                     commit-interval="10"
+                                     skip-policy="compositeSkipPolicy"
+                                     retry-policy="compositeRetryPolicy">
+                            <!--<batch:retryable-exception-classes>-->
+                                <!--<batch:include class="java.io.IOException"/>-->
+                                <!--<batch:include class="org.springframework.dao.OptimisticLockingFailureException"/>-->
+                            <!--</batch:retryable-exception-classes>-->
+                            <!--<batch:skippable-exception-classes>-->
+                                <!--<batch:include class="org.springframework.batch.item.validator.ValidationException"/>-->
+                                <!--<batch:include class="javax.persistence.PersistenceException"/>-->
+                            <!--</batch:skippable-exception-classes>-->
                             <batch:listeners merge="true">
                                 <batch:listener ref="logStep1ItemProcessorListener"/>
                             </batch:listeners>
@@ -174,6 +175,26 @@
                     </property>
                 </bean>
                 <bean class="be.raildelays.batch.skip.SkipUniqueKeyViolationPolicy"/>
+            </array>
+        </property>
+    </bean>
+
+    <bean id="compositeRetryPolicy" class="org.springframework.retry.policy.CompositeRetryPolicy">
+        <property name="policies">
+            <array>
+                <bean class="org.springframework.retry.policy.SimpleRetryPolicy">
+                    <constructor-arg name="maxAttempts" value="3"/>
+                    <constructor-arg name="retryableExceptions">
+                        <map>
+                            <entry key="java.io.IOException" value="true"/>
+                            <entry key="org.springframework.dao.OptimisticLockingFailureException" value="true"/>
+                        </map>
+                    </constructor-arg>
+                    <constructor-arg name="traverseCauses" value="true"/>
+                </bean>
+                <bean class="be.raildelays.batch.retry.WaitRetryPolicy">
+                    <property name="timer" value="5000"/>
+                </bean>
             </array>
         </property>
     </bean>
