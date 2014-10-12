@@ -2,6 +2,7 @@ package be.raildelays.batch.reader;
 
 import be.raildelays.domain.railtime.Direction;
 import be.raildelays.domain.railtime.TwoDirections;
+import be.raildelays.httpclient.impl.DelaysRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.step.item.Chunk;
@@ -26,9 +27,9 @@ public class CompositeRailtimeItemReader extends CompositeItemStream implements 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(CompositeRailtimeItemReader.class);
 
-    private RailtimeItemReader departureReader;
+    private RailtimeItemReader<Direction, DelaysRequest> departureReader;
 
-    private RailtimeItemReader arrivalReader;
+    private RailtimeItemReader<Direction, DelaysRequest> arrivalReader;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -38,8 +39,7 @@ public class CompositeRailtimeItemReader extends CompositeItemStream implements 
         LOGGER.debug("Reader initialized with arrivalReader={} and departureReader={}", arrivalReader, departureReader);
     }
 
-    public TwoDirections read() throws Exception, UnexpectedInputException,
-            ParseException, NonTransientResourceException {
+    public TwoDirections read() throws Exception {
         TwoDirections result = null;
 
         Direction departureDirection = departureReader.read();

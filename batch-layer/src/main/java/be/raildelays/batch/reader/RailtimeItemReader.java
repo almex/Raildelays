@@ -1,84 +1,84 @@
 package be.raildelays.batch.reader;
 
-import be.raildelays.domain.Language;
-import be.raildelays.domain.Sens;
-import be.raildelays.domain.railtime.Direction;
+import be.raildelays.httpclient.Request;
 import be.raildelays.httpclient.RequestStreamer;
 import be.raildelays.parser.StreamParser;
-import be.raildelays.parser.impl.RailtimeStreamParser;
-import org.dozer.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.NonTransientResourceException;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.retry.RetryCallback;
+import org.springframework.retry.RetryContext;
+import org.springframework.retry.RetryPolicy;
+import org.springframework.retry.backoff.BackOffPolicy;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.util.Assert;
 
-import javax.annotation.Resource;
-import java.io.Reader;
-import java.util.Date;
-import java.util.Locale;
+/**
+ * {@link org.springframework.batch.item.ItemReader} capable of retrieving data from <i>www.railtime.be</i> website.
+ * This implementation use a {@link org.springframework.retry.RetryPolicy} to allow to configure upon which
+ * {@link java.lang.Exception} you want to try multiple attempt to read. For instance, {@code IOException} would be a
+ * good choice as it denote a problem during the HTTP connection (maybe Wi-Fi is off, you network is not fully
+ * startup yet). Then aside to the {@link org.springframework.retry.RetryPolicy} you must also configure the
+ * {@link org.springframework.retry.backoff.BackOffPolicy} in order to define what to do between two attempts (e.g.:
+ * wait 5 seconds).
+ * <p>
+ *     To retrieve data from Railtime, this reader need to know the {@code trainId}, the {@code date},
+ *     the {@code sens} and the {@code language}.
+ * </p>
+ * <p>
+ *     To be respectful of the website we attempt to read, this reader also wait between 1 and 5 seconds between two
+ *     reads. Then we avoid any Deny Of Service.
+ * </p>
+ */
+public class RailtimeItemReader<T, R extends Request> implements ItemReader<T>, InitializingBean {
 
-public class RailtimeItemReader implements ItemReader<Direction>, InitializingBean {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RailtimeItemReader.class);
 
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(RailtimeItemReader.class);
+    private RequestStreamer<R> streamer;
 
-    @Resource
-    private RequestStreamer streamer;
+    private StreamParser<T, R> parser;
 
-    @Resource
-    private Mapper mapper;
+    private R request;
 
-    private String trainId;
+    private RetryPolicy retryPolicy;
 
-    private Date date;
+    private BackOffPolicy backOffPolicy;
 
-    private Sens sens;
-
-    private String language = Language.EN.name();
+    private RetryTemplate retryTemplate;
 
     @Override
     public void afterPropertiesSet() throws Exception {
         // Validate all job parameters
-        Assert.notNull(date, "You must provide the date parameter to this Reader.");
-        Assert.notNull(sens, "You must provide the sens parameter to this Reader.");
-        Assert.notNull(language, "You must provide the language parameter to this Reader.");
+        Assert.notNull(parser, "The 'parser' property must have a value");
+        Assert.notNull(request, "The 'request' property must have a value");
+        Assert.notNull(streamer, "The 'streamer' property must have a value");
+        Assert.notNull(retryPolicy, "The 'retryPolicy' property must have a value");
+        Assert.notNull(backOffPolicy, "The 'backOffPolicy' property must have a value");
+        retryTemplate = new RetryTemplate();
+        retryTemplate.setRetryPolicy(retryPolicy);
+        retryTemplate.setBackOffPolicy(backOffPolicy);
     }
 
-    public Direction read() throws Exception, UnexpectedInputException,
-            ParseException, NonTransientResourceException {
-        Direction result = null;
+    public T read() throws Exception {
 
-        if (trainId != null && date != null && sens != null && language != null) {
+        return retryTemplate.execute(new RetryCallback<T, Exception>() {
+            @Override
+            public T doWithRetry(RetryContext context) throws Exception {
+                T result = null;
 
-            LOGGER.debug("Requesting Railtime for trainId={} date={} sens={} language={}", new Object[]{trainId, date, sens, language});
+                if (request != null) {
+                    LOGGER.debug("Requesting Railtime for {}", request);
 
-            // -- Create a request to target Railtime
-            Reader englishStream = streamer.getDelays(trainId, date,
-                    Language.valueOf(language.toUpperCase(Locale.US)).getRailtimeParameter(),
-                    sens.getRailtimeParameter());
+                    waitRandomly();
 
-            // -- Parse the content
-            StreamParser parser = new RailtimeStreamParser(englishStream);
+                    result = parser.parse(streamer.stream(request));
+                }
 
-            waitRandomly();
+                return result;
+            }
+        });
 
-            result = parser.parseDelay(trainId, date);
-
-            reset();
-        }
-
-        return result;
-    }
-
-    /**
-     * Reset the reader for the next iteration
-     */
-    private void reset() {
-        trainId = null;
     }
 
     /**
@@ -97,27 +97,27 @@ public class RailtimeItemReader implements ItemReader<Direction>, InitializingBe
         Thread.sleep(waitTime);
     }
 
-    public Date getDate() {
-        return date;
+    public void setRetryPolicy(RetryPolicy retryPolicy) {
+        this.retryPolicy = retryPolicy;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setBackOffPolicy(BackOffPolicy backOffPolicy) {
+        this.backOffPolicy = backOffPolicy;
     }
 
-    public Sens getSens() {
-        return sens;
+    public void setStreamer(RequestStreamer<R> streamer) {
+        this.streamer = streamer;
     }
 
-    public void setSens(Sens sens) {
-        this.sens = sens;
+    public void setParser(StreamParser<T, R> parser) {
+        this.parser = parser;
     }
 
-    public void setTrainId(String trainId) {
-        this.trainId = trainId;
+    public R getRequest() {
+        return request;
     }
 
-    public void setLanguage(String language) {
-        this.language = language;
+    public void setRequest(R request) {
+        this.request = request;
     }
 }

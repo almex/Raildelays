@@ -1,37 +1,14 @@
 package be.raildelays.httpclient.impl
 
+import be.raildelays.httpclient.Request
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class BRailRequestStreamer extends AbstractRequestStreamBuilder {
+abstract class BRailRequestStreamer<T extends Request> extends AbstractRequestStreamBuilder<T> {
 
     def static Logger log = LoggerFactory.getLogger(BRailRequestStreamer.class)
 
-    def static final DEFAULT_ROOT = 'http://hari.b-rail.be';
-
-    /**
-     * {@inheritDoc}
-     */
-    //@Override FIXME Removed due to a bug since upgrade to Groovy 2.3.4
-    public Reader getTrainList(String stationNameFrom, String stationNameTo, Date day, Integer hour, String language = '1') {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    //@Override FIXME Removed due to a bug since upgrade to Groovy 2.3.4
-    public Reader getStationList(String language = '1') {
-        return httpGet('/infsta/StationList.ashx', [lang: language]);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    //@Override FIXME Removed due to a bug since upgrade to Groovy 2.3.4
-    public Reader getDelays(String idTrain, Date day, String language = '1', String sens = 'A') {
-        throw new UnsupportedOperationException();
-    }
+    def static final ROOT = 'http://hari.b-rail.be';
 
     /**
      * {@inheritDoc}

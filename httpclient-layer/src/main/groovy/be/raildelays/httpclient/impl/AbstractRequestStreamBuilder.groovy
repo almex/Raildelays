@@ -1,5 +1,6 @@
 package be.raildelays.httpclient.impl
 
+import be.raildelays.httpclient.Request
 import be.raildelays.httpclient.RequestStreamer
 import groovyx.net.http.HTTPBuilder
 import org.apache.http.auth.AuthScope
@@ -11,7 +12,7 @@ import static groovyx.net.http.ContentType.TEXT
 import static groovyx.net.http.Method.GET
 
 
-abstract class AbstractRequestStreamBuilder implements RequestStreamer {
+abstract class AbstractRequestStreamBuilder<T extends Request> implements RequestStreamer<T> {
 
     def static
     final USER_AGENT = 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; custom; .NET CLR 1.1.4322; InfoPath.1; .NET CLR 2.0.50727; InfoPath.2; custom; custom)'

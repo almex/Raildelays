@@ -2,9 +2,10 @@ package be.raildelays.parser
 
 import be.raildelays.domain.railtime.Direction
 import be.raildelays.domain.railtime.Step
-import be.raildelays.httpclient.RequestStreamer
-import be.raildelays.httpclient.impl.RailtimeRequestStreamer
-import be.raildelays.parser.impl.RailtimeStreamParser
+import be.raildelays.httpclient.DefaultStream
+import be.raildelays.httpclient.impl.DelaysRequest
+import be.raildelays.httpclient.impl.DelaysRequestStreamer
+import be.raildelays.parser.impl.DelaysStreamParser
 import be.raildelays.util.ParsingUtil
 import org.junit.Assert
 import org.junit.Ignore
@@ -17,8 +18,6 @@ import org.slf4j.LoggerFactory
  */
 class StreamParserIT {
 
-    def StreamParser parser
-
     def Logger log = LoggerFactory.getLogger(StreamParserIT.class)
 
     /**
@@ -27,20 +26,18 @@ class StreamParserIT {
     @Test
     @Ignore
     void testParseDelayFrom466() {
-        RequestStreamer streamer = new RailtimeRequestStreamer();
-        Date date = new Date();
-        String train = "466";
-        parser = new RailtimeStreamParser(streamer.getDelays(train, date));
-        Object object = parser.parseDelay(train, date);
+        Object object = new DelaysStreamParser()
+                .parse(new DelaysRequestStreamer()
+                .stream(new DelaysRequest('466', new Date(), 'D', 'en')));
         Assert.assertNotNull("This method should return a result", object);
         Assert.assertNotNull("This method should return a Direction", object instanceof Direction);
     }
 
     @Test
     void testParseDelayFromSample1() {
-        Reader reader = new InputStreamReader(this.getClass().getResourceAsStream("/Sample1.html"), "UTF-8");
-        parser = new RailtimeStreamParser(reader);
-        Object object = parser.parseDelay("477", ParsingUtil.parseDate("13/01/2012"));
+        Object object = new DelaysStreamParser().parse(new DefaultStream<DelaysRequest>(
+                new InputStreamReader(this.getClass().getResourceAsStream("/Sample1.html"), "UTF-8"),
+                new DelaysRequest("477", ParsingUtil.parseDate("13/01/2012"), "D", "en")));
         Assert.assertNotNull("This method should return a result", object);
         Assert.assertNotNull("This method should return a Direction", object instanceof Direction);
         Direction direction = (Direction) object;
@@ -60,9 +57,9 @@ class StreamParserIT {
 
     @Test
     void testParseDelayFromSample2() {
-        Reader reader = new InputStreamReader(this.getClass().getResourceAsStream("/Sample2.html"), "UTF-8");
-        parser = new RailtimeStreamParser(reader);
-        Object object = parser.parseDelay("466", ParsingUtil.parseDate("11/01/2012"));
+        Object object = new DelaysStreamParser().parse(new DefaultStream<DelaysRequest>(
+                new InputStreamReader(this.getClass().getResourceAsStream("/Sample2.html"), "UTF-8"),
+                new DelaysRequest("466", ParsingUtil.parseDate("11/01/2012"), "D", "en")));
         Assert.assertNotNull("This method should return a result", object);
         Assert.assertNotNull("This method should return a Direction", object instanceof Direction);
         Direction direction = (Direction) object;
@@ -82,9 +79,9 @@ class StreamParserIT {
 
     @Test
     void testParseDelayFrom1hDelayDeparture() {
-        Reader reader = new InputStreamReader(this.getClass().getResourceAsStream("/1h delay departure.html"), "UTF-8");
-        parser = new RailtimeStreamParser(reader);
-        Object object = parser.parseDelay("516", ParsingUtil.parseDate("12/11/2013"));
+        Object object = new DelaysStreamParser().parse(new DefaultStream<DelaysRequest>(
+                new InputStreamReader(this.getClass().getResourceAsStream("/1h delay departure.html"), "UTF-8"),
+                new DelaysRequest("516", ParsingUtil.parseDate("12/11/2013"), "D", "en")));
 
         Direction direction = (Direction) object;
         Step[] steps = (Step[]) direction.getSteps().toArray();
@@ -95,9 +92,9 @@ class StreamParserIT {
 
     @Test
     void testParseDelayFrom1hDelayArrival() {
-        Reader reader = new InputStreamReader(this.getClass().getResourceAsStream("/1h delay arrival.html"), "UTF-8");
-        parser = new RailtimeStreamParser(reader);
-        Object object = parser.parseDelay("516", ParsingUtil.parseDate("12/11/2013"));
+        Object object = new DelaysStreamParser().parse(new DefaultStream<DelaysRequest>(
+                new InputStreamReader(this.getClass().getResourceAsStream("/1h delay arrival.html"), "UTF-8"),
+                new DelaysRequest("516", ParsingUtil.parseDate("12/11/2013"), "D", "en")));
 
         Direction direction = (Direction) object;
         Step[] steps = (Step[]) direction.getSteps().toArray();

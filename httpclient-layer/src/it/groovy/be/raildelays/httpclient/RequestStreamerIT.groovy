@@ -1,6 +1,10 @@
 package be.raildelays.httpclient
 
+import be.raildelays.httpclient.impl.DelaysRequest
+import be.raildelays.httpclient.impl.DelaysRequestStreamer
 import be.raildelays.httpclient.impl.RailtimeRequestStreamer
+import be.raildelays.httpclient.impl.StationListRequest
+import be.raildelays.httpclient.impl.StationListRequestStreamer
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -9,30 +13,14 @@ import static org.junit.Assert.assertNotNull
 
 class RequestStreamerIT {
 
-    /**
-     * S.U.T.
-     */
-    private RequestStreamer streamer;
-
     @Test(timeout = 15000L)
-    void testGetTrainList() {
-        assertNotNull("The request should return a result", streamer.getTrainList('Bruxelles-Central', 'Liège-Guillemins', new Date(), 0))
-    }
-
-    @Test(timeout = 15000L)
-    @Ignore
     void testGetStationList() {
-        assertNotNull("The request should return a result", streamer.getStationList())
+        assertNotNull("The request should return a result", new StationListRequestStreamer().stream(new StationListRequest()))
     }
 
     @Test(timeout = 15000L)
     void testGetDelays() {
-        assertNotNull("The request should return a result", streamer.getDelays('466', new Date()))
-    }
-
-    @Before
-    void setUp() {
-        streamer = new RailtimeRequestStreamer()
+        assertNotNull("The request should return a result", new DelaysRequestStreamer().stream(new DelaysRequest('466', new Date(), 'D', 'en')))
     }
 
 }

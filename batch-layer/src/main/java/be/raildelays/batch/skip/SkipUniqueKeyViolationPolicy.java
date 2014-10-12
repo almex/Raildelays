@@ -21,7 +21,7 @@ public class SkipUniqueKeyViolationPolicy implements SkipPolicy {
 
     private static final String CONSTRAINT_NAME = "LineStopUniqueBusinessKeyConstraint".toUpperCase();
 
-    private static Class<? extends Throwable>[] expecteds = new Class[]{ConstraintViolationException.class,
+    private static Class<? extends Throwable>[] expected = new Class[]{ConstraintViolationException.class,
             SQLIntegrityConstraintViolationException.class,
             PersistenceException.class};
 
@@ -42,7 +42,7 @@ public class SkipUniqueKeyViolationPolicy implements SkipPolicy {
     private static boolean isExpectedException(Throwable e) {
         boolean result = false;
 
-        for (Class<? extends Throwable> expected : expecteds) {
+        for (Class<? extends Throwable> expected : SkipUniqueKeyViolationPolicy.expected) {
             if (expected.isAssignableFrom(e.getClass())) {
                 result = true;
                 break;
