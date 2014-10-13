@@ -197,8 +197,16 @@
                     <bean class="be.raildelays.httpclient.impl.DelaysRequest">
                         <constructor-arg value="#{stepExecutionContext['trainId']}"/>
                         <constructor-arg value="#{jobParameters['date']}"/>
-                        <constructor-arg value="D"/>
-                        <constructor-arg value="#{jobParameters['lang']}"/>
+                        <constructor-arg>
+                            <util:constant static-field="be.raildelays.domain.Sens.DEPARTURE"/>
+                        </constructor-arg>
+                        <constructor-arg>
+                            <bean class="be.raildelays.domain.Language" factory-method="valueOf">
+                                <constructor-arg>
+                                    <value>#{jobParameters['lang']?.toUpperCase()}</value>
+                                </constructor-arg>
+                            </bean>
+                        </constructor-arg>
                     </bean>
                 </property>
                 <property name="streamer">
@@ -218,8 +226,16 @@
                     <bean class="be.raildelays.httpclient.impl.DelaysRequest">
                         <constructor-arg value="#{stepExecutionContext['trainId']}"/>
                         <constructor-arg value="#{jobParameters['date']}"/>
-                        <constructor-arg value="A"/>
-                        <constructor-arg value="#{jobParameters['lang']}"/>
+                        <constructor-arg>
+                            <util:constant static-field="be.raildelays.domain.Sens.ARRIVAL"/>
+                        </constructor-arg>
+                        <constructor-arg>
+                            <bean class="be.raildelays.domain.Language" factory-method="valueOf">
+                                <constructor-arg>
+                                    <value>#{jobParameters['lang']?.toUpperCase()}</value>
+                                </constructor-arg>
+                            </bean>
+                        </constructor-arg>
                     </bean>
                 </property>
                 <property name="streamer">

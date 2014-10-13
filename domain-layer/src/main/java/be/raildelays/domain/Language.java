@@ -12,9 +12,9 @@ package be.raildelays.domain;
  */
 public enum Language {
 
-    EN("en", "en", "en"),
-    FR("fr", "fr", "fr"),
-    NL("nl", "nl", "nl");
+    EN("en", "EN", "en"),
+    FR("fr", "FR", "fr"),
+    NL("nl", "NL", "nl");
 
     private String railtimeParameter;
     private String mobileParameter;

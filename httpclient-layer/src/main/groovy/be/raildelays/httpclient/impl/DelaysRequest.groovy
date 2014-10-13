@@ -1,8 +1,8 @@
-package be.raildelays.httpclient.impl;
+package be.raildelays.httpclient.impl
 
-import be.raildelays.httpclient.AbstractRequest;
-
-import java.util.Date;
+import be.raildelays.domain.Language
+import be.raildelays.domain.Sens
+import be.raildelays.httpclient.AbstractRequest
 
 /**
  * @author Almex
@@ -10,7 +10,7 @@ import java.util.Date;
  */
 public class DelaysRequest extends AbstractRequest {
 
-    public DelaysRequest(String trainId, Date day, String sens, String language) {
+    public DelaysRequest(String trainId, Date day, Sens sens, Language language) {
         setTrainId(trainId)
         setDay(day)
         setSens(sens)
@@ -21,7 +21,7 @@ public class DelaysRequest extends AbstractRequest {
         return getValue("trainId");
     }
 
-    public void setTrainId(String trainId) {
+    private void setTrainId(String trainId) {
         setValue(trainId, "trainId", String.class);
     }
 
@@ -29,24 +29,24 @@ public class DelaysRequest extends AbstractRequest {
         return getValue("day");
     }
 
-    public void setDay(Date day) {
+    private void setDay(Date day) {
         setValue(day, "day", Date.class);
     }
 
-    public String getSens() {
+    public Sens getSens() {
         return getValue("sens");
     }
 
-    public void setSens(String sens) {
+    private void setSens(Sens sens) {
         setValue(sens, "sens", String.class);
     }
 
-    public String getLanguage() {
+    public Language getLanguage() {
         return getValue("language");
     }
 
-    public void setLanguage(String language) {
-        setValue(language, "language", String.class);
+    private void setLanguage(Language language) {
+        setValue(language, "language", Language.class);
     }
 
 }

@@ -14,12 +14,15 @@
     <dependencies>
 
         <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>raildelays-domain</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.codehaus.groovy.modules.http-builder</groupId>
             <artifactId>http-builder</artifactId>
             <version>0.5.2</version>
         </dependency>
-
-
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>

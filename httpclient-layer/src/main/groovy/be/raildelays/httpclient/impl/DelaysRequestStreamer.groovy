@@ -16,17 +16,17 @@ class DelaysRequestStreamer extends RailtimeRequestStreamer<DelaysRequest> {
     /**
      * @param idTrain train's id using Railtime format
      * @param day day for which you want to retrive
-     * @param language specify 'en', 'fr' or 'nl'
+     * @param language specify 'EN', 'FR' or 'NL'
      * @param sens 'D' for departure or 'A' for arrival
      * @return an HTML content as a stream to parse
      */
     @Override
     public Stream<DelaysRequest> stream(DelaysRequest request) {
         return new DefaultStream<DelaysRequest>(httpGet('/mobile/HTML/TrainDetail.aspx'
-                , [l    : request.language
+                , [l    : request.language.railtimeParameter
                    , tid: request.trainId
                    , dt : ParsingUtil.formatDate(request.day)
-                   , da : request.sens])
+                   , da : request.sens.railtimeParameter])
                 , request);
     }
 }

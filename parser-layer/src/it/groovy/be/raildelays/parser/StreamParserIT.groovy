@@ -1,5 +1,7 @@
 package be.raildelays.parser
 
+import be.raildelays.domain.Language
+import be.raildelays.domain.Sens
 import be.raildelays.domain.railtime.Direction
 import be.raildelays.domain.railtime.Step
 import be.raildelays.httpclient.DefaultStream
@@ -28,7 +30,7 @@ class StreamParserIT {
     void testParseDelayFrom466() {
         Object object = new DelaysStreamParser()
                 .parse(new DelaysRequestStreamer()
-                .stream(new DelaysRequest('466', new Date(), 'D', 'en')));
+                .stream(new DelaysRequest('466', new Date(), , Sens.DEPARTURE, Language.EN)));
         Assert.assertNotNull("This method should return a result", object);
         Assert.assertNotNull("This method should return a Direction", object instanceof Direction);
     }
@@ -37,7 +39,7 @@ class StreamParserIT {
     void testParseDelayFromSample1() {
         Object object = new DelaysStreamParser().parse(new DefaultStream<DelaysRequest>(
                 new InputStreamReader(this.getClass().getResourceAsStream("/Sample1.html"), "UTF-8"),
-                new DelaysRequest("477", ParsingUtil.parseDate("13/01/2012"), "D", "en")));
+                new DelaysRequest("477", ParsingUtil.parseDate("13/01/2012"), Sens.DEPARTURE, Language.EN)));
         Assert.assertNotNull("This method should return a result", object);
         Assert.assertNotNull("This method should return a Direction", object instanceof Direction);
         Direction direction = (Direction) object;
@@ -59,7 +61,7 @@ class StreamParserIT {
     void testParseDelayFromSample2() {
         Object object = new DelaysStreamParser().parse(new DefaultStream<DelaysRequest>(
                 new InputStreamReader(this.getClass().getResourceAsStream("/Sample2.html"), "UTF-8"),
-                new DelaysRequest("466", ParsingUtil.parseDate("11/01/2012"), "D", "en")));
+                new DelaysRequest("466", ParsingUtil.parseDate("11/01/2012"), Sens.DEPARTURE, Language.EN)));
         Assert.assertNotNull("This method should return a result", object);
         Assert.assertNotNull("This method should return a Direction", object instanceof Direction);
         Direction direction = (Direction) object;
@@ -81,7 +83,7 @@ class StreamParserIT {
     void testParseDelayFrom1hDelayDeparture() {
         Object object = new DelaysStreamParser().parse(new DefaultStream<DelaysRequest>(
                 new InputStreamReader(this.getClass().getResourceAsStream("/1h delay departure.html"), "UTF-8"),
-                new DelaysRequest("516", ParsingUtil.parseDate("12/11/2013"), "D", "en")));
+                new DelaysRequest("516", ParsingUtil.parseDate("12/11/2013"), Sens.DEPARTURE, Language.EN)));
 
         Direction direction = (Direction) object;
         Step[] steps = (Step[]) direction.getSteps().toArray();
@@ -94,7 +96,7 @@ class StreamParserIT {
     void testParseDelayFrom1hDelayArrival() {
         Object object = new DelaysStreamParser().parse(new DefaultStream<DelaysRequest>(
                 new InputStreamReader(this.getClass().getResourceAsStream("/1h delay arrival.html"), "UTF-8"),
-                new DelaysRequest("516", ParsingUtil.parseDate("12/11/2013"), "D", "en")));
+                new DelaysRequest("516", ParsingUtil.parseDate("12/11/2013"), Sens.DEPARTURE, Language.EN)));
 
         Direction direction = (Direction) object;
         Step[] steps = (Step[]) direction.getSteps().toArray();
