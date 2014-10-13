@@ -23,12 +23,12 @@ import org.springframework.util.Assert;
  * {@link org.springframework.retry.backoff.BackOffPolicy} in order to define what to do between two attempts (e.g.:
  * wait 5 seconds).
  * <p>
- *     To retrieve data from Railtime, this reader need to know the {@code trainId}, the {@code date},
- *     the {@code sens} and the {@code language}.
+ * To retrieve data from Railtime, this reader need to know the {@code trainId}, the {@code date},
+ * the {@code sens} and the {@code language}.
  * </p>
  * <p>
- *     To be respectful of the website we attempt to read, this reader also wait between 1 and 5 seconds between two
- *     reads. Then we avoid any Deny Of Service.
+ * To be respectful of the website we attempt to read, this reader also wait between 1 and 5 seconds between two
+ * reads. Then we avoid any Deny Of Service.
  * </p>
  */
 public class RailtimeItemReader<T, R extends Request> implements ItemReader<T>, InitializingBean {
@@ -73,6 +73,8 @@ public class RailtimeItemReader<T, R extends Request> implements ItemReader<T>, 
                     waitRandomly();
 
                     result = parser.parse(streamer.stream(request));
+
+                    request = null; // We consume read, then next time we will return null if no new request is provided
                 }
 
                 return result;
