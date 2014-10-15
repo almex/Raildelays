@@ -1,7 +1,7 @@
 package be.raildelays.batch.processor;
 
 import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.batch.bean.StationBasedBatchExcelRowComparator;
+import be.raildelays.batch.bean.StationBasedExcelRowComparator;
 import be.raildelays.domain.Language;
 import be.raildelays.logging.Logger;
 import be.raildelays.logging.LoggerFactory;
@@ -13,6 +13,8 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.beans.factory.InitializingBean;
+
+import java.util.Locale;
 
 /**
  * Filter items to get only two. One for departure and the other one for arrival.
@@ -47,7 +49,8 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
          * By default we return the item itself
          */
         BatchExcelRow result = item;
-        final StationBasedBatchExcelRowComparator comparator = new StationBasedBatchExcelRowComparator(language);
+        Language lang = Language.valueOf(language.toUpperCase(Locale.US));
+        final StationBasedExcelRowComparator comparator = new StationBasedExcelRowComparator(lang);
 
         LOGGER.trace("item", item);
 
