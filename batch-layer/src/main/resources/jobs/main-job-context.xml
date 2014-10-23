@@ -173,14 +173,7 @@
         <property name="waitForTasksToCompleteOnShutdown" value="true"/>
     </bean>
 
-    <bean id="language" 
-          class="be.raildelays.domain.Language" 
-          factory-method="valueOf"
-          scope="step">
-        <constructor-arg>
-            <value>#{jobParameters['lang']?.toUpperCase()}</value>
-        </constructor-arg>
-    </bean>
+
 
     <!-- ================================================================================================== -->
     <!-- =====================================        READERS         ===================================== -->
@@ -209,7 +202,13 @@
                         <constructor-arg>
                             <util:constant static-field="be.raildelays.domain.Sens.DEPARTURE"/>
                         </constructor-arg>
-                        <constructor-arg ref="language"/>
+                        <constructor-arg>
+                            <bean class="be.raildelays.domain.Language" factory-method="valueOf">
+                                <constructor-arg>
+                                    <value>#{jobParameters['lang']?.toUpperCase()}</value>
+                                </constructor-arg>
+                            </bean>
+                        </constructor-arg>
                     </bean>
                 </property>
                 <property name="streamer">
@@ -232,7 +231,13 @@
                         <constructor-arg>
                             <util:constant static-field="be.raildelays.domain.Sens.ARRIVAL"/>
                         </constructor-arg>
-                        <constructor-arg ref="language"/>
+                        <constructor-arg>
+                            <bean class="be.raildelays.domain.Language" factory-method="valueOf">
+                                <constructor-arg>
+                                    <value>#{jobParameters['lang']?.toUpperCase()}</value>
+                                </constructor-arg>
+                            </bean>
+                        </constructor-arg>
                     </bean>
                 </property>
                 <property name="streamer">
@@ -462,7 +467,13 @@
         <property name="keyName" value="${excel.item.max.key}"/>
         <property name="comparator">
             <bean class="be.raildelays.batch.bean.StationBasedExcelRowComparator">
-                <constructor-arg ref="language"/>
+                <constructor-arg>
+                    <bean class="be.raildelays.domain.Language" factory-method="valueOf">
+                        <constructor-arg>
+                            <value>#{jobParameters['lang']?.toUpperCase()}</value>
+                        </constructor-arg>
+                    </bean>
+                </constructor-arg>
             </bean>
         </property>
     </bean>
