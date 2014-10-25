@@ -7,7 +7,11 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.cglib.core.Local;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
@@ -33,18 +37,24 @@ public class TriggerWhenMaxMonthsTasklet implements Tasklet {
         final ExecutionContext executionContext = chunkContext.getStepContext().getStepExecution().getExecutionContext();
         ExcelRow item = reader.read();
 
-        if (maximum == null || maximum.before(item.getDate())) {
-            maximum = item.getDate();
-        }
+        if (item != null) {
+            if (maximum == null || maximum.before(item.getDate())) {
+                maximum = item.getDate();
+            }
 
-        if (minimum == null || minimum.after(item.getDate())) {
-            minimum = item.getDate();
-        }
+            if (minimum == null || minimum.after(item.getDate())) {
+                minimum = item.getDate();
+            }
 
-        if (minimum.toInstant().until(maximum.toInstant(), ChronoUnit.MONTHS) >= maxNumberOfMonth ) {
-            executionContext.putString(keyName, "true");
-        } else {
-            executionContext.remove(keyName);
+            LocalDate startDate = minimum.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate endDate = maximum.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            Period period = Period.between(startDate, endDate);
+
+            if (period.get(ChronoUnit.MONTHS) >= maxNumberOfMonth) {
+                executionContext.putString(keyName, "true");
+            } else {
+                executionContext.remove(keyName);
+            }
         }
 
         return item != null ? RepeatStatus.CONTINUABLE : RepeatStatus.FINISHED;
