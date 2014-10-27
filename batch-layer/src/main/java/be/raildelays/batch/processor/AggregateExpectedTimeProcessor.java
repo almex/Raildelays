@@ -119,8 +119,8 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, L
             LOGGER.debug("candidate", candidate);
         }
 
-        final TimestampDelay departureTime = new TimestampDelay(candidate.getDepartureTime().getExpected(), 0L);
-        final TimestampDelay arrivalTime = new TimestampDelay(candidate.getArrivalTime().getExpected(), 0L);
+        final TimestampDelay departureTime = new TimestampDelay(candidate.getDepartureTime().getExpected(), item.getDepartureTime().getDelay());
+        final TimestampDelay arrivalTime = new TimestampDelay(candidate.getArrivalTime().getExpected(), item.getArrivalTime().getDelay());
 
         result.departureTime(departureTime) //
                 .arrivalTime(arrivalTime);

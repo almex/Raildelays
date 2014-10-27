@@ -13,14 +13,17 @@ import static org.hamcrest.Matchers.lessThan;
 @RunWith(BlockJUnit4ClassRunner.class)
 public class TimeBasedExcelRowComparatorTest extends AbstractExcelRowComparatorTest {
 
+    private Date now;
+
     @Override
     public void setUp() {
         comparator = new TimeBasedExcelRowComparator();
+        now = new Date();
     }
 
     @Test
     public final void testCompareNullDate() throws Exception {
-        Assert.assertThat(comparator.compare(new ExcelRow.Builder(new Date(), null)
+        Assert.assertThat(comparator.compare(new ExcelRow.Builder(now, null)
                                 .build(false),
                         new BatchExcelRow.Builder(null, null)
                                 .build(false)),
@@ -29,22 +32,22 @@ public class TimeBasedExcelRowComparatorTest extends AbstractExcelRowComparatorT
 
     @Test
     public void testCompareNullExpectedDepartureTime() throws Exception {
-        Assert.assertThat(comparator.compare(new ExcelRow.Builder(new Date(), null)
+        Assert.assertThat(comparator.compare(new ExcelRow.Builder(now, null)
                                 .expectedDepartureTime(new Date())
                                 .build(false),
-                        new BatchExcelRow.Builder(new Date(), null)
+                        new BatchExcelRow.Builder(now, null)
                                 .build(false)),
                 lessThan(0));
     }
 
     @Test
     public void testCompareNullExpecteArrivalTime() throws Exception {
-        Assert.assertThat(comparator.compare(new ExcelRow.Builder(new Date(), null)
-                                .expectedDepartureTime(new Date())
-                                .expectedArrivalTime(new Date())
+        Assert.assertThat(comparator.compare(new ExcelRow.Builder(now, null)
+                                .expectedDepartureTime(now)
+                                .expectedArrivalTime(now)
                                 .build(false),
-                        new BatchExcelRow.Builder(new Date(), null)
-                                .expectedDepartureTime(new Date())
+                        new BatchExcelRow.Builder(now, null)
+                                .expectedDepartureTime(now)
                                 .build(false)),
                 lessThan(0));
     }

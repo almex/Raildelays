@@ -14,10 +14,5 @@
 
 
     <batch:job id="parentJob" abstract="true">
-        <batch:listeners merge="true">
-            <!--<batch:listener ref="processShutdownListener" />-->
-        </batch:listeners>
     </batch:job>
-
-    <bean id="processShutdownListener" class="be.raildelays.batch.listener.ProcessShutdownListener"/>
 </beans>

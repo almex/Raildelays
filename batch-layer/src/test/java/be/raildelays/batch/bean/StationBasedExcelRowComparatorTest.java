@@ -12,15 +12,18 @@ import static org.hamcrest.Matchers.greaterThan;
 
 public class StationBasedExcelRowComparatorTest extends AbstractExcelRowComparatorTest {
 
+    private Date now;
+
     @Override
     public void setUp() {
         comparator = new StationBasedExcelRowComparator(Language.EN);
+        now = new Date();
     }
 
 
     @Test
     public final void testCompareNullDate() throws Exception {
-        Assert.assertThat(comparator.compare(new ExcelRow.Builder(new Date(), null)
+        Assert.assertThat(comparator.compare(new ExcelRow.Builder(now, null)
                                 .build(false),
                         new BatchExcelRow.Builder(null, null)
                                 .build(false)),
@@ -29,21 +32,21 @@ public class StationBasedExcelRowComparatorTest extends AbstractExcelRowComparat
 
     @Test
     public void testCompareNullDepartureStation() throws Exception {
-        Assert.assertThat(comparator.compare(new ExcelRow.Builder(new Date(), null)
+        Assert.assertThat(comparator.compare(new ExcelRow.Builder(now, null)
                                 .departureStation(new Station("foo"))
                                 .build(false),
-                        new BatchExcelRow.Builder(new Date(), null)
+                        new BatchExcelRow.Builder(now, null)
                                 .build(false)),
                 greaterThan(0));
     }
 
     @Test
     public void testCompareNullArrivalStation() throws Exception {
-        Assert.assertThat(comparator.compare(new ExcelRow.Builder(new Date(), null)
+        Assert.assertThat(comparator.compare(new ExcelRow.Builder(now, null)
                                 .departureStation(new Station("foo"))
                                 .arrivalStation(new Station("bar"))
                                 .build(false),
-                        new BatchExcelRow.Builder(new Date(), null)
+                        new BatchExcelRow.Builder(now, null)
                                 .departureStation(new Station("foo"))
                                 .build(false)),
                 greaterThan(0));
