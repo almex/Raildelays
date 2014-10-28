@@ -117,7 +117,7 @@ public class SearchNextTrainProcessor implements
         LineStop fastestLineStop = searchFastestTrain(item, candidates);
 
         if (fastestLineStop != null) {
-            ExcelRowMapperProcessor processor = new ExcelRowMapperProcessor();
+            BatchExcelRowMapperProcessor processor = new BatchExcelRowMapperProcessor();
 
             switch (lang) {
                 case EN:

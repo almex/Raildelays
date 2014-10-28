@@ -82,7 +82,7 @@
         </property>
     </bean>
 
-    <bean id="excelRowMapperProcessor" class="be.raildelays.batch.processor.ExcelRowMapperProcessor"
+    <bean id="excelRowMapperProcessor" class="be.raildelays.batch.processor.BatchExcelRowMapperProcessor"
           scope="step">
         <property name="stationA" value="#{jobParameters['station.a.name']}"/>
         <property name="stationB" value="#{jobParameters['station.b.name']}"/>

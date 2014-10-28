@@ -26,7 +26,7 @@ public class BatchExcelRowMapperProcessorTest {
     /**
      * S.U.T.
      */
-    private ExcelRowMapperProcessor processor;
+    private BatchExcelRowMapperProcessor processor;
 
     @Before
     public void setUp() throws ParseException {
@@ -106,7 +106,7 @@ public class BatchExcelRowMapperProcessorTest {
 
         fromB = lineStop.getNext().getNext().getNext(); // stationB
 
-        processor = new ExcelRowMapperProcessor();
+        processor = new BatchExcelRowMapperProcessor();
         processor.setStationA("stationA");
         processor.setStationB("stationB");
         processor.setLanguage(Language.EN.name());

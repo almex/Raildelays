@@ -10,8 +10,12 @@ import org.springframework.util.Assert;
 import java.util.Comparator;
 
 /**
+ * If the input item match the one retrieved from the {@link org.springframework.batch.item.ExecutionContext} then it's
+ * filtered.
+ *
  * @author Almex
  * @since 1.2
+ * @param <T> type of the Input/Output of this {@link org.springframework.batch.item.ItemProcessor}
  */
 public class FilterItemInContextProcessor<T> implements ItemProcessor<T, T>, InitializingBean {
 
@@ -30,6 +34,7 @@ public class FilterItemInContextProcessor<T> implements ItemProcessor<T, T>, Ini
     }
 
     @Override
+    @SuppressWarnings("unchecked") // ClassCastException must be thrown if the value in the context is of the wrong type
     public T process(T item) throws Exception {
         T result = item;
 

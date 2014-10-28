@@ -35,7 +35,8 @@
                                                 <property name="skipLimit" value="10"/>
                                                 <property name="skippableExceptionMap">
                                                     <map>
-                                                        <entry key="org.springframework.batch.item.validator.ValidationException" value="true"/>
+                                                        <entry key="org.springframework.batch.item.validator.ValidationException"
+                                                               value="true"/>
                                                     </map>
                                                 </property>
                                             </bean>
@@ -172,7 +173,6 @@
         <property name="allowCoreThreadTimeOut" value="true"/>
         <property name="waitForTasksToCompleteOnShutdown" value="true"/>
     </bean>
-
 
 
     <!-- ================================================================================================== -->
@@ -394,7 +394,7 @@
     </bean>
 
     <bean id="excelRowMapperProcessor"
-          class="be.raildelays.batch.processor.ExcelRowMapperProcessor"
+          class="be.raildelays.batch.processor.BatchExcelRowMapperProcessor"
           scope="step">
         <property name="stationA" value="#{jobParameters['station.a.name']}"/>
         <property name="stationB" value="#{jobParameters['station.b.name']}"/>

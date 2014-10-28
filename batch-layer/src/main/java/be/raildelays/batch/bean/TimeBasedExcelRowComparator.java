@@ -6,7 +6,7 @@ import java.util.Comparator;
 
 /**
  * It's the reverse of the chronological ordering but where <code>null</code> values must be last element in the list.
- * So, it's not the same as simply using {@link java.util.Collections#reverse(java.util.List)} as it would put
+ * So, it's not the same as simply using {@code Collections.reverse()} as it would put
  * {@code null} values as first element in the list.
  * <p>
  * <p>
@@ -20,8 +20,9 @@ import java.util.Comparator;
  * <li>null
  * </ul>
  * </p>
- *<
+ *
  * @author Almex
+ * @see java.util.Collections
  * @since 1.2
  */
 public class TimeBasedExcelRowComparator implements Comparator<ExcelRow> {
@@ -34,7 +35,7 @@ public class TimeBasedExcelRowComparator implements Comparator<ExcelRow> {
         if (lho == rho) {
             result = 0;
         } else if (lho == null) {
-            result = (rho == null) ? 0 : -1;
+            result = -1;
         } else if (rho == null) {
             result = 1;
         } else {

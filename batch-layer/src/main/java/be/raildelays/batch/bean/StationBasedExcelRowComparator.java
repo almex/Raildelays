@@ -10,7 +10,12 @@ import java.util.Comparator;
 import java.util.Locale;
 
 /**
+ * Compare {@code date} and {@link be.raildelays.domain.entities.Station} name for departure and arrival without taking
+ * into account cast and accents. But you must set the {@link be.raildelays.domain.Language} to handle the
+ * internationalization.
+ *
  * @author Almex
+ * @since 1.2
  */
 public class StationBasedExcelRowComparator implements Comparator<ExcelRow> {
 
@@ -27,7 +32,7 @@ public class StationBasedExcelRowComparator implements Comparator<ExcelRow> {
         if (lho == rho) {
             result = 0;
         } else if (lho == null) {
-            result = (rho == null) ? 0 : -1;
+            result = -1;
         } else if (rho == null) {
             result = 1;
         } else {
