@@ -30,7 +30,7 @@ class StreamParserIT {
     void testParseDelayFrom466() {
         Object object = new DelaysStreamParser()
                 .parse(new DelaysRequestStreamer()
-                .stream(new DelaysRequest('466', new Date(), , Sens.DEPARTURE, Language.EN)));
+                .stream(new DelaysRequest('466', new Date(), Sens.DEPARTURE, Language.EN)));
         Assert.assertNotNull("This method should return a result", object);
         Assert.assertNotNull("This method should return a Direction", object instanceof Direction);
     }
