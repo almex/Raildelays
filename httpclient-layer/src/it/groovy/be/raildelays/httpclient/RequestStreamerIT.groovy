@@ -14,12 +14,12 @@ class RequestStreamerIT {
 
     @Test(timeout = 15000L)
     void testGetStationList() {
-        assertNotNull("The request should return a result", new StationListRequestStreamer().stream(new StationListRequest()))
+        assertNotNull("The request should return a result", new StationListRequestStreamer().stream(new StationListRequest(Language.EN)));
     }
 
     @Test(timeout = 15000L)
     void testGetDelays() {
-        assertNotNull("The request should return a result", new DelaysRequestStreamer().stream(new DelaysRequest('466', new Date(), Sens.DEPARTURE, Language.EN)))
+        assertNotNull("The request should return a result", new DelaysRequestStreamer().stream(new DelaysRequest('466', new Date(), Sens.DEPARTURE, Language.EN)));
     }
 
 }

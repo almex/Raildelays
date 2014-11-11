@@ -56,7 +56,7 @@ public class  AbstractFileTest {
         //-- We remove any result from the test
         for (File file : getExcelFiles()) {
             if (!file.delete()) {
-                file.delete();
+                file.deleteOnExit();
             }
         }
     }

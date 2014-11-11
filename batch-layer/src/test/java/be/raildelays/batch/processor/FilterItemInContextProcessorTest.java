@@ -1,16 +1,12 @@
 package be.raildelays.batch.processor;
 
-import be.raildelays.batch.bean.StationBasedExcelRowComparator;
-import be.raildelays.domain.Language;
 import be.raildelays.domain.Sens;
-import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.xls.ExcelRow;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.test.JobRepositoryTestUtils;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 
 import java.util.Comparator;
@@ -22,8 +18,8 @@ public class FilterItemInContextProcessorTest {
 
     private ExecutionContext context;
 
-
     private static final String KEY_NAME = "foo";
+
     @Before
     public void setUp() throws Exception {
         StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution();

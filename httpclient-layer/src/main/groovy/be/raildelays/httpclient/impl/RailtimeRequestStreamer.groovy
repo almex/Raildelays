@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory
 import static be.raildelays.util.ParsingUtil.formatDate
 import static be.raildelays.util.ParsingUtil.formatTime
 
-abstract class RailtimeRequestStreamer<T extends Request> extends AbstractRequestStreamBuilder<T> {
+public abstract class RailtimeRequestStreamer<T extends Request> extends AbstractRequestStreamBuilder<T> {
 
     def static Logger log = LoggerFactory.getLogger(RailtimeRequestStreamer.class)
 

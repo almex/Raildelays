@@ -1,5 +1,6 @@
 package be.raildelays.httpclient.impl
 
+import be.raildelays.domain.Language
 import be.raildelays.httpclient.AbstractRequest
 
 /**
@@ -8,15 +9,15 @@ import be.raildelays.httpclient.AbstractRequest
  */
 class StationListRequest extends AbstractRequest {
 
-    public StationListRequest(String language) {
+    public StationListRequest(Language language) {
         setLanguage(language)
     }
 
-    public String getLanguage() {
+    public Language getLanguage() {
         return getValue("language");
     }
 
-    public void setLanguage(String language) {
-        setValue(language, "language", String.class);
+    private void setLanguage(Language language) {
+        setValue(language, "language", Language.class);
     }
 }

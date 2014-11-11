@@ -35,7 +35,7 @@ public class RailtimeItemReader<T, R extends Request> implements ItemReader<T>, 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RailtimeItemReader.class);
 
-    private RequestStreamer<R> streamer;
+    private  RequestStreamer<R> streamer;
 
     private StreamParser<T, R> parser;
 

@@ -4,7 +4,7 @@ import be.raildelays.httpclient.Request
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-abstract class BRailRequestStreamer<T extends Request> extends AbstractRequestStreamBuilder<T> {
+public abstract class BRailRequestStreamer<T extends Request> extends AbstractRequestStreamBuilder<T> {
 
     def static Logger log = LoggerFactory.getLogger(BRailRequestStreamer.class)
 

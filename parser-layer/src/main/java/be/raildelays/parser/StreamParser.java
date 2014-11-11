@@ -8,6 +8,7 @@ import be.raildelays.httpclient.Stream;
  *
  * @author Almex
  */
+@FunctionalInterface
 public interface StreamParser<T, R extends Request> {
 
     public T parse(Stream<R> stream);

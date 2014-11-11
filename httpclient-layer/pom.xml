@@ -22,6 +22,12 @@
             <groupId>org.codehaus.groovy.modules.http-builder</groupId>
             <artifactId>http-builder</artifactId>
             <version>0.5.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.coodehaus.groovy</groupId>
+                    <artifactId>groovy</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>

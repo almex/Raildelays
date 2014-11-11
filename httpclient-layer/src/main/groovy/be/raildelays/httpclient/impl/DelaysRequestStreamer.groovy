@@ -11,7 +11,7 @@ import be.raildelays.util.ParsingUtil
  * @since 2.0
  */
 
-class DelaysRequestStreamer extends RailtimeRequestStreamer<DelaysRequest> {
+public class DelaysRequestStreamer extends RailtimeRequestStreamer<DelaysRequest> {
 
     /**
      * @param idTrain train's id using Railtime format

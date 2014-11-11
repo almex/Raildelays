@@ -54,7 +54,6 @@ class StreamParserIT {
         Assert.assertTrue("Step15 should be canceled", steps[14].isCanceled());
         Assert.assertTrue("Step15 should be canceled", steps[15].isCanceled());
         Assert.assertTrue("Step15 should be canceled", steps[16].isCanceled());
-
     }
 
     @Test

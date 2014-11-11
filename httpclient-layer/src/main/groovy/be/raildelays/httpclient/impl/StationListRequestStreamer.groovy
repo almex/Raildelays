@@ -6,7 +6,7 @@ import be.raildelays.httpclient.Stream
 /**
  * Created by xbmc on 11-10-14.
  */
-class StationListRequestStreamer extends BRailRequestStreamer<StationListRequest> {
+public class StationListRequestStreamer extends BRailRequestStreamer<StationListRequest> {
 
     @Override
     Stream<StationListRequest> stream(StationListRequest request) {
