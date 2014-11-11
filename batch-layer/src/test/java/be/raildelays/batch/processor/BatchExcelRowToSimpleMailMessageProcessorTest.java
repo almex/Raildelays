@@ -15,7 +15,7 @@ public class BatchExcelRowToSimpleMailMessageProcessorTest {
 
     private BatchExcelRowToSimpleMailMessageProcessor processor;
 
-    @Before 
+    @Before
     public void setUp() {
         processor = new BatchExcelRowToSimpleMailMessageProcessor();
     }
