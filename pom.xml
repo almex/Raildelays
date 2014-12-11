@@ -70,8 +70,10 @@
     </prerequisites>
 
     <properties>
+        <jdk.version>1.8</jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
+
         <version.spring>4.1.1.RELEASE</version.spring>
         <version.spring.batch>3.0.1.RELEASE</version.spring.batch>
         <version.spring.data>1.6.2.RELEASE</version.spring.data>
@@ -91,7 +93,7 @@
         <version.derby>10.10.1.1</version.derby>
         <version.servlet>3.1.0</version.servlet>
         <version.atomikos>3.9.2</version.atomikos>
-        <version.log4j>2.0.1</version.log4j>
+        <version.log4j>2.1</version.log4j>
         <version.slf4j>1.7.5</version.slf4j>
         <version.log4jdbc>1.16</version.log4jdbc>
         <version.disruptor>3.3.0</version.disruptor>
@@ -104,10 +106,11 @@
         <version.commons.dbcp>1.4</version.commons.dbcp>
         <version.dbunit>2.4.9</version.dbunit>
         <version.jodatime>2.3</version.jodatime>
-        <jdk.version>1.7</jdk.version>
+
+        <!-- Surefire/Failsafe settings -->
         <forkCount>1</forkCount>
         <reuseForks>true</reuseForks>
-        
+
         <!-- The destination file for the code coverage report has to be set
             to the same value in the parent pom and in each module pom. Then JaCoCo will
             add up information in the same report, so that, it will give the cross-module
@@ -655,6 +658,28 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-versions</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>2.0.6</version>
+                                </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <version>${jdk.version}</version>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <configuration>
                     <encoding>${project.build.sourceEncoding}</encoding>
@@ -814,6 +839,12 @@
                     <version>1.0.9</version>
                 </plugin>
 
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>1.3.1</version>
+                </plugin>
+
                 <!--This plugin's configuration is used to store Eclipse m2e settings
                     only. It has no influence on the Maven build itself. -->
                 <plugin>
@@ -947,24 +978,24 @@
         <!-- Integration tests profile : execution -->
         <profile>
             <id>it</id>
-            
+
             <!-- automaticaly enable this profile during a release (see FRA-3575) -->
             <activation>
                 <property>
                     <name>performRelease</name>
                 </property>
             </activation>
-         
+
             <build>
                 <plugins>
-                         
+
                     <!-- Failsafe plugin: configured to run integration tests -->
                     <plugin>
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
                             <sources>
                                 <source>${it.source.path}</source>
-                            </sources>     
+                            </sources>
                         </configuration>
                         <executions>
                             <execution>
@@ -973,7 +1004,7 @@
                                 <goals>
                                     <goal>integration-test</goal>
                                 </goals>
-                                <configuration>                                    
+                                <configuration>
                                     <argLine>-Xmx512m -Xms256m -XX:MaxPermSize=256m -XX:PermSize=128m</argLine>
                                 </configuration>
                             </execution>
@@ -986,10 +1017,10 @@
                             </execution>
                         </executions>
                     </plugin>
-         
+
                 </plugins>
             </build>
-         
+
         </profile>
 
         <profile>
@@ -1016,10 +1047,10 @@
                 </dependency>
 
             </dependencies>
-            
+
             <build>
                 <plugins>
-                
+
                     <!-- Build Helper plugin: configured to add source and resources path for integration tests -->
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
@@ -1052,30 +1083,33 @@
                                         <resource>
                                             <directory>${it.resources.path}</directory>
                                             <filtering>false</filtering>
-                                        </resource>         
+                                        </resource>
                                     </resources>
                                 </configuration>
                             </execution>
                         </executions>
-                    </plugin>   
+                    </plugin>
                 </plugins>
             </build>
         </profile>
 
         <!-- Compute code coverage before Sonar execution (This profile must be activated in Bamboo for the Sonar plan) -->
         <profile>
-            <id>code-coverage</id>   
+            <id>code-coverage</id>
 
             <build>
                 <plugins>
-                                                            
+
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>    
-                            <skipTests>false</skipTests> <!-- If you want code coverage you must run tests -->   
-                            <reportFormat>xml</reportFormat> <!-- required format for Sonar -->   
-                            <testFailureIgnore>true</testFailureIgnore> <!-- We want to count the number of failed tests -->                 
-                        </configuration> 
+                        <configuration>
+                            <skipTests>false</skipTests>
+                            <!-- If you want code coverage you must run tests -->
+                            <reportFormat>xml</reportFormat>
+                            <!-- required format for Sonar -->
+                            <testFailureIgnore>true</testFailureIgnore>
+                            <!-- We want to count the number of failed tests -->
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>default-test</id>
@@ -1085,24 +1119,30 @@
                                 </goals>
                                 <configuration>
                                     <skip>false</skip>
-                                    <forkCount>1</forkCount> <!-- fork mode must be enable with JaCoCo (1 thread per CPU Core) -->  
+                                    <forkCount>1</forkCount>
+                                    <!-- fork mode must be enable with JaCoCo (1 thread per CPU Core) -->
                                     <reuseForks>true</reuseForks>
                                     <!-- coverage.test.argLine is the link with JaCoCo plug-in -->
-                                    <argLine>${coverage.test.argLine} -Xmx256m -Xms128m -XX:MaxPermSize=128m -XX:PermSize=64m</argLine>
+                                    <argLine>${coverage.test.argLine} -Xmx256m -Xms128m -XX:MaxPermSize=128m
+                                        -XX:PermSize=64m
+                                    </argLine>
                                 </configuration>
                             </execution>
                         </executions>
                     </plugin>
-                    
+
                     <plugin>
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
                             <sources>
                                 <source>${it.source.path}</source>
-                            </sources>     
-                            <skipTests>false</skipTests> <!-- If you want code coverage you must run tests -->
-                            <reportFormat>xml</reportFormat> <!-- required format for Sonar -->   
-                            <testFailureIgnore>true</testFailureIgnore> <!-- We want to count the number of failed tests -->     
+                            </sources>
+                            <skipTests>false</skipTests>
+                            <!-- If you want code coverage you must run tests -->
+                            <reportFormat>xml</reportFormat>
+                            <!-- required format for Sonar -->
+                            <testFailureIgnore>true</testFailureIgnore>
+                            <!-- We want to count the number of failed tests -->
                         </configuration>
                         <executions>
                             <execution>
@@ -1113,10 +1153,13 @@
                                 </goals>
                                 <configuration>
                                     <skip>false</skip>
-                                    <forkCount>1</forkCount> <!-- fork mode must be enable with JaCoCo (1 thread per CPU Core) --> 
-                                    <reuseForks>true</reuseForks> 
+                                    <forkCount>1</forkCount>
+                                    <!-- fork mode must be enable with JaCoCo (1 thread per CPU Core) -->
+                                    <reuseForks>true</reuseForks>
                                     <!-- coverage.it.argLine is the link with JaCoCo plug-in -->
-                                    <argLine>${coverage.it.argLine} -Xmx512m -Xms256m -XX:MaxPermSize=256m -XX:PermSize=128m</argLine>
+                                    <argLine>${coverage.it.argLine} -Xmx512m -Xms256m -XX:MaxPermSize=256m
+                                        -XX:PermSize=128m
+                                    </argLine>
                                 </configuration>
                             </execution>
                             <execution>
@@ -1128,7 +1171,7 @@
                             </execution>
                         </executions>
                     </plugin>
-         
+
                     <!-- To compute Code Coverage for integration tests seperataly from unit tests -->
                     <plugin>
                         <groupId>org.jacoco</groupId>
@@ -1159,49 +1202,52 @@
                                 </configuration>
                             </execution>
                         </executions>
-                    </plugin> 
-                    
+                    </plugin>
+
                 </plugins>
             </build>
         </profile>
-        
+
         <!-- Instrument code coverage per tests during Sonar execution (This profile must be activated in Bamboo for the Sonar plan) -->
         <profile>
-            <id>coverage-per-test</id>  
-            
+            <id>coverage-per-test</id>
+
             <!-- Add a link to Sonar dashboard between unit test and source code  -->
-            <dependencies>        
-                <dependency>          
-                    <groupId>org.codehaus.sonar-plugins.java</groupId>          
-                    <artifactId>sonar-jacoco-listeners</artifactId>          
-                    <version>2.4</version>          
-                    <scope>test</scope>        
-                </dependency>     
-            </dependencies>  
+            <dependencies>
+                <dependency>
+                    <groupId>org.codehaus.sonar-plugins.java</groupId>
+                    <artifactId>sonar-jacoco-listeners</artifactId>
+                    <version>2.4</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
 
             <build>
                 <plugins>
-                                                            
+
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>    
-                            <skipTests>false</skipTests> <!-- If you want code coverage you must run tests -->   
-                            <reportFormat>xml</reportFormat> <!-- required format for Sonar -->   
-                            <testFailureIgnore>true</testFailureIgnore> <!-- We want to count the number of failed tests -->      
+                        <configuration>
+                            <skipTests>false</skipTests>
+                            <!-- If you want code coverage you must run tests -->
+                            <reportFormat>xml</reportFormat>
+                            <!-- required format for Sonar -->
+                            <testFailureIgnore>true</testFailureIgnore>
+                            <!-- We want to count the number of failed tests -->
                             <!-- Add a link to Sonar dashboard between unit test and source code  -->
-                            <properties>                
-                                <property>                  
-                                    <name>listener</name>                  
-                                    <value>org.sonar.java.jacoco.JUnitListener</value>                
-                                </property>              
-                            </properties>            
+                            <properties>
+                                <property>
+                                    <name>listener</name>
+                                    <value>org.sonar.java.jacoco.JUnitListener</value>
+                                </property>
+                            </properties>
                         </configuration>
                     </plugin>
-                    
+
                 </plugins>
             </build>
         </profile>
-        
+
         <profile>
             <id>jdk8</id>
             <activation>
@@ -1223,6 +1269,9 @@
 
         <profile>
             <id>api</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
 
             <modules>
                 <module>api</module>

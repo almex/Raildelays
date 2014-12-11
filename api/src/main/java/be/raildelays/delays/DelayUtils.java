@@ -1,7 +1,5 @@
 package be.raildelays.delays;
 
-import com.sun.istack.internal.Nullable;
-
 import java.time.Duration;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -39,7 +37,7 @@ public final class DelayUtils {
      * @param timestampB second {@link be.raildelays.delays.TimestampDelay}
      * @return number of milliseconds between <code>timestampA</code> and <code>timestampB</code>
      */
-    public static long compareTimeAndDelay(@Nullable TimestampDelay timestampA, @Nullable TimestampDelay timestampB) {
+    public static long compareTimeAndDelay(TimestampDelay timestampA, TimestampDelay timestampB) {
         long result = 0;
 
         if (timestampA != null && timestampB != null) {
@@ -86,7 +84,7 @@ public final class DelayUtils {
      * @param timestamp a {@link be.raildelays.delays.TimestampDelay}
      * @return number of milliseconds between <code>date</code> and <code>timestamp</code>
      */
-    public static long compareTimeAndDelay(@Nullable Date date, @Nullable TimestampDelay timestamp) {
+    public static long compareTimeAndDelay(Date date, TimestampDelay timestamp) {
         return compareTimeAndDelay(new TimestampDelay(date), timestamp);
     }
 
@@ -98,7 +96,7 @@ public final class DelayUtils {
      * @param date      a {@link java.util.Date}
      * @return number of milliseconds between <code>timestamp</code> and <code>date</code>
      */
-    public static long compareTimeAndDelay(@Nullable TimestampDelay timestamp, @Nullable Date date) {
+    public static long compareTimeAndDelay(TimestampDelay timestamp, Date date) {
         return compareTimeAndDelay(timestamp, new TimestampDelay(date));
     }
 
@@ -110,7 +108,7 @@ public final class DelayUtils {
      * @param timestampB second {@link be.raildelays.delays.TimestampDelay}
      * @return number of milliseconds between <code>timestampA</code> and <code>timestampB</code>
      */
-    public static long compareTime(@Nullable TimestampDelay timestampA, @Nullable TimestampDelay timestampB) {
+    public static long compareTime(TimestampDelay timestampA, TimestampDelay timestampB) {
         return compareTimeAndDelay(timestampA != null ? new TimestampDelay(timestampA.getExpected()) : null, timestampB != null ? new TimestampDelay(timestampB.getExpected()) : null);
     }
 
@@ -122,7 +120,7 @@ public final class DelayUtils {
      * @param date      a {@link java.util.Date}
      * @return number of milliseconds between <code>timestamp</code> and <code>date</code>
      */
-    public static long compareTime(@Nullable TimestampDelay timestamp, @Nullable Date date) {
+    public static long compareTime(TimestampDelay timestamp, Date date) {
         return compareTimeAndDelay(timestamp != null ? new TimestampDelay(timestamp.getExpected()) : null, new TimestampDelay(date));
     }
 
@@ -134,7 +132,7 @@ public final class DelayUtils {
      * @param timestamp a {@link be.raildelays.delays.TimestampDelay}
      * @return number of milliseconds between <code>date</code> and <code>timestamp</code>
      */
-    public static long compareTime(@Nullable Date date, @Nullable TimestampDelay timestamp) {
+    public static long compareTime(Date date, TimestampDelay timestamp) {
         return compareTimeAndDelay(new TimestampDelay(date), timestamp != null ? new TimestampDelay(timestamp.getExpected()) : null);
     }
 }
