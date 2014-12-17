@@ -26,6 +26,7 @@ import static org.springframework.batch.item.file.ExcelSheetItemWriter.Format;
  * result: path/filename_suffix.extension
  *
  * @author Almex
+ * @see ResourceLocatorListener
  */
 public abstract class AbstractItemResourceLocator implements ResourceLocator {
 

@@ -11,6 +11,8 @@ import java.util.List;
 
 /**
  * @author Almex
+ * @since 1.2
+ * @see be.raildelays.batch.support.ItemWriterResourceLocator
  */
 public class ResourceLocatorListener {
 
@@ -29,9 +31,13 @@ public class ResourceLocatorListener {
             // Retrieve first element of what would be written
             BatchExcelRow item = items.get(0);
             SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
-            String suffix = formatter.format(item.getDate());
 
-            context.putString(FILENAME_SUFFIX_KEY, suffix);
+            // We could have an empty row (i.e.: date can be null)
+            if (item.getDate() != null) {
+                String suffix = formatter.format(item.getDate());
+
+                context.putString(FILENAME_SUFFIX_KEY, suffix);
+            }
         }
     }
 }

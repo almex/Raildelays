@@ -7,6 +7,7 @@ import org.springframework.core.io.Resource;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 /**
  * This class is responsible to build path of a temporary {@link java.io.File} based on  the given
@@ -17,6 +18,7 @@ import java.io.IOException;
  * @author Almex
  * @since 1.2
  */
+//TODO replace this implementation by using Files.createTempFile() and System.getProperty("java.io.tmpdir")
 public class TemporaryFileResourceLocator implements ResourceLocator {
 
     private Resource resource;
@@ -29,6 +31,8 @@ public class TemporaryFileResourceLocator implements ResourceLocator {
     public Resource getResource(ExecutionContext context) throws IOException {
         Resource result = new FileSystemResource(resource.getFile().getParent() + File.separator
                 + relativePathAndFileName);
+
+
 
         context.putString(keyName, result.getFile().getAbsolutePath());
 

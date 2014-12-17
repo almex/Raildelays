@@ -6,8 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.support.ResourceLocator;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
@@ -16,15 +14,12 @@ import org.springframework.util.Assert;
 import java.io.File;
 
 /**
- *
- *
  * @author Almex
  * @since 1.2
  */
-public class MoveFileTasklet implements Tasklet, InitializingBean {
+public class DeleteFileTasklet implements Tasklet, InitializingBean {
 
     private Resource source;
-    private Resource destination;
     private static final Logger LOGGER = LoggerFactory.getLogger(MoveFileTasklet.class);
 
     @Override
@@ -36,22 +31,13 @@ public class MoveFileTasklet implements Tasklet, InitializingBean {
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         File file = source.getFile();
 
-        // Moving to a null destination is equivalent to delete the file
-        if (destination != null) {
-            File newFile = destination.getFile();
-            /*
-             * If the destination file exists but is writable then it will be overwrite.
-             * We must delete this on JVM shutdown in order to allow close() of ItemStream coming afterwards.
-             */
-            FileUtils.copyFile(file, newFile);
+        LOGGER.info("Delete file from {}", file.getCanonicalPath());
 
-            LOGGER.debug("Moved file to   {}", newFile.getAbsolutePath());
-        }
-
+        /*
+         * If the destination file exists but is writable then it will be overwrite.
+         * We must delete this on JVM shutdown in order to allow close() of ItemStream coming afterwards.
+         */
         file.deleteOnExit();
-
-        LOGGER.info("Deleted file {}", file.getCanonicalPath());
-
 
         return RepeatStatus.FINISHED;
     }
@@ -59,8 +45,5 @@ public class MoveFileTasklet implements Tasklet, InitializingBean {
     public void setSource(Resource source) {
         this.source = source;
     }
-
-    public void setDestination(Resource destination) {
-        this.destination = destination;
-    }
 }
+
