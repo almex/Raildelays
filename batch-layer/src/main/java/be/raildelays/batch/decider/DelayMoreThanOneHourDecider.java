@@ -37,7 +37,7 @@ public class DelayMoreThanOneHourDecider implements JobExecutionDecider, Initial
 
         if (stepExecution != null) {
             // We retrieve the effective status
-            finalStatus = new FlowExecutionStatus(stepExecution.getStatus().name());
+            finalStatus = new FlowExecutionStatus(jobExecution.getExitStatus().toString());
 
             // Only if the previous step succeed we can go next
             if (stepExecution.getStatus().equals(BatchStatus.COMPLETED)) {

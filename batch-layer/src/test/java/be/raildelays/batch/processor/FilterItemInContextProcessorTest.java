@@ -9,6 +9,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 
@@ -31,8 +32,9 @@ public class FilterItemInContextProcessorTest {
 
     @Test
     public void testFiltered() throws Exception {
-        context.put(KEY_NAME, new ExcelRow.Builder(new Date(), Sens.ARRIVAL)
-                .build(false));
+        context.put(KEY_NAME, Collections.singletonMap(Sens.ARRIVAL,
+                new ExcelRow.Builder(new Date(), Sens.ARRIVAL)
+                        .build(false)));
 
         processor.setComparator(new Comparator<ExcelRow>() {
             @Override
@@ -47,8 +49,9 @@ public class FilterItemInContextProcessorTest {
 
     @Test
     public void testNotFiltered() throws Exception {
-        context.put(KEY_NAME, new ExcelRow.Builder(new Date(), Sens.ARRIVAL)
-                .build(false));
+        context.put(KEY_NAME, Collections.singletonMap(Sens.ARRIVAL,
+                new ExcelRow.Builder(new Date(), Sens.ARRIVAL)
+                        .build(false)));
 
         processor.setComparator(new Comparator<ExcelRow>() {
             @Override

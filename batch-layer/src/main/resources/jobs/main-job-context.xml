@@ -95,6 +95,8 @@
         </batch:step>
         <batch:decision id="decision" decider="delayMoreThanOneHourDecider">
             <batch:next on="COMPLETED_WITH_60M_DELAY" to="handleDelayMoreThanOneHour"/>
+            <batch:fail on="FAILED"/>
+            <batch:end on="COMPLETED"/>
         </batch:decision>
         <batch:step id="handleDelayMoreThanOneHour" next="removeDelayMoreThanOneHour">
             <batch:tasklet transaction-manager="batchTransactionManager">
@@ -172,6 +174,11 @@
         <property name="maxPoolSize" value="4"/>
         <property name="allowCoreThreadTimeOut" value="true"/>
         <property name="waitForTasksToCompleteOnShutdown" value="true"/>
+    </bean>
+
+    <bean id="delayMoreThanOneHourDecider"
+          class="be.raildelays.batch.decider.DelayMoreThanOneHourDecider">
+        <property name="keyName" value="${excel.item.max.key}"/>
     </bean>
 
 
@@ -336,6 +343,8 @@
         <property name="rowMapper">
             <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
                 <property name="language" value="#{jobParameters['lang']}"/>
+                <!-- We do not take into account empty rows -->
+                <!--property name="validateOutcomes" value="true"/-->
             </bean>
         </property>
         <property name="resource" value="file:#{stepExecutionContext['${excel.resource.key}']}"/>
@@ -617,12 +626,6 @@
     <bean id="loggerContextStepListener"
           class="be.raildelays.batch.listener.LoggerContextStepListener"
           scope="step"/>
-
-    <bean id="delayMoreThanOneHourDecider"
-          class="be.raildelays.batch.decider.DelayMoreThanOneHourDecider"
-          scope="step">
-        <property name="keyName" value="${excel.item.max.key}"/>
-    </bean>
 
     <bean id="promoteContextListener"
           class="org.springframework.batch.core.listener.ExecutionContextPromotionListener"
