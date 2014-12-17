@@ -1,32 +1,39 @@
 package be.raildelays.batch.reader;
 
 import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.domain.Sens;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamReader;
+import org.springframework.batch.item.support.IteratorItemReader;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
+
+import java.util.Map;
 
 /**
  * Get the {@link be.raildelays.batch.bean.BatchExcelRow} retrieved from the <code>Step</code>
- * {@link org.springframework.batch.item.ExecutionContext}. This implementation can only read one item.
+ * {@link org.springframework.batch.item.ExecutionContext}.
  *
  * @author Almex
  * @see be.raildelays.batch.processor.StoreDelayGreaterThanThresholdInContextProcessor
  * @since 1.2
  */
-public class BatchExcelRowInContextReader implements ItemStreamReader<BatchExcelRow> {
+public class BatchExcelRowInContextReader implements ItemStreamReader<BatchExcelRow>, InitializingBean {
 
     private String keyName;
 
-    private BatchExcelRow singleton;
+    private IteratorItemReader<BatchExcelRow> delegate;
 
 
     @Override
+    public void afterPropertiesSet() throws Exception {
+        Assert.notNull(keyName, "The 'keyName' property must be provided");
+    }
+
+    @Override
     public BatchExcelRow read() throws Exception {
-        BatchExcelRow result = singleton;
-
-        singleton = null; // We consume it then next time we return null to promote EOF
-
-        return result;
+        return delegate.read();
     }
 
     public void setKeyName(String keyName) {
@@ -35,16 +42,22 @@ public class BatchExcelRowInContextReader implements ItemStreamReader<BatchExcel
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
-        singleton = (BatchExcelRow) executionContext.get(keyName);
+        if (executionContext.containsKey(keyName)) {
+            Map<Sens, BatchExcelRow> map = (Map) executionContext.get(keyName);
+
+            delegate = new IteratorItemReader<BatchExcelRow>(map.values());
+        } else {
+            throw new IllegalStateException("Context should contain a value with this key : '" + keyName + "'");
+        }
     }
 
     @Override
     public void update(ExecutionContext executionContext) throws ItemStreamException {
-
+        //NOOP
     }
 
     @Override
     public void close() throws ItemStreamException {
-
+        //NOOP
     }
 }

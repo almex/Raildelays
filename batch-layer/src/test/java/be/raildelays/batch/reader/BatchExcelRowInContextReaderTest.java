@@ -11,6 +11,7 @@ import org.springframework.batch.test.MetaDataInstanceFactory;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
@@ -45,7 +46,7 @@ public class BatchExcelRowInContextReaderTest {
                 .delay(10L) //
                 .build(false);
         reader.setKeyName(KEY_NAME);
-        context.put(KEY_NAME, expected);
+        context.put(KEY_NAME, Collections.singletonMap(Sens.DEPARTURE, expected));
     }
 
     @Test
@@ -61,7 +62,7 @@ public class BatchExcelRowInContextReaderTest {
         assertEquals(null, reader.read());
     }
 
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void testEmptyContext() throws Exception {
         context.remove(KEY_NAME);
         reader.open(context);

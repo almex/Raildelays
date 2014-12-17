@@ -1,6 +1,7 @@
 package be.raildelays.batch.processor;
 
 import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.domain.Sens;
 import be.raildelays.logging.Logger;
 import be.raildelays.logging.LoggerFactory;
 import org.springframework.batch.core.StepExecution;
@@ -9,6 +10,11 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Filter delay greater than a certain threshold and store the {@link be.raildelays.batch.bean.BatchExcelRow}
@@ -19,7 +25,7 @@ import org.springframework.util.Assert;
  * </p>
  * <p>
  * <code>
- * BatchExcelRow excelRow = (BatchExcelRow) context.get(keyName);
+ * Map<Sens, BatchExcelRow> excelRow = (Map) context.get(keyName);
  * </code>
  * </p>
  *
@@ -45,40 +51,38 @@ public class StoreDelayGreaterThanThresholdInContextProcessor implements ItemPro
     @Override
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(threshold, "The 'threshold' property must be provided");
+        Assert.notNull(keyName, "The 'keyName' property must be provided");
     }
 
     @Override
     public BatchExcelRow process(final BatchExcelRow item) throws Exception {
 
         if (item.getDelay() < threshold) {
-            LOGGER.debug("keep_delay<" + threshold, item);
+            LOGGER.debug("delay<" + threshold, item);
         } else {
             storeInContext(item);
+            LOGGER.debug("delay>=" + threshold, item);
         }
 
         return item;
     }
 
     private void storeInContext(final BatchExcelRow item) {
+        Map<Sens, BatchExcelRow> list = null;
+
         /*
-         * We can only have one train the same day having more than one hour of delay.
-         * But we take the greatest one.
+         * We can only have two trains  the same day having more than one hour of delay (one per sens).
          */
         if (context.containsKey(keyName)) {
-            BatchExcelRow itemInContext = (BatchExcelRow) context.get(keyName);
-
-            if (itemInContext.getDelay() < item.getDelay()) {
-                context.put(keyName, item);
-
-                LOGGER.debug("replace_in_context", itemInContext);
-            } else {
-                LOGGER.debug("not_replace_in_context", itemInContext);
-            }
+            list = (Map) context.get(keyName);
         } else {
-            context.put(keyName, item);
-
-            LOGGER.debug("store_in_context", item);
+            list = new HashMap<>(2);
+            context.put(keyName, list);
         }
+
+        list.put(item.getSens(), item);
+
+        LOGGER.debug("store_in_context", item);
     }
 
     public void setThreshold(Long threshold) {

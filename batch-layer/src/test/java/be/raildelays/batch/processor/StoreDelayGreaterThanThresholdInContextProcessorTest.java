@@ -12,6 +12,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 
 import java.util.Date;
+import java.util.Map;
 
 public class StoreDelayGreaterThanThresholdInContextProcessorTest {
 
@@ -53,6 +54,6 @@ public class StoreDelayGreaterThanThresholdInContextProcessorTest {
         input.setDelay(61L);
         processor.process(input);
 
-        Assert.assertEquals(input, stepbExecution.getExecutionContext().get(KEY_NAME));
+        Assert.assertEquals(input, ((Map) stepbExecution.getExecutionContext().get(KEY_NAME)).get(Sens.DEPARTURE));
     }
 }

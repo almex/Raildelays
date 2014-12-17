@@ -75,7 +75,7 @@
         <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
 
         <version.spring>4.1.1.RELEASE</version.spring>
-        <version.spring.batch>3.0.1.RELEASE</version.spring.batch>
+        <version.spring.batch>3.0.2.RELEASE</version.spring.batch>
         <version.spring.data>1.6.2.RELEASE</version.spring.data>
         <version.spring.data.rest>2.0.1.RELEASE</version.spring.data.rest>
         <version.spring.data.commons>1.8.2.RELEASE</version.spring.data.commons>

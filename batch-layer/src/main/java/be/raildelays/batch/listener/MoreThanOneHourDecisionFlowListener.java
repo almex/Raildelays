@@ -16,6 +16,7 @@ import org.springframework.util.Assert;
  *
  * @author Almex
  * @see be.raildelays.batch.processor.StoreDelayGreaterThanThresholdInContextProcessor
+ * @deprecated use {@link be.raildelays.batch.decider.DelayMoreThanOneHourDecider} instead
  */
 public class MoreThanOneHourDecisionFlowListener extends StepExecutionListenerSupport implements InitializingBean {
 
