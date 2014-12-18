@@ -95,7 +95,6 @@
         </batch:step>
         <batch:decision id="decision" decider="delayMoreThanOneHourDecider">
             <batch:next on="COMPLETED_WITH_60M_DELAY" to="handleDelayMoreThanOneHour"/>
-            <batch:fail on="FAILED"/>
             <batch:end on="COMPLETED"/>
         </batch:decision>
         <batch:step id="handleDelayMoreThanOneHour" next="removeDelayMoreThanOneHour">
@@ -177,7 +176,7 @@
     </bean>
 
     <bean id="delayMoreThanOneHourDecider"
-          class="be.raildelays.batch.decider.DelayMoreThanOneHourDecider">
+          class="be.raildelays.batch.decider.MoreThanOneHourDelayDecider">
         <property name="keyName" value="${excel.item.max.key}"/>
     </bean>
 
