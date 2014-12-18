@@ -706,8 +706,6 @@
     <bean id="temporaryFileResourceLocator"
           class="be.raildelays.batch.support.TemporaryFileResourceLocator"
           scope="step">
-        <property name="resource" value="file:#{stepExecutionContext['${excel.resource.key}']}"/>
-        <property name="relativePathAndFileName" value="tmp/moreThanOneHour.xls"/>
         <property name="keyName" value="excel.tmp.file.path.key"/>
     </bean>
 
