@@ -7,17 +7,18 @@
 
     <job id="flowJob" xmlns="http://www.springframework.org/schema/batch">
         <step id="step1" next="decision">
-            <tasklet ref="noop" />
+            <tasklet ref="mock" transaction-manager="batchTransactionManager"/>
         </step>
         <decision id="decision" decider="delayMoreThanOneHourDecider">
             <next on="COMPLETED_WITH_60M_DELAY" to="step2"/>
             <end on="COMPLETED"/>
         </decision>
         <step id="step2">
-            <tasklet ref="noop" />
+            <tasklet ref="noop" transaction-manager="batchTransactionManager"/>
         </step>
     </job>
 
+    <bean id="mock" class="be.raildelays.batch.test.MockStatusTasklet"/>
     <bean id="noop" class="be.raildelays.batch.test.NoopTasklet"/>
     <bean id="delayMoreThanOneHourDecider"
           class="be.raildelays.batch.decider.MoreThanOneHourDelayDecider">
