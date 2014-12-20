@@ -20,9 +20,9 @@ import java.io.IOException;
  *
  * @author Almex
  */
-public class ItemWriterResourceLocator extends AbstractItemResourceLocator {
+public class ToWriteExcelResourceLocator extends AbstractItemResourceLocator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ItemWriterResourceLocator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ToWriteExcelResourceLocator.class);
 
     @Override
     public Resource getResource(ExecutionContext context) throws IOException {

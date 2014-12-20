@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * @author Almex
  * @since 1.2
- * @see be.raildelays.batch.support.ItemWriterResourceLocator
+ * @see be.raildelays.batch.support.ToWriteExcelResourceLocator
  */
 public class ResourceLocatorListener {
 

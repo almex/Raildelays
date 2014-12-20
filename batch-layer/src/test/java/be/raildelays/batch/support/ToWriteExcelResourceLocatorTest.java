@@ -21,10 +21,10 @@ import static org.springframework.batch.item.file.ExcelSheetItemWriter.Format;
 /**
  * @author Almex
  */
-public class ItemWriterResourceLocatorTest extends AbstractFileTest {
+public class ToWriteExcelResourceLocatorTest extends AbstractFileTest {
 
 
-    private ItemWriterResourceLocator resourceLocator;
+    private ToWriteExcelResourceLocator resourceLocator;
 
     private ResourceLocatorListener listener;
 
@@ -41,7 +41,7 @@ public class ItemWriterResourceLocatorTest extends AbstractFileTest {
         copyFile();
 
         listener = new ResourceLocatorListener();
-        resourceLocator = new ItemWriterResourceLocator();
+        resourceLocator = new ToWriteExcelResourceLocator();
         resourceLocator.setResource(new FileSystemResource(CURRENT_PATH + EXCEL_FILE_PREFIX + Format.OLE2.getFileExtension()));
         resourceLocator.setKeyName("foo");
     }

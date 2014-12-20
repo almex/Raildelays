@@ -5,8 +5,8 @@ import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.bean.ExcelRowComparator;
 import be.raildelays.batch.listener.ResourceLocatorListener;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
-import be.raildelays.batch.support.ItemWriterResourceLocator;
 import be.raildelays.batch.support.SimpleResourceItemSearch;
+import be.raildelays.batch.support.ToWriteExcelResourceLocator;
 import be.raildelays.batch.writer.BatchExcelRowAggregator;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
@@ -42,7 +42,7 @@ public class MultiResourceItemWriterTest extends AbstractFileTest {
 
     private StepExecution stepExecution;
 
-    private ItemWriterResourceLocator resourceLocator;
+    private ToWriteExcelResourceLocator resourceLocator;
 
     private ResourceLocatorListener listener;
 
@@ -61,7 +61,7 @@ public class MultiResourceItemWriterTest extends AbstractFileTest {
         FileSystemResource resource = new FileSystemResource(CURRENT_PATH + "retard_sncb.xls");
         ExcelSheetItemWriter<BatchExcelRow> delegate = new ExcelSheetItemWriter<>();
         SimpleResourceItemSearch resourceItemSearch = new SimpleResourceItemSearch();
-        resourceLocator = new ItemWriterResourceLocator();
+        resourceLocator = new ToWriteExcelResourceLocator();
         executionContext = stepExecution.getExecutionContext();
         writer = new MultiResourceSupportItemWriter();
         listener = new ResourceLocatorListener();

@@ -26,7 +26,7 @@ import static org.springframework.batch.item.file.ExcelSheetItemWriter.Format;
 public class ItemWriterResourceLocatorWithItemSearchIT extends AbstractFileTest {
 
 
-    private ItemWriterResourceLocator resourceLocator;
+    private ToWriteExcelResourceLocator resourceLocator;
     private ExcelSheetItemReader<BatchExcelRow> reader;
     private ResourceLocatorListener listener;
 
@@ -54,7 +54,7 @@ public class ItemWriterResourceLocatorWithItemSearchIT extends AbstractFileTest 
 
         itemSearch.setReader(reader);
 
-        resourceLocator = new ItemWriterResourceLocator();
+        resourceLocator = new ToWriteExcelResourceLocator();
         resourceLocator.setResourceItemSearch(itemSearch);
         resourceLocator.setResource(new FileSystemResource(CURRENT_PATH + EXCEL_FILE_PREFIX + Format.OLE2.getFileExtension()));
         resourceLocator.setKeyName("foo");

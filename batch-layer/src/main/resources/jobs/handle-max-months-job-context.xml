@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- Needed if we use a AutomaticJobRegistrar -->
+    <context:annotation-config/>
+
+    <import resource="parent-job-context.xml"/>
+
+    <job id="mainJob" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+        <step id="step1" next="decision">
+
+        </step>
+        <decision id="decision" decider="maxMonthsDecider">
+            <next on="COMPLETED_WITH_MAX_MONTHS" to="handleMaxMonthsStep"/>
+            <end on="COMPLETED"/>
+        </decision>
+        <step id="handleMaxMonthsStep">
+            <job ref="handleMaxMonthsJob"/>
+        </step>
+    </job>
+
+
+    <!--
+        The goal of this job is :
+        ________________________________________________________________________________________________________________
+
+        /sncb_20140812.xls             /sncb_20140812.xls              /20150212/sncb_20140812.xls
+        /sncb_20141016.xls    =(1)=>   /sncb_20141016.xls    =(2)=>    /20150212/sncb_20141016.xls
+        /sncb_20150102.xls             /sncb_20150102.xls              /20150212/sncb_20150102.xls
+                                       /sncb_20150113.xls              /sncb_20150113.xls
+        ________________________________________________________________________________________________________________
+
+
+        As an input of this job we should have :
+
+            executionContext['thresholdDate'] = '20150212'
+            executionContext['filesToArchive'] = {'sncb_20140812', 'sncb_20141016', 'sncb_20150102'}
+
+        The last file to archive should be the one to split.
+
+        1) Split Excel files from the last date matching the end of 6 months period.
+
+        ATTENTION: If there is one or more files containing dates after threshold, they all have to be re-written
+        in order to shift all rows! Thus means we may have to create new files and to delete others.
+
+        This pseudo code can only be implemented if and only if we can overwrite the file that we will read.
+        In our case the ExcelSheetItemReader put all rows in memory during ItemStream#open() so this requirement is
+        full-filed.
+
+        for (ExcelSheet excelSheet : directory.getFiles()) {
+            for (Row item : excelSheet.getRows()) {
+                if (item >= threshold) {
+                    newFile.write(item)
+                } else {
+                    currentFile.write(item)
+                }
+            }
+        }
+
+        One way to solve this is to get communication between the ResourceLocator for the Reader and the ResourceLocator
+        for the Writer.
+
+        2) Archives all Excel files containing delays for 6 months. We should store in the job execution context the
+        newly created archive directory to allow next to locate files to attach.
+
+        Note: The archiveDirectory should be equal to the thresholdDate.
+
+        3) Send an e-mail with all Excel files containing delays for 6 months as attachment.
+
+        Note: Using thresholdDate and filesToArchive should be enough to determine what are the attachments.
+    -->
+    <job id="handleMaxMonthsJob" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+        <step id="splitFiles" next="moveFiles">
+            <tasklet transaction-manager="batchTransactionManager">
+                <chunk reader="allExcelFilesToSplitItemReader"
+                       writer="splitItemWriter"/>
+            </tasklet>
+        </step>
+        <step id="moveFiles" next="sendEmail">
+            <tasklet transaction-manager="batchTransactionManager" ref=""/>
+        </step>
+        <step id="sendEmail">
+            <tasklet transaction-manager="batchTransactionManager" ref=""/>
+        </step>
+    </job>
+
+    <bean id="maxMonthsDecider" class="be.raildelays.batch.tasklet.MaxMonthsDecider">
+        <property name="maxNumberOfMonth" value="${excel.max.months}"/>
+        <property name="reader">
+            <bean class="org.springframework.batch.item.file.MultiResourceItemReader"
+                  scope="step">
+                <property name="delegate" ref="allExcelFilesToSplitItemReader"/>
+                <property name="resources" value="file:#{jobParameters['excel.output.path']}/*.xls"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!--bean id="allExcelFilesResourceLocator"
+          class="be.raildelays.batch.support.BySearchExcelResourceLocator"
+          scope="step">
+        <property name="resource" value="file:#{jobParameters['excel.output.path']}"/>
+        <property name="resourceItemSearch" ref="allExcelFilesItemSearch"/>
+        <property name="keyName" value="${excel.resource.key}"/>
+    </bean-->
+
+    <!--bean id="allExcelFilesItemSearch"
+          class="be.raildelays.batch.support.SimpleResourceItemSearch"
+          scope="step">
+        <property name="reader">
+            <bean class="org.springframework.batch.item.file.ExcelSheetItemReader">
+                <property name="name" value="excelSheetItemReader3"/>
+                <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
+                <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
+                <property name="rowMapper">
+                    <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
+                        <property name="language" value="#{jobParameters['lang']}"/>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+        <property name="comparator">
+            <bean class="be.raildelays.batch.bean.ExcelRowComparator"/>
+        </property>
+    </bean-->
+
+    <!-- ================================================================================================== -->
+    <!-- =====================================         READERS        ===================================== -->
+    <!-- ================================================================================================== -->
+
+    <bean id="allExcelFilesToSplitItemReader"
+          class="org.springframework.batch.item.file.MultiResourceItemReader"
+          scope="step">
+        <property name="delegate">
+            <bean class="org.springframework.batch.item.file.ExcelSheetItemReader">
+                <property name="name" value="allExcelFilesToSplitItemReader"/>
+                <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
+                <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
+                <property name="rowMapper">
+                    <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
+                        <property name="language" value="#{jobParameters['lang']}"/>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+        <property name="resources" value="file:#{jobParameters['excel.output.path']}/*.xls"/>
+    </bean>
+
+    <!-- ================================================================================================== -->
+    <!-- =====================================       PROCESSORS       ===================================== -->
+    <!-- ================================================================================================== -->
+
+    <!-- ================================================================================================== -->
+    <!-- =====================================         WRITERS        ===================================== -->
+    <!-- ================================================================================================== -->
+
+    <!--
+        TODO: create a ResourceLocator which will handle the split
+    -->
+    <bean id="splitItemWriter"
+          class="org.springframework.batch.item.support.MultiResourceSupportItemWriter"
+          scope="step">
+        <property name="delegate">
+            <bean class="org.springframework.batch.item.file.ExcelSheetItemWriter"
+                  scope="step">
+                <property name="rowAggregator">
+                    <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator"
+                          scope="step">
+                        <property name="language" value="#{jobParameters['lang']}"/>
+                    </bean>
+                </property>
+                <property name="name" value="sortedForSplitExcelSheetItemWriter"/>
+                <property name="shouldDeleteIfExists" value="false"/>
+                <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
+                <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
+                <property name="template" value="file:#{jobParameters['excel.input.template']}"/>
+            </bean>
+        </property>
+        <property name="name" value="multiResourceForSplitItemWriter"/>
+        <property name="resourceLocator">
+            <!--bean class="be.raildelays.batch.support.ToWriteExcelResourceLocator"
+                  scope="step">
+                <property name="resource" value="file:#{jobParameters['excel.output.path']}"/>
+                <property name="resourceItemSearch" ref="resourceItemSearch"/>
+                <property name="keyName" value="${excel.resource.key}"/>
+            </bean-->
+        </property>
+    </bean>
+
+
+    <!--bean id="resourceItemSearch"
+          class="be.raildelays.batch.support.SimpleResourceItemSearch"
+          scope="step">
+        <property name="reader">
+            <bean class="org.springframework.batch.item.file.ExcelSheetItemReader">
+                <property name="name" value="excelSheetItemReader3"/>
+                <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
+                <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
+                <property name="rowMapper">
+                    <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
+                        <property name="language" value="#{jobParameters['lang']}"/>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+        <property name="comparator">
+            <bean class="be.raildelays.batch.bean.ExcelRowComparator"/>
+        </property>
+    </bean-->
+
+
+</beans>

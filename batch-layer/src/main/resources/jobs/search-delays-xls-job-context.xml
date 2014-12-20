@@ -147,7 +147,7 @@
     <!-- =====================================        RESOURCES       ===================================== -->
     <!-- ================================================================================================== -->
 
-    <bean id="itemWriterResourceLocator" class="be.raildelays.batch.support.ItemWriterResourceLocator" scope="step">
+    <bean id="itemWriterResourceLocator" class="be.raildelays.batch.support.ToWriteExcelResourceLocator" scope="step">
         <property name="resource" value="file:#{jobParameters['excel.output.path']}"/>
         <property name="resourceItemSearch" ref="resourceItemSearch"/>
     </bean>

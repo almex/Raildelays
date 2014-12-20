@@ -662,7 +662,7 @@
     <!-- ================================================================================================== -->
 
     <bean id="itemReaderResourceLocator"
-          class="be.raildelays.batch.support.ItemReaderResourceLocator"
+          class="be.raildelays.batch.support.BySearchExcelResourceLocator"
           scope="step">
         <property name="resource" value="file:#{jobParameters['excel.output.path']}"/>
         <property name="resourceItemSearch" ref="resourceItemSearch"/>
@@ -670,7 +670,7 @@
     </bean>
 
     <bean id="itemWriterResourceLocator"
-          class="be.raildelays.batch.support.ItemWriterResourceLocator"
+          class="be.raildelays.batch.support.ToWriteExcelResourceLocator"
           scope="step">
         <property name="resource" value="file:#{jobParameters['excel.output.path']}"/>
         <property name="resourceItemSearch" ref="resourceItemSearch"/>
