@@ -415,17 +415,6 @@
         <property name="language" value="#{jobParameters['lang']}"/>
     </bean>
 
-    <bean id="validatorProcessor"
-          class="org.springframework.batch.item.validator.ValidatingItemProcessor">
-        <property name="validator">
-            <bean class="org.springframework.batch.item.validator.SpringValidator">
-                <property name="validator">
-                    <bean class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
-                </property>
-            </bean>
-        </property>
-    </bean>
-
     <bean id="filterTwoSensPerDayXlsProcessor"
           class="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor"
           scope="step">

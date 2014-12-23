@@ -58,6 +58,7 @@
                     newFile.write(item)
                 } else {
                     currentFile.write(item)
+
                 }
             }
         }
@@ -78,10 +79,14 @@
         <step id="splitFiles" next="moveFiles">
             <tasklet transaction-manager="batchTransactionManager">
                 <chunk reader="allExcelFilesToSplitItemReader"
+                       processor="chainedProcessorsToSplit"
                        writer="splitItemWriter"/>
             </tasklet>
         </step>
-        <step id="moveFiles" next="sendEmail">
+        <step id="moveFiles" next="deleteFiles">
+            <tasklet transaction-manager="batchTransactionManager" ref=""/>
+        </step>
+        <step id="deleteFiles" next="sendEmail">
             <tasklet transaction-manager="batchTransactionManager" ref=""/>
         </step>
         <step id="sendEmail">
@@ -98,35 +103,8 @@
                 <property name="resources" value="file:#{jobParameters['excel.output.path']}/*.xls"/>
             </bean>
         </property>
+        <property name="keyName" value="${threshold.date.key}" />
     </bean>
-
-    <!--bean id="allExcelFilesResourceLocator"
-          class="be.raildelays.batch.support.BySearchExcelResourceLocator"
-          scope="step">
-        <property name="resource" value="file:#{jobParameters['excel.output.path']}"/>
-        <property name="resourceItemSearch" ref="allExcelFilesItemSearch"/>
-        <property name="keyName" value="${excel.resource.key}"/>
-    </bean-->
-
-    <!--bean id="allExcelFilesItemSearch"
-          class="be.raildelays.batch.support.SimpleResourceItemSearch"
-          scope="step">
-        <property name="reader">
-            <bean class="org.springframework.batch.item.file.ExcelSheetItemReader">
-                <property name="name" value="excelSheetItemReader3"/>
-                <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
-                <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
-                <property name="rowMapper">
-                    <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
-                        <property name="language" value="#{jobParameters['lang']}"/>
-                    </bean>
-                </property>
-            </bean>
-        </property>
-        <property name="comparator">
-            <bean class="be.raildelays.batch.bean.ExcelRowComparator"/>
-        </property>
-    </bean-->
 
     <!-- ================================================================================================== -->
     <!-- =====================================         READERS        ===================================== -->
@@ -153,6 +131,21 @@
     <!-- ================================================================================================== -->
     <!-- =====================================       PROCESSORS       ===================================== -->
     <!-- ================================================================================================== -->
+
+    <bean id="chainedProcessorsToSplit"
+          class="org.springframework.batch.item.support.CompositeItemProcessor">
+        <property name="delegates">
+            <list>
+                <ref bean="lineStopMapperProcessor"/>
+                <ref bean="validatorProcessor"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="" class="be.raildelays.batch.processor.SplitExcelSheetProcessor"
+          scope="step">
+        <property name="thresholdDate" value="#{jobExecutionContext['${threshold.date.key}']}"/>
+    </bean>
 
     <!-- ================================================================================================== -->
     <!-- =====================================         WRITERS        ===================================== -->

@@ -23,17 +23,12 @@ import java.util.Map;
 
 @DirtiesContext
 // Because of issue [SPR-8849] (https://jira.springsource.org/browse/SPR-8849)
-@ContextConfiguration(locations = {"/jobs/main-job-context.xml"})
-@DataSet(value = "classpath:HandleDelayMoreThanOneHourIT.xml", tearDownOperation = DBOperation.DELETE_ALL)
+@ContextConfiguration(locations = {"/jobs/handle-max-months-job-context.xml"})
 public class HandleDelayMoreThanOneHourIT extends AbstractContextIT {
 
     @Test
-    @Ignore
-    public void testStep3() throws ParseException, IOException {
+    public void testCompleted() throws Exception {
         final Map<String, JobParameter> parameters = new HashMap<>();
-        final ExecutionContext executionContext = MetaDataInstanceFactory.createJobExecution().getExecutionContext();
-
-        executionContext.putLong("moreThanOneHourDelay", 466);
 
         parameters.put("input.file.path", new JobParameter("train-list.properties"));
         parameters.put("date", new JobParameter(new SimpleDateFormat("dd/MM/yyyy").parse("01/01/2000")));
@@ -47,10 +42,9 @@ public class HandleDelayMoreThanOneHourIT extends AbstractContextIT {
         parameters.put("mail.server.host", new JobParameter("smtp.gmail.com"));
         parameters.put("mail.server.port", new JobParameter("465"));
 
-        JobExecution jobExecution = getJobLauncherTestUtils().launchStep("handleDelayMoreThanOneHour", new JobParameters(parameters), executionContext);
+        JobExecution jobExecution = getJobLauncherTestUtils().launchJob(new JobParameters(parameters));
 
         Assert.assertFalse(jobExecution.getStatus().isUnsuccessful());
-        Assert.assertEquals(1, jobExecution.getStepExecutions().toArray(new StepExecution[1])[0].getWriteCount());
     }
 
 }

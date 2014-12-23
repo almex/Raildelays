@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:batch="http://www.springframework.org/schema/batch"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
@@ -12,7 +11,20 @@
 
     <context:property-placeholder location="classpath:application.properties" order="1" ignore-unresolvable="true"/>
 
+    <job id="parentJob" abstract="true" xmlns="http://www.springframework.org/schema/batch">
+    </job>
 
-    <batch:job id="parentJob" abstract="true">
-    </batch:job>
+    <step id="parentStep" abstract="true" xmlns="http://www.springframework.org/schema/batch">
+    </step>
+
+    <bean id="validatorProcessor"
+          class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+        <property name="validator">
+            <bean class="org.springframework.batch.item.validator.SpringValidator">
+                <property name="validator">
+                    <bean class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
+                </property>
+            </bean>
+        </property>
+    </bean>
 </beans>
