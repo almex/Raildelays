@@ -97,10 +97,10 @@
         <version.slf4j>1.7.5</version.slf4j>
         <version.log4jdbc>1.16</version.log4jdbc>
         <version.disruptor>3.3.0</version.disruptor>
-        <version.groovy>2.3.4</version.groovy>
-        <version.groovy.all>2.3.4</version.groovy.all>
-        <version.groovy.eclipse.compiler>2.9.0-01</version.groovy.eclipse.compiler>
-        <version.groovy.eclipse.batch>2.3.4-01</version.groovy.eclipse.batch>
+        <version.groovy>2.3.9</version.groovy>
+        <version.groovy.all>2.3.9</version.groovy.all>
+        <version.groovy.eclipse.compiler>2.9.1-01</version.groovy.eclipse.compiler>
+        <version.groovy.eclipse.batch>2.3.7-01</version.groovy.eclipse.batch>
         <version.tagsoup>1.2.1</version.tagsoup>
         <version.apache.poi>3.10.1</version.apache.poi>
         <version.commons.dbcp>1.4</version.commons.dbcp>
@@ -916,6 +916,13 @@
                     <groupId>org.codehaus.groovy</groupId>
                     <artifactId>groovy-all</artifactId>
                     <version>${version.groovy.all}</version>
+                </dependency>
+                <!-- We remove dependency in conflict -->
+                <dependency>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy</artifactId>
+                    <version>1.7.11</version>
+                    <scope>provided</scope>
                 </dependency>
             </dependencies>
 
