@@ -36,10 +36,6 @@
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>eclipselink</artifactId>
         </dependency>-->
-        <!--<dependency>-->
-        <!--<groupId>com.mysema.querydsl</groupId>-->
-        <!--<artifactId>querydsl-jpa</artifactId>-->
-        <!--</dependency>-->
 
         <!-- JTA transaction manager -->
         <dependency>

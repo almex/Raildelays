@@ -1,4 +1,4 @@
-package be.raildelays.batch.tasklet;
+package be.raildelays.batch.decider;
 
 import be.raildelays.domain.xls.ExcelRow;
 import org.springframework.batch.core.JobExecution;

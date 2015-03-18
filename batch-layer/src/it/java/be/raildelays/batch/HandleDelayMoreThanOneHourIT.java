@@ -10,7 +10,9 @@ import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.MetaDataInstanceFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -25,6 +27,12 @@ import java.util.Map;
 // Because of issue [SPR-8849] (https://jira.springsource.org/browse/SPR-8849)
 @ContextConfiguration(locations = {"/jobs/handle-max-months-job-context.xml"})
 public class HandleDelayMoreThanOneHourIT extends AbstractContextIT {
+
+    /**
+     * SUT.
+     */
+    @Autowired
+    private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Test
     public void testCompleted() throws Exception {
@@ -41,6 +49,7 @@ public class HandleDelayMoreThanOneHourIT extends AbstractContextIT {
         parameters.put("mail.account.address", new JobParameter("alexis.soumagne@gmail.com"));
         parameters.put("mail.server.host", new JobParameter("smtp.gmail.com"));
         parameters.put("mail.server.port", new JobParameter("465"));
+        parameters.put("lang", new JobParameter("en"));
 
         JobExecution jobExecution = getJobLauncherTestUtils().launchJob(new JobParameters(parameters));
 
