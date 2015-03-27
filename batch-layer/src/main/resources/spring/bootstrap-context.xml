@@ -8,15 +8,8 @@
 
     <context:property-placeholder location="classpath:application.properties" order="1" ignore-unresolvable="true"/>
 
-    <bean id="configuration"
-          class="org.springframework.beans.factory.config.PropertiesFactoryBean">
-        <property name="locations">
-            <list>
-                <value>${file.configuration.uri}</value>
-            </list>
-        </property>
-        <property name="fileEncoding" value="ISO8859-1"/>
-        <property name="ignoreResourceNotFound" value="false"/>
+    <bean id="jobParametersFromPropertiesExtractor" class="be.raildelays.batch.job.PropertiesFileJobParametersExtractor">
+        <property name="resource" value="${file.configuration.uri}"/>
     </bean>
 
     <import resource="classpath:spring/batch/raildelays-batch-integration-context.xml"/>

@@ -11,8 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.step.job.JobParametersExtractor;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Assert;
 
@@ -58,35 +60,9 @@ public class Bootstrap {
         final BatchStartAndRecoveryService service = applicationContext.getBean("BatchStartAndRecoveryService", BatchStartAndRecoveryService.class);
 
         try {
-            Properties configuration = applicationContext.getBean("configuration",
-                    Properties.class);
-            final DefaultJobParametersConverter converter = new DefaultJobParametersConverter();
+            JobParametersExtractor propertiesExtractor = applicationContext.getBean("jobParametersFromPropertiesExtractor",
+                    JobParametersExtractor.class);
 
-            converter.setDateFormat(new SimpleDateFormat("dd/MM/yyyy"));
-
-            final String departure = configuration.getProperty("departure");
-            final String arrival = configuration.getProperty("arrival");
-            final String excelInputTemplate = configuration.getProperty("excel.input.template");
-            final String textOutputPath = configuration.getProperty("text.output.path");
-            final String excelOutputPath = configuration.getProperty("excel.output.path");
-            final String language = configuration.getProperty("language");
-            final String mailAccountUsername = configuration.getProperty("mail.account.username");
-            final String mailAccountPassword = configuration.getProperty("mail.account.password");
-            final String mailServerHost = configuration.getProperty("mail.server.host");
-            final String mailServerPort = configuration.getProperty("mail.server.port");
-            final String mailAccountAddress = configuration.getProperty("mail.account.address");
-
-            Assert.notNull(departure, "You must add a 'departure' property into the ./conf/raildelays.properties");
-            Assert.notNull(arrival, "You must add a 'arrival' property into the ./conf/raildelays.properties");
-            Assert.notNull(excelInputTemplate, "You must add a 'excel.input.template' property into the ./conf/raildelays.properties");
-            Assert.notNull(textOutputPath, "You must add a 'text.output.path' property into the ./conf/raildelays.properties");
-            Assert.notNull(excelOutputPath, "You must add a 'excel.output.path' property into the ./conf/raildelays.properties");
-            Assert.notNull(language, "You must add a 'language' property into the ./conf/raildelays.properties");
-            Assert.notNull(mailAccountUsername, "You must add a 'mail.account.username' property into the ./conf/raildelays.properties");
-            Assert.notNull(mailAccountPassword, "You must add a 'mail.account.password' property into the ./conf/raildelays.properties");
-            Assert.notNull(mailServerHost, "You must add a 'mail.server.host' property into the ./conf/raildelays.properties");
-            Assert.notNull(mailServerPort, "You must add a 'mail.server.port' property into the ./conf/raildelays.properties");
-            Assert.notNull(mailAccountAddress, "You must add a 'mail.account.address' property into the ./conf/raildelays.properties");
 
             if (recovery) {
                 LOGGER.info("[Recovery activated]");
@@ -97,23 +73,9 @@ public class Bootstrap {
 
             //-- Launch one Job per date
             for (Date date : dates) {
-                Map<String, JobParameter> parameters = new HashMap<>();
+                JobParameters jobParameters = propertiesExtractor.getJobParameters(null, null);
 
-                parameters.put("date", new JobParameter(date));
-                parameters.put("station.a.name", new JobParameter(departure));
-                parameters.put("station.b.name", new JobParameter(arrival));
-                parameters.put("excel.input.template", new JobParameter(excelInputTemplate));
-                parameters.put("excel.output.path", new JobParameter(excelOutputPath));
-                parameters.put("output.file.path", new JobParameter(textOutputPath));
-                parameters.put("lang", new JobParameter(language));
-                parameters.put("mail.account.username", new JobParameter(mailAccountUsername));
-                parameters.put("mail.account.password", new JobParameter(mailAccountPassword));
-                parameters.put("mail.server.host", new JobParameter(mailServerHost));
-                parameters.put("mail.server.port", new JobParameter(mailServerPort));
-                parameters.put("mail.account.address", new JobParameter(mailAccountAddress));
-
-
-                JobParameters jobParameters = new JobParameters(parameters);
+                jobParameters.getParameters().put("date", new JobParameter(date));
 
                 try {
                     service.start("mainJob", jobParameters);

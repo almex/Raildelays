@@ -2,6 +2,7 @@ package be.raildelays.batch.job;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
@@ -22,7 +23,6 @@ import java.util.Properties;
  */
 public class PropertiesFileJobParametersExtractor implements JobParametersExtractor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesFileJobParametersExtractor.class);
     private Resource resource;
 
     @Override
@@ -32,7 +32,7 @@ public class PropertiesFileJobParametersExtractor implements JobParametersExtrac
         try (Reader reader = new FileReader(resource.getFile())) {
             properties.load(reader);
         } catch (IOException e) {
-            LOGGER.error("Exception occurred when retrieving data from properties file", e);
+            stepExecution.setExitStatus(ExitStatus.FAILED.addExitDescription(e));
         }
 
         return new DefaultJobParametersConverter().getJobParameters(properties);
