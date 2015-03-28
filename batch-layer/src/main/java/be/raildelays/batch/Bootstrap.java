@@ -74,11 +74,13 @@ public class Bootstrap {
             //-- Launch one Job per date
             for (Date date : dates) {
                 JobParameters jobParameters = propertiesExtractor.getJobParameters(null, null);
+                JobParametersBuilder builder = new JobParametersBuilder(jobParameters);
 
-                jobParameters.getParameters().put("date", new JobParameter(date));
+
+                builder.addDate("date", date);
 
                 try {
-                    service.start("mainJob", jobParameters);
+                    service.start("mainJob", builder.toJobParameters());
                 } catch (JobInstanceAlreadyCompleteException e) {
                     LOGGER.warn("Job already completed for this date {}", new SimpleDateFormat("dd/MM/yyyy").format(date));
                 }

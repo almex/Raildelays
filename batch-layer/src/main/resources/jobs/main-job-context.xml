@@ -231,7 +231,7 @@
                         <constructor-arg>
                             <bean class="be.raildelays.domain.Language" factory-method="valueOf">
                                 <constructor-arg>
-                                    <value>#{jobParameters['lang']?.toUpperCase()}</value>
+                                    <value>#{jobParameters['language']?.toUpperCase()}</value>
                                 </constructor-arg>
                             </bean>
                         </constructor-arg>
@@ -260,7 +260,7 @@
                         <constructor-arg>
                             <bean class="be.raildelays.domain.Language" factory-method="valueOf">
                                 <constructor-arg>
-                                    <value>#{jobParameters['lang']?.toUpperCase()}</value>
+                                    <value>#{jobParameters['language']?.toUpperCase()}</value>
                                 </constructor-arg>
                             </bean>
                         </constructor-arg>
@@ -302,7 +302,7 @@
           scope="step">
         <property name="stationA" value="#{jobParameters['station.departure']}"/>
         <property name="stationB" value="#{jobParameters['station.arrival']}"/>
-        <property name="language" value="#{jobParameters['lang']}"/>
+        <property name="language" value="#{jobParameters['language']}"/>
         <property name="date" value="#{jobParameters['date']}"/>
         <property name="threshold" value="${excel.item.delay.min.threshold}"/>
     </bean>
@@ -361,7 +361,7 @@
         <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
         <property name="rowMapper">
             <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
-                <property name="language" value="#{jobParameters['lang']}"/>
+                <property name="language" value="#{jobParameters['language']}"/>
                 <!-- We do not take into account empty rows -->
                 <!--property name="validateOutcomes" value="true"/-->
             </bean>
@@ -414,7 +414,7 @@
           class="be.raildelays.batch.processor.LineStopMapperProcessor"
           scope="step">
         <property name="date" value="#{jobParameters[date]}"/>
-        <property name="language" value="#{jobParameters['lang']}"/>
+        <property name="language" value="#{jobParameters['language']}"/>
     </bean>
 
     <bean id="aggregateExpectedTimeProcessor"
@@ -426,19 +426,19 @@
           scope="step">
         <property name="stationA" value="#{jobParameters['station.departure']}"/>
         <property name="stationB" value="#{jobParameters['station.arrival']}"/>
-        <property name="language" value="#{jobParameters['lang']}"/>
+        <property name="language" value="#{jobParameters['language']}"/>
     </bean>
 
     <bean id="searchNextTrainProcessor"
           class="be.raildelays.batch.processor.SearchNextTrainProcessor"
           scope="step">
-        <property name="language" value="#{jobParameters['lang']}"/>
+        <property name="language" value="#{jobParameters['language']}"/>
     </bean>
 
     <bean id="filterTwoSensPerDayXlsProcessor"
           class="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor"
           scope="step">
-        <property name="language" value="#{jobParameters['lang']}"/>
+        <property name="language" value="#{jobParameters['language']}"/>
         <property name="outputReader">
             <bean class="org.springframework.batch.item.file.MultiResourceAwareItemReader">
                 <property name="delegate">
@@ -448,7 +448,7 @@
                         <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
                         <property name="rowMapper">
                             <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
-                                <property name="language" value="#{jobParameters['lang']}"/>
+                                <property name="language" value="#{jobParameters['language']}"/>
                             </bean>
                         </property>
                     </bean>
@@ -487,7 +487,7 @@
                 <constructor-arg>
                     <bean class="be.raildelays.domain.Language" factory-method="valueOf">
                         <constructor-arg>
-                            <value>#{jobParameters['lang']?.toUpperCase()}</value>
+                            <value>#{jobParameters['language']?.toUpperCase()}</value>
                         </constructor-arg>
                     </bean>
                 </constructor-arg>
@@ -513,7 +513,7 @@
     <bean id="flatFileItemWriter"
           class="org.springframework.batch.item.file.FlatFileItemWriter"
           scope="step">
-        <property name="resource" value="#{jobParameters['output.file.path']}"/>
+        <property name="resource" value="#{jobParameters['text.output.path']}"/>
         <property name="appendAllowed" value="true"/>
         <property name="shouldDeleteIfExists" value="false"/>
         <property name="saveState" value="true"/>
@@ -540,7 +540,7 @@
                 <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
                 <property name="rowMapper">
                     <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
-                        <property name="language" value="#{jobParameters['lang']}"/>
+                        <property name="language" value="#{jobParameters['language']}"/>
                     </bean>
                 </property>
             </bean>
@@ -557,7 +557,7 @@
         <property name="rowAggregator">
             <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator"
                   scope="step">
-                <property name="language" value="#{jobParameters['lang']}"/>
+                <property name="language" value="#{jobParameters['language']}"/>
             </bean>
         </property>
         <property name="name" value="excelSheetItemWriter"/>
@@ -595,7 +595,7 @@
         <property name="rowAggregator">
             <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator"
                   scope="step">
-                <property name="language" value="#{jobParameters['lang']}"/>
+                <property name="language" value="#{jobParameters['language']}"/>
             </bean>
         </property>
         <property name="name" value="excelSheetItemWriter2"/>
@@ -696,7 +696,7 @@
                 <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
                 <property name="rowMapper">
                     <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
-                        <property name="language" value="#{jobParameters['lang']}"/>
+                        <property name="language" value="#{jobParameters['language']}"/>
                     </bean>
                 </property>
             </bean>
