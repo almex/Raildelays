@@ -8,12 +8,11 @@ import be.raildelays.httpclient.AbstractRequest
  * @author Almex
  * @since 1.2
  */
-public class DelaysRequest extends AbstractRequest {
+public class DelaysRequestV2 extends AbstractRequest {
 
-    public DelaysRequest(String trainId, Date day, Sens sens, Language language) {
+    public DelaysRequestV2(String trainId, Date day, Language language) {
         setTrainId(trainId)
         setDay(day)
-        setSens(sens)
         setLanguage(language)
     }
 
@@ -31,14 +30,6 @@ public class DelaysRequest extends AbstractRequest {
 
     private void setDay(Date day) {
         setValue(day, "day", Date.class);
-    }
-
-    public Sens getSens() {
-        return getValue("sens");
-    }
-
-    private void setSens(Sens sens) {
-        setValue(sens, "sens", String.class);
     }
 
     public Language getLanguage() {

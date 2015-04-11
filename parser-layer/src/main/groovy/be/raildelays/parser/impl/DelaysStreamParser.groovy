@@ -49,7 +49,6 @@ class DelaysStreamParser implements StreamParser<Direction, DelaysRequest> {
             String station = tr.td[1].text()
             String hour = tr.td[2].text()
             String delay = tr.td[3].text()
-            //boolean canceled = tr.td[1].a.@class.text().contains("red")
             boolean canceled = tr.td[0].@class.text().contains("Deleted")
 
             log.debug("station=" + station)

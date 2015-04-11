@@ -8,16 +8,14 @@ import be.raildelays.util.ParsingUtil
  * Request a direction for a train to retrieve delays.
  *
  * @author Almex
- * @since 2.0
+ * @since 1.2
  */
-
 public class DelaysRequestStreamer extends RailtimeRequestStreamer<DelaysRequest> {
 
     /**
-     * @param idTrain train's id using Railtime format
-     * @param day day for which you want to retrive
-     * @param language specify 'EN', 'FR' or 'NL'
-     * @param sens 'D' for departure or 'A' for arrival
+     * @param idTrain train's id using Sncb format
+     * @param day for which you want to retrieve delays
+     * @param language specify 'eny', 'fny' or 'nny'
      * @return an HTML content as a stream to parse
      */
     @Override

@@ -43,7 +43,7 @@
         </repository>
     </repositories-->
 
-    <pluginRepositories>
+    <!--pluginRepositories>
         <pluginRepository>
             <id>spring-milestones</id>
             <name>Spring Milestones</name>
@@ -52,7 +52,7 @@
                 <enabled>false</enabled>
             </snapshots>
         </pluginRepository>
-    </pluginRepositories>
+    </pluginRepositories-->
 
     <modules>
         <module>domain-layer</module>
@@ -76,9 +76,9 @@
 
         <version.spring>4.1.4.RELEASE</version.spring>
         <version.spring.batch>3.0.3.RELEASE</version.spring.batch>
-        <version.spring.data>1.7.1.RELEASE</version.spring.data>
-        <version.spring.data.rest>2.2.1.RELEASE</version.spring.data.rest>
-        <version.spring.data.commons>1.9.1.RELEASE</version.spring.data.commons>
+        <version.spring.data>1.8.0.RELEASE</version.spring.data>
+        <version.spring.data.rest>2.3.0.RELEASE</version.spring.data.rest>
+        <version.spring.data.commons>1.10.0.RELEASE</version.spring.data.commons>
         <version.spring.mock>2.0.8</version.spring.mock>
         <version.spring.boot>1.1.7.RELEASE</version.spring.boot>
         <version.spring.dbunit>1.4.0</version.spring.dbunit>
@@ -99,9 +99,9 @@
         <version.log4jdbc>1.16</version.log4jdbc>
         <version.disruptor>3.3.0</version.disruptor>
         <version.groovy>2.3.9</version.groovy>
-        <version.groovy.all>2.3.9</version.groovy.all>
-        <version.groovy.eclipse.compiler>2.9.1-01</version.groovy.eclipse.compiler>
-        <version.groovy.eclipse.batch>2.3.7-01</version.groovy.eclipse.batch>
+        <version.groovy.all>2.4.3</version.groovy.all>
+        <version.groovy.eclipse.compiler>2.9.2-01</version.groovy.eclipse.compiler>
+        <version.groovy.eclipse.batch>2.4.3-01</version.groovy.eclipse.batch>
         <version.tagsoup>1.2.1</version.tagsoup>
         <version.apache.poi>3.10.1</version.apache.poi>
         <version.commons.dbcp>1.4</version.commons.dbcp>
@@ -740,7 +740,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.1</version>
+                    <version>3.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -775,12 +775,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.17</version>
+                    <version>2.18.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>2.17</version>
+                    <version>2.18.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -917,13 +917,6 @@
                     <groupId>org.codehaus.groovy</groupId>
                     <artifactId>groovy-all</artifactId>
                     <version>${version.groovy.all}</version>
-                </dependency>
-                <!-- We remove dependency in conflict -->
-                <dependency>
-                    <groupId>org.codehaus.groovy</groupId>
-                    <artifactId>groovy</artifactId>
-                    <version>1.7.11</version>
-                    <scope>provided</scope>
                 </dependency>
             </dependencies>
 
