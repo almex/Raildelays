@@ -12,7 +12,7 @@ import java.io.Reader;
  */
 public abstract class SncbRequestStreamer<T extends Request> extends AbstractRequestStreamBuilder<T> {
 
-    private static final String ROOT = "http://sncb-siv.hafas.de/bin/trainsearch.exe";
+    private static final String ROOT = "http://sncb-siv.hafas.de";
 
     @Override
     protected Reader httpGet(path, parameters) {

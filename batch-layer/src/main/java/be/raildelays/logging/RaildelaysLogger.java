@@ -167,9 +167,9 @@ public class RaildelaysLogger implements Logger {
     private static Date computeEffectiveTime(TimestampDelay timestampDelay) {
         Date result = null;
 
-        if (timestampDelay.getExpected() != null) {
+        if (timestampDelay != null && timestampDelay.getExpected() != null) {
             result = DateUtils.addMinutes(timestampDelay.getExpected(),
-                    timestampDelay.getDelay().intValue());
+                    timestampDelay.getDelay() != null ? timestampDelay.getDelay().intValue() : 0);
         }
 
         return result;

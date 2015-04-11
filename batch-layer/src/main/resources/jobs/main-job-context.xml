@@ -20,8 +20,8 @@
                 <batch:handler task-executor="taskExecutor"/>
                 <batch:step>
                     <batch:tasklet transaction-manager="batchTransactionManager">
-                        <batch:chunk reader="compositeRailtimeItemReader"
-                                     processor="chainedProcessorsForRailtime"
+                        <batch:chunk reader="afasItemReader"
+                                     processor="chainedProcessorsForAfas"
                                      writer="jpaItemWriter"
                                      commit-interval="10" retry-limit="3">
                             <batch:retryable-exception-classes>
@@ -215,11 +215,36 @@
         <property name="resource" value="${file.trainlist.uri}"/>
     </bean>
 
-    <bean id="compositeRailtimeItemReader"
+    <bean id="afasItemReader" class="be.raildelays.batch.reader.ScraperItemReader"
+          scope="step">
+        <property name="request">
+            <bean class="be.raildelays.httpclient.impl.DelaysRequestV2">
+                <constructor-arg value="#{stepExecutionContext['trainId']}"/>
+                <constructor-arg value="#{jobParameters['date']}"/>
+                <constructor-arg>
+                    <bean class="be.raildelays.domain.Language" factory-method="valueOf">
+                        <constructor-arg>
+                            <value>#{jobParameters['language']?.toUpperCase()}</value>
+                        </constructor-arg>
+                    </bean>
+                </constructor-arg>
+            </bean>
+        </property>
+        <property name="streamer">
+            <bean class="be.raildelays.httpclient.impl.DelaysRequestStreamerV2"/>
+        </property>
+        <property name="parser">
+            <bean class="be.raildelays.parser.impl.DelaysStreamParserV2"/>
+        </property>
+        <property name="retryPolicy" ref="railtimeReaderRetryPolicy"/>
+        <property name="backOffPolicy" ref="railtimeReaderBackOffPolicy"/>
+    </bean>
+
+    <!--<bean id="compositeRailtimeItemReader"
           class="be.raildelays.batch.reader.CompositeRailtimeItemReader"
           scope="step">
         <property name="departureReader">
-            <bean class="be.raildelays.batch.reader.RailtimeItemReader"
+            <bean class="be.raildelays.batch.reader.ScraperItemReader"
                   scope="step">
                 <property name="request">
                     <bean class="be.raildelays.httpclient.impl.DelaysRequest">
@@ -248,7 +273,7 @@
             </bean>
         </property>
         <property name="arrivalReader">
-            <bean class="be.raildelays.batch.reader.RailtimeItemReader"
+            <bean class="be.raildelays.batch.reader.ScraperItemReader"
                   scope="step">
                 <property name="request">
                     <bean class="be.raildelays.httpclient.impl.DelaysRequest">
@@ -276,7 +301,7 @@
                 <property name="backOffPolicy" ref="railtimeReaderBackOffPolicy"/>
             </bean>
         </property>
-    </bean>
+    </bean>-->
 
 
     <bean id="railtimeReaderRetryPolicy"
@@ -373,11 +398,20 @@
     <!-- =====================================       PROCESSORS       ===================================== -->
     <!-- ================================================================================================== -->
 
-    <bean id="chainedProcessorsForRailtime"
+    <!--<bean id="chainedProcessorsForRailtime"
           class="org.springframework.batch.item.support.CompositeItemProcessor">
         <property name="delegates">
             <list>
                 <ref bean="lineStopMapperProcessor"/>
+                <ref bean="validatorProcessor"/>
+            </list>
+        </property>
+    </bean>-->
+
+    <bean id="chainedProcessorsForAfas"
+          class="org.springframework.batch.item.support.CompositeItemProcessor">
+        <property name="delegates">
+            <list>
                 <ref bean="validatorProcessor"/>
             </list>
         </property>

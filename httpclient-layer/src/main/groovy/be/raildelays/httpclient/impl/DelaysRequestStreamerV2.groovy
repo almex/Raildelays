@@ -18,7 +18,7 @@ class DelaysRequestStreamerV2 extends SncbRequestStreamer<DelaysRequestV2> {
     Stream<DelaysRequestV2> stream(DelaysRequestV2 request) {
         final SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yy");
 
-        return new DefaultStream<DelaysRequestV2>(httpGet('/' + request.language.sncbParameter
+        return new DefaultStream<DelaysRequestV2>(httpGet('/bin/trainsearch.exe/' + request.language.sncbParameter
                 , [trainname: request.trainId, date : formatter.format(request.day), getTrainFromArchive: 'yes'])
                 , request);
     }

@@ -16,8 +16,6 @@ import org.slf4j.LoggerFactory
  */
 class DelaysStreamParserV2IT {
 
-    def Logger log = LoggerFactory.getLogger(DelaysStreamParserV2IT.class)
-
 
     @Test
     void testParseDelayFromSample1() {
@@ -29,6 +27,5 @@ class DelaysStreamParserV2IT {
         Assert.assertNotNull("This method should return a result", lineStop);
         Assert.assertEquals("Bruxelles-Midi", lineStop.getStation().getName(Language.EN))
         Assert.assertEquals("Bruxelles-Central", lineStop.getNext().getStation().getName(Language.EN))
-
     }
 }

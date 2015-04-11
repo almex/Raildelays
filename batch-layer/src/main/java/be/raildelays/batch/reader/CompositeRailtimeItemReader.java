@@ -13,7 +13,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
- * Composition of {@link FlatFileItemReader} and two {@link RailtimeItemReader}.
+ * Composition of {@link FlatFileItemReader} and two {@link ScraperItemReader}.
  * <p>
  * This reader is restartable from the last FAILED {@link Chunk}.
  *
@@ -24,9 +24,9 @@ public class CompositeRailtimeItemReader extends CompositeItemStream implements 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(CompositeRailtimeItemReader.class);
 
-    private RailtimeItemReader<Direction, DelaysRequest> departureReader;
+    private ScraperItemReader<Direction, DelaysRequest> departureReader;
 
-    private RailtimeItemReader<Direction, DelaysRequest> arrivalReader;
+    private ScraperItemReader<Direction, DelaysRequest> arrivalReader;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -49,11 +49,11 @@ public class CompositeRailtimeItemReader extends CompositeItemStream implements 
         return result;
     }
 
-    public void setArrivalReader(RailtimeItemReader arrivalReader) {
+    public void setArrivalReader(ScraperItemReader arrivalReader) {
         this.arrivalReader = arrivalReader;
     }
 
-    public void setDepartureReader(RailtimeItemReader departureReader) {
+    public void setDepartureReader(ScraperItemReader departureReader) {
         this.departureReader = departureReader;
     }
 

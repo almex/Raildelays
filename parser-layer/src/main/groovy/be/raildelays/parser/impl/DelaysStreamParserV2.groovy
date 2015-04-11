@@ -15,14 +15,21 @@ import org.slf4j.LoggerFactory
 
 import java.text.SimpleDateFormat
 
+/**
+ * Stream parser for data coming from HAFAS interface of SNCB/NMBS.
+ *
+ * @author Almex
+ * @since 1.2
+ */
 class DelaysStreamParserV2 implements StreamParser<LineStop, DelaysRequestV2> {
 
     def slurper;
     List<List<Map>> json;
 
     private void init(Reader reader) {
-        slurper = new JsonSlurper(type: JsonParserType.INDEX_OVERLAY)
+        slurper = new JsonSlurper(type: JsonParserType.CHAR_BUFFER)
         json = slurper.parse(reader)
+
         assert json instanceof List
     }
 
@@ -31,17 +38,27 @@ class DelaysStreamParserV2 implements StreamParser<LineStop, DelaysRequestV2> {
     @Override
     public LineStop parse(Stream<DelaysRequestV2> stream) {
         LineStop.Builder result = null;
-        init(stream.reader)
+
+        if (stream.reader != null) {
+            init(stream.reader);
+            result = map(stream.request);
+        }
+
+        return result != null ? result.build() : null;
+    }
+
+    private map(request) {
+        LineStop.Builder result = null;
 
         json[0].forEach { object ->
             if (!"".equals(object.csAt) && !"".equals(object.csDt)) {
                 LineStop.Builder builder = new LineStop.Builder();
 
-                builder.date(stream.request.day)
+                builder.date(request.day)
                         .train(getTrain(object))
-                        .station(getStation(object, stream.request.language))
-                        .departureTime(getTimestampDelay(object))
-                        .arrivalTime(getTimestampDelay(object))
+                        .station(getStation(object, request.language))
+                        .departureTime(getDepartureTime(object))
+                        .arrivalTime(getArrivalTime(object))
                         .canceled(false);
 
                 if (result == null) {
@@ -52,15 +69,26 @@ class DelaysStreamParserV2 implements StreamParser<LineStop, DelaysRequestV2> {
             }
         }
 
-        return result.build();
+        return result;
     }
 
-    private static TimestampDelay getTimestampDelay(Map object) {
+    private static TimestampDelay getDepartureTime(Map object) {
         final SimpleDateFormat parser = new SimpleDateFormat("hh:mm");
         TimestampDelay result = null;
 
         if (object.csDt != null) {
-            result = new TimestampDelay(parser.parse(object.csDt), object.dD);
+            result = new TimestampDelay(parser.parse(object.csDt), object.dD != null ? object.dD : 0);
+        }
+
+        return result;
+    }
+
+    private static TimestampDelay getArrivalTime(Map object) {
+        final SimpleDateFormat parser = new SimpleDateFormat("hh:mm");
+        TimestampDelay result = null;
+
+        if (object.csAt != null) {
+            result = new TimestampDelay(parser.parse(object.csAt), object.dA != null ? object.dA : 0);
         }
 
         return result;
