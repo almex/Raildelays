@@ -59,7 +59,7 @@ class DelaysStreamParserV2 implements StreamParser<LineStop, DelaysRequestV2> {
                         .station(getStation(object, request.language))
                         .departureTime(getDepartureTime(object))
                         .arrivalTime(getArrivalTime(object))
-                        .canceled(false);
+                        .canceled(isCanceled(object));
 
                 if (result == null) {
                     result = builder;
@@ -112,6 +112,13 @@ class DelaysStreamParserV2 implements StreamParser<LineStop, DelaysRequestV2> {
         }
 
         return result;
+    }
+
+    private static boolean isCanceled(Map object) {
+        boolean departure = object.sD != null && object.sD == 1;
+        boolean arrival = object.sA != null && object.sA == 1;
+
+        return departure || arrival;
     }
 
 }
