@@ -17,7 +17,12 @@ public class LogStep1ItemProcessorListener extends AbstractLogItemProcessorListe
     @Override
     public void infoOutput(String message, Object output) {
         if (output instanceof LineStop) {
-            logger.info(message, (LineStop) output);
+            LineStop current = (LineStop) output;
+
+            while (current != null) {
+                logger.info(message, current);
+                current = current.getNext();
+            }
         }
     }
 }

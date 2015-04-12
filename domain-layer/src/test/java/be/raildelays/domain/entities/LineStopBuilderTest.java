@@ -72,6 +72,10 @@ public class LineStopBuilderTest {
 
         Assert.assertNotNull(builder.build().getNext());
         Assert.assertNotNull(builder.build().getNext().getNext());
+
+        LineStop lineStop = builder.build();
+        Assert.assertEquals(lineStop, lineStop.getNext().getPrevious());
+        Assert.assertEquals(lineStop, lineStop.getNext().getNext().getPrevious().getPrevious());
     }
 
     @Test
