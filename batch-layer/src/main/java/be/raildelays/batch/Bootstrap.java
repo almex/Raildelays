@@ -85,6 +85,8 @@ public class Bootstrap {
                     LOGGER.warn("Job already completed for this date {}", new SimpleDateFormat("dd/MM/yyyy").format(date));
                 }
             }
+        } catch (Exception e) {
+            LOGGER.error("Error occur in the Bootstrap", e);
         } finally {
             if (service != null) {
                 service.stopAllRunningJobs();

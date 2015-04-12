@@ -26,34 +26,6 @@
         </repository>
     </distributionManagement>
 
-    <!--repositories>
-        <repository>
-            <id>excilys-release</id>
-            <name>Spring dbUnit Respository</name>
-            <url>http://repository.excilys.com/content/repositories/releases</url>
-            <layout>default</layout>
-        </repository>
-        <repository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>http://repo.spring.io/milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories-->
-
-    <!--pluginRepositories>
-        <pluginRepository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>http://repo.spring.io/milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories-->
-
     <modules>
         <module>domain-layer</module>
         <module>repository-layer</module>
@@ -94,7 +66,7 @@
         <version.derby>10.10.1.1</version.derby>
         <version.servlet>3.1.0</version.servlet>
         <version.atomikos>3.9.2</version.atomikos>
-        <version.log4j>2.1</version.log4j>
+        <version.log4j>2.2</version.log4j>
         <version.slf4j>1.7.5</version.slf4j>
         <version.log4jdbc>1.16</version.log4jdbc>
         <version.disruptor>3.3.0</version.disruptor>

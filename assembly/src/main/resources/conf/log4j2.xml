@@ -11,9 +11,6 @@
     </Properties>
 
     <appenders>
-        <!--<Console name="console" target="SYSTEM_OUT">-->
-        <!--<PatternLayout pattern="%m%n"/>-->
-        <!--</Console>-->
 
         <RollingFile name="console" fileName="logs/output.log"
                      filePattern="logs/backup/output-%d{MM-dd-yyyy}-%i.log.gz" append="true">
@@ -28,6 +25,18 @@
         <RollingFile name="jdbc"
                      fileName="logs/jdbc.log"
                      filePattern="logs/backup/jdbc-%d{MM-dd-yyyy}-%i.log.gz"
+                     append="true">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %level - %m%n%ex%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="1 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+
+        <RollingFile name="error"
+                     fileName="logs/error.log"
+                     filePattern="logs/backup/error-%d{MM-dd-yyyy}-%i.log.gz"
                      append="true">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %level - %m%n%ex%n"/>
             <Policies>
@@ -262,15 +271,15 @@
         <logger name="org.springframework.batch" level="debug" additivity="false">
             <appender-ref ref="springbatch"/>
         </logger>
-        <logger name="log4jdbc.log4j2" level="info" additivity="false">
+        <!-- Configuration for Log4JDBC -->
+        <!--logger name="log4jdbc.log4j2" level="info" additivity="false">
             <MarkerFilter marker="LOG4JDBC_AUDIT" onMatch="ACCEPT" onMismatch="NEUTRAL"/>
             <MarkerFilter marker="LOG4JDBC_RESULTSETTABLE" onMatch="ACCEPT" onMismatch="NEUTRAL"/>
             <appender-ref ref="jdbc"/>
-        </logger>
+        </logger-->
 
-
-        <root level="warn">
-            <appender-ref ref="console"/>
+        <root level="error">
+            <appender-ref ref="error"/>
         </root>
     </loggers>
 </configuration>
