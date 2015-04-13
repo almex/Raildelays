@@ -20,10 +20,11 @@
             <end on="COMPLETED"/>
         </decision>
         <step id="handleMaxMonthsStep">
-            <job ref="handleMaxMonthsJob"/>
+            <job ref="handleMaxMonthsJob" job-parameters-extractor="jobParameterExtractor"/>
         </step>
-    </job>-->
+    </job>
 
+    <bean id="jobParameterExtractor" class="org.springframework.batch.core.step.job.DefaultJobParametersExtractor" />-->
 
     <!--
         The goal of this job is :
@@ -76,23 +77,28 @@
         Note: Using thresholdDate and filesToArchive should be enough to determine what are the attachments.
     -->
     <job id="handleMaxMonthsJob" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-        <step id="splitFiles" next="moveFiles">
+        <step id="splitBeforeThreshold" next="splitAfterThreshold">
             <tasklet transaction-manager="batchTransactionManager">
                 <chunk reader="allExcelFilesToSplitItemReader"
-                       processor="chainedProcessorsToSplit"
-                       writer="splitItemWriter"
+                       processor="splitBeforeExcelSheetProcessor"
+                       writer="excelSheetBeforeItemWriter"
                        commit-interval="1"/>
             </tasklet>
         </step>
-        <step id="moveFiles" next="deleteFiles">
-            <tasklet transaction-manager="batchTransactionManager" ref="tasklet"/>
+        <step id="splitAfterThreshold">
+            <tasklet transaction-manager="batchTransactionManager">
+                <chunk reader="allExcelFilesToSplitItemReader"
+                       processor="splitAfterExcelSheetProcessor"
+                       writer="excelSheetAfterItemWriter"
+                       commit-interval="1"/>
+            </tasklet>
         </step>
-        <step id="deleteFiles" next="sendEmail">
+        <!--step id="deleteFiles" next="sendEmail">
             <tasklet transaction-manager="batchTransactionManager" ref="tasklet"/>
-        </step>
-        <step id="sendEmail">
+        </step-->
+        <!--step id="sendEmail">
             <tasklet transaction-manager="batchTransactionManager" ref="tasklet"/>
-        </step>
+        </step-->
     </job>
 
     <bean id="maxMonthsDecider" class="be.raildelays.batch.decider.MaxMonthsDecider">
@@ -132,17 +138,12 @@
     <!-- =====================================       PROCESSORS       ===================================== -->
     <!-- ================================================================================================== -->
 
-    <bean id="chainedProcessorsToSplit"
-          class="org.springframework.batch.item.support.CompositeItemProcessor">
-        <property name="delegates">
-            <list>
-                <ref bean="lineStopMapperProcessor"/>
-                <ref bean="validatorProcessor"/>
-            </list>
-        </property>
+    <bean id="splitBeforeExcelSheetProcessor" class="be.raildelays.batch.processor.SplitExcelSheetProcessor"
+          scope="step">
+        <property name="thresholdDate" value="#{jobExecutionContext['${threshold.date.key}']}"/>
     </bean>
 
-    <bean id="lineStopMapperProcessor" class="be.raildelays.batch.processor.SplitExcelSheetProcessor"
+    <bean id="splitAfterExcelSheetProcessor" class="be.raildelays.batch.processor.SplitExcelSheetProcessor"
           scope="step">
         <property name="thresholdDate" value="#{jobExecutionContext['${threshold.date.key}']}"/>
     </bean>
@@ -151,10 +152,7 @@
     <!-- =====================================         WRITERS        ===================================== -->
     <!-- ================================================================================================== -->
 
-    <!--
-        TODO: create a ResourceLocator which will handle the split
-    -->
-    <bean id="splitItemWriter"
+    <bean id="excelSheetBeforeItemWriter"
           class="org.springframework.batch.item.support.MultiResourceSupportItemWriter"
           scope="step">
         <property name="delegate">
@@ -174,15 +172,46 @@
             </bean>
         </property>
         <property name="name" value="multiResourceForSplitItemWriter"/>
-        <!--<property name="resourceLocator">
+        <property name="resourceLocator">
+            <bean class="be.raildelays.batch.support.ToWriteExcelResourceLocator"
+                  scope="step">
+                <property name="resource" value="file:#{jobParameters['excel.archive.path']}"/>
+                <property name="resourceItemSearch" ref="resourceItemSearch"/>
+                <property name="keyName" value="${excel.resource.key}"/>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="excelSheetAfterItemWriter"
+          class="org.springframework.batch.item.support.MultiResourceSupportItemWriter"
+          scope="step">
+        <property name="delegate">
+            <bean class="org.springframework.batch.item.file.ExcelSheetItemWriter"
+                  scope="step">
+                <property name="rowAggregator">
+                    <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator"
+                          scope="step">
+                        <property name="language" value="#{jobParameters['lang']}"/>
+                    </bean>
+                </property>
+                <property name="name" value="sortedForSplitExcelSheetItemWriter"/>
+                <property name="shouldDeleteIfExists" value="false"/>
+                <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
+                <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
+                <property name="template" value="file:#{jobParameters['excel.input.template']}"/>
+            </bean>
+        </property>
+        <property name="name" value="multiResourceForSplitItemWriter"/>
+        <property name="resourceLocator">
             <bean class="be.raildelays.batch.support.ToWriteExcelResourceLocator"
                   scope="step">
                 <property name="resource" value="file:#{jobParameters['excel.output.path']}"/>
                 <property name="resourceItemSearch" ref="resourceItemSearch"/>
                 <property name="keyName" value="${excel.resource.key}"/>
             </bean>
-        </property>-->
+        </property>
     </bean>
+
 
     <bean id="tasklet"
           class="be.raildelays.batch.tasklet.DeleteFileTasklet"
@@ -190,7 +219,7 @@
         <property name="source" value="file:#{jobParameters['excel.output.path']}"/>
     </bean>
 
-    <!--bean id="resourceItemSearch"
+    <bean id="resourceItemSearch"
           class="be.raildelays.batch.support.SimpleResourceItemSearch"
           scope="step">
         <property name="reader">
@@ -208,7 +237,7 @@
         <property name="comparator">
             <bean class="be.raildelays.batch.bean.ExcelRowComparator"/>
         </property>
-    </bean-->
+    </bean>
 
 
 </beans>
