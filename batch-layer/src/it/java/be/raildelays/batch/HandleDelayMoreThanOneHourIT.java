@@ -38,18 +38,10 @@ public class HandleDelayMoreThanOneHourIT extends AbstractContextIT {
     public void testCompleted() throws Exception {
         final Map<String, JobParameter> parameters = new HashMap<>();
 
-        parameters.put("input.file.path", new JobParameter("train-list.properties"));
-        parameters.put("date", new JobParameter(new SimpleDateFormat("dd/MM/yyyy").parse("01/01/2000")));
-        parameters.put("station.a.name", new JobParameter("Liège-Guillemins"));
-        parameters.put("station.b.name", new JobParameter("Brussels (Bruxelles)-Central"));
         parameters.put("excel.output.path", new JobParameter("./output.xls"));
+        parameters.put("excel.archive.path", new JobParameter("./#{java.time.LocalDate.now().toString()}/retard_sncb.xls"));
         parameters.put("excel.input.template", new JobParameter(new ClassPathResource("template.xls").getFile().getAbsolutePath()));
-        parameters.put("mail.account.username", new JobParameter("alexis.soumagne@gmail.com"));
-        parameters.put("mail.account.password", new JobParameter("BRU338 tcpqriow"));
-        parameters.put("mail.account.address", new JobParameter("alexis.soumagne@gmail.com"));
-        parameters.put("mail.server.host", new JobParameter("smtp.gmail.com"));
-        parameters.put("mail.server.port", new JobParameter("465"));
-        parameters.put("lang", new JobParameter("en"));
+        parameters.put("language", new JobParameter("en"));
 
         JobExecution jobExecution = getJobLauncherTestUtils().launchJob(new JobParameters(parameters));
 
