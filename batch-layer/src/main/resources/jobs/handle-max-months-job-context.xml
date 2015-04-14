@@ -2,9 +2,11 @@
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns="http://www.springframework.org/schema/beans"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
     <!-- Needed if we use a AutomaticJobRegistrar -->
     <context:annotation-config/>
@@ -141,11 +143,17 @@
     <bean id="splitBeforeExcelSheetProcessor" class="be.raildelays.batch.processor.SplitExcelSheetProcessor"
           scope="step">
         <property name="thresholdDate" value="#{jobExecutionContext['${threshold.date.key}']}"/>
+        <property name="mode">
+            <util:constant static-field="be.raildelays.batch.processor.SplitExcelSheetProcessor.Mode#BEFORE"/>
+        </property>
     </bean>
 
     <bean id="splitAfterExcelSheetProcessor" class="be.raildelays.batch.processor.SplitExcelSheetProcessor"
           scope="step">
         <property name="thresholdDate" value="#{jobExecutionContext['${threshold.date.key}']}"/>
+        <property name="mode">
+            <util:constant static-field="be.raildelays.batch.processor.SplitExcelSheetProcessor.Mode#AFTER"/>
+        </property>
     </bean>
 
     <!-- ================================================================================================== -->
@@ -238,6 +246,5 @@
             <bean class="be.raildelays.batch.bean.ExcelRowComparator"/>
         </property>
     </bean>
-
 
 </beans>
