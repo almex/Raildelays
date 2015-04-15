@@ -194,7 +194,7 @@
                 <property name="shouldDeleteIfExists" value="true"/>
                 <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
                 <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
-                <property name="template" value="file:#{jobParameters['excel.input.template']}"/>
+                <property name="template" value="#{jobParameters['excel.input.template']}"/>
             </bean>
         </property>
         <property name="name" value="multiResourceForSplitItemWriter"/>
@@ -225,7 +225,7 @@
                 <property name="shouldDeleteIfExists" value="true"/>
                 <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
                 <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
-                <property name="template" value="file:#{jobParameters['excel.input.template']}"/>
+                <property name="template" value="#{jobParameters['excel.input.template']}"/>
             </bean>
         </property>
         <property name="name" value="multiResourceForSplitItemWriter"/>
