@@ -32,17 +32,19 @@
         The goal of this job is :
         ________________________________________________________________________________________________________________
 
-        /sncb_20140812.xls             /sncb_20140812.xls              /20150212/sncb_20140812.xls
-        /sncb_20141016.xls    =(1)=>   /sncb_20141016.xls    =(2)=>    /20150212/sncb_20141016.xls
-        /sncb_20150102.xls             /sncb_20150102.xls              /20150212/sncb_20150102.xls
-                                       /sncb_20150113.xls              /sncb_20150113.xls
+        /sncb_20140812.xls             /20150212/sncb_20140812.xls              /20150212/sncb_20140812.xls
+        /sncb_20141016.xls    =(1)=>   /20150212/sncb_20141016.xls    =(2)=>    /20150212/sncb_20141016.xls
+        /sncb_20150102.xls             /20150212/sncb_20150102.xls              /20150212/sncb_20150102.xls
+                                       /sncb_20140812.xls                       /sncb_20150113.xls
+                                       /sncb_20141016.xls
+                                       /sncb_20150102.xls
+                                       /sncb_20150113.xls
         ________________________________________________________________________________________________________________
 
 
         As an input of this job we should have :
 
-            executionContext['thresholdDate'] = '20150212'
-            executionContext['filesToArchive'] = {'sncb_20140812', 'sncb_20141016', 'sncb_20150102'}
+            jobParameters['threshold.date'] = '20150212'
 
         The last file to archive should be the one to split.
 
@@ -61,22 +63,14 @@
                     newFile.write(item)
                 } else {
                     currentFile.write(item)
-
                 }
             }
         }
 
-        One way to solve this is to get communication between the ResourceLocator for the Reader and the ResourceLocator
-        for the Writer.
-
-        2) Archives all Excel files containing delays for 6 months. We should store in the job execution context the
-        newly created archive directory to allow next to locate files to attach.
-
-        Note: The archiveDirectory should be equal to the thresholdDate.
+        2) Delete all files already archived. Meaning we can match file names between archive folder and target folder
+        to know which one to delete.
 
         3) Send an e-mail with all Excel files containing delays for 6 months as attachment.
-
-        Note: Using thresholdDate and filesToArchive should be enough to determine what are the attachments.
     -->
     <job id="handleMaxMonthsJob" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
         <step id="splitBeforeThreshold" next="splitAfterThreshold">
@@ -239,13 +233,6 @@
         </property>
     </bean>
 
-
-    <bean id="tasklet"
-          class="be.raildelays.batch.tasklet.DeleteFileTasklet"
-          scope="step">
-        <property name="source" value="file:#{jobParameters['excel.output.path']}"/>
-    </bean>
-
     <bean id="resourceItemSearch"
           class="be.raildelays.batch.support.SimpleResourceItemSearch"
           scope="step">
@@ -264,6 +251,17 @@
         <property name="comparator">
             <bean class="be.raildelays.batch.bean.ExcelRowComparator"/>
         </property>
+    </bean>
+
+    <!-- ================================================================================================== -->
+    <!-- =====================================         TASKLET        ===================================== -->
+    <!-- ================================================================================================== -->
+
+
+    <bean id="tasklet"
+          class="be.raildelays.batch.tasklet.DeleteFileTasklet"
+          scope="step">
+        <property name="source" value="file:#{jobParameters['excel.output.path']}"/>
     </bean>
 
 </beans>

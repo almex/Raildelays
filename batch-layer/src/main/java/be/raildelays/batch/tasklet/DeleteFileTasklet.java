@@ -1,6 +1,5 @@
 package be.raildelays.batch.tasklet;
 
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
@@ -12,38 +11,58 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
+ * Delete all files contained in the array of resources.
+ * Try first to delete via {@link File#delete()} and then fallback to {@link File#deleteOnExit()} if it did not succeed.
+ *
  * @author Almex
  * @since 1.2
  */
 public class DeleteFileTasklet implements Tasklet, InitializingBean {
 
-    private Resource source;
-    private static final Logger LOGGER = LoggerFactory.getLogger(MoveFileTasklet.class);
+    private Resource[] resources;
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeleteFileTasklet.class);
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Assert.notNull(source, "The 'source' property must be provided");
+        Assert.notNull(resources, "The 'resources' property must be provided");
     }
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        File file = source.getFile();
-
-        LOGGER.info("Delete file from {}", file.getCanonicalPath());
+        List<Resource> files = resources != null ? Arrays.asList(resources) : Collections.EMPTY_LIST;
 
         /*
          * If the destination file exists but is writable then it will be overwrite.
          * We must delete this on JVM shutdown in order to allow close() of ItemStream coming afterwards.
          */
-        file.deleteOnExit();
+        files.stream().flatMap(resource -> {
+            Stream<File> result = Stream.<File>empty();
+
+            LOGGER.info("Deleting file {}...", resource.getFilename());
+
+            try {
+                result = Stream.of(resource.getFile());
+            } catch (IOException e) {
+                LOGGER.error("Cannot retrieve the File from this Resource", e);
+            }
+
+            return result;
+        })
+                .filter(file -> !file.delete())
+                .forEach(File::deleteOnExit);
 
         return RepeatStatus.FINISHED;
     }
 
-    public void setSource(Resource source) {
-        this.source = source;
+    public void setResources(Resource[] resources) {
+        this.resources = resources;
     }
 }
 
