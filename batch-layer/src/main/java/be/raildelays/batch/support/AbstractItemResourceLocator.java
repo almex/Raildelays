@@ -61,21 +61,26 @@ public abstract class AbstractItemResourceLocator implements ResourceLocator {
         File result = null;
 
         if (directory != null) {
-            for (File file : directory.listFiles(pathname ->
+            File[] files = directory.listFiles(pathname ->
                     pathname.getName().endsWith(Format.OLE2.getFileExtension()) ||
-                            pathname.getName().endsWith(Format.OOXML.getFileExtension()))) {
-                try {
-                    //-- We search the first empty Row
-                    if (resourceItemSearch.indexOf(BatchExcelRow.EMPTY, new FileSystemResource(file)) != ResourceItemSearch.EOF) {
-                        result = file;
+                            pathname.getName().endsWith(Format.OOXML.getFileExtension()));
+
+            if (files != null) {
+                for (File file : files) {
+                    try {
+                        //-- We search the first empty Row
+                        if (resourceItemSearch.indexOf(BatchExcelRow.EMPTY, new FileSystemResource(file)) != ResourceItemSearch.EOF) {
+                            result = file;
+                        }
+                    } catch (InvalidFormatException e) {
+                        throw new IOException("Excel format not supported for this workbook!", e);
+                    } catch (Exception e) {
+                        throw new IOException("Cannot find content in your Excel file", e);
                     }
-                } catch (InvalidFormatException e) {
-                    throw new IOException("Excel format not supported for this workbook!", e);
-                } catch (Exception e) {
-                    throw new IOException("Cannot find content in your Excel file", e);
                 }
             }
         }
+
 
         return result;
     }

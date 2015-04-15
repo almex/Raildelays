@@ -75,7 +75,7 @@
         <version.groovy.eclipse.compiler>2.9.2-01</version.groovy.eclipse.compiler>
         <version.groovy.eclipse.batch>2.4.3-01</version.groovy.eclipse.batch>
         <version.tagsoup>1.2.1</version.tagsoup>
-        <version.apache.poi>3.10.1</version.apache.poi>
+        <version.apache.poi>3.11</version.apache.poi>
         <version.commons.dbcp>1.4</version.commons.dbcp>
         <version.dbunit>2.4.9</version.dbunit>
         <version.jodatime>2.3</version.jodatime>

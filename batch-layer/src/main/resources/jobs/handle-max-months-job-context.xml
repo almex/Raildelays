@@ -84,7 +84,13 @@
                 <chunk reader="allExcelFilesToSplitItemReader"
                        processor="splitBeforeExcelSheetProcessor"
                        writer="excelSheetBeforeItemWriter"
-                       commit-interval="1"/>
+                       commit-interval="1">
+
+                    <listeners merge="true">
+                        <!-- To compute file name of the Excel file after filtering -->
+                        <listener ref="resourceLocatorListener"/>
+                    </listeners>
+                </chunk>
             </tasklet>
         </step>
         <step id="splitAfterThreshold">
@@ -92,7 +98,13 @@
                 <chunk reader="allExcelFilesToSplitItemReader"
                        processor="splitAfterExcelSheetProcessor"
                        writer="excelSheetAfterItemWriter"
-                       commit-interval="1"/>
+                       commit-interval="1">
+
+                    <listeners merge="true">
+                        <!-- To compute file name of the Excel file after filtering -->
+                        <listener ref="resourceLocatorListener"/>
+                    </listeners>
+                </chunk>
             </tasklet>
         </step>
         <!--step id="deleteFiles" next="sendEmail">
@@ -103,13 +115,18 @@
         </step-->
     </job>
 
+
+    <bean id="resourceLocatorListener"
+          class="be.raildelays.batch.listener.ResourceLocatorListener"
+          scope="step"/>
+
     <bean id="maxMonthsDecider" class="be.raildelays.batch.decider.MaxMonthsDecider">
         <property name="maxNumberOfMonth" value="${excel.max.months}"/>
         <property name="reader">
             <bean class="org.springframework.batch.item.file.MultiResourceItemReader"
                   scope="step">
                 <property name="delegate" ref="allExcelFilesToSplitItemReader"/>
-                <property name="resources" value="file:#{jobParameters['excel.output.path']}/*.xls"/>
+                <property name="resources" value="#{jobParameters['excel.input.path']}"/>
             </bean>
         </property>
     </bean>
@@ -128,12 +145,12 @@
                 <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
                 <property name="rowMapper">
                     <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
-                        <property name="language" value="#{jobParameters['lang']}"/>
+                        <property name="language" value="#{jobParameters['language']}"/>
                     </bean>
                 </property>
             </bean>
         </property>
-        <property name="resources" value="file:#{jobParameters['excel.output.path']}/*.xls"/>
+        <property name="resources" value="#{jobParameters['excel.input.path']}"/>
     </bean>
 
     <!-- ================================================================================================== -->
@@ -142,17 +159,17 @@
 
     <bean id="splitBeforeExcelSheetProcessor" class="be.raildelays.batch.processor.SplitExcelSheetProcessor"
           scope="step">
-        <property name="thresholdDate" value="#{jobExecutionContext['${threshold.date.key}']}"/>
+        <property name="thresholdDate" value="#{jobParameters['threshold.date']}"/>
         <property name="mode">
-            <util:constant static-field="be.raildelays.batch.processor.SplitExcelSheetProcessor.Mode#BEFORE"/>
+            <util:constant static-field="be.raildelays.batch.processor.SplitExcelSheetProcessor.Mode.BEFORE"/>
         </property>
     </bean>
 
     <bean id="splitAfterExcelSheetProcessor" class="be.raildelays.batch.processor.SplitExcelSheetProcessor"
           scope="step">
-        <property name="thresholdDate" value="#{jobExecutionContext['${threshold.date.key}']}"/>
+        <property name="thresholdDate" value="#{jobParameters['threshold.date']}"/>
         <property name="mode">
-            <util:constant static-field="be.raildelays.batch.processor.SplitExcelSheetProcessor.Mode#AFTER"/>
+            <util:constant static-field="be.raildelays.batch.processor.SplitExcelSheetProcessor.Mode.AFTER_OR_EQUALS"/>
         </property>
     </bean>
 
@@ -169,11 +186,12 @@
                 <property name="rowAggregator">
                     <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator"
                           scope="step">
-                        <property name="language" value="#{jobParameters['lang']}"/>
+                        <property name="language" value="#{jobParameters['language']}"/>
                     </bean>
                 </property>
-                <property name="name" value="sortedForSplitExcelSheetItemWriter"/>
-                <property name="shouldDeleteIfExists" value="false"/>
+                <property name="useItemIndex" value="false"/>
+                <property name="name" value="excelSheetBeforeItemWriter"/>
+                <property name="shouldDeleteIfExists" value="true"/>
                 <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
                 <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
                 <property name="template" value="file:#{jobParameters['excel.input.template']}"/>
@@ -183,7 +201,7 @@
         <property name="resourceLocator">
             <bean class="be.raildelays.batch.support.ToWriteExcelResourceLocator"
                   scope="step">
-                <property name="resource" value="file:#{jobParameters['excel.archive.path']}"/>
+                <property name="resource" value="#{jobParameters['excel.archive.path']}"/>
                 <property name="resourceItemSearch" ref="resourceItemSearch"/>
                 <property name="keyName" value="${excel.resource.key}"/>
             </bean>
@@ -199,11 +217,12 @@
                 <property name="rowAggregator">
                     <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator"
                           scope="step">
-                        <property name="language" value="#{jobParameters['lang']}"/>
+                        <property name="language" value="#{jobParameters['language']}"/>
                     </bean>
                 </property>
-                <property name="name" value="sortedForSplitExcelSheetItemWriter"/>
-                <property name="shouldDeleteIfExists" value="false"/>
+                <property name="useItemIndex" value="false"/>
+                <property name="name" value="excelSheetAfterItemWriter"/>
+                <property name="shouldDeleteIfExists" value="true"/>
                 <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
                 <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
                 <property name="template" value="file:#{jobParameters['excel.input.template']}"/>
@@ -213,7 +232,7 @@
         <property name="resourceLocator">
             <bean class="be.raildelays.batch.support.ToWriteExcelResourceLocator"
                   scope="step">
-                <property name="resource" value="file:#{jobParameters['excel.output.path']}"/>
+                <property name="resource" value="#{jobParameters['excel.output.path']}"/>
                 <property name="resourceItemSearch" ref="resourceItemSearch"/>
                 <property name="keyName" value="${excel.resource.key}"/>
             </bean>
@@ -237,7 +256,7 @@
                 <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
                 <property name="rowMapper">
                     <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
-                        <property name="language" value="#{jobParameters['lang']}"/>
+                        <property name="language" value="#{jobParameters['language']}"/>
                     </bean>
                 </property>
             </bean>

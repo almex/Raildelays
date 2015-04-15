@@ -3,8 +3,9 @@ package be.raildelays.batch.processor;
 import be.raildelays.domain.xls.ExcelRow;
 import org.springframework.batch.item.ItemProcessor;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
-import java.util.function.Consumer;
 
 /**
  * We filter items based on a threshold date.
@@ -15,36 +16,40 @@ import java.util.function.Consumer;
 */
 public class SplitExcelSheetProcessor implements ItemProcessor<ExcelRow, ExcelRow> {
 
-    private Date thresholdDate;
+    private LocalDate thresholdDate;
 
     private Mode mode;
 
-    public static enum Mode {
-        BEFORE, AFTER_OR_EQUALS;
+    public enum Mode {
+        BEFORE, AFTER_OR_EQUALS
     }
 
     @Override
     public ExcelRow process(ExcelRow item) throws Exception {
         ExcelRow result = null;
 
-        switch (mode) {
-            case BEFORE:
-                if (item.getDate().before(thresholdDate)) {
-                    result = item;
-                }
-                break;
-            case AFTER_OR_EQUALS:
-                if (item.getDate().after(thresholdDate) || item.getDate().equals(thresholdDate)) {
-                    result = item;
-                }
-                break;
+        if (item.getDate() != null) {
+            LocalDate itemDate = item.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+            switch (mode) {
+                case BEFORE:
+                    if (itemDate.isBefore(thresholdDate)) {
+                        result = item;
+                    }
+                    break;
+                case AFTER_OR_EQUALS:
+                    if (itemDate.isAfter(thresholdDate) || itemDate.isEqual(thresholdDate)) {
+                        result = item;
+                    }
+                    break;
+            }
         }
 
         return result;
     }
 
     public void setThresholdDate(Date thresholdDate) {
-        this.thresholdDate = thresholdDate;
+        this.thresholdDate = thresholdDate != null ? thresholdDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate() : null;
     }
 
     public void setMode(Mode mode) {
