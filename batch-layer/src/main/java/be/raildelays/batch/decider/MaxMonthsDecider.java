@@ -18,9 +18,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 /**
- * Read all {@link be.raildelays.domain.xls.ExcelRow} given in input and store the start date and the end date.
- * If the difference between start and end is greater or equal to the {@code maxNumberOfMonth} then we store in the
- * {@link org.springframework.batch.item.ExecutionContext} the value {@code true} with the given {@code keyName}.
+ * Read all {@link be.raildelays.domain.xls.ExcelRow} given in {@link ItemReader} and store the start date and the end date.
+ * If the difference between start and end is greater or equal to the {@code maxNumberOfMonth} then we return the status
+ * {@link #COMPLETED_WITH_MAX_MONTHS} on which you can branch another flow.
+ *
+ * The threshold {@link Date} is stored in the {@code jobExecutionContext} via the key {@code 'threshold.date'}.
  *
  * @author Almex
  * @since 1.2
@@ -44,6 +46,7 @@ public class MaxMonthsDecider implements JobExecutionDecider, InitializingBean {
     @Override
     public FlowExecutionStatus decide(final JobExecution jobExecution, final StepExecution stepExecution) {
         new RepeatTemplate().iterate((context) -> {
+            RepeatStatus result = RepeatStatus.CONTINUABLE;
             ExcelRow item = reader.read();
 
             if (item != null) {
@@ -61,10 +64,14 @@ public class MaxMonthsDecider implements JobExecutionDecider, InitializingBean {
 
                 if (period.get(ChronoUnit.MONTHS) >= maxNumberOfMonth) {
                     this.finalStatus = COMPLETED_WITH_MAX_MONTHS;
+                    result = RepeatStatus.FINISHED;
+                    jobExecution.getExecutionContext().put("threshold.date", maximum);
                 }
+            } else {
+                result = RepeatStatus.FINISHED;
             }
 
-            return item != null ? RepeatStatus.CONTINUABLE : RepeatStatus.FINISHED;
+            return result;
         });
 
         return this.finalStatus;

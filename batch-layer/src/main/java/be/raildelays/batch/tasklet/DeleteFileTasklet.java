@@ -39,7 +39,6 @@ public class DeleteFileTasklet implements Tasklet, InitializingBean {
         List<Resource> files = resources != null ? Arrays.asList(resources) : Collections.EMPTY_LIST;
 
         /*
-         * If the destination file exists but is writable then it will be overwrite.
          * We must delete this on JVM shutdown in order to allow close() of ItemStream coming afterwards.
          */
         files.stream().flatMap(resource -> {
@@ -55,7 +54,10 @@ public class DeleteFileTasklet implements Tasklet, InitializingBean {
 
             return result;
         })
-                .filter(file -> !file.delete())
+                .filter(file -> {
+                    contribution.incrementWriteCount(1);
+                    return !file.delete();
+                })
                 .forEach(File::deleteOnExit);
 
         return RepeatStatus.FINISHED;

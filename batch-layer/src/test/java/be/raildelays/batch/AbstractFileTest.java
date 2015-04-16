@@ -3,7 +3,6 @@ package be.raildelays.batch;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,12 +41,9 @@ public class  AbstractFileTest {
     protected File[] getExcelFiles() {
         final File directory = new File(CURRENT_PATH);
 
-        File[] result = directory.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return pathname.getName().endsWith(Format.OLE2.getFileExtension()) || pathname.getName().endsWith(Format.OOXML.getFileExtension());
-            }
-        });
+        File[] result = directory.listFiles(pathname ->
+                pathname.getName().endsWith(Format.OLE2.getFileExtension()) ||
+                        pathname.getName().endsWith(Format.OOXML.getFileExtension()));
 
         return result != null ? result : new File[0];
     }
