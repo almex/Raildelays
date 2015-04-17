@@ -38,7 +38,7 @@ public class ToDeleteExcelResourcesLocator {
                     boolean result = false;
 
                     try {
-                        result = Files.list(destinationPath).anyMatch(path2 -> path1.getFileName().equals(path2.getFileName()));
+                        result = Files.list(destinationPath).filter(path -> path.getFileName() != null).anyMatch(path2 -> path2.getFileName().equals(path1.getFileName()));
                     } catch (IOException e) {
                         LOGGER.error("Cannot list this directory", e);
                     }
