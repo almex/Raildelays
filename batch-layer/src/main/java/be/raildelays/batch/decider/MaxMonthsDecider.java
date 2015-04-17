@@ -18,10 +18,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 /**
- * Read all {@link be.raildelays.domain.xls.ExcelRow} given in {@link ItemReader} and store the start date and the end date.
- * If the difference between start and end is greater or equal to the {@code maxNumberOfMonth} then we return the status
+ * Read all {@link be.raildelays.domain.xls.ExcelRow} given in {@link ItemReader} and compare the first date with today.
+ * If the difference between those two dates is greater or equal to the {@code maxNumberOfMonth} then we return the status
  * {@link #COMPLETED_WITH_MAX_MONTHS} on which you can branch another flow.
- *
+ * <p/>
  * The threshold {@link Date} is stored in the {@code jobExecutionContext} via the key {@code 'threshold.date'}.
  *
  * @author Almex
@@ -31,11 +31,9 @@ public class MaxMonthsDecider implements JobExecutionDecider, InitializingBean {
 
     public static final FlowExecutionStatus COMPLETED_WITH_MAX_MONTHS = new FlowExecutionStatus("COMPLETED_WITH_MAX_MONTHS");
     private ItemReader<ExcelRow> reader;
-    private Date minimum;
-    private Date maximum;
     private long maxNumberOfMonth;
-    // Must be a field to be modifiable inside a lambda expression
-    private FlowExecutionStatus finalStatus = FlowExecutionStatus.COMPLETED;
+    private FlowExecutionStatus finalStatus; // To be accessible by the Lambda expression
+    private Date firstDate; // To be accessible by the Lambda expression
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -45,27 +43,34 @@ public class MaxMonthsDecider implements JobExecutionDecider, InitializingBean {
 
     @Override
     public FlowExecutionStatus decide(final JobExecution jobExecution, final StepExecution stepExecution) {
+        final LocalDate now = LocalDate.now();
+
+        finalStatus = FlowExecutionStatus.COMPLETED; // By default it's COMPLETED
+
         new RepeatTemplate().iterate((context) -> {
             RepeatStatus result = RepeatStatus.CONTINUABLE;
             ExcelRow item = reader.read();
 
             if (item != null) {
-                if (maximum == null || maximum.before(item.getDate())) {
-                    maximum = item.getDate();
+                if (firstDate == null || firstDate.after(item.getDate())) {
+                    firstDate = item.getDate();
                 }
 
-                if (minimum == null || minimum.after(item.getDate())) {
-                    minimum = item.getDate();
-                }
-
-                LocalDate startDate = minimum.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                LocalDate endDate = maximum.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                LocalDate startDate = firstDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                LocalDate endDate = now;
                 Period period = Period.between(startDate, endDate);
 
+                /**
+                 * If the period between the first date and today is greater or equal to maxNumberOfMonth
+                 */
                 if (period.get(ChronoUnit.MONTHS) >= maxNumberOfMonth) {
-                    this.finalStatus = COMPLETED_WITH_MAX_MONTHS;
+                    finalStatus = COMPLETED_WITH_MAX_MONTHS;
                     result = RepeatStatus.FINISHED;
-                    jobExecution.getExecutionContext().put("threshold.date", maximum);
+                    // We store the threshold date in the context
+                    jobExecution.getExecutionContext().put("threshold.date", Date.from(
+                                    now.atStartOfDay(ZoneId.systemDefault()).toInstant()
+                            )
+                    );
                 }
             } else {
                 result = RepeatStatus.FINISHED;
@@ -74,7 +79,7 @@ public class MaxMonthsDecider implements JobExecutionDecider, InitializingBean {
             return result;
         });
 
-        return this.finalStatus;
+        return finalStatus;
     }
 
     public void setReader(ItemReader<ExcelRow> reader) {
@@ -86,3 +91,4 @@ public class MaxMonthsDecider implements JobExecutionDecider, InitializingBean {
     }
 
 }
+
