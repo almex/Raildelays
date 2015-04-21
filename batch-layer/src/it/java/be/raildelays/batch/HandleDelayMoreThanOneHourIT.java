@@ -17,6 +17,8 @@ import org.springframework.test.context.ContextConfiguration;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -32,7 +34,7 @@ public class HandleDelayMoreThanOneHourIT extends AbstractContextIT {
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
-    private static List<String> FILES_NAMES = Arrays.asList("20131113", "20130221", "20130627", "20131022");
+    private static List<String> FILES_NAMES = Arrays.asList("20140107", "20131128", "20130905");
 
     private static String TEMPLATE_PATH;
 
@@ -50,29 +52,31 @@ public class HandleDelayMoreThanOneHourIT extends AbstractContextIT {
     public static void setUp() throws IOException {
         File templateFile = new ClassPathResource("template.xls").getFile();
 
-        TARGET_PATH = templateFile.getParentFile().getParentFile().getAbsolutePath();
-        SOURCE_PATH = TARGET_PATH + "/test-classes/6monthsDelays/";
-        ARCHIVE_PATH = TARGET_PATH + "/" + LocalDate.now().toString();
+        TARGET_PATH = templateFile.getParentFile().getParentFile().getAbsolutePath() + "/";
+        SOURCE_PATH = TARGET_PATH + "test-classes/6monthsDelays/";
+        ARCHIVE_PATH = TARGET_PATH + LocalDate.now().toString() + "/";
         TEMPLATE_PATH = templateFile.getAbsolutePath();
 
         cleanUp();
+        copyFiles();
     }
 
     @Test
     public void testCompleted() throws Exception {
         final Map<String, JobParameter> parameters = new HashMap<>();
 
-        parameters.put("excel.output.path", new JobParameter("file:" + TARGET_PATH + "/retard_sncb.xls"));
-        parameters.put("excel.input.path", new JobParameter("file:" + SOURCE_PATH + "/*.xls"));
-        parameters.put("excel.archive.path", new JobParameter("file:" + ARCHIVE_PATH + "/retard_sncb.xls"));
-        parameters.put("excel.input.template", new JobParameter("file:" + TEMPLATE_PATH));
+        parameters.put("excel.output.path", new JobParameter(TARGET_PATH));
+        parameters.put("excel.file.name", new JobParameter("retard_sncb"));
+        parameters.put("excel.file.extension", new JobParameter("xls"));
+        parameters.put("excel.archive.path", new JobParameter(ARCHIVE_PATH));
+        parameters.put("excel.input.template", new JobParameter(TEMPLATE_PATH));
         parameters.put("language", new JobParameter("en"));
-        parameters.put("threshold.date", new JobParameter(Date.from(LocalDate.of(2013, 11, 13).atStartOfDay().toInstant(ZoneOffset.UTC))));
+        parameters.put("threshold.date", new JobParameter(Date.from(LocalDate.of(2014, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC))));
 
         JobExecution jobExecution = getJobLauncherTestUtils().launchJob(new JobParameters(parameters));
 
         Assert.assertFalse(jobExecution.getStatus().isUnsuccessful());
-        Assert.assertEquals(4, getExcelFiles().size());
+        Assert.assertEquals(3, getExcelFiles().size());
 
         getExcelFiles().forEach(file -> {
             Assert.assertTrue("The file name is not one of those expected",
@@ -82,9 +86,19 @@ public class HandleDelayMoreThanOneHourIT extends AbstractContextIT {
 
     @AfterClass
     public static void tearDown() {
-        cleanUp();
+        //cleanUp();
     }
 
+
+    protected static void copyFiles() throws IOException {
+        Files.list(Paths.get(SOURCE_PATH)).forEach(path -> {
+            try {
+                Files.copy(path, Paths.get(TARGET_PATH + "/" + path.getFileName()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
 
     protected static List<File> getExcelFiles() {
         final List<File> result = new ArrayList<>();

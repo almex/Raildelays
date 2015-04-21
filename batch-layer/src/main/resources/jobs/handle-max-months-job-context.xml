@@ -87,7 +87,7 @@
                 </chunk>
             </tasklet>
         </step>
-        <step id="splitAfterThreshold">
+        <step id="splitAfterThreshold" next="deleteFiles">
             <tasklet transaction-manager="batchTransactionManager">
                 <chunk reader="allExcelFilesToSplitItemReader"
                        processor="splitAfterExcelSheetProcessor"
@@ -101,9 +101,9 @@
                 </chunk>
             </tasklet>
         </step>
-        <!--step id="deleteFiles" next="sendEmail">
-            <tasklet transaction-manager="batchTransactionManager" ref="tasklet"/>
-        </step-->
+        <step id="deleteFiles">
+            <tasklet transaction-manager="batchTransactionManager" ref="deleteDuplicatedFiles"/>
+        </step>
         <!--step id="sendEmail">
             <tasklet transaction-manager="batchTransactionManager" ref="tasklet"/>
         </step-->
@@ -120,7 +120,8 @@
             <bean class="org.springframework.batch.item.file.MultiResourceItemReader"
                   scope="step">
                 <property name="delegate" ref="allExcelFilesToSplitItemReader"/>
-                <property name="resources" value="#{jobParameters['excel.input.path']}"/>
+                <property name="resources"
+                          value="file:#{jobParameters['excel.output.path']}/*.#{jobParameters['excel.file.extension']}"/>
             </bean>
         </property>
     </bean>
@@ -133,7 +134,8 @@
           class="org.springframework.batch.item.file.MultiResourceItemReader"
           scope="step">
         <property name="delegate">
-            <bean class="org.springframework.batch.item.file.ExcelSheetItemReader">
+            <bean class="org.springframework.batch.item.file.ExcelSheetItemReader"
+                  scope="step">
                 <property name="name" value="allExcelFilesToSplitItemReader"/>
                 <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
                 <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
@@ -144,7 +146,8 @@
                 </property>
             </bean>
         </property>
-        <property name="resources" value="#{jobParameters['excel.input.path']}"/>
+        <property name="resources"
+                  value="file:#{jobParameters['excel.output.path']}/*.#{jobParameters['excel.file.extension']}"/>
     </bean>
 
     <!-- ================================================================================================== -->
@@ -172,7 +175,7 @@
     <!-- ================================================================================================== -->
 
     <bean id="excelSheetBeforeItemWriter"
-          class="org.springframework.batch.item.support.MultiResourceSupportItemWriter"
+          class="org.springframework.batch.item.support.MultiResourceMaxItemCountItemWriter"
           scope="step">
         <property name="delegate">
             <bean class="org.springframework.batch.item.file.ExcelSheetItemWriter"
@@ -185,17 +188,18 @@
                 </property>
                 <property name="useItemIndex" value="false"/>
                 <property name="name" value="excelSheetBeforeItemWriter"/>
-                <property name="shouldDeleteIfExists" value="true"/>
+                <property name="shouldDeleteIfExists" value="false"/>
                 <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
                 <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
-                <property name="template" value="#{jobParameters['excel.input.template']}"/>
+                <property name="template" value="file:#{jobParameters['excel.input.template']}"/>
             </bean>
         </property>
         <property name="name" value="multiResourceForSplitItemWriter"/>
         <property name="resourceLocator">
             <bean class="be.raildelays.batch.support.ToWriteExcelResourceLocator"
                   scope="step">
-                <property name="resource" value="#{jobParameters['excel.archive.path']}"/>
+                <property name="resource"
+                          value="file:#{jobParameters['excel.archive.path']}/#{jobParameters['excel.file.name']}.#{jobParameters['excel.file.extension']}"/>
                 <property name="resourceItemSearch" ref="resourceItemSearch"/>
                 <property name="keyName" value="${excel.resource.key}"/>
             </bean>
@@ -203,7 +207,7 @@
     </bean>
 
     <bean id="excelSheetAfterItemWriter"
-          class="org.springframework.batch.item.support.MultiResourceSupportItemWriter"
+          class="org.springframework.batch.item.support.MultiResourceMaxItemCountItemWriter"
           scope="step">
         <property name="delegate">
             <bean class="org.springframework.batch.item.file.ExcelSheetItemWriter"
@@ -219,14 +223,16 @@
                 <property name="shouldDeleteIfExists" value="true"/>
                 <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
                 <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
-                <property name="template" value="#{jobParameters['excel.input.template']}"/>
+                <property name="template" value="file:#{jobParameters['excel.input.template']}"/>
             </bean>
         </property>
         <property name="name" value="multiResourceForSplitItemWriter"/>
         <property name="resourceLocator">
             <bean class="be.raildelays.batch.support.ToWriteExcelResourceLocator"
                   scope="step">
-                <property name="resource" value="#{jobParameters['excel.output.path']}"/>
+                <property name="forceNewFile" value="true"/>
+                <property name="resource"
+                          value="file:#{jobParameters['excel.output.path']}/#{jobParameters['excel.file.name']}.#{jobParameters['excel.file.extension']}"/>
                 <property name="resourceItemSearch" ref="resourceItemSearch"/>
                 <property name="keyName" value="${excel.resource.key}"/>
             </bean>
@@ -258,10 +264,15 @@
     <!-- ================================================================================================== -->
 
 
-    <bean id="tasklet"
+    <bean id="deleteDuplicatedFiles"
           class="be.raildelays.batch.tasklet.DeleteFileTasklet"
           scope="step">
-        <property name="source" value="file:#{jobParameters['excel.output.path']}"/>
+        <property name="resources">
+            <bean class="be.raildelays.batch.support.ToDeleteExcelResourcesLocator" factory-method="getResources">
+                <constructor-arg value="file:#{jobParameters['excel.output.path']}"/>
+                <constructor-arg value="file:#{jobParameters['excel.archive.path']}"/>
+            </bean>
+        </property>
     </bean>
 
 </beans>

@@ -19,26 +19,25 @@ import java.util.List;
  */
 public class ToDeleteExcelResourcesLocator {
 
-    private Resource source;
-
-    private Resource destination;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ToDeleteExcelResourcesLocator.class);
 
-    public Resource[] getResources() throws IOException {
+    public static Resource[] getResources(Resource source, Resource destination) throws IOException {
         List<Resource> resourceList = new ArrayList<>();
         Path sourcePath = source.getFile().toPath();
         Path destinationPath = destination.getFile().toPath();
 
-        assert Files.isDirectory(sourcePath) : "Source must be a directory";
-        assert Files.isDirectory(destinationPath) : "Destination must be a directory";
+        if (Files.notExists(destinationPath)) {
+            Files.createDirectories(destinationPath);
+        }
 
         Files.list(sourcePath)
                 .filter(path1 -> {
                     boolean result = false;
 
                     try {
-                        result = Files.list(destinationPath).filter(path -> path.getFileName() != null).anyMatch(path2 -> path2.getFileName().equals(path1.getFileName()));
+                        result = Files.list(destinationPath)
+                                .filter(path2 -> path2.getFileName() != null)
+                                .anyMatch(path2 -> path2.getFileName().equals(path1.getFileName()));
                     } catch (IOException e) {
                         LOGGER.error("Cannot list this directory", e);
                     }
@@ -47,13 +46,5 @@ public class ToDeleteExcelResourcesLocator {
                 }).forEach(path -> resourceList.add(new FileSystemResource(path.toFile())));
 
         return resourceList.toArray(new Resource[resourceList.size()]);
-    }
-
-    public void setSource(Resource source) {
-        this.source = source;
-    }
-
-    public void setDestination(Resource destination) {
-        this.destination = destination;
     }
 }

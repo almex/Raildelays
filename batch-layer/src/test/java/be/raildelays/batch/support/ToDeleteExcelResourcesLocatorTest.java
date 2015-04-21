@@ -1,10 +1,7 @@
 package be.raildelays.batch.support;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -23,8 +20,6 @@ import java.util.stream.Stream;
  * Created by xbmc on 16-04-15.
  */
 public class ToDeleteExcelResourcesLocatorTest {
-
-    private ToDeleteExcelResourcesLocator resourcesLocator;
 
     private static Path TARGET_PATH; // Should be ./target/
 
@@ -52,9 +47,6 @@ public class ToDeleteExcelResourcesLocatorTest {
                 Paths.get(DESTINATION_PATH.toString(), "2012.java"),
                 Paths.get(DESTINATION_PATH.toString(), "2015.xls")
         };
-        resourcesLocator = new ToDeleteExcelResourcesLocator();
-        resourcesLocator.setDestination(new FileSystemResource(SOURCE_PATH.toFile()));
-        resourcesLocator.setSource(new FileSystemResource(DESTINATION_PATH.toFile()));
 
         cleanUp();
         createFiles();
@@ -65,15 +57,17 @@ public class ToDeleteExcelResourcesLocatorTest {
         Assert.assertEquals(3, Files.list(SOURCE_PATH).count());
         Assert.assertEquals(4, Files.list(DESTINATION_PATH).count());
 
-        Resource[] result = resourcesLocator.getResources();
+        Resource[] result = ToDeleteExcelResourcesLocator.getResources(new FileSystemResource(SOURCE_PATH.toFile()),
+                new FileSystemResource(DESTINATION_PATH.toFile()));
 
         Assert.assertEquals(2, result.length);
     }
 
     @Test(expected = AssertionError.class)
+    @Ignore
     public void testAssertion() throws IOException {
-        resourcesLocator.setSource(new FileSystemResource(PATHS[0].toFile()));
-        resourcesLocator.getResources();
+        ToDeleteExcelResourcesLocator.getResources(new FileSystemResource(PATHS[0].toFile()),
+                new FileSystemResource(DESTINATION_PATH.toFile()));
     }
 
     @After

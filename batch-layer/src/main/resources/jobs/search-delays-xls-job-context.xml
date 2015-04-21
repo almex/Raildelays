@@ -116,7 +116,7 @@
     </bean>
 
     <bean id="multiResourceItemWriter"
-          class="org.springframework.batch.item.support.MultiResourceSupportItemWriter"
+          class="org.springframework.batch.item.support.MultiResourceMaxItemCountItemWriter"
           scope="step">
         <property name="name" value="multiResourceItemWriter"/>
         <property name="delegate" ref="excelSheetItemWriter"/>
@@ -148,7 +148,8 @@
     <!-- ================================================================================================== -->
 
     <bean id="itemWriterResourceLocator" class="be.raildelays.batch.support.ToWriteExcelResourceLocator" scope="step">
-        <property name="resource" value="file:#{jobParameters['excel.output.path']}"/>
+        <property name="resource"
+                  value="file:#{jobParameters['excel.output.path']}/#{jobParameters['excel.file.name']}"/>
         <property name="resourceItemSearch" ref="resourceItemSearch"/>
     </bean>
 

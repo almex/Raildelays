@@ -24,9 +24,15 @@ public class ToWriteExcelResourceLocator extends AbstractItemResourceLocator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ToWriteExcelResourceLocator.class);
 
+    private boolean forceNewFile = false;
+
     @Override
     public Resource getResource(ExecutionContext context) throws IOException {
-        File file = getExistingFile();
+        File file = null;
+
+        if (!forceNewFile) {
+            file = getExistingFile();
+        }
 
         if (file == null) {
             file = getFileBasedOnSuffix(context);
@@ -37,4 +43,7 @@ public class ToWriteExcelResourceLocator extends AbstractItemResourceLocator {
         return new FileSystemResource(file);
     }
 
+    public void setForceNewFile(boolean forceNewFile) {
+        this.forceNewFile = forceNewFile;
+    }
 }

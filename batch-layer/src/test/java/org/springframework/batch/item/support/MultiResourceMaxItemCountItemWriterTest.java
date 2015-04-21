@@ -32,9 +32,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RunWith(BlockJUnit4ClassRunner.class)
-public class MultiResourceItemWriterTest extends AbstractFileTest {
+public class MultiResourceMaxItemCountItemWriterTest extends AbstractFileTest {
 
-    private MultiResourceSupportItemWriter writer;
+    private MultiResourceMaxItemCountItemWriter writer;
 
     private List<BatchExcelRow> items = new ArrayList<>();
 
@@ -63,7 +63,7 @@ public class MultiResourceItemWriterTest extends AbstractFileTest {
         SimpleResourceItemSearch resourceItemSearch = new SimpleResourceItemSearch();
         resourceLocator = new ToWriteExcelResourceLocator();
         executionContext = stepExecution.getExecutionContext();
-        writer = new MultiResourceSupportItemWriter();
+        writer = new MultiResourceMaxItemCountItemWriter();
         listener = new ResourceLocatorListener();
 
 

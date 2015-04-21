@@ -2,12 +2,10 @@
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:batch="http://www.springframework.org/schema/batch"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:util="http://www.springframework.org/schema/util"
        xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <!-- Needed if we use a AutomaticJobRegistrar -->
     <context:annotation-config/>
@@ -170,7 +168,10 @@
                 <value>station.departure</value>
                 <value>station.arrival</value>
                 <value>excel.template.path</value>
+                <value>excel.file.name</value>
+                <value>excel.file.extension</value>
                 <value>excel.output.path</value>
+                <value>excel.archive.path</value>
                 <value>text.output.path</value>
                 <value>language</value>
                 <value>mail.account.username</value>
@@ -557,7 +558,7 @@
     </bean>
 
     <bean id="multiResourceItemWriter"
-          class="org.springframework.batch.item.support.MultiResourceSupportItemWriter"
+          class="org.springframework.batch.item.support.MultiResourceMaxItemCountItemWriter"
           scope="step">
         <property name="delegate" ref="sortedItemWriter"/>
         <property name="name" value="multiResourceItemWriter"/>
@@ -707,7 +708,8 @@
     <bean id="itemReaderResourceLocator"
           class="be.raildelays.batch.support.BySearchExcelResourceLocator"
           scope="step">
-        <property name="resource" value="file:#{jobParameters['excel.output.path']}"/>
+        <property name="resource"
+                  value="file:#{jobParameters['excel.output.path']}/#{jobParameters['excel.file.name']}.#{jobParameters['excel.file.extension']}"/>
         <property name="resourceItemSearch" ref="resourceItemSearch"/>
         <property name="keyName" value="${excel.resource.key}"/>
     </bean>
@@ -715,7 +717,8 @@
     <bean id="itemWriterResourceLocator"
           class="be.raildelays.batch.support.ToWriteExcelResourceLocator"
           scope="step">
-        <property name="resource" value="file:#{jobParameters['excel.output.path']}"/>
+        <property name="resource"
+                  value="file:#{jobParameters['excel.output.path']}/#{jobParameters['excel.file.name']}.#{jobParameters['excel.file.extension']}"/>
         <property name="resourceItemSearch" ref="resourceItemSearch"/>
         <property name="keyName" value="${excel.resource.key}"/>
     </bean>

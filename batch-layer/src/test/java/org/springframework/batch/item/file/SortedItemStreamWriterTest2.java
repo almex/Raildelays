@@ -17,7 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.item.support.MultiResourceSupportItemWriter;
+import org.springframework.batch.item.support.MultiResourceMaxItemCountItemWriter;
 import org.springframework.batch.item.support.SortedItemStreamWriter;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -37,7 +37,7 @@ public class SortedItemStreamWriterTest2 extends AbstractFileTest {
 
     private ToWriteExcelResourceLocator resourceLocator;
 
-    private MultiResourceSupportItemWriter<BatchExcelRow> writer;
+    private MultiResourceMaxItemCountItemWriter<BatchExcelRow> writer;
 
     private ResourceLocatorListener listener;
 
@@ -51,7 +51,7 @@ public class SortedItemStreamWriterTest2 extends AbstractFileTest {
         ExcelSheetItemWriter<BatchExcelRow> writer = new ExcelSheetItemWriter<>();
         SimpleResourceItemSearch resourceItemSearch = new SimpleResourceItemSearch();
         resourceLocator = new ToWriteExcelResourceLocator();
-        this.writer = new MultiResourceSupportItemWriter<>();
+        this.writer = new MultiResourceMaxItemCountItemWriter<>();
 
         copyFile();
 

@@ -5,10 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
-import org.springframework.batch.item.util.FileUtils;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.util.Assert;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,10 +39,10 @@ import java.util.List;
  * @author Almex
  */
 //FIXME If the delegate is not an AbstractItemCountingItemStreamItemWriter then we should change resource upon this.maxItemCount
-public class MultiResourceSupportItemWriter<T> extends AbstractItemCountingItemStreamItemWriter<T> {
+public class MultiResourceMaxItemCountItemWriter<T> extends AbstractItemCountingItemStreamItemWriter<T> {
 
     private final static String RESOURCE_KEY = "resource";
-    private static final Logger LOGGER = LoggerFactory.getLogger(MultiResourceSupportItemWriter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MultiResourceMaxItemCountItemWriter.class);
     protected ResourceLocator resourceLocator;
     private ResourceAwareItemWriterItemStream<? super T> delegate;
     private ExecutionContext executionContext;
@@ -61,9 +59,10 @@ public class MultiResourceSupportItemWriter<T> extends AbstractItemCountingItemS
     protected boolean doWrite(T item) throws Exception {
         List<T> items = new ArrayList<>();
         if (!opened) {
-            File file = setResourceToDelegate();
-            FileUtils.setUpOutputFile(file, false, true, false);
-            Assert.state(file.canWrite(), "Output resource " + file.getAbsolutePath() + " must be writable");
+            /*
+             * The delegate is responsible to create the resource in the open() method if it does not exist.
+             */
+            setResourceToDelegate();
             delegate.open(executionContext);
             opened = true;
 
