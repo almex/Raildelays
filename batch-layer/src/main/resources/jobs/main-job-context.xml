@@ -510,7 +510,7 @@
           scope="step">
         <property name="from" value="#{jobParameters['mail.account.address']}"/>
         <property name="to" value="#{jobParameters['mail.account.address']}"/>
-        <property name="subject" value="[SNCB/NMBS] Retard de plus d'une heure"/>
+        <property name="subject" value="${email.more.than.one.hour.subject}"/>
     </bean>
 
     <bean id="filterItemInContextProcessor"

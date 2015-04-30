@@ -101,12 +101,12 @@
                 </chunk>
             </tasklet>
         </step>
-        <step id="deleteFiles">
+        <step id="deleteFiles" next="sendEmail">
             <tasklet transaction-manager="batchTransactionManager" ref="deleteDuplicatedFiles"/>
         </step>
-        <!--step id="sendEmail">
-            <tasklet transaction-manager="batchTransactionManager" ref="tasklet"/>
-        </step-->
+        <step id="sendEmail">
+            <tasklet transaction-manager="batchTransactionManager" ref="sendExcelFilesByEmail"/>
+        </step>
     </job>
 
 
@@ -259,6 +259,22 @@
         </property>
     </bean>
 
+    <bean id="emailWriter"
+          class="org.springframework.batch.item.mail.SimpleMailMessageItemWriter"
+          scope="step">
+        <property name="mailSender">
+            <bean class="org.springframework.mail.javamail.JavaMailSenderImpl">
+                <property name="host" value="#{jobParameters['mail.server.host']}"/>
+                <property name="port" value="#{jobParameters['mail.server.port']}"/>
+                <property name="password" value="#{jobParameters['mail.account.password']}"/>
+                <property name="username" value="#{jobParameters['mail.account.username']}"/>
+            </bean>
+        </property>
+        <property name="mailErrorHandler">
+            <bean class="org.springframework.batch.item.mail.DefaultMailErrorHandler"/>
+        </property>
+    </bean>
+
     <!-- ================================================================================================== -->
     <!-- =====================================         TASKLET        ===================================== -->
     <!-- ================================================================================================== -->
@@ -274,5 +290,24 @@
             </bean>
         </property>
     </bean>
+
+    <bean id="sendExcelFilesByEmail"
+          class="be.raildelays.batch.tasklet.SendResourcesByEmailTasklet"
+          scope="step">
+        <property name="resources"
+                  value="file:#{jobParameters['excel.archive.path']}/*.#{jobParameters['excel.file.extension']}"/>
+        <property name="mailSender">
+            <bean class="org.springframework.mail.javamail.JavaMailSenderImpl">
+                <property name="host" value="#{jobParameters['mail.server.host']}"/>
+                <property name="port" value="#{jobParameters['mail.server.port']}"/>
+                <property name="password" value="#{jobParameters['mail.account.password']}"/>
+                <property name="username" value="#{jobParameters['mail.account.username']}"/>
+            </bean>
+        </property>
+        <property name="from" value="#{jobParameters['mail.account.address']}"/>
+        <property name="to" value="#{jobParameters['mail.account.address']}"/>
+        <property name="subject" value="${email.max.months.subject}"/>
+    </bean>
+
 
 </beans>
