@@ -4,8 +4,10 @@ import be.raildelays.domain.entities.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
-import javax.persistence.criteria.*;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * A class which is used to create {@link Specification} objects which are used
@@ -23,22 +25,22 @@ public class LineStopSpecifications {
      */
     public static Specification<LineStop> stationEquals(final Station station) {
 
-        return new Specification<LineStop>() {
-            @Override
-            public Predicate toPredicate(Root<LineStop> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
-                Predicate predicate = null;
-                Path<Station> path = root.get(LineStop_.station);
+        return (root, query, builder) -> {
+            Predicate predicate = null;
+            Path<Station> path = root.get(LineStop_.station);
 
-                if (StringUtils.isNotBlank(station.getEnglishName())) {
-                    predicate = builder.and(builder.equal(path.get(Station_.englishName), station.getEnglishName()));
-                } else if (StringUtils.isNotBlank(station.getFrenchName())) {
-                    predicate = builder.and(builder.equal(path.get(Station_.frenchName), station.getFrenchName()));
-                } else if (StringUtils.isNotBlank(station.getDutchName())) {
-                    predicate = builder.and(builder.equal(path.get(Station_.dutchName), station.getDutchName()));
-                }
-
-                return predicate;
+            if (StringUtils.isNotBlank(station.getEnglishName())) {
+                predicate = builder.and(builder.equal(builder.upper(path.get(Station_.englishName)),
+                        station.getEnglishName().toUpperCase(Locale.ENGLISH)));
+            } else if (StringUtils.isNotBlank(station.getFrenchName())) {
+                predicate = builder.and(builder.equal(builder.upper(path.get(Station_.frenchName)),
+                        station.getFrenchName().toUpperCase(Locale.ENGLISH)));
+            } else if (StringUtils.isNotBlank(station.getDutchName())) {
+                predicate = builder.and(builder.equal(builder.upper(path.get(Station_.dutchName)),
+                        station.getDutchName().toUpperCase(Locale.ENGLISH)));
             }
+
+            return predicate;
         };
     }
 
@@ -50,22 +52,22 @@ public class LineStopSpecifications {
      */
     public static Specification<LineStop> trainEquals(final Train train) {
 
-        return new Specification<LineStop>() {
-            @Override
-            public Predicate toPredicate(Root<LineStop> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
-                Predicate predicate = null;
-                Path<Train> path = root.get(LineStop_.train);
+        return (root, query, builder) -> {
+            Predicate predicate = null;
+            Path<Train> path = root.get(LineStop_.train);
 
-                if (StringUtils.isNotBlank(train.getEnglishName())) {
-                    predicate = builder.and(builder.equal(path.get(Train_.englishName), train.getEnglishName()));
-                } else if (StringUtils.isNotBlank(train.getFrenchName())) {
-                    predicate = builder.and(builder.equal(path.get(Train_.frenchName), train.getFrenchName()));
-                } else if (StringUtils.isNotBlank(train.getDutchName())) {
-                    predicate = builder.and(builder.equal(path.get(Train_.dutchName), train.getDutchName()));
-                }
-
-                return predicate;
+            if (StringUtils.isNotBlank(train.getEnglishName())) {
+                predicate = builder.and(builder.equal(builder.upper(path.get(Train_.englishName)),
+                        train.getEnglishName().toUpperCase(Locale.ENGLISH)));
+            } else if (StringUtils.isNotBlank(train.getFrenchName())) {
+                predicate = builder.and(builder.equal(builder.upper(path.get(Train_.frenchName)),
+                        train.getFrenchName().toUpperCase(Locale.ENGLISH)));
+            } else if (StringUtils.isNotBlank(train.getDutchName())) {
+                predicate = builder.and(builder.equal(builder.upper(path.get(Train_.dutchName)),
+                        train.getDutchName().toUpperCase(Locale.ENGLISH)));
             }
+
+            return predicate;
         };
     }
 
@@ -77,12 +79,7 @@ public class LineStopSpecifications {
      */
     public static Specification<LineStop> dateEquals(final Date date) {
 
-        return new Specification<LineStop>() {
-            @Override
-            public Predicate toPredicate(Root<LineStop> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
-                return builder.equal(root.get(LineStop_.date), date);
-            }
-        };
+        return (root, query, builder) -> builder.equal(root.get(LineStop_.date), date);
     }
 
     /**
@@ -92,12 +89,7 @@ public class LineStopSpecifications {
      */
     public static Specification<LineStop> arrivalTimeIsNotNull() {
 
-        return new Specification<LineStop>() {
-            @Override
-            public Predicate toPredicate(Root<LineStop> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
-                return root.get(LineStop_.arrivalTime).get(TimestampDelay_.expected).isNotNull();
-            }
-        };
+        return (root, query, builder) -> root.get(LineStop_.arrivalTime).get(TimestampDelay_.expected).isNotNull();
     }
 
     /**
@@ -108,12 +100,7 @@ public class LineStopSpecifications {
      */
     public static Specification<LineStop> arrivalTimeGreaterThan(final Date date) {
 
-        return new Specification<LineStop>() {
-            @Override
-            public Predicate toPredicate(Root<LineStop> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
-                return builder.greaterThan(root.get(LineStop_.arrivalTime).get(TimestampDelay_.expected), date);
-            }
-        };
+        return (root, query, builder) -> builder.greaterThan(root.get(LineStop_.arrivalTime).get(TimestampDelay_.expected), date);
     }
 
     /**
@@ -123,12 +110,7 @@ public class LineStopSpecifications {
      */
     public static Specification<LineStop> arrivalDelayIsNotNull() {
 
-        return new Specification<LineStop>() {
-            @Override
-            public Predicate toPredicate(Root<LineStop> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
-                return root.get(LineStop_.arrivalTime).get(TimestampDelay_.delay).isNotNull();
-            }
-        };
+        return (root, query, builder) -> root.get(LineStop_.arrivalTime).get(TimestampDelay_.delay).isNotNull();
     }
 
     /**
@@ -139,12 +121,7 @@ public class LineStopSpecifications {
      */
     public static Specification<LineStop> arrivalDelayGreaterThan(final Long delay) {
 
-        return new Specification<LineStop>() {
-            @Override
-            public Predicate toPredicate(Root<LineStop> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
-                return builder.greaterThan(root.get(LineStop_.arrivalTime).get(TimestampDelay_.delay), delay);
-            }
-        };
+        return (root, query, builder) -> builder.greaterThan(root.get(LineStop_.arrivalTime).get(TimestampDelay_.delay), delay);
     }
 
     /**
@@ -155,12 +132,7 @@ public class LineStopSpecifications {
      */
     public static Specification<LineStop> arrivalDelayGreaterThanOrEqualTo(final Long delay) {
 
-        return new Specification<LineStop>() {
-            @Override
-            public Predicate toPredicate(Root<LineStop> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
-                return builder.greaterThanOrEqualTo(root.get(LineStop_.arrivalTime).get(TimestampDelay_.delay), delay);
-            }
-        };
+        return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get(LineStop_.arrivalTime).get(TimestampDelay_.delay), delay);
     }
 
     /**
@@ -170,12 +142,7 @@ public class LineStopSpecifications {
      */
     public static Specification<LineStop> departureTimeIsNotNull() {
 
-        return new Specification<LineStop>() {
-            @Override
-            public Predicate toPredicate(Root<LineStop> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
-                return root.get(LineStop_.departureTime).get(TimestampDelay_.expected).isNotNull();
-            }
-        };
+        return (root, query, builder) -> root.get(LineStop_.departureTime).get(TimestampDelay_.expected).isNotNull();
     }
 
     /**
@@ -186,12 +153,7 @@ public class LineStopSpecifications {
      */
     public static Specification<LineStop> departureTimeGreaterThan(final Date date) {
 
-        return new Specification<LineStop>() {
-            @Override
-            public Predicate toPredicate(Root<LineStop> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
-                return builder.greaterThan(root.get(LineStop_.departureTime).get(TimestampDelay_.expected), date);
-            }
-        };
+        return (root, query, builder) -> builder.greaterThan(root.get(LineStop_.departureTime).get(TimestampDelay_.expected), date);
     }
 
     /**
@@ -201,12 +163,7 @@ public class LineStopSpecifications {
      */
     public static Specification<LineStop> departureDelayIsNotNull() {
 
-        return new Specification<LineStop>() {
-            @Override
-            public Predicate toPredicate(Root<LineStop> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
-                return root.get(LineStop_.departureTime).get(TimestampDelay_.delay).isNotNull();
-            }
-        };
+        return (root, query, builder) -> root.get(LineStop_.departureTime).get(TimestampDelay_.delay).isNotNull();
     }
 
     /**
@@ -217,12 +174,7 @@ public class LineStopSpecifications {
      */
     public static Specification<LineStop> departureDelayGreaterThan(final Long delay) {
 
-        return new Specification<LineStop>() {
-            @Override
-            public Predicate toPredicate(Root<LineStop> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
-                return builder.greaterThan(root.get(LineStop_.departureTime).get(TimestampDelay_.delay), delay);
-            }
-        };
+        return (root, query, builder) -> builder.greaterThan(root.get(LineStop_.departureTime).get(TimestampDelay_.delay), delay);
     }
 
     /**
@@ -230,14 +182,19 @@ public class LineStopSpecifications {
      *
      * @return a predicate
      */
-    public static Specification<LineStop> isCanceled() {
+    public static Specification<LineStop> isCanceledDeparture() {
 
-        return new Specification<LineStop>() {
-            @Override
-            public Predicate toPredicate(Root<LineStop> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
-                return builder.equal(root.get(LineStop_.canceled), true);
-            }
-        };
+        return (root, query, builder) -> builder.equal(root.get(LineStop_.canceledDeparture), true);
+    }
+
+    /**
+     * Creates a specification used to find LineStop whose are canceled.
+     *
+     * @return a predicate
+     */
+    public static Specification<LineStop> isCanceledArrival() {
+
+        return (root, query, builder) -> builder.equal(root.get(LineStop_.canceledArrival), true);
     }
 
     /**
@@ -247,12 +204,10 @@ public class LineStopSpecifications {
      */
     public static Specification<LineStop> isNotCanceled() {
 
-        return new Specification<LineStop>() {
-            @Override
-            public Predicate toPredicate(Root<LineStop> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
-                return builder.equal(root.get(LineStop_.canceled), false);
-            }
-        };
+        return (root, query, builder) -> builder.and(
+                builder.equal(root.get(LineStop_.canceledDeparture), false),
+                builder.equal(root.get(LineStop_.canceledArrival), false)
+        );
     }
 
 }

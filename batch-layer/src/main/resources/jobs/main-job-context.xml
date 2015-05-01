@@ -422,8 +422,8 @@
           class="org.springframework.batch.item.support.CompositeItemProcessor">
         <property name="delegates">
             <list>
-                <ref bean="aggregateExpectedTimeProcessor"/>
-                <ref bean="validatorProcessor"/>
+                <!--ref bean="aggregateExpectedTimeProcessor"/-->
+                <!--ref bean="validatorProcessor"/-->
                 <ref bean="excelRowMapperProcessor"/>
                 <ref bean="validatorProcessor"/>
                 <ref bean="searchNextTrainProcessor"/>
@@ -548,7 +548,7 @@
     <bean id="flatFileItemWriter"
           class="org.springframework.batch.item.file.FlatFileItemWriter"
           scope="step">
-        <property name="resource" value="#{jobParameters['text.output.path']}"/>
+        <property name="resource" value="file:#{jobParameters['text.output.path']}"/>
         <property name="appendAllowed" value="true"/>
         <property name="shouldDeleteIfExists" value="false"/>
         <property name="saveState" value="true"/>

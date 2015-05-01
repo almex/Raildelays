@@ -43,7 +43,7 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
         canceled.select(canceledRoot.get(LineStop_.id))
                 .where(where(dateEquals(date))
                         .and(stationEquals(station))
-                        .and(isCanceled())
+                        .and(isCanceledDeparture())
                         .toPredicate(root, query, builder));
 
         notCanceled.select(notCanceledRoot.get(LineStop_.id))
@@ -76,7 +76,7 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
         canceled.select(canceledRoot.get(LineStop_.id))
                 .where(where(dateEquals(date))
                         .and(stationEquals(station))
-                        .and(isCanceled())
+                        .and(isCanceledArrival())
                         .toPredicate(canceledRoot, query, builder));
 
         notCanceled.select(notCanceledRoot.get(LineStop_.id))

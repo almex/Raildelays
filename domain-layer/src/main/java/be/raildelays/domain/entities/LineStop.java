@@ -39,8 +39,11 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
     @NotNull
     protected Station station;
 
-    @Column(name = "CANCELED")
-    protected boolean canceled;
+    @Column(name = "CANCELED_DEPARTURE")
+    protected boolean canceledDeparture;
+
+    @Column(name = "CANCELED_ARRIVAL")
+    protected boolean canceledArrival;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATE")
@@ -74,7 +77,8 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
         this.station = null;
         this.arrivalTime = null;
         this.departureTime = null;
-        this.canceled = false;
+        this.canceledDeparture = false;
+        this.canceledArrival = false;
         this.previous = null;
         this.next = null;
     }
@@ -86,7 +90,8 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
         this.station = builder.station;
         this.arrivalTime = builder.arrivalTime;
         this.departureTime = builder.departureTime;
-        this.canceled = builder.canceled;
+        this.canceledDeparture = builder.canceledDeparture;
+        this.canceledArrival = builder.canceledArrival;
     }
 
     @Override
@@ -105,7 +110,7 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
                 .append("}, ") //
                 .append("arrivalTime: {").append(arrivalTime).append("}, ") //
                 .append("departureTime: {").append(departureTime).append("}, ") //
-                .append("canceled: ").append(canceled).append(" ") //
+                .append("canceled: ").append(isCanceled()).append(" ") //
                 .append("next: ").append(next != null ? next.getId() : "N/A").append(" ") //
                 .append("previous: ").append(previous != null ? previous.getId() : "N/A").append(" ") //
                 .append("} ").toString();
@@ -253,12 +258,36 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
         this.date = date;
     }
 
+    /**
+     * Use {@link #isCanceledDeparture} or {@link #isCanceledArrival} instead.
+     */
+    @Deprecated
     public boolean isCanceled() {
-        return canceled;
+        return canceledDeparture || canceledArrival;
     }
 
+    /**
+     * Use {@link #setCanceledDeparture} or {@link #setCanceledArrival} instead.
+     */
+    @Deprecated
     public void setCanceled(boolean canceled) {
-        this.canceled = canceled;
+        this.canceledDeparture = this.canceledArrival = canceled;
+    }
+
+    public boolean isCanceledDeparture() {
+        return canceledDeparture;
+    }
+
+    public void setCanceledDeparture(boolean canceledDeparture) {
+        this.canceledDeparture = canceledDeparture;
+    }
+
+    public boolean isCanceledArrival() {
+        return canceledArrival;
+    }
+
+    public void setCanceledArrival(boolean canceledArrival) {
+        this.canceledArrival = canceledArrival;
     }
 
     public LineStop getPrevious() {
@@ -294,7 +323,8 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
         private Long id;
         private Train train;
         private Station station;
-        private boolean canceled;
+        private boolean canceledDeparture;
+        private boolean canceledArrival;
         private Date date;
         private TimestampDelay arrivalTime;
         private TimestampDelay departureTime;
@@ -315,7 +345,8 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
             this.station = lineStop.station;
             this.arrivalTime = lineStop.arrivalTime;
             this.departureTime = lineStop.departureTime;
-            this.canceled = lineStop.canceled;
+            this.canceledDeparture = lineStop.canceledDeparture;
+            this.canceledArrival = lineStop.canceledArrival;
 
             //-- Copy backward
             LineStop previousLineStop = lineStop.previous;
@@ -328,7 +359,8 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
                         .station(previousLineStop.station)
                         .arrivalTime(previousLineStop.arrivalTime)
                         .departureTime(previousLineStop.departureTime)
-                        .canceled(previousLineStop.canceled)
+                        .canceledDeparture(previousLineStop.canceledDeparture)
+                        .canceledArrival(previousLineStop.canceledArrival)
                         .addNext(backwardBuilder);
 
                 backwardBuilder = backwardBuilder.previous;
@@ -346,7 +378,8 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
                         .station(nextLineStop.station)
                         .arrivalTime(nextLineStop.arrivalTime)
                         .departureTime(nextLineStop.departureTime)
-                        .canceled(nextLineStop.canceled)
+                        .canceledDeparture(previousLineStop.canceledDeparture)
+                        .canceledArrival(previousLineStop.canceledArrival)
                         .addPrevious(forwardBuilder);
 
                 forwardBuilder = forwardBuilder.next;
@@ -408,8 +441,24 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
             return this;
         }
 
+        /**
+         * Use {@link #canceledDeparture} or {@link #canceledArrival} instead.
+         */
+        @Deprecated
         public Builder canceled(boolean canceled) {
-            this.canceled = canceled;
+            this.canceledDeparture = this.canceledArrival = canceled;
+
+            return this;
+        }
+
+        public Builder canceledDeparture(boolean canceled) {
+            this.canceledDeparture = canceled;
+
+            return this;
+        }
+
+        public Builder canceledArrival(boolean canceled) {
+            this.canceledArrival = canceled;
 
             return this;
         }

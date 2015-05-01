@@ -28,8 +28,7 @@ import java.util.Locale;
  *
  * @author Almex
  */
-public class SearchNextTrainProcessor implements
-        ItemProcessor<BatchExcelRow, BatchExcelRow>, InitializingBean {
+public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, BatchExcelRow>, InitializingBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("Nxt", SearchNextTrainProcessor.class);
 
@@ -169,8 +168,7 @@ public class SearchNextTrainProcessor implements
                 .build();
     }
 
-    private LineStop searchFastestTrain(BatchExcelRow item,
-                                        List<LineStop> candidates) {
+    private LineStop searchFastestTrain(BatchExcelRow item, List<LineStop> candidates) {
         LineStop fastestTrain = null;
 
 		/*
@@ -185,8 +183,12 @@ public class SearchNextTrainProcessor implements
             LOGGER.debug("candidate_departure", candidateDeparture);
 
             // We don't process null values
-            if (candidateDeparture == null || candidateArrival == null) {
+            if (candidateDeparture == null) {
                 LOGGER.trace("filter_null_departure", candidateDeparture);
+                continue;
+            }
+
+            if (candidateArrival == null) {
                 LOGGER.trace("filter_null_arrival", candidateArrival);
                 continue;
             }
@@ -196,8 +198,12 @@ public class SearchNextTrainProcessor implements
              * If our start point is not canceled and than our stop is ever then we can take this train.
              * No matter if in between some stop are canceled.
              */
-            if (candidateDeparture.isCanceled() || candidateArrival.isCanceled()) {
+            if (candidateDeparture.isCanceledDeparture()) {
                 LOGGER.trace("filter_canceled_departure", candidateDeparture);
+                continue;
+            }
+
+            if (candidateArrival.isCanceledArrival()) {
                 LOGGER.trace("filter_canceled_arrival", candidateArrival);
                 continue;
             }

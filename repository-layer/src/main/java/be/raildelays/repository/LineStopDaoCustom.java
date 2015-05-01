@@ -10,8 +10,8 @@ import java.util.List;
 public interface LineStopDaoCustom {
 
     /**
-     * Search a list of arrival delayed line stops that belong departure or
-     * arrival for a certain day.
+     * Search a list of delayed or canceled arrival {@link LineStop} which belong to departure or
+     * arrival station for a certain day.
      *
      * @param date           date for which you do the search
      * @param station        departure station
@@ -22,8 +22,8 @@ public interface LineStopDaoCustom {
                                        long delayThreshold);
 
     /**
-     * Search a list of departure delayed line stops that belong departure or
-     * arrival for a certain day.
+     * Search a list of delayed or canceled departure {@link LineStop} which belong to departure or
+     * arrival station for a certain day.
      *
      * @param date           date for which you do the search
      * @param station        arrival station

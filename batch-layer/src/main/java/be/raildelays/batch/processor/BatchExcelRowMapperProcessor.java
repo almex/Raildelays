@@ -128,47 +128,29 @@ public class BatchExcelRowMapperProcessor implements ItemProcessor<LineStop, Bat
         return result;
     }
 
+    /**
+     * No matter which sens it is, the mapping remains the same.
+     *
+     * @param lineStopFrom start point
+     * @param lineStopTo   stop point
+     * @param sens         to determine if we go or return
+     * @return a {@link BatchExcelRow} containing the combination of {@code lineStopFrom} and {@code lineStopTo}
+     */
     protected BatchExcelRow map(LineStop lineStopFrom, LineStop lineStopTo, Sens sens) {
         Date effectiveDepartureTime = computeEffectiveTime(lineStopFrom.getDepartureTime());
         Date effectiveArrivalTime = computeEffectiveTime(lineStopTo.getArrivalTime());
-        BatchExcelRow result;
-
-        switch (sens) {
-            case DEPARTURE:
-                result = new Builder(lineStopFrom.getDate(), sens) //
-                        .departureStation(lineStopFrom.getStation()) //
-                        .arrivalStation(lineStopTo.getStation()) //
-                        .expectedDepartureTime(lineStopFrom.getDepartureTime().getExpected()) //
-                        .expectedArrivalTime(lineStopTo.getArrivalTime().getExpected()) //
-                        .expectedTrain1(lineStopFrom.getTrain()) //
-                        .effectiveDepartureTime(effectiveDepartureTime) //
-                        .effectiveArrivalTime(effectiveArrivalTime) //
-                        .effectiveTrain1(lineStopTo.getTrain()) //
-                        .delay(lineStopTo.getArrivalTime().getDelay()) //
-                        .canceled(lineStopTo.isCanceled() || lineStopFrom.isCanceled())
-                        .build(false);
-
-                break;
-            case ARRIVAL:
-                result = new Builder(lineStopFrom.getDate(), sens) //
-                        .departureStation(lineStopFrom.getStation()) //
-                        .arrivalStation(lineStopTo.getStation()) //
-                        .expectedDepartureTime(lineStopFrom.getDepartureTime().getExpected()) //
-                        .expectedArrivalTime(lineStopTo.getArrivalTime().getExpected()) //
-                        .expectedTrain1(lineStopFrom.getTrain()) //
-                        .effectiveDepartureTime(effectiveDepartureTime) //
-                        .effectiveArrivalTime(effectiveArrivalTime) //
-                        .effectiveTrain1(lineStopTo.getTrain()) //
-                        .delay(lineStopTo.getArrivalTime().getDelay()) //
-                        .canceled(lineStopTo.isCanceled() || lineStopFrom.isCanceled())
-                        .build(false);
-
-                break;
-            default:
-                result = new Builder(lineStopFrom.getDate(), sens).build();
-
-                break;
-        }
+        BatchExcelRow result = new Builder(lineStopFrom.getDate(), sens) //
+                .departureStation(lineStopFrom.getStation()) //
+                .arrivalStation(lineStopTo.getStation()) //
+                .expectedDepartureTime(lineStopFrom.getDepartureTime().getExpected()) //
+                .expectedArrivalTime(lineStopTo.getArrivalTime().getExpected()) //
+                .expectedTrain1(lineStopFrom.getTrain()) //
+                .effectiveDepartureTime(effectiveDepartureTime) //
+                .effectiveArrivalTime(effectiveArrivalTime) //
+                .effectiveTrain1(lineStopTo.getTrain()) //
+                .delay(lineStopTo.getArrivalTime().getDelay()) //
+                .canceled(lineStopFrom.isCanceledDeparture() || lineStopTo.isCanceledArrival())
+                .build(false);
 
         return result;
     }

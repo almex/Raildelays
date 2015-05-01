@@ -59,7 +59,8 @@ class DelaysStreamParserV2 implements StreamParser<LineStop, DelaysRequestV2> {
                         .station(getStation(object, request.language))
                         .departureTime(getDepartureTime(object))
                         .arrivalTime(getArrivalTime(object))
-                        .canceled(isCanceled(object));
+                        .canceledDeparture(isCanceledDeparture(object))
+                        .canceledArrival(isCanceledArrival(object));
 
                 if (result == null) {
                     result = builder;
@@ -73,7 +74,7 @@ class DelaysStreamParserV2 implements StreamParser<LineStop, DelaysRequestV2> {
     }
 
     private static TimestampDelay getDepartureTime(Map object) {
-        final SimpleDateFormat parser = new SimpleDateFormat("hh:mm");
+        final SimpleDateFormat parser = new SimpleDateFormat("HH:mm");
         TimestampDelay result = null;
 
         if (object.csDt != null) {
@@ -84,7 +85,7 @@ class DelaysStreamParserV2 implements StreamParser<LineStop, DelaysRequestV2> {
     }
 
     private static TimestampDelay getArrivalTime(Map object) {
-        final SimpleDateFormat parser = new SimpleDateFormat("hh:mm");
+        final SimpleDateFormat parser = new SimpleDateFormat("HH:mm");
         TimestampDelay result = null;
 
         if (object.csAt != null) {
@@ -114,11 +115,16 @@ class DelaysStreamParserV2 implements StreamParser<LineStop, DelaysRequestV2> {
         return result;
     }
 
-    private static boolean isCanceled(Map object) {
+    private static boolean isCanceledDeparture(Map object) {
         boolean departure = object.sD != null && object.sD == 1;
+
+        return departure;
+    }
+
+    private static boolean isCanceledArrival(Map object) {
         boolean arrival = object.sA != null && object.sA == 1;
 
-        return departure || arrival;
+        return arrival;
     }
 
 }

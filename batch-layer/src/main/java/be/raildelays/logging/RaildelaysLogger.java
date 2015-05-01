@@ -90,12 +90,19 @@ public class RaildelaysLogger implements Logger {
                     .departureStation(object.getStation() != null ? object.getStation().getName() : null)
                     .expectedDepartureTime(object.getTimestamp())
                     .effectiveDepartureTime(computeEffectiveTime(new TimestampDelay(object.getTimestamp(), object.getDelay())))
+                    .canceledDeparture(object.isCanceled())
+                    .canceledArrival(object.isCanceled())
                     .build();
         }
     };
     private Delegator<LineStop> lineStopDelegator = new Delegator<LineStop>() {
         @Override
         public String logLine(String message, LineStop object) {
+            /**
+             * We revert here departure and arrival because what we want to show here it's a stop:
+             * - we reach the stop at the arrival time <-> we start our route at departure time
+             * - we leave the stop at the departure time <-> we stop our route at arrival time
+             */
             return new LogLineBuilder()
                     .message(message)
                     .id(object.getId())
@@ -106,6 +113,8 @@ public class RaildelaysLogger implements Logger {
                     .expectedArrivalTime(object.getDepartureTime() != null ? object.getDepartureTime().getExpected() : null)
                     .effectiveDepartureTime(computeEffectiveTime(object.getArrivalTime()))
                     .effectiveArrivalTime(computeEffectiveTime(object.getDepartureTime()))
+                    .canceledDeparture(object.isCanceledArrival())
+                    .canceledArrival(object.isCanceledDeparture())
                     .idPrevious(object.getPrevious() != null ? object.getPrevious().getId() : null)
                     .idNext(object.getNext() != null ? object.getNext().getId() : null)
                     .build();
@@ -142,6 +151,11 @@ public class RaildelaysLogger implements Logger {
     private Delegator<ServedStopDTO> servedStopDTODelegator = new Delegator<ServedStopDTO>() {
         @Override
         public String logLine(String message, ServedStopDTO object) {
+            /**
+             * We revert here departure and arrival because what we want to show here it's a stop:
+             * - we reach the stop at the arrival time <-> we start our route at departure time
+             * - we leave the stop at the departure time <-> we stop our route at arrival time
+             */
             return new LogLineBuilder()
                     .message(message)
                     .departureStation(object.getStationName())
@@ -149,6 +163,8 @@ public class RaildelaysLogger implements Logger {
                     .expectedArrivalTime(object.getDepartureTime())
                     .effectiveDepartureTime(computeEffectiveTime(new TimestampDelay(object.getArrivalTime(), object.getArrivalDelay())))
                     .effectiveArrivalTime(computeEffectiveTime(new TimestampDelay(object.getDepartureTime(), object.getDepartureDelay())))
+                    .canceledDeparture(object.isCanceled())
+                    .canceledArrival(object.isCanceled())
                     .build();
         }
     };
@@ -666,6 +682,8 @@ public class RaildelaysLogger implements Logger {
         private Date effectiveArrivalTime;
         private Long idPrevious;
         private Long idNext;
+        private boolean canceledDeparture;
+        private boolean canceledArrival;
 
         public LogLineBuilder message(String message) {
             this.message = message;
@@ -745,6 +763,18 @@ public class RaildelaysLogger implements Logger {
             return this;
         }
 
+        public LogLineBuilder canceledDeparture(boolean canceled) {
+            this.canceledDeparture = canceled;
+
+            return this;
+        }
+
+        public LogLineBuilder canceledArrival(boolean canceled) {
+            this.canceledArrival = canceled;
+
+            return this;
+        }
+
 
         public String build() {
             final StringBuilder builder = new StringBuilder();
@@ -774,9 +804,9 @@ public class RaildelaysLogger implements Logger {
                 builder.append(separator);
                 builder.append(StringUtils.rightPad(expectedArrivalTime != null ? timeFormat.format(expectedArrivalTime) : "null", TIME_FORMAT.length()));
                 builder.append(separator);
-                builder.append(StringUtils.rightPad(effectiveDepartureTime != null ? timeFormat.format(effectiveDepartureTime) : "", TIME_FORMAT.length()));
+                builder.append(formatEffectiveTime(effectiveDepartureTime, canceledDeparture));
                 builder.append(separator);
-                builder.append(StringUtils.rightPad(effectiveArrivalTime != null ? timeFormat.format(effectiveArrivalTime) : "", TIME_FORMAT.length()));
+                builder.append(formatEffectiveTime(effectiveArrivalTime, canceledArrival));
                 builder.append(separator);
                 builder.append(delayFormat.format(computeDelay()));
                 builder.append(separator);
@@ -790,6 +820,20 @@ public class RaildelaysLogger implements Logger {
 
 
             return builder.toString();
+        }
+
+        public String formatEffectiveTime(Date effectiveTime, boolean canceled) {
+            final SimpleDateFormat timeFormat = new SimpleDateFormat(TIME_FORMAT);
+            final SimpleDateFormat canceledTimeFormat = new SimpleDateFormat("HH'x'mm");
+            final String result;
+
+            if (effectiveTime != null) {
+                result = StringUtils.rightPad((canceled ? canceledTimeFormat : timeFormat).format(effectiveTime), TIME_FORMAT.length());
+            } else {
+                result = StringUtils.center(canceled ? "x" : "", TIME_FORMAT.length());
+            }
+
+            return result;
         }
 
         public String substringCenter(String characters, int length, char centerCharacter) {

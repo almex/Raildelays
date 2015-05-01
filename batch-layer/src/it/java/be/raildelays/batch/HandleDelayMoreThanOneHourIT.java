@@ -72,11 +72,12 @@ public class HandleDelayMoreThanOneHourIT extends AbstractContextIT {
         parameters.put("excel.input.template", new JobParameter(TEMPLATE_PATH));
         parameters.put("language", new JobParameter("en"));
         parameters.put("threshold.date", new JobParameter(Date.from(LocalDate.of(2014, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC))));
-//        parameters.put("mail.server.host", new JobParameter("relay.skynet.be"));
-//        parameters.put("mail.server.port", new JobParameter("25"));
+        // We don't test the last step sendEmail
+//        parameters.put("mail.server.host", new JobParameter(""));
+//        parameters.put("mail.server.port", new JobParameter(""));
 //        parameters.put("mail.account.username", new JobParameter(""));
 //        parameters.put("mail.account.password", new JobParameter(""));
-//        parameters.put("mail.account.address", new JobParameter("alexis.soumagne@gmail.com"));
+//        parameters.put("mail.account.address", new JobParameter(""));
 
         JobExecution jobExecution = getJobLauncherTestUtils().launchJob(new JobParameters(parameters));
 
