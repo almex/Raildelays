@@ -11,6 +11,7 @@
     <context:annotation-config/>
 
     <import resource="parent-job-context.xml"/>
+    <import resource="steps/handle-max-months-job-context.xml"/>
 
     <batch:job id="mainJob" parent="parentJob">
         <batch:step id="retrieveDataFromRailtime" parent="parentStep" next="generateExcelFiles">
@@ -59,7 +60,7 @@
                 </batch:step>
             </batch:partition>
         </batch:step>
-        <batch:step id="generateExcelFiles" parent="parentStep" next="decision">
+        <batch:step id="generateExcelFiles" parent="parentStep" next="decideIfWeHaveAMoreThanOneHourDelay">
             <batch:tasklet transaction-manager="batchTransactionManager">
                 <batch:chunk reader="delaysItemReader"
                              processor="chainedProcessorsForDelays"
@@ -91,9 +92,10 @@
                 <batch:listener ref="promoteContextListener"/>
             </batch:listeners>
         </batch:step>
-        <batch:decision id="decision" decider="delayMoreThanOneHourDecider">
-            <batch:next on="COMPLETED_WITH_60M_DELAY" to="handleDelayMoreThanOneHour"/>
-            <batch:end on="COMPLETED"/>
+        <batch:decision id="decideIfWeHaveAMoreThanOneHourDelay" decider="delayMoreThanOneHourDecider">
+            <batch:fail on="FAILED"/>
+            <batch:next on="COMPLETED_WITH_60M_ELAY" to="handleDelayMoreThanOneHour"/>
+            <batch:next on="*" to="decideIfWeHaveReachedMaxMonths"/>
         </batch:decision>
         <batch:step id="handleDelayMoreThanOneHour" parent="parentStep" next="removeDelayMoreThanOneHour">
             <batch:tasklet transaction-manager="batchTransactionManager">
@@ -141,7 +143,7 @@
                 <batch:listener ref="demoteContextListener"/>
             </batch:listeners>
         </batch:step>
-        <batch:step id="renameFile" parent="parentStep">
+        <batch:step id="renameFile" parent="parentStep" next="decideIfWeHaveReachedMaxMonths">
             <batch:tasklet transaction-manager="batchTransactionManager">
                 <bean class="be.raildelays.batch.tasklet.MoveFileTasklet"
                       scope="step">
@@ -153,6 +155,19 @@
                 <!-- Get back some information from previous step -->
                 <batch:listener ref="demoteContextListener"/>
             </batch:listeners>
+        </batch:step>
+        <!--batch:decision id="decideIfWeHaveReachedMaxMonths" decider="maxMonthsDecider">
+            <batch:next on="COMPLETED_WITH_MAX_MONTHS" to="handleMaxMonthsStep"/>
+            <batch:end on="COMPLETED"/>
+        </batch:decision-->
+        <batch:step id="decideIfWeHaveReachedMaxMonths" parent="parentStep">
+            <batch:tasklet transaction-manager="batchTransactionManager" ref="maxMonthsDecider"/>
+            <batch:fail on="FAILED"/>
+            <batch:next on="COMPLETED_WITH_MAX_MONTHS" to="handleMaxMonthsStep"/>
+            <batch:end on="*"/>
+        </batch:step>
+        <batch:step id="handleMaxMonthsStep" parent="parentStep">
+            <batch:job job-parameters-extractor="jobParameterExtractor" ref="handleMaxMonthsJob"/>
         </batch:step>
         <batch:validator ref="jobParametersValidator" />
         <batch:listeners merge="true">

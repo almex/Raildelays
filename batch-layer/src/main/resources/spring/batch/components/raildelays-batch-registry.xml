@@ -8,12 +8,11 @@
         <property name="jobRegistry" ref="jobRegistry"/>
     </bean>
 
-    <bean
-            class="org.springframework.batch.core.configuration.support.AutomaticJobRegistrar">
+    <bean class="org.springframework.batch.core.configuration.support.AutomaticJobRegistrar">
         <property name="applicationContextFactories">
             <bean
                     class="org.springframework.batch.core.configuration.support.ClasspathXmlApplicationContextsFactoryBean">
-                <property name="resources" value="classpath:/jobs/**/*job-context.xml"/>
+                <property name="resources" value="classpath:/jobs/*job-context.xml"/>
             </bean>
         </property>
         <property name="jobLoader">

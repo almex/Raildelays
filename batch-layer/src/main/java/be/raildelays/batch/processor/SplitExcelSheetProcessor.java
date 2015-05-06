@@ -2,6 +2,8 @@ package be.raildelays.batch.processor;
 
 import be.raildelays.domain.xls.ExcelRow;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -14,11 +16,16 @@ import java.util.Date;
  * @author Almex
  * @since 1.2
 */
-public class SplitExcelSheetProcessor implements ItemProcessor<ExcelRow, ExcelRow> {
+public class SplitExcelSheetProcessor implements ItemProcessor<ExcelRow, ExcelRow>, InitializingBean {
 
     private LocalDate thresholdDate;
 
     private Mode mode;
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        Assert.notNull(thresholdDate, "The 'thresholdDate' property must be provided");
+    }
 
     public enum Mode {
         BEFORE, AFTER_OR_EQUALS

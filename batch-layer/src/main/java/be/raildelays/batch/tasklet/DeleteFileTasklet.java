@@ -53,12 +53,10 @@ public class DeleteFileTasklet implements Tasklet, InitializingBean {
             }
 
             return result;
-        })
-                .filter(file -> {
-                    contribution.incrementWriteCount(1);
-                    return !file.delete();
-                })
-                .forEach(File::deleteOnExit);
+        }).filter(file -> {
+            contribution.incrementWriteCount(1);
+            return !file.delete();
+        }).forEach(File::deleteOnExit);
 
         return RepeatStatus.FINISHED;
     }

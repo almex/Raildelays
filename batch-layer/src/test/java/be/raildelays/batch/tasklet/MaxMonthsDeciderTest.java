@@ -11,6 +11,8 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 import org.springframework.batch.item.support.IteratorItemReader;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 
@@ -19,7 +21,6 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -41,24 +42,38 @@ public class MaxMonthsDeciderTest {
         decider.setMaxNumberOfMonth(6);
     }
 
+    private class ItemStreamItemReaderDelegator extends AbstractItemStreamItemReader<ExcelRow> {
+
+        private ItemReader<ExcelRow> delegate;
+
+        public ItemStreamItemReaderDelegator(ItemReader<ExcelRow> delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public ExcelRow read() throws Exception {
+            return delegate.read();
+        }
+    }
+
     @Test
     public void testCompleted() throws ParseException {
-        decider.setReader(new IteratorItemReader<>(Arrays.asList(
-                        new ExcelRow.Builder(Date.from(NOW
-                                .minus(1, ChronoUnit.MONTHS)
-                                .atStartOfDay(ZoneId.systemDefault())
-                                .toInstant() // 1 month before Now
-                        ), Sens.ARRIVAL)
-                                .build(false),
-                        new ExcelRow.Builder(Date.from(NOW
-                                .plus(1, ChronoUnit.MONTHS)
-                                .atStartOfDay(ZoneId.systemDefault())
-                                .toInstant() // 1 month after Now
-                        ), Sens.ARRIVAL)
-                                .build(false)
-                )
-                )
-        );
+        decider.setReader(new ItemStreamItemReaderDelegator(new IteratorItemReader<>(Arrays.asList(
+                new ExcelRow.Builder(Date.from(NOW
+                        .minus(1, ChronoUnit.MONTHS)
+                        .atStartOfDay(ZoneId.systemDefault())
+                        .toInstant() // 1 month before Now
+                ), Sens.ARRIVAL)
+                        .build(false),
+                new ExcelRow.Builder(null, Sens.ARRIVAL) // To test null value
+                        .build(false),
+                new ExcelRow.Builder(Date.from(NOW
+                        .plus(1, ChronoUnit.MONTHS)
+                        .atStartOfDay(ZoneId.systemDefault())
+                        .toInstant() // 1 month after Now
+                ), Sens.ARRIVAL)
+                        .build(false)
+        ))));
 
         FlowExecutionStatus status = decider.decide(jobExecution, stepExecution);
 
@@ -68,25 +83,25 @@ public class MaxMonthsDeciderTest {
 
     @Test
     public void testCompletedWithMaxMonths() throws ParseException {
-        decider.setReader(new IteratorItemReader<>(Arrays.asList(
-                        new ExcelRow.Builder(Date.from(NOW
-                                .minus(6, ChronoUnit.MONTHS)
-                                .atStartOfDay(ZoneId.systemDefault())
-                                .toInstant() // 6 month before Now
-                        ), Sens.ARRIVAL)
-                                .build(false),
-                        new ExcelRow.Builder(Date.from(NOW
-                                .plus(2, ChronoUnit.MONTHS)
-                                .atStartOfDay(ZoneId.systemDefault())
-                                .toInstant() // 2 month after Now
-                        ), Sens.ARRIVAL)
-                                .build(false)
-                )
-                )
-        );
+        decider.setReader(new ItemStreamItemReaderDelegator(new IteratorItemReader<>(Arrays.asList(
+                new ExcelRow.Builder(Date.from(NOW
+                        .minus(6, ChronoUnit.MONTHS)
+                        .atStartOfDay(ZoneId.systemDefault())
+                        .toInstant() // 6 month before Now
+                ), Sens.ARRIVAL)
+                        .build(false),
+                new ExcelRow.Builder(null, Sens.ARRIVAL) // To test null value
+                        .build(false),
+                new ExcelRow.Builder(Date.from(NOW
+                        .plus(2, ChronoUnit.MONTHS)
+                        .atStartOfDay(ZoneId.systemDefault())
+                        .toInstant() // 2 month after Now
+                ), Sens.ARRIVAL)
+                        .build(false)
+        ))));
 
         FlowExecutionStatus status = decider.decide(jobExecution, stepExecution);
 
-        Assert.assertEquals(MaxMonthsDecider.COMPLETED_WITH_MAX_MONTHS, status);
+        Assert.assertEquals(new FlowExecutionStatus(MaxMonthsDecider.COMPLETED_WITH_MAX_MONTHS.getExitCode()), status);
     }
 }

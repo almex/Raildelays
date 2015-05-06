@@ -25,7 +25,7 @@ import java.util.*;
 
 @DirtiesContext
 // Because of issue [SPR-8849] (https://jira.springsource.org/browse/SPR-8849)
-@ContextConfiguration(locations = {"/jobs/handle-max-months-job-context.xml"})
+@ContextConfiguration(locations = {"/jobs/steps/handle-max-months-job-context.xml"})
 public class HandleDelayMoreThanOneHourIT extends AbstractContextIT {
 
     /**
@@ -52,14 +52,15 @@ public class HandleDelayMoreThanOneHourIT extends AbstractContextIT {
     public static void setUp() throws IOException {
         File templateFile = new ClassPathResource("template.xls").getFile();
 
-        TARGET_PATH = templateFile.getParentFile().getParentFile().getAbsolutePath() + "/";
-        SOURCE_PATH = TARGET_PATH + "test-classes/6monthsDelays/";
-        ARCHIVE_PATH = TARGET_PATH + LocalDate.now().toString() + "/";
+        TARGET_PATH = templateFile.getParentFile().getParentFile().getAbsolutePath() + File.separator;
+        SOURCE_PATH = TARGET_PATH + "test-classes" + File.separator + "6monthsDelays" + File.separator;
+        ARCHIVE_PATH = TARGET_PATH + LocalDate.now().toString() + File.separator;
         TEMPLATE_PATH = templateFile.getAbsolutePath();
 
         cleanUp();
         copyFiles();
     }
+
 
     @Test
     public void testCompleted() throws Exception {
@@ -68,8 +69,8 @@ public class HandleDelayMoreThanOneHourIT extends AbstractContextIT {
         parameters.put("excel.output.path", new JobParameter(TARGET_PATH));
         parameters.put("excel.file.name", new JobParameter("retard_sncb"));
         parameters.put("excel.file.extension", new JobParameter("xls"));
-        parameters.put("excel.archive.path", new JobParameter(ARCHIVE_PATH));
-        parameters.put("excel.input.template", new JobParameter(TEMPLATE_PATH));
+        parameters.put("excel.archive.path", new JobParameter(TARGET_PATH));
+        parameters.put("excel.template.path", new JobParameter(TEMPLATE_PATH));
         parameters.put("language", new JobParameter("en"));
         parameters.put("threshold.date", new JobParameter(Date.from(LocalDate.of(2014, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC))));
         // We don't test the last step sendEmail
@@ -96,7 +97,7 @@ public class HandleDelayMoreThanOneHourIT extends AbstractContextIT {
 
     @AfterClass
     public static void tearDown() {
-        //cleanUp();
+        cleanUp();
     }
 
 

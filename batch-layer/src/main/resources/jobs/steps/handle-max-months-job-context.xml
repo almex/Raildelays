@@ -10,23 +10,10 @@
 
     <!-- Needed if we use a AutomaticJobRegistrar -->
     <context:annotation-config/>
+    <!-- To make the embedded step to use scope="step" -->
+    <bean class="org.springframework.batch.core.scope.StepScope"/>
 
-    <import resource="parent-job-context.xml"/>
-
-    <!--<job id="mainJob" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-        <step id="step1" next="decision">
-
-        </step>
-        <decision id="decision" decider="maxMonthsDecider">
-            <next on="COMPLETED_WITH_MAX_MONTHS" to="handleMaxMonthsStep"/>
-            <end on="COMPLETED"/>
-        </decision>
-        <step id="handleMaxMonthsStep">
-            <job ref="handleMaxMonthsJob" job-parameters-extractor="jobParameterExtractor"/>
-        </step>
-    </job>
-
-    <bean id="jobParameterExtractor" class="org.springframework.batch.core.step.job.DefaultJobParametersExtractor" />-->
+    <import resource="classpath:/jobs/parent-job-context.xml"/>
 
     <!--
         The goal of this job is :
@@ -109,22 +96,16 @@
         </step>
     </job>
 
+    <bean id="maxMonthsDecider"
+          class="be.raildelays.batch.decider.MaxMonthsDecider"
+          scope="step">
+        <property name="maxNumberOfMonth" value="${excel.max.months}"/>
+        <property name="reader" ref="allExcelFilesToSplitItemReader"/>
+    </bean>
 
     <bean id="resourceLocatorListener"
           class="be.raildelays.batch.listener.ResourceLocatorListener"
           scope="step"/>
-
-    <bean id="maxMonthsDecider" class="be.raildelays.batch.decider.MaxMonthsDecider">
-        <property name="maxNumberOfMonth" value="${excel.max.months}"/>
-        <property name="reader">
-            <bean class="org.springframework.batch.item.file.MultiResourceItemReader"
-                  scope="step">
-                <property name="delegate" ref="allExcelFilesToSplitItemReader"/>
-                <property name="resources"
-                          value="file:#{jobParameters['excel.output.path']}/*.#{jobParameters['excel.file.extension']}"/>
-            </bean>
-        </property>
-    </bean>
 
     <!-- ================================================================================================== -->
     <!-- =====================================         READERS        ===================================== -->
@@ -191,7 +172,7 @@
                 <property name="shouldDeleteIfExists" value="false"/>
                 <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
                 <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
-                <property name="template" value="file:#{jobParameters['excel.input.template']}"/>
+                <property name="template" value="file:#{jobParameters['excel.template.path']}"/>
             </bean>
         </property>
         <property name="name" value="multiResourceForSplitItemWriter"/>
@@ -199,7 +180,7 @@
             <bean class="be.raildelays.batch.support.ToWriteExcelResourceLocator"
                   scope="step">
                 <property name="resource"
-                          value="file:#{jobParameters['excel.archive.path']}/#{jobParameters['excel.file.name']}.#{jobParameters['excel.file.extension']}"/>
+                          value="file:#{jobParameters['excel.archive.path']}/#{T(java.time.LocalDate).now().toString()}/#{jobParameters['excel.file.name']}.#{jobParameters['excel.file.extension']}"/>
                 <property name="resourceItemSearch" ref="resourceItemSearch"/>
                 <property name="keyName" value="${excel.resource.key}"/>
             </bean>
@@ -223,7 +204,7 @@
                 <property name="shouldDeleteIfExists" value="true"/>
                 <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
                 <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
-                <property name="template" value="file:#{jobParameters['excel.input.template']}"/>
+                <property name="template" value="file:#{jobParameters['excel.template.path']}"/>
             </bean>
         </property>
         <property name="name" value="multiResourceForSplitItemWriter"/>
@@ -286,7 +267,8 @@
         <property name="resources">
             <bean class="be.raildelays.batch.support.ToDeleteExcelResourcesLocator" factory-method="getResources">
                 <constructor-arg value="file:#{jobParameters['excel.output.path']}"/>
-                <constructor-arg value="file:#{jobParameters['excel.archive.path']}"/>
+                <constructor-arg
+                        value="file:#{jobParameters['excel.archive.path']}/#{T(java.time.LocalDate).now().toString()}/"/>
             </bean>
         </property>
     </bean>

@@ -28,4 +28,6 @@
         </property>
     </bean>
 
+    <bean id="jobParameterExtractor" class="be.raildelays.batch.job.ExecutionContextJobParametersExtractor"/>
+
 </beans>
