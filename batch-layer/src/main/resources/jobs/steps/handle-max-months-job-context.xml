@@ -277,7 +277,7 @@
           class="be.raildelays.batch.tasklet.SendResourcesByEmailTasklet"
           scope="step">
         <property name="resources"
-                  value="file:#{jobParameters['excel.archive.path']}/*.#{jobParameters['excel.file.extension']}"/>
+                  value="file:#{jobParameters['excel.archive.path']}/#{T(java.time.LocalDate).now().toString()}/*.#{jobParameters['excel.file.extension']}"/>
         <property name="mailSender">
             <bean class="org.springframework.mail.javamail.JavaMailSenderImpl">
                 <property name="host" value="#{jobParameters['mail.server.host']}"/>
