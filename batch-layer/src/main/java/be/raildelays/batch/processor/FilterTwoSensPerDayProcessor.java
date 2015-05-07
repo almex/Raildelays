@@ -29,18 +29,14 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
     private ExecutionContext executionContext;
     private String language = Language.EN.name();
 
-    private static boolean isEmpty(Object object) {
-        return object == null;
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        Validate.notNull(outputReader, "outputReader is mandatory");
     }
 
     @BeforeStep
     public void beforeStep(StepExecution stepExecution) {
         this.executionContext = stepExecution.getExecutionContext();
-    }
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        Validate.notNull(outputReader, "outputReader is mandatory");
     }
 
     @Override
@@ -143,6 +139,10 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
         }
 
         return result;
+    }
+
+    private static boolean isEmpty(Object object) {
+        return object == null;
     }
 
     public void setLanguage(String language) {
