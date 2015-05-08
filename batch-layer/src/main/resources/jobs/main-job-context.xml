@@ -94,7 +94,7 @@
         </batch:step>
         <batch:decision id="decideIfWeHaveAMoreThanOneHourDelay" decider="delayMoreThanOneHourDecider">
             <batch:fail on="FAILED"/>
-            <batch:next on="COMPLETED_WITH_60M_ELAY" to="handleDelayMoreThanOneHour"/>
+            <batch:next on="COMPLETED_WITH_60M_DELAY" to="handleDelayMoreThanOneHour"/>
             <batch:next on="*" to="decideIfWeHaveReachedMaxMonths"/>
         </batch:decision>
         <batch:step id="handleDelayMoreThanOneHour" parent="parentStep" next="removeDelayMoreThanOneHour">
