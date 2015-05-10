@@ -13,20 +13,20 @@ import java.time.Instant;
 import java.util.Date;
 
 @RunWith(BlockJUnit4ClassRunner.class)
-public class SplitExcelSheetProcessorTest {
+public class FilterWithThresholdDateProcessorTest {
 
     private static Date THRESHOLD_DATE = Date.from(Instant.parse("2014-02-18T00:00:00.00Z"));
-    private SplitExcelSheetProcessor processor;
+    private FilterWithThresholdDateProcessor processor;
 
     @Before
     public void setUp() {
-        processor = new SplitExcelSheetProcessor();
+        processor = new FilterWithThresholdDateProcessor();
         processor.setThresholdDate(THRESHOLD_DATE);
     }
 
     @Test
     public void testFilteredBefore() throws Exception {
-        processor.setMode(SplitExcelSheetProcessor.Mode.BEFORE);
+        processor.setMode(FilterWithThresholdDateProcessor.Mode.BEFORE);
 
         BatchExcelRow item = new BatchExcelRow
                 .Builder(Date.from(Instant.parse("2014-12-31T00:00:00.00Z")), Sens.DEPARTURE)
@@ -38,7 +38,7 @@ public class SplitExcelSheetProcessorTest {
 
     @Test
     public void testNotFilteredBefore() throws Exception {
-        processor.setMode(SplitExcelSheetProcessor.Mode.BEFORE);
+        processor.setMode(FilterWithThresholdDateProcessor.Mode.BEFORE);
 
         BatchExcelRow item = new BatchExcelRow
                 .Builder(Date.from(Instant.parse("2014-01-01T00:00:00.00Z")), Sens.DEPARTURE)
@@ -50,7 +50,7 @@ public class SplitExcelSheetProcessorTest {
 
     @Test
     public void testNotFilteredEquals() throws Exception {
-        processor.setMode(SplitExcelSheetProcessor.Mode.BEFORE);
+        processor.setMode(FilterWithThresholdDateProcessor.Mode.BEFORE);
 
         BatchExcelRow item = new BatchExcelRow
                 .Builder(Date.from(Instant.parse("2014-01-18T00:00:00.00Z")), Sens.DEPARTURE)
@@ -62,7 +62,7 @@ public class SplitExcelSheetProcessorTest {
 
     @Test
     public void testFilteredEquals() throws Exception {
-        processor.setMode(SplitExcelSheetProcessor.Mode.AFTER_OR_EQUALS);
+        processor.setMode(FilterWithThresholdDateProcessor.Mode.AFTER_OR_EQUALS);
 
         BatchExcelRow item = new BatchExcelRow
                 .Builder(Date.from(Instant.parse("2014-01-18T00:00:00.00Z")), Sens.DEPARTURE)
@@ -74,7 +74,7 @@ public class SplitExcelSheetProcessorTest {
 
     @Test
     public void testFilteredAfter() throws Exception {
-        processor.setMode(SplitExcelSheetProcessor.Mode.AFTER_OR_EQUALS);
+        processor.setMode(FilterWithThresholdDateProcessor.Mode.AFTER_OR_EQUALS);
 
         BatchExcelRow item = new BatchExcelRow
                 .Builder(Date.from(Instant.parse("2014-01-01T00:00:00.00Z")), Sens.DEPARTURE)
@@ -86,7 +86,7 @@ public class SplitExcelSheetProcessorTest {
 
     @Test
     public void testNotFilteredAfter() throws Exception {
-        processor.setMode(SplitExcelSheetProcessor.Mode.AFTER_OR_EQUALS);
+        processor.setMode(FilterWithThresholdDateProcessor.Mode.AFTER_OR_EQUALS);
 
         BatchExcelRow item = new BatchExcelRow
                 .Builder(Date.from(Instant.parse("2014-12-31T00:00:00.00Z")), Sens.DEPARTURE)

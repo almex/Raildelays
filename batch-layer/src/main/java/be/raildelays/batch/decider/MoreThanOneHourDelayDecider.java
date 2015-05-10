@@ -1,12 +1,12 @@
 package be.raildelays.batch.decider;
 
-import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -19,7 +19,7 @@ import org.springframework.util.Assert;
  * @author Almex
  * @see be.raildelays.batch.processor.StoreDelayGreaterThanThresholdInContextProcessor
  */
-public class MoreThanOneHourDelayDecider implements JobExecutionDecider, InitializingBean {
+public class MoreThanOneHourDelayDecider extends AbstractJobExecutionDeciderTasklet implements InitializingBean {
 
     private String keyName;
 
@@ -29,10 +29,8 @@ public class MoreThanOneHourDelayDecider implements JobExecutionDecider, Initial
     }
 
     @Override
-    public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
-        // The default status will be COMPLETED (we arbitrary kept the original keyword to mark this step as succeed)
-        FlowExecutionStatus finalStatus = FlowExecutionStatus.COMPLETED;
-        ExecutionContext executionContext = stepExecution.getExecutionContext();
+    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+        ExecutionContext executionContext = chunkContext.getStepContext().getStepExecution().getExecutionContext();
 
         /*
          * The Spring Batch documentation is not clear but from what I can understand :
@@ -54,11 +52,15 @@ public class MoreThanOneHourDelayDecider implements JobExecutionDecider, Initial
 
         // Only if the context contains what we expect we return our specific status
         if (executionContext.containsKey(keyName)) {
-            finalStatus = new FlowExecutionStatus("COMPLETED_WITH_60M_DELAY");
+            contribution.setExitStatus(new ExitStatus("COMPLETED_WITH_60M_DELAY"));
+        } else {
+            // The default status will be COMPLETED (we arbitrary kept the original keyword to mark this step as succeed)
+            contribution.setExitStatus(ExitStatus.COMPLETED);
         }
 
-        return finalStatus;
+        return RepeatStatus.FINISHED;
     }
+
 
     public void setKeyName(String keyName) {
         this.keyName = keyName;

@@ -16,7 +16,7 @@ import java.util.Date;
  * @author Almex
  * @since 1.2
 */
-public class SplitExcelSheetProcessor implements ItemProcessor<ExcelRow, ExcelRow>, InitializingBean {
+public class FilterWithThresholdDateProcessor implements ItemProcessor<ExcelRow, ExcelRow>, InitializingBean {
 
     private LocalDate thresholdDate;
 

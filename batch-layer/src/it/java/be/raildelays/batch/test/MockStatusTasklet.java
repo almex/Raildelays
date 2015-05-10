@@ -13,6 +13,8 @@ import java.util.Map;
  */
 public class MockStatusTasklet implements Tasklet {
 
+    public enum Status {COMPLETED, COMPLETED_WITH_60M_DELAY, FAILED}
+
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         Map<String, Object> jobParameters = chunkContext.getStepContext().getJobParameters();
@@ -32,6 +34,4 @@ public class MockStatusTasklet implements Tasklet {
 
         return RepeatStatus.FINISHED;
     }
-
-    public static enum Status {COMPLETED, COMPLETED_WITH_60M_DELAY, FAILED;}
 }

@@ -26,7 +26,7 @@ import java.util.*;
 @DirtiesContext
 // Because of issue [SPR-8849] (https://jira.springsource.org/browse/SPR-8849)
 @ContextConfiguration(locations = {"/jobs/steps/handle-max-months-job-context.xml"})
-public class HandleDelayMoreThanOneHourIT extends AbstractContextIT {
+public class HandleMaxMonthsIT extends AbstractContextIT {
 
     /**
      * SUT.
@@ -75,7 +75,7 @@ public class HandleDelayMoreThanOneHourIT extends AbstractContextIT {
         parameters.put("threshold.date", new JobParameter(Date.from(LocalDate.of(2014, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC))));
         // We don't test the last step sendEmail
 //        parameters.put("mail.server.host", new JobParameter(""));
-//        parameters.put("mail.server.port", new JobParameter(""));
+//        parameters.put("mail.server.port", new JobParameter(25L));
 //        parameters.put("mail.account.username", new JobParameter(""));
 //        parameters.put("mail.account.password", new JobParameter(""));
 //        parameters.put("mail.account.address", new JobParameter(""));

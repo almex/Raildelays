@@ -30,4 +30,62 @@
 
     <bean id="jobParameterExtractor" class="be.raildelays.batch.job.ExecutionContextJobParametersExtractor"/>
 
+    <!-- ================================================================================================== -->
+    <!-- =====================================        LISTENERS       ===================================== -->
+    <!-- ================================================================================================== -->
+
+    <bean id="logSkippedItemListener"
+          class="be.raildelays.batch.listener.LogSkippedItemListener"
+          scope="step"/>
+
+    <bean id="resourceLocatorListener"
+          class="be.raildelays.batch.listener.ResourceLocatorListener"
+          scope="step"/>
+
+    <bean id="logStep1ItemProcessorListener"
+          class="be.raildelays.batch.listener.LogStep1ItemProcessorListener"
+          scope="step"/>
+
+    <bean id="logStep2ItemProcessorListener"
+          class="be.raildelays.batch.listener.LogStep2ItemProcessorListener"
+          scope="step"/>
+
+    <bean id="loggerContextJobListener"
+          class="be.raildelays.batch.listener.LoggerContextJobListener"
+          scope="job"/>
+
+    <bean id="loggerContextStepListener"
+          class="be.raildelays.batch.listener.LoggerContextStepListener"
+          scope="step"/>
+
+    <bean id="promoteContextListener"
+          class="org.springframework.batch.core.listener.ExecutionContextPromotionListener"
+          scope="step">
+        <property name="keys">
+            <array>
+                <value>${excel.item.max.key}</value>
+                <value>${excel.resource.key}</value>
+                <value>excel.tmp.file.path.key</value>
+            </array>
+        </property>
+        <property name="statuses">
+            <array>
+                <value>COMPLETED_WITH_60M_DELAY</value>
+                <value>COMPLETED</value>
+            </array>
+        </property>
+    </bean>
+
+    <bean id="demoteContextListener"
+          class="org.springframework.batch.core.listener.ExecutionContextDemotionListener"
+          scope="step">
+        <property name="keys">
+            <array>
+                <value>${excel.item.max.key}</value>
+                <value>${excel.resource.key}</value>
+                <value>excel.tmp.file.path.key</value>
+            </array>
+        </property>
+    </bean>
+
 </beans>

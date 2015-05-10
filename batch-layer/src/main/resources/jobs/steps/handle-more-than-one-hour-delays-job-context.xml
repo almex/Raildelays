@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!-- Needed if we use a AutomaticJobRegistrar -->
+    <context:annotation-config/>
+    <!-- To make the embedded step to use scope="step" -->
+    <bean class="org.springframework.batch.core.scope.StepScope"/>
+
+    <import resource="classpath:/jobs/parent-job-context.xml"/>
+
+
+    <job id="handleMoreThanOneHourDelaysJob" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+        <step id="sendByEmailDelayMoreThanOneHour" parent="parentStep" next="removeDelayMoreThanOneHour">
+            <tasklet transaction-manager="batchTransactionManager">
+                <chunk reader="excelSheetWithOneHourDelayItemReader"
+                       processor="chainedProcessorsForMoreThanOneHourDelay"
+                       writer="emailWriter"
+                       commit-interval="1">
+                    <listeners merge="true">
+                        <!-- Put in a log file skipped items -->
+                        <listener ref="logSkippedItemListener"/>
+                    </listeners>
+                </chunk>
+            </tasklet>
+            <listeners merge="true">
+                <!-- To transfer some information for next steps -->
+                <listener ref="promoteContextListener"/>
+                <!-- Get back some information from previous step -->
+                <listener ref="demoteContextListener"/>
+            </listeners>
+        </step>
+        <step id="removeDelayMoreThanOneHour" parent="parentStep" next="decideIfWeHaveToRenameOrDeleteFile">
+            <tasklet transaction-manager="batchTransactionManager">
+                <chunk reader="excelSheetWithOneHourDelayItemReader"
+                       processor="chainedProcessorsForLessThanOneHourDelay"
+                       writer="excelSheetWithOneHourDelayItemWriter"
+                       commit-interval="${excel.sheet0.maxitemcount}">
+                    <listeners merge="true">
+                        <!-- Put in a log file skipped items -->
+                        <listener ref="logSkippedItemListener"/>
+                    </listeners>
+                </chunk>
+            </tasklet>
+            <listeners merge="true">
+                <!-- To transfer some information for next steps -->
+                <listener ref="promoteContextListener"/>
+                <!-- To compute file name of the Excel file after filtering (we could have removed the first row) -->
+                <listener ref="resourceLocatorListener"/>
+                <!-- Because this bean need access to the StepExecutionContext -->
+                <listener ref="temporaryFileResource"/>
+                <!-- Put in a log file skipped items -->
+                <listener ref="logSkippedItemListener"/>
+                <!-- Get back some information from previous step -->
+                <listener ref="demoteContextListener"/>
+            </listeners>
+        </step>
+        <step id="decideIfWeHaveToRenameOrDeleteFile" parent="parentStep">
+            <tasklet transaction-manager="batchTransactionManager" ref="excelFileToRenameOrDeleteDecider"/>
+            <next on="RENAME" to="renameFile"/>
+            <next on="DELETE" to="deleteFile"/>
+            <fail on="*"/>
+        </step>
+        <step id="renameFile" parent="parentStep">
+            <tasklet transaction-manager="batchTransactionManager" ref="renameFileTasklet"/>
+            <listeners merge="true">
+                <!-- Get back some information from previous step -->
+                <listener ref="demoteContextListener"/>
+            </listeners>
+        </step>
+        <step id="deleteFile" parent="parentStep">
+            <tasklet transaction-manager="batchTransactionManager" ref="deleteFileTasklet"/>
+            <listeners merge="true">
+                <!-- Get back some information from previous step -->
+                <listener ref="demoteContextListener"/>
+            </listeners>
+        </step>
+    </job>
+
+    <!-- ================================================================================================== -->
+    <!-- =====================================         DECIDERS       ===================================== -->
+    <!-- ================================================================================================== -->
+
+    <bean id="excelFileToRenameOrDeleteDecider"
+          class="be.raildelays.batch.decider.ExcelFileToRenameOrDeleteDecider"
+          scope="step">
+        <property name="fileNamePrefix" value="#{jobParameters['excel.file.name']}"/>
+        <property name="contextKey" value="'${excel.resource.key}"/>
+        <property name="directory" value="file:#{jobParameters['excel.output.path']}"/>
+        <property name="reader" ref="excelSheetWithOneHourDelayItemReader"/>
+    </bean>
+
+    <bean id="moreThanOneHourDelaysDecider"
+          class="be.raildelays.batch.decider.MoreThanOneHourDelayDecider">
+        <property name="keyName" value="${excel.item.max.key}"/>
+    </bean>
+
+    <!-- ================================================================================================== -->
+    <!-- =====================================         READERS        ===================================== -->
+    <!-- ================================================================================================== -->
+
+    <bean id="excelSheetWithOneHourDelayItemReader"
+          class="org.springframework.batch.item.file.ExcelSheetItemReader"
+          scope="step">
+        <property name="name" value="excelSheetWithOneHourDelayItemReader"/>
+        <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
+        <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
+        <property name="rowMapper">
+            <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
+                <property name="language" value="#{jobParameters['language']}"/>
+            </bean>
+        </property>
+        <property name="resource" value="file:#{jobParameters['excel.resource.key']}"/>
+    </bean>
+
+    <!-- ================================================================================================== -->
+    <!-- =====================================       PROCESSORS       ===================================== -->
+    <!-- ================================================================================================== -->
+
+    <bean id="chainedProcessorsForMoreThanOneHourDelay"
+          class="org.springframework.batch.item.support.CompositeItemProcessor">
+        <property name="delegates">
+            <list>
+                <ref bean="filterLessThanOneHourDelaysProcessor"/>
+                <ref bean="batchExcelRowToSimpleMailMessageProcessor"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="filterLessThanOneHourDelaysProcessor"
+          class="be.raildelays.batch.processor.FilterWithThresholdDelayProcessor"
+          scope="step">
+        <property name="mode">
+            <util:constant
+                    static-field="be.raildelays.batch.processor.FilterWithThresholdDelayProcessor.Mode.FILTER_LESS_THAN"/>
+        </property>
+        <property name="threshold" value="${excel.item.delay.max.threshold}"/>
+    </bean>
+
+    <bean id="chainedProcessorsForLessThanOneHourDelay"
+          class="org.springframework.batch.item.support.CompositeItemProcessor">
+        <property name="delegates">
+            <list>
+                <ref bean="filterGreaterThanOneHourDelaysProcessor"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="filterGreaterThanOneHourDelaysProcessor"
+          class="be.raildelays.batch.processor.FilterWithThresholdDelayProcessor"
+          scope="step">
+        <property name="mode">
+            <util:constant
+                    static-field="be.raildelays.batch.processor.FilterWithThresholdDelayProcessor.Mode.FILTER_GREATER_OR_EQUAL_TO"/>
+        </property>
+        <property name="threshold" value="${excel.item.delay.max.threshold}"/>
+    </bean>
+
+    <bean id="batchExcelRowToSimpleMailMessageProcessor"
+          class="be.raildelays.batch.processor.BatchExcelRowToSimpleMailMessageProcessor"
+          scope="step">
+        <property name="from" value="#{jobParameters['mail.account.address']}"/>
+        <property name="to" value="#{jobParameters['mail.account.address']}"/>
+        <property name="subject" value="${email.more.than.one.hour.subject}"/>
+    </bean>
+
+    <!-- ================================================================================================== -->
+    <!-- =====================================         WRITERS        ===================================== -->
+    <!-- ================================================================================================== -->
+
+    <bean id="excelSheetWithOneHourDelayItemWriter"
+          class="org.springframework.batch.item.file.ExcelSheetItemWriter"
+          scope="step">
+        <property name="rowAggregator">
+            <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator"
+                  scope="step">
+                <property name="language" value="#{jobParameters['language']}"/>
+            </bean>
+        </property>
+        <property name="name" value="excelSheetWithOneHourDelayItemWriter"/>
+        <property name="shouldDeleteIfExists" value="true"/>
+        <property name="useItemIndex" value="false"/>
+        <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
+        <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
+        <property name="template" value="file:#{jobParameters['excel.template.path']}"/>
+        <property name="resource" ref="temporaryFileResource"/>
+    </bean>
+
+    <bean id="temporaryFileResource"
+          class="org.springframework.batch.item.support.ResourceLocatorAdapter"
+          scope="step">
+        <property name="resourceLocator" ref="temporaryFileResourceLocator"/>
+    </bean>
+
+    <bean id="temporaryFileResourceLocator"
+          class="be.raildelays.batch.support.TemporaryFileResourceLocator"
+          scope="step">
+        <property name="keyName" value="excel.tmp.file.path.key"/>
+    </bean>
+
+    <bean id="emailWriter"
+          class="org.springframework.batch.item.mail.SimpleMailMessageItemWriter"
+          scope="step">
+        <property name="mailSender">
+            <bean class="org.springframework.mail.javamail.JavaMailSenderImpl">
+                <property name="host" value="#{jobParameters['mail.server.host']}"/>
+                <property name="port" value="#{jobParameters['mail.server.port']}"/>
+                <property name="password" value="#{jobParameters['mail.account.password']}"/>
+                <property name="username" value="#{jobParameters['mail.account.username']}"/>
+            </bean>
+        </property>
+        <property name="mailErrorHandler">
+            <bean class="org.springframework.batch.item.mail.DefaultMailErrorHandler"/>
+        </property>
+    </bean>
+
+    <!-- ================================================================================================== -->
+    <!-- =====================================         TASKLET        ===================================== -->
+    <!-- ================================================================================================== -->
+
+    <bean id="renameFileTasklet"
+          class="be.raildelays.batch.tasklet.MoveFileTasklet"
+          scope="step">
+        <property name="source" value="file:#{stepExecutionContext['excel.tmp.file.path.key']}"/>
+        <property name="destination" value="file:#{stepExecutionContext['${excel.resource.key}']}"/>
+    </bean>
+
+    <bean id="deleteFileTasklet"
+          class="be.raildelays.batch.tasklet.DeleteFileTasklet"
+          scope="step">
+        <property name="resources" value="file:#{stepExecutionContext['excel.tmp.file.path.key']}"/>
+    </bean>
+
+
+</beans>

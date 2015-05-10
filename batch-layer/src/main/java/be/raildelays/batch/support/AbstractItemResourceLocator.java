@@ -1,5 +1,6 @@
 package be.raildelays.batch.support;
 
+import be.raildelays.batch.ExcelFileUtils;
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.listener.ResourceLocatorListener;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -36,17 +37,10 @@ public abstract class AbstractItemResourceLocator implements ResourceLocator {
         File result = resource.getFile(); // By default we return the resource itself
 
         if (suffix != null) {
-            StringBuilder builder = new StringBuilder();
-            File original = resource.getFile();
-            String originalFileName = original.getName();
+            String fileName = ExcelFileUtils.getFileName(resource.getFile());
+            String fileExtension = ExcelFileUtils.getFileExtension(resource.getFile());
 
-            int extensionIndex = originalFileName.lastIndexOf(".");
-            builder.append(originalFileName.substring(0, extensionIndex));
-            builder.append(" ");
-            builder.append(suffix);
-            builder.append(originalFileName.substring(extensionIndex));
-
-            result = new File(original.getParentFile(), builder.toString());
+            result = ExcelFileUtils.getFile(resource.getFile().getParentFile(), fileName, suffix, fileExtension);
         }
 
         return result;

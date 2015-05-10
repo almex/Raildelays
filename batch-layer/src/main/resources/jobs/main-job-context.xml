@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:batch="http://www.springframework.org/schema/batch"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
@@ -12,22 +11,24 @@
 
     <import resource="parent-job-context.xml"/>
     <import resource="steps/handle-max-months-job-context.xml"/>
+    <import resource="steps/handle-more-than-one-hour-delays-job-context.xml"/>
 
-    <batch:job id="mainJob" parent="parentJob">
-        <batch:step id="retrieveDataFromRailtime" parent="parentStep" next="generateExcelFiles">
-            <batch:partition partitioner="partitioner">
-                <batch:handler task-executor="taskExecutor"/>
-                <batch:step>
-                    <batch:tasklet transaction-manager="batchTransactionManager">
-                        <batch:chunk reader="afasItemReader"
-                                     processor="chainedProcessorsForAfas"
-                                     writer="jpaItemWriter"
-                                     commit-interval="10" retry-limit="3">
-                            <batch:retryable-exception-classes>
-                                <batch:include class="org.springframework.dao.OptimisticLockingFailureException"/>
-                            </batch:retryable-exception-classes>
-                            <batch:skip-policy>
-                                <bean class="org.springframework.batch.core.step.skip.CompositeSkipPolicy">
+    <job id="mainJob" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+        <step id="retrieveDataFromRailtime" parent="parentStep" next="generateExcelFiles">
+            <partition partitioner="partitioner">
+                <handler task-executor="taskExecutor"/>
+                <step>
+                    <tasklet transaction-manager="batchTransactionManager">
+                        <chunk reader="afasItemReader"
+                               processor="chainedProcessorsForAfas"
+                               writer="jpaItemWriter"
+                               commit-interval="10" retry-limit="3">
+                            <retryable-exception-classes>
+                                <include class="org.springframework.dao.OptimisticLockingFailureException"/>
+                            </retryable-exception-classes>
+                            <skip-policy>
+                                <bean xmlns="http://www.springframework.org/schema/beans"
+                                      class="org.springframework.batch.core.step.skip.CompositeSkipPolicy">
                                     <property name="skipPolicies">
                                         <array>
                                             <bean class="org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy">
@@ -43,138 +44,77 @@
                                         </array>
                                     </property>
                                 </bean>
-                            </batch:skip-policy>
-                            <batch:listeners merge="true">
-                                <batch:listener ref="logStep1ItemProcessorListener"/>
-                            </batch:listeners>
-                        </batch:chunk>
-                        <batch:no-rollback-exception-classes>
-                            <batch:include class="org.springframework.batch.item.validator.ValidationException"/>
-                        </batch:no-rollback-exception-classes>
-                        <batch:transaction-attributes
-                                isolation="DEFAULT" propagation="REQUIRED"/>
-                    </batch:tasklet>
-                    <batch:listeners merge="true">
-                        <batch:listener ref="loggerContextStepListener"/>
-                    </batch:listeners>
-                </batch:step>
-            </batch:partition>
-        </batch:step>
-        <batch:step id="generateExcelFiles" parent="parentStep" next="decideIfWeHaveAMoreThanOneHourDelay">
-            <batch:tasklet transaction-manager="batchTransactionManager">
-                <batch:chunk reader="delaysItemReader"
-                             processor="chainedProcessorsForDelays"
-                             writer="compositeItemWriter"
-                             commit-interval="1" skip-limit="10">
-                    <batch:skippable-exception-classes>
-                        <batch:include class="org.springframework.batch.item.validator.ValidationException"/>
-                        <batch:include class="be.raildelays.batch.exception.ArrivalDepartureEqualsException"/>
-                    </batch:skippable-exception-classes>
-                    <batch:listeners merge="true">
-                        <batch:listener ref="logSkippedItemListener"/>
+                            </skip-policy>
+                            <listeners merge="true">
+                                <listener ref="logStep1ItemProcessorListener"/>
+                            </listeners>
+                        </chunk>
+                        <no-rollback-exception-classes>
+                            <include class="org.springframework.batch.item.validator.ValidationException"/>
+                        </no-rollback-exception-classes>
+                        <transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
+                    </tasklet>
+                    <listeners merge="true">
+                        <listener ref="loggerContextStepListener"/>
+                    </listeners>
+                </step>
+            </partition>
+        </step>
+        <step id="generateExcelFiles" parent="parentStep" next="decideIfWeHaveAMoreThanOneHourDelay">
+            <tasklet transaction-manager="batchTransactionManager">
+                <chunk reader="delaysItemReader"
+                       processor="chainedProcessorsForDelays"
+                       writer="compositeItemWriter"
+                       commit-interval="1" skip-limit="10">
+                    <skippable-exception-classes>
+                        <include class="org.springframework.batch.item.validator.ValidationException"/>
+                        <include class="be.raildelays.batch.exception.ArrivalDepartureEqualsException"/>
+                    </skippable-exception-classes>
+                    <listeners merge="true">
+                        <listener ref="logSkippedItemListener"/>
                         <!-- To compute file name of the Excel file after filtering -->
-                        <batch:listener ref="resourceLocatorListener"/>
-                        <batch:listener ref="logStep2ItemProcessorListener"/>
-                    </batch:listeners>
-                </batch:chunk>
-                <batch:transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
-            </batch:tasklet>
-            <batch:listeners merge="true">
+                        <listener ref="resourceLocatorListener"/>
+                        <listener ref="logStep2ItemProcessorListener"/>
+                    </listeners>
+                </chunk>
+                <transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
+            </tasklet>
+            <listeners merge="true">
                 <!-- Because this reader need access to the StepExecutionContext -->
-                <batch:listener ref="delaysItemReader"/>
+                <listener ref="delaysItemReader"/>
                 <!-- Because this processor need access to the StepExecutionContext -->
-                <batch:listener ref="filterTwoSensPerDayXlsProcessor"/>
+                <listener ref="filterTwoSensPerDayXlsProcessor"/>
                 <!-- Because this processor need access to the StepExecutionContext -->
-                <batch:listener ref="storeInContextMoreThanOneHourDelayProcessor"/>
+                <listener ref="storeInContextMoreThanOneHourDelayProcessor"/>
                 <!-- Feed Logger MDC with some properties from StepContext -->
-                <batch:listener ref="loggerContextStepListener"/>
+                <listener ref="loggerContextStepListener"/>
                 <!-- To transfer some information for next steps -->
-                <batch:listener ref="promoteContextListener"/>
-            </batch:listeners>
-        </batch:step>
-        <batch:decision id="decideIfWeHaveAMoreThanOneHourDelay" decider="delayMoreThanOneHourDecider">
-            <batch:fail on="FAILED"/>
-            <batch:next on="COMPLETED_WITH_60M_DELAY" to="handleDelayMoreThanOneHour"/>
-            <batch:next on="*" to="decideIfWeHaveReachedMaxMonths"/>
-        </batch:decision>
-        <batch:step id="handleDelayMoreThanOneHour" parent="parentStep" next="removeDelayMoreThanOneHour">
-            <batch:tasklet transaction-manager="batchTransactionManager">
-                <batch:chunk reader="retrieveLineStopViaContextReader"
-                             processor="chainedProcessorsForMoreThanOneHourDelay"
-                             writer="emailWriter"
-                             commit-interval="1">
-                    <batch:listeners merge="true">
-                        <!-- Put in a log file skipped items -->
-                        <batch:listener ref="logSkippedItemListener"/>
-                    </batch:listeners>
-                </batch:chunk>
-            </batch:tasklet>
-            <batch:listeners merge="true">
-                <!-- To transfer some information for next steps -->
-                <batch:listener ref="promoteContextListener"/>
-                <!-- Get back some information from previous step -->
-                <batch:listener ref="demoteContextListener"/>
-            </batch:listeners>
-        </batch:step>
-        <batch:step id="removeDelayMoreThanOneHour" parent="parentStep" next="renameFile">
-            <batch:tasklet transaction-manager="batchTransactionManager">
-                <batch:chunk reader="excelSheetItemReader4"
-                             processor="filterItemInContextProcessor"
-                             writer="excelSheetItemWriter2"
-                             commit-interval="${excel.sheet0.maxitemcount}">
-                    <batch:listeners merge="true">
-                        <!-- Put in a log file skipped items -->
-                        <batch:listener ref="logSkippedItemListener"/>
-                    </batch:listeners>
-                </batch:chunk>
-            </batch:tasklet>
-            <batch:listeners merge="true">
-                <!-- To transfer some information for next steps -->
-                <batch:listener ref="promoteContextListener"/>
-                <!-- Because this processor need access to the StepExecutionContext -->
-                <batch:listener ref="filterItemInContextProcessor"/>
-                <!-- To compute file name of the Excel file after filtering (we could have removed the first row) -->
-                <batch:listener ref="resourceLocatorListener"/>
-                <!-- Because this bean need access to the StepExecutionContext -->
-                <batch:listener ref="temporaryFileResource"/>
-                <!-- Put in a log file skipped items -->
-                <batch:listener ref="logSkippedItemListener"/>
-                <!-- Get back some information from previous step -->
-                <batch:listener ref="demoteContextListener"/>
-            </batch:listeners>
-        </batch:step>
-        <batch:step id="renameFile" parent="parentStep" next="decideIfWeHaveReachedMaxMonths">
-            <batch:tasklet transaction-manager="batchTransactionManager">
-                <bean class="be.raildelays.batch.tasklet.MoveFileTasklet"
-                      scope="step">
-                    <property name="source" value="file:#{stepExecutionContext['excel.tmp.file.path.key']}"/>
-                    <property name="destination" value="file:#{stepExecutionContext['${excel.resource.key}']}"/>
-                </bean>
-            </batch:tasklet>
-            <batch:listeners merge="true">
-                <!-- Get back some information from previous step -->
-                <batch:listener ref="demoteContextListener"/>
-            </batch:listeners>
-        </batch:step>
-        <!--batch:decision id="decideIfWeHaveReachedMaxMonths" decider="maxMonthsDecider">
-            <batch:next on="COMPLETED_WITH_MAX_MONTHS" to="handleMaxMonthsStep"/>
-            <batch:end on="COMPLETED"/>
-        </batch:decision-->
-        <batch:step id="decideIfWeHaveReachedMaxMonths" parent="parentStep">
-            <batch:tasklet transaction-manager="batchTransactionManager" ref="maxMonthsDecider"/>
-            <batch:fail on="FAILED"/>
-            <batch:next on="COMPLETED_WITH_MAX_MONTHS" to="handleMaxMonthsStep"/>
-            <batch:end on="*"/>
-        </batch:step>
-        <batch:step id="handleMaxMonthsStep" parent="parentStep">
-            <batch:job job-parameters-extractor="jobParameterExtractor" ref="handleMaxMonthsJob"/>
-        </batch:step>
-        <batch:validator ref="jobParametersValidator" />
-        <batch:listeners merge="true">
+                <listener ref="promoteContextListener"/>
+            </listeners>
+        </step>
+        <decision id="decideIfWeHaveAMoreThanOneHourDelay" decider="moreThanOneHourDelaysDecider">
+            <fail on="FAILED"/>
+            <next on="COMPLETED_WITH_60M_DELAY" to="handleMoreThanOneHourDelays"/>
+            <next on="COMPLETED" to="decideIfWeHaveReachedMaxMonths"/>
+        </decision>
+        <step id="handleMoreThanOneHourDelays" parent="parentStep">
+            <job job-parameters-extractor="jobParameterExtractor" ref="handleMoreThanOneHourDelaysJob"/>
+        </step>
+        <step id="decideIfWeHaveReachedMaxMonths" parent="parentStep">
+            <tasklet transaction-manager="batchTransactionManager" ref="maxMonthsDecider"/>
+            <fail on="FAILED"/>
+            <next on="COMPLETED_WITH_MAX_MONTHS" to="handleMaxMonthsStep"/>
+            <end on="COMPLETED"/>
+        </step>
+        <step id="handleMaxMonthsStep" parent="parentStep">
+            <job job-parameters-extractor="jobParameterExtractor" ref="handleMaxMonthsJob"/>
+        </step>
+        <validator ref="jobParametersValidator"/>
+        <listeners merge="true">
             <!-- Feed Logger MDC with some properties from JobContext -->
-            <batch:listener ref="loggerContextJobListener"/>
-        </batch:listeners>
-    </batch:job>
+            <listener ref="loggerContextJobListener"/>
+        </listeners>
+    </job>
 
     <bean id="jobParametersValidator" class="org.springframework.batch.core.job.DefaultJobParametersValidator">
         <property name="requiredKeys">
@@ -209,11 +149,6 @@
         <property name="maxPoolSize" value="4"/>
         <property name="allowCoreThreadTimeOut" value="true"/>
         <property name="waitForTasksToCompleteOnShutdown" value="true"/>
-    </bean>
-
-    <bean id="delayMoreThanOneHourDecider"
-          class="be.raildelays.batch.decider.MoreThanOneHourDelayDecider">
-        <property name="keyName" value="${excel.item.max.key}"/>
     </bean>
 
 
@@ -388,28 +323,6 @@
         </property>
     </bean>
 
-    <bean id="retrieveLineStopViaContextReader"
-          class="be.raildelays.batch.reader.BatchExcelRowInContextReader"
-          scope="step">
-        <property name="keyName" value="${excel.item.max.key}"/>
-    </bean>
-
-    <bean id="excelSheetItemReader4"
-          class="org.springframework.batch.item.file.ExcelSheetItemReader"
-          scope="step">
-        <property name="name" value="excelSheetItemReader4"/>
-        <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
-        <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
-        <property name="rowMapper">
-            <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
-                <property name="language" value="#{jobParameters['language']}"/>
-                <!-- We do not take into account empty rows -->
-                <!--property name="validateOutcomes" value="true"/-->
-            </bean>
-        </property>
-        <property name="resource" value="file:#{stepExecutionContext['${excel.resource.key}']}"/>
-    </bean>
-
     <!-- ================================================================================================== -->
     <!-- =====================================       PROCESSORS       ===================================== -->
     <!-- ================================================================================================== -->
@@ -446,16 +359,6 @@
                 <ref bean="filterTwoSensPerDayXlsProcessor"/>
                 <ref bean="filterSmallDelaysProcessor"/>
                 <ref bean="storeInContextMoreThanOneHourDelayProcessor"/>
-            </list>
-        </property>
-    </bean>
-
-    <bean id="chainedProcessorsForMoreThanOneHourDelay"
-          class="org.springframework.batch.item.support.CompositeItemProcessor">
-        <property name="delegates">
-            <list>
-                <ref bean="validatorProcessor"/>
-                <ref bean="batchExcelRowToSimpleMailMessageProcessor"/>
             </list>
         </property>
     </bean>
@@ -518,31 +421,6 @@
           scope="step">
         <property name="threshold" value="${excel.item.delay.max.threshold}"/>
         <property name="keyName" value="${excel.item.max.key}"/>
-    </bean>
-
-    <bean id="batchExcelRowToSimpleMailMessageProcessor"
-          class="be.raildelays.batch.processor.BatchExcelRowToSimpleMailMessageProcessor"
-          scope="step">
-        <property name="from" value="#{jobParameters['mail.account.address']}"/>
-        <property name="to" value="#{jobParameters['mail.account.address']}"/>
-        <property name="subject" value="${email.more.than.one.hour.subject}"/>
-    </bean>
-
-    <bean id="filterItemInContextProcessor"
-          class="be.raildelays.batch.processor.FilterItemInContextProcessor"
-          scope="step">
-        <property name="keyName" value="${excel.item.max.key}"/>
-        <property name="comparator">
-            <bean class="be.raildelays.batch.bean.StationBasedExcelRowComparator">
-                <constructor-arg>
-                    <bean class="be.raildelays.domain.Language" factory-method="valueOf">
-                        <constructor-arg>
-                            <value>#{jobParameters['language']?.toUpperCase()}</value>
-                        </constructor-arg>
-                    </bean>
-                </constructor-arg>
-            </bean>
-        </property>
     </bean>
 
     <!-- ================================================================================================== -->
@@ -623,99 +501,6 @@
         <property name="entityManagerFactory" ref="raildelaysEntityManagerFactory"/>
     </bean>
 
-    <bean id="emailWriter"
-          class="org.springframework.batch.item.mail.SimpleMailMessageItemWriter"
-          scope="step">
-        <property name="mailSender">
-            <bean class="org.springframework.mail.javamail.JavaMailSenderImpl">
-                <property name="host" value="#{jobParameters['mail.server.host']}"/>
-                <property name="port" value="#{jobParameters['mail.server.port']}"/>
-                <property name="password" value="#{jobParameters['mail.account.password']}"/>
-                <property name="username" value="#{jobParameters['mail.account.username']}"/>
-            </bean>
-        </property>
-        <property name="mailErrorHandler">
-            <bean class="org.springframework.batch.item.mail.DefaultMailErrorHandler"/>
-        </property>
-    </bean>
-
-    <bean id="excelSheetItemWriter2"
-          class="org.springframework.batch.item.file.ExcelSheetItemWriter"
-          scope="step">
-        <property name="rowAggregator">
-            <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator"
-                  scope="step">
-                <property name="language" value="#{jobParameters['language']}"/>
-            </bean>
-        </property>
-        <property name="name" value="excelSheetItemWriter2"/>
-        <property name="shouldDeleteIfExists" value="true"/>
-        <property name="useItemIndex" value="false"/>
-        <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
-        <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
-        <property name="template" value="file:#{jobParameters['excel.template.path']}"/>
-        <property name="resource" ref="temporaryFileResource"/>
-    </bean>
-
-    <!-- ================================================================================================== -->
-    <!-- =====================================        LISTENERS       ===================================== -->
-    <!-- ================================================================================================== -->
-
-    <bean id="logSkippedItemListener"
-          class="be.raildelays.batch.listener.LogSkippedItemListener"
-          scope="step"/>
-
-    <bean id="resourceLocatorListener"
-          class="be.raildelays.batch.listener.ResourceLocatorListener"
-          scope="step"/>
-
-    <bean id="logStep1ItemProcessorListener"
-          class="be.raildelays.batch.listener.LogStep1ItemProcessorListener"
-          scope="step"/>
-
-    <bean id="logStep2ItemProcessorListener"
-          class="be.raildelays.batch.listener.LogStep2ItemProcessorListener"
-          scope="step"/>
-
-    <bean id="loggerContextJobListener"
-          class="be.raildelays.batch.listener.LoggerContextJobListener"
-          scope="job"/>
-
-    <bean id="loggerContextStepListener"
-          class="be.raildelays.batch.listener.LoggerContextStepListener"
-          scope="step"/>
-
-    <bean id="promoteContextListener"
-          class="org.springframework.batch.core.listener.ExecutionContextPromotionListener"
-          scope="step">
-        <property name="keys">
-            <array>
-                <value>${excel.item.max.key}</value>
-                <value>${excel.resource.key}</value>
-                <value>excel.tmp.file.path.key</value>
-            </array>
-        </property>
-        <property name="statuses">
-            <array>
-                <value>COMPLETED_WITH_60M_DELAY</value>
-                <value>COMPLETED</value>
-            </array>
-        </property>
-    </bean>
-
-    <bean id="demoteContextListener"
-          class="org.springframework.batch.core.listener.ExecutionContextDemotionListener"
-          scope="step">
-        <property name="keys">
-            <array>
-                <value>${excel.item.max.key}</value>
-                <value>${excel.resource.key}</value>
-                <value>excel.tmp.file.path.key</value>
-            </array>
-        </property>
-    </bean>
-
-
     <!-- ================================================================================================== -->
     <!-- =====================================        RESOURCES       ===================================== -->
     <!-- ================================================================================================== -->
@@ -756,18 +541,6 @@
         <property name="comparator">
             <bean class="be.raildelays.batch.bean.ExcelRowComparator"/>
         </property>
-    </bean>
-
-    <bean id="temporaryFileResource"
-          class="org.springframework.batch.item.support.ResourceLocatorAdapter"
-          scope="step">
-        <property name="resourceLocator" ref="temporaryFileResourceLocator"/>
-    </bean>
-
-    <bean id="temporaryFileResourceLocator"
-          class="be.raildelays.batch.support.TemporaryFileResourceLocator"
-          scope="step">
-        <property name="keyName" value="excel.tmp.file.path.key"/>
     </bean>
 
 

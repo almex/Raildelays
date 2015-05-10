@@ -96,16 +96,17 @@
         </step>
     </job>
 
+    <!-- ================================================================================================== -->
+    <!-- =====================================         DECIDERS       ===================================== -->
+    <!-- ================================================================================================== -->
+
+
     <bean id="maxMonthsDecider"
           class="be.raildelays.batch.decider.MaxMonthsDecider"
           scope="step">
         <property name="maxNumberOfMonth" value="${excel.max.months}"/>
         <property name="reader" ref="allExcelFilesToSplitItemReader"/>
     </bean>
-
-    <bean id="resourceLocatorListener"
-          class="be.raildelays.batch.listener.ResourceLocatorListener"
-          scope="step"/>
 
     <!-- ================================================================================================== -->
     <!-- =====================================         READERS        ===================================== -->
@@ -135,19 +136,20 @@
     <!-- =====================================       PROCESSORS       ===================================== -->
     <!-- ================================================================================================== -->
 
-    <bean id="splitBeforeExcelSheetProcessor" class="be.raildelays.batch.processor.SplitExcelSheetProcessor"
+    <bean id="splitBeforeExcelSheetProcessor" class="be.raildelays.batch.processor.FilterWithThresholdDateProcessor"
           scope="step">
         <property name="thresholdDate" value="#{jobParameters['threshold.date']}"/>
         <property name="mode">
-            <util:constant static-field="be.raildelays.batch.processor.SplitExcelSheetProcessor.Mode.BEFORE"/>
+            <util:constant static-field="be.raildelays.batch.processor.FilterWithThresholdDateProcessor.Mode.BEFORE"/>
         </property>
     </bean>
 
-    <bean id="splitAfterExcelSheetProcessor" class="be.raildelays.batch.processor.SplitExcelSheetProcessor"
+    <bean id="splitAfterExcelSheetProcessor" class="be.raildelays.batch.processor.FilterWithThresholdDateProcessor"
           scope="step">
         <property name="thresholdDate" value="#{jobParameters['threshold.date']}"/>
         <property name="mode">
-            <util:constant static-field="be.raildelays.batch.processor.SplitExcelSheetProcessor.Mode.AFTER_OR_EQUALS"/>
+            <util:constant
+                    static-field="be.raildelays.batch.processor.FilterWithThresholdDateProcessor.Mode.AFTER_OR_EQUALS"/>
         </property>
     </bean>
 
