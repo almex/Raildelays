@@ -41,14 +41,15 @@ public class MoveFileTasklet implements Tasklet, InitializingBean {
             File newFile = destination.getFile();
             /*
              * If the destination file exists but is writable then it will be overwrite.
-             * We must delete this on JVM shutdown in order to allow close() of ItemStream coming afterwards.
              */
             FileUtils.copyFile(file, newFile);
 
             LOGGER.debug("Moved file to   {}", newFile.getAbsolutePath());
         }
 
-        file.deleteOnExit();
+        if (!file.delete()) {
+            file.deleteOnExit();
+        }
 
         LOGGER.info("Deleted file {}", file.getCanonicalPath());
 
