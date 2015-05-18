@@ -61,7 +61,7 @@ public class HandleMoreThanOneHourDelaysIT extends AbstractContextIT {
         parameters.put("excel.file.extension", new JobParameter("xls"));
         parameters.put("excel.archive.path", new JobParameter(TARGET_PATH));
         parameters.put("excel.template.path", new JobParameter(TEMPLATE_PATH));
-        parameters.put("excel.resource.key", new JobParameter(new ClassPathResource("retard_sncb 20140522.xls").getFile().getAbsolutePath()));
+        parameters.put("more.than.one.hour.excel.path", new JobParameter(new ClassPathResource("retard_sncb 20140522.xls").getFile().getAbsolutePath()));
         parameters.put("language", new JobParameter("en"));
         parameters.put("threshold.date", new JobParameter(Date.from(LocalDate.of(2014, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC))));
         // We don't test the last step sendEmail

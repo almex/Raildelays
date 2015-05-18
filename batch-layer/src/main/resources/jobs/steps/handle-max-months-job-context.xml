@@ -15,84 +15,63 @@
 
     <import resource="classpath:/jobs/parent-job-context.xml"/>
 
-    <!--
-        The goal of this job is :
-        ________________________________________________________________________________________________________________
 
-        /sncb_20140812.xls             /20150212/sncb_20140812.xls              /20150212/sncb_20140812.xls
-        /sncb_20141016.xls    =(1)=>   /20150212/sncb_20141016.xls    =(2)=>    /20150212/sncb_20141016.xls
-        /sncb_20150102.xls             /20150212/sncb_20150102.xls              /20150212/sncb_20150102.xls
-                                       /sncb_20140812.xls                       /sncb_20150113.xls
-                                       /sncb_20141016.xls
-                                       /sncb_20150102.xls
-                                       /sncb_20150113.xls
-        ________________________________________________________________________________________________________________
-
-
-        As an input of this job we should have :
-
-            jobParameters['threshold.date'] = '20150212'
-
-        The last file to archive should be the one to split.
-
-        1) Split Excel files from the last date matching the end of 6 months period.
-
-        ATTENTION: If there is one or more files containing dates after threshold, they all have to be re-written
-        in order to shift all rows! Thus means we may have to create new files and to delete others.
-
-        This pseudo code can only be implemented if and only if we can overwrite the file that we will read.
-        In our case the ExcelSheetItemReader put all rows in memory during ItemStream#open() so this requirement is
-        full-filed.
-
-        for (ExcelSheet excelSheet : directory.getFiles()) {
-            for (Row item : excelSheet.getRows()) {
-                if (item >= threshold) {
-                    newFile.write(item)
-                } else {
-                    currentFile.write(item)
-                }
-            }
-        }
-
-        2) Delete all files already archived. Meaning we can match file names between archive folder and target folder
-        to know which one to delete.
-
-        3) Send an e-mail with all Excel files containing delays for 6 months as attachment.
-    -->
-    <job id="handleMaxMonthsJob" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-        <step id="splitBeforeThreshold" next="splitAfterThreshold">
+    <job id="handleMoreThanOneHourDelaysJob" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+        <step id="moveFileStep" parent="parentStep" next="sendByEmailDelayMoreThanOneHour">
+            <tasklet transaction-manager="batchTransactionManager" ref="moveFileTasklet"/>
+            <listeners merge="true">
+                <!-- Get back some information from previous step -->
+                <listener ref="demoteContextListener"/>
+            </listeners>
+        </step>
+        <step id="sendByEmailDelayMoreThanOneHour" parent="parentStep" next="removeDelayMoreThanOneHour">
             <tasklet transaction-manager="batchTransactionManager">
-                <chunk reader="allExcelFilesToSplitItemReader"
-                       processor="splitBeforeExcelSheetProcessor"
-                       writer="excelSheetBeforeItemWriter"
+                <chunk reader="excelSheetWithOneHourDelayItemReader"
+                       processor="chainedProcessorsForMoreThanOneHourDelay"
+                       writer="emailWriter"
                        commit-interval="1">
-
                     <listeners merge="true">
-                        <!-- To compute file name of the Excel file after filtering -->
-                        <listener ref="resourceLocatorListener"/>
+                        <!-- Put in a log file skipped items -->
+                        <listener ref="logSkippedItemListener"/>
                     </listeners>
                 </chunk>
             </tasklet>
+            <listeners merge="true">
+                <!-- To transfer some information for next steps -->
+                <listener ref="promoteContextListener"/>
+                <!-- Get back some information from previous step -->
+                <listener ref="demoteContextListener"/>
+            </listeners>
         </step>
-        <step id="splitAfterThreshold" next="deleteFiles">
+        <step id="removeDelayMoreThanOneHour" parent="parentStep" next="deleteFile">
             <tasklet transaction-manager="batchTransactionManager">
-                <chunk reader="allExcelFilesToSplitItemReader"
-                       processor="splitAfterExcelSheetProcessor"
-                       writer="excelSheetAfterItemWriter"
-                       commit-interval="1">
-
+                <chunk reader="excelSheetWithOneHourDelayItemReader"
+                       processor="chainedProcessorsForLessThanOneHourDelay"
+                       writer="excelSheetWithOneHourDelayItemWriter"
+                       commit-interval="${excel.sheet0.maxitemcount}">
                     <listeners merge="true">
-                        <!-- To compute file name of the Excel file after filtering -->
-                        <listener ref="resourceLocatorListener"/>
+                        <!-- Put in a log file skipped items -->
+                        <listener ref="logSkippedItemListener"/>
                     </listeners>
                 </chunk>
             </tasklet>
+            <listeners merge="true">
+                <!-- To transfer some information for next steps -->
+                <listener ref="promoteContextListener"/>
+                <!-- To compute file name of the Excel file after filtering (we could have removed the first row) -->
+                <listener ref="resourceLocatorListener"/>
+                <!-- Put in a log file skipped items -->
+                <listener ref="logSkippedItemListener"/>
+                <!-- Get back some information from previous step -->
+                <listener ref="demoteContextListener"/>
+            </listeners>
         </step>
-        <step id="deleteFiles" next="sendEmail">
-            <tasklet transaction-manager="batchTransactionManager" ref="deleteDuplicatedFiles"/>
-        </step>
-        <step id="sendEmail">
-            <tasklet transaction-manager="batchTransactionManager" ref="sendExcelFilesByEmail"/>
+        <step id="deleteFile" parent="parentStep">
+            <tasklet transaction-manager="batchTransactionManager" ref="deleteFileTasklet"/>
+            <listeners merge="true">
+                <!-- Get back some information from previous step -->
+                <listener ref="demoteContextListener"/>
+            </listeners>
         </step>
     </job>
 
@@ -100,146 +79,100 @@
     <!-- =====================================         DECIDERS       ===================================== -->
     <!-- ================================================================================================== -->
 
-
-    <bean id="maxMonthsDecider"
-          class="be.raildelays.batch.decider.MaxMonthsDecider"
-          scope="step">
-        <property name="maxNumberOfMonth" value="${excel.max.months}"/>
-        <property name="reader" ref="allExcelFilesToSplitItemReader"/>
+    <bean id="moreThanOneHourDelaysDecider"
+          class="be.raildelays.batch.decider.MoreThanOneHourDelayDecider">
+        <property name="keyName" value="${excel.item.max.key}"/>
     </bean>
 
     <!-- ================================================================================================== -->
     <!-- =====================================         READERS        ===================================== -->
     <!-- ================================================================================================== -->
 
-    <bean id="allExcelFilesToSplitItemReader"
-          class="org.springframework.batch.item.file.MultiResourceItemReader"
+    <bean id="excelSheetWithOneHourDelayItemReader"
+          class="org.springframework.batch.item.file.ExcelSheetItemReader"
           scope="step">
-        <property name="delegate">
-            <bean class="org.springframework.batch.item.file.ExcelSheetItemReader"
-                  scope="step">
-                <property name="name" value="allExcelFilesToSplitItemReader"/>
-                <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
-                <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
-                <property name="rowMapper">
-                    <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
-                        <property name="language" value="#{jobParameters['language']}"/>
-                    </bean>
-                </property>
+        <property name="name" value="excelSheetWithOneHourDelayItemReader"/>
+        <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
+        <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
+        <property name="rowMapper">
+            <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
+                <property name="language" value="#{jobParameters['language']}"/>
             </bean>
         </property>
-        <property name="resources"
-                  value="file:#{jobParameters['excel.output.path']}/*.#{jobParameters['excel.file.extension']}"/>
+        <property name="resource" value="file:#{jobParameters['more.than.one.hour.excel.path']}"/>
     </bean>
 
     <!-- ================================================================================================== -->
     <!-- =====================================       PROCESSORS       ===================================== -->
     <!-- ================================================================================================== -->
 
-    <bean id="splitBeforeExcelSheetProcessor" class="be.raildelays.batch.processor.FilterWithThresholdDateProcessor"
-          scope="step">
-        <property name="thresholdDate" value="#{jobParameters['threshold.date']}"/>
-        <property name="mode">
-            <util:constant static-field="be.raildelays.batch.processor.FilterWithThresholdDateProcessor.Mode.BEFORE"/>
+    <bean id="chainedProcessorsForMoreThanOneHourDelay"
+          class="org.springframework.batch.item.support.CompositeItemProcessor">
+        <property name="delegates">
+            <list>
+                <ref bean="filterLessThanOneHourDelaysProcessor"/>
+                <ref bean="batchExcelRowToSimpleMailMessageProcessor"/>
+            </list>
         </property>
     </bean>
 
-    <bean id="splitAfterExcelSheetProcessor" class="be.raildelays.batch.processor.FilterWithThresholdDateProcessor"
+    <bean id="filterLessThanOneHourDelaysProcessor"
+          class="be.raildelays.batch.processor.FilterWithThresholdDelayProcessor"
           scope="step">
-        <property name="thresholdDate" value="#{jobParameters['threshold.date']}"/>
         <property name="mode">
             <util:constant
-                    static-field="be.raildelays.batch.processor.FilterWithThresholdDateProcessor.Mode.AFTER_OR_EQUALS"/>
+                    static-field="be.raildelays.batch.processor.FilterWithThresholdDelayProcessor.Mode.FILTER_LESS_THAN"/>
         </property>
+        <property name="threshold" value="${excel.item.delay.max.threshold}"/>
+    </bean>
+
+    <bean id="chainedProcessorsForLessThanOneHourDelay"
+          class="org.springframework.batch.item.support.CompositeItemProcessor">
+        <property name="delegates">
+            <list>
+                <ref bean="filterGreaterThanOneHourDelaysProcessor"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="filterGreaterThanOneHourDelaysProcessor"
+          class="be.raildelays.batch.processor.FilterWithThresholdDelayProcessor"
+          scope="step">
+        <property name="mode">
+            <util:constant
+                    static-field="be.raildelays.batch.processor.FilterWithThresholdDelayProcessor.Mode.FILTER_GREATER_OR_EQUAL_TO"/>
+        </property>
+        <property name="threshold" value="${excel.item.delay.max.threshold}"/>
+    </bean>
+
+    <bean id="batchExcelRowToSimpleMailMessageProcessor"
+          class="be.raildelays.batch.processor.BatchExcelRowToSimpleMailMessageProcessor"
+          scope="step">
+        <property name="from" value="#{jobParameters['mail.account.address']}"/>
+        <property name="to" value="#{jobParameters['mail.account.address']}"/>
+        <property name="subject" value="${email.more.than.one.hour.subject}"/>
     </bean>
 
     <!-- ================================================================================================== -->
     <!-- =====================================         WRITERS        ===================================== -->
     <!-- ================================================================================================== -->
 
-    <bean id="excelSheetBeforeItemWriter"
-          class="org.springframework.batch.item.support.MultiResourceMaxItemCountItemWriter"
+    <bean id="excelSheetWithOneHourDelayItemWriter"
+          class="org.springframework.batch.item.file.ExcelSheetItemWriter"
           scope="step">
-        <property name="delegate">
-            <bean class="org.springframework.batch.item.file.ExcelSheetItemWriter"
+        <property name="rowAggregator">
+            <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator"
                   scope="step">
-                <property name="rowAggregator">
-                    <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator"
-                          scope="step">
-                        <property name="language" value="#{jobParameters['language']}"/>
-                    </bean>
-                </property>
-                <property name="useItemIndex" value="false"/>
-                <property name="name" value="excelSheetBeforeItemWriter"/>
-                <property name="shouldDeleteIfExists" value="false"/>
-                <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
-                <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
-                <property name="template" value="file:#{jobParameters['excel.template.path']}"/>
+                <property name="language" value="#{jobParameters['language']}"/>
             </bean>
         </property>
-        <property name="name" value="multiResourceForSplitItemWriter"/>
-        <property name="resourceLocator">
-            <bean class="be.raildelays.batch.support.ToWriteExcelResourceLocator"
-                  scope="step">
-                <property name="resource"
-                          value="file:#{jobParameters['excel.archive.path']}/#{T(java.time.LocalDate).now().toString()}/#{jobParameters['excel.file.name']}.#{jobParameters['excel.file.extension']}"/>
-                <property name="resourceItemSearch" ref="resourceItemSearch"/>
-                <property name="keyName" value="${excel.resource.key}"/>
-            </bean>
-        </property>
-    </bean>
-
-    <bean id="excelSheetAfterItemWriter"
-          class="org.springframework.batch.item.support.MultiResourceMaxItemCountItemWriter"
-          scope="step">
-        <property name="delegate">
-            <bean class="org.springframework.batch.item.file.ExcelSheetItemWriter"
-                  scope="step">
-                <property name="rowAggregator">
-                    <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator"
-                          scope="step">
-                        <property name="language" value="#{jobParameters['language']}"/>
-                    </bean>
-                </property>
-                <property name="useItemIndex" value="false"/>
-                <property name="name" value="excelSheetAfterItemWriter"/>
-                <property name="shouldDeleteIfExists" value="true"/>
-                <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
-                <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
-                <property name="template" value="file:#{jobParameters['excel.template.path']}"/>
-            </bean>
-        </property>
-        <property name="name" value="multiResourceForSplitItemWriter"/>
-        <property name="resourceLocator">
-            <bean class="be.raildelays.batch.support.ToWriteExcelResourceLocator"
-                  scope="step">
-                <property name="forceNewFile" value="true"/>
-                <property name="resource"
-                          value="file:#{jobParameters['excel.output.path']}/#{jobParameters['excel.file.name']}.#{jobParameters['excel.file.extension']}"/>
-                <property name="resourceItemSearch" ref="resourceItemSearch"/>
-                <property name="keyName" value="${excel.resource.key}"/>
-            </bean>
-        </property>
-    </bean>
-
-    <bean id="resourceItemSearch"
-          class="be.raildelays.batch.support.SimpleResourceItemSearch"
-          scope="step">
-        <property name="reader">
-            <bean class="org.springframework.batch.item.file.ExcelSheetItemReader">
-                <property name="name" value="excelSheetItemReader3"/>
-                <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
-                <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
-                <property name="rowMapper">
-                    <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
-                        <property name="language" value="#{jobParameters['language']}"/>
-                    </bean>
-                </property>
-            </bean>
-        </property>
-        <property name="comparator">
-            <bean class="be.raildelays.batch.bean.ExcelRowComparator"/>
-        </property>
+        <property name="name" value="excelSheetWithOneHourDelayItemWriter"/>
+        <property name="shouldDeleteIfExists" value="true"/>
+        <property name="useItemIndex" value="false"/>
+        <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
+        <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
+        <property name="template" value="file:#{jobParameters['excel.template.path']}"/>
+        <property name="resource" ref="itemWriterResourceWithOneHourDelay"/>
     </bean>
 
     <bean id="emailWriter"
@@ -259,38 +192,39 @@
     </bean>
 
     <!-- ================================================================================================== -->
+    <!-- =====================================        RESOURCES       ===================================== -->
+    <!-- ================================================================================================== -->
+
+    <bean id="itemWriterResourceWithOneHourDelay"
+          class="org.springframework.batch.item.support.ResourceLocatorAdapter"
+          scope="step">
+        <property name="resourceLocator" ref="itemWriterResourceLocatorWithOneHourDelay"/>
+    </bean>
+
+    <bean id="itemWriterResourceLocatorWithOneHourDelay"
+          class="be.raildelays.batch.support.ToWriteExcelResourceLocator"
+          scope="step">
+        <property name="resource"
+                  value="file:#{jobParameters['excel.output.path']}/#{jobParameters['excel.file.name']}.#{jobParameters['excel.file.extension']}"/>
+        <property name="keyName" value="${excel.resource.key}"/>
+        <property name="forceNewFile" value="true" />
+    </bean>
+
+    <!-- ================================================================================================== -->
     <!-- =====================================         TASKLET        ===================================== -->
     <!-- ================================================================================================== -->
 
-
-    <bean id="deleteDuplicatedFiles"
-          class="be.raildelays.batch.tasklet.DeleteFileTasklet"
+    <bean id="moveFileTasklet"
+          class="be.raildelays.batch.tasklet.MoveFileTasklet"
           scope="step">
-        <property name="resources">
-            <bean class="be.raildelays.batch.support.ToDeleteExcelResourcesLocator" factory-method="getResources">
-                <constructor-arg value="file:#{jobParameters['excel.output.path']}"/>
-                <constructor-arg
-                        value="file:#{jobParameters['excel.archive.path']}/#{T(java.time.LocalDate).now().toString()}/"/>
-            </bean>
-        </property>
+        <property name="source" value="file:#{jobParameters['more.than.one.hour.excel.path']}"/>
+        <property name="destination" value="file:#{jobParameters['excel.output.path']}/moreThanOneHourBackup/#{jobParameters['excel.file.name']}.#{jobParameters['excel.file.extension']}"/>
     </bean>
 
-    <bean id="sendExcelFilesByEmail"
-          class="be.raildelays.batch.tasklet.SendResourcesByEmailTasklet"
+    <bean id="deleteFileTasklet"
+          class="be.raildelays.batch.tasklet.DeleteFileTasklet"
           scope="step">
-        <property name="resources"
-                  value="file:#{jobParameters['excel.archive.path']}/#{T(java.time.LocalDate).now().toString()}/*.#{jobParameters['excel.file.extension']}"/>
-        <property name="mailSender">
-            <bean class="org.springframework.mail.javamail.JavaMailSenderImpl">
-                <property name="host" value="#{jobParameters['mail.server.host']}"/>
-                <property name="port" value="#{jobParameters['mail.server.port']}"/>
-                <property name="password" value="#{jobParameters['mail.account.password']}"/>
-                <property name="username" value="#{jobParameters['mail.account.username']}"/>
-            </bean>
-        </property>
-        <property name="from" value="#{jobParameters['mail.account.address']}"/>
-        <property name="to" value="#{jobParameters['mail.account.address']}"/>
-        <property name="subject" value="${email.max.months.subject}"/>
+        <property name="resources" value="file:#{jobParameters['excel.output.path']}/moreThanOneHourBackup/#{jobParameters['excel.file.name']}.#{jobParameters['excel.file.extension']}"/>
     </bean>
 
 
