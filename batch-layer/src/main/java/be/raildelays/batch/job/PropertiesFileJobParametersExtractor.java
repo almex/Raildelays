@@ -1,7 +1,5 @@
 package be.raildelays.batch.job;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
@@ -32,7 +30,9 @@ public class PropertiesFileJobParametersExtractor implements JobParametersExtrac
         try (Reader reader = new FileReader(resource.getFile())) {
             properties.load(reader);
         } catch (IOException e) {
-            stepExecution.setExitStatus(ExitStatus.FAILED.addExitDescription(e));
+            if (stepExecution != null) {
+                stepExecution.setExitStatus(ExitStatus.FAILED.addExitDescription(e));
+            }
         }
 
         return new DefaultJobParametersConverter().getJobParameters(properties);

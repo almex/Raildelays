@@ -1,5 +1,6 @@
 package be.raildelays.batch.service;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
@@ -40,18 +41,18 @@ public interface BatchStartAndRecoveryService {
 
     JobExecution start(String jobName, JobParameters jobParameters) throws JobInstanceAlreadyExistsException, NoSuchJobException, JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException;
 
-    JobExecution restart(Long jobExecutionId)
-            throws JobExecutionAlreadyRunningException, NoSuchJobExecutionException, NoSuchJobException, JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException;
+    JobExecution restart(Long jobExecutionId) throws JobExecutionAlreadyRunningException, NoSuchJobExecutionException, NoSuchJobException, JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException;
 
     JobExecution startNewInstance(String jobName, JobParameters jobParameters) throws JobInstanceAlreadyExistsException, NoSuchJobException, JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException;
 
-    JobExecution stop(Long jobExecutionId) throws NoSuchJobExecutionException,
-            JobExecutionNotRunningException;
+    JobExecution stop(Long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException;
 
-    JobExecution abandon(Long jobExecutionId)
-            throws NoSuchJobExecutionException,
-            JobExecutionAlreadyRunningException;
+    JobExecution abandon(Long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionAlreadyRunningException;
 
     Set<String> getJobNames();
+
+    BatchStatus getStatus(Long jobInstanceId) throws NoSuchJobInstanceException;
+
+    JobExecution refresh(JobExecution jobExecution) throws NoSuchJobExecutionException;
 
 }

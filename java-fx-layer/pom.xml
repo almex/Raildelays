@@ -7,26 +7,9 @@
     <parent>
         <groupId>be.raildelays</groupId>
         <artifactId>raildelays-parent</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.1.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
-    <properties>
-        <path.javafx>C:\Program Files\Oracle\JavaFX 2.0 SDK</path.javafx>
-    </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <!-- Extracted this part from root POM to make this project more portable by disabling this module -->
-            <dependency>
-                <groupId>com.oracle</groupId>
-                <artifactId>javafx</artifactId>
-                <version>2.0</version>
-                <systemPath>${path.javafx}/rt/lib/jfxrt.jar</systemPath>
-                <scope>system</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <build>
         <resources>
@@ -47,80 +30,6 @@
         </resources>
 
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>package</phase>
-                        <configuration>
-                            <overwritereleases>false</overwritereleases>
-                            <overwritesnapshots>false</overwritesnapshots>
-                            <overwriteifnewer>true</overwriteifnewer>
-                        </configuration>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <configuration>
-                            <target>
-
-                                <taskdef name="jfxdeploy"
-                                         classname="com.sun.javafx.tools.ant.DeployFXTask"
-                                         classpathref="maven.plugin.classpath"/>
-
-                                <taskdef name="jfxsignjar"
-                                         classname="com.sun.javafx.tools.ant.FXSignJarTask"
-                                         classpathref="maven.plugin.classpath"/>
-
-
-                                <jfxdeploy width="800" height="600"
-                                           outdir="${project.build.directory}/deploy"
-                                           outfile="${project.build.finalName}">
-                                    <info title="${project.name}"/>
-                                    <application name="${project.name}"
-                                                 mainClass="be.raildelays.javafx.BootStrap"/>
-                                    <resources>
-                                        <fileset dir="${project.build.directory}" includes="*.jar"/>
-                                        <fileset dir="${project.build.directory}/dependency" includes="*.jar"/>
-                                    </resources>
-                                </jfxdeploy>
-
-                                <!--                                 <jfxsignjar destdir="${project.build.directory}/deploy" -->
-                                <!--                                             keyStore="${project.basedir}/src/main/jnlp/keystore.jks" -->
-                                <!--                                             storePass="password" -->
-                                <!--                                             alias="webstart" -->
-                                <!--                                             keyPass="password"> -->
-                                <!--                                     <fileset dir="${project.build.directory}/deploy" includes="*.jar"/> -->
-                                <!--                                 </jfxsignjar> -->
-
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.sun.javafx</groupId>
-                        <artifactId>javafx-ant</artifactId>
-                        <version>2.0</version>
-                        <scope>system</scope>
-                        <systemPath>${ant.javafx.jar}</systemPath>
-                    </dependency>
-                </dependencies>
-            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -144,44 +53,54 @@
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
     </build>
 
     <dependencies>
-
-        <dependency>
-            <groupId>be.raildelays</groupId>
-            <artifactId>raildelays-domain</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>be.raildelays</groupId>
-            <artifactId>raildelays-service</artifactId>
-        </dependency>
         <dependency>
             <groupId>be.raildelays</groupId>
             <artifactId>raildelays-batch</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
+            <groupId>org.springframework.batch</groupId>
+            <artifactId>spring-batch-core</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.batch</groupId>
+            <artifactId>spring-batch-infrastructure</artifactId>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring-context-support</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>javafx</artifactId>
+            <artifactId>spring-context</artifactId>
+            <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.sun.javafx</groupId>
-            <artifactId>javafx-ant</artifactId>
-            <version>2.0</version>
-            <scope>system</scope>
-            <systemPath>${ant.javafx.jar}</systemPath>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.lmax</groupId>
+            <artifactId>disruptor</artifactId>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- For testing -->
@@ -193,22 +112,8 @@
         <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
-
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>javafx</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <javafx.rt.jar>C:/Program Files/Oracle/JavaFX 2.0 SDK/rt/lib/jfxrt.jar</javafx.rt.jar>
-                <ant.javafx.jar>C:/Program Files/Oracle/JavaFX 2.0 SDK/tools/ant-javafx.jar</ant.javafx.jar>
-            </properties>
-        </profile>
-    </profiles>
 
 </project>

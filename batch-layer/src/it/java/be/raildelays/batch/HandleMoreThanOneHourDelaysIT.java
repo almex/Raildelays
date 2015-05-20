@@ -2,6 +2,7 @@ package be.raildelays.batch;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameter;
@@ -53,6 +54,7 @@ public class HandleMoreThanOneHourDelaysIT extends AbstractContextIT {
 
 
     @Test
+    @Ignore
     public void testCompleted() throws Exception {
         final Map<String, JobParameter> parameters = new HashMap<>();
 

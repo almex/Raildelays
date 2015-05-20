@@ -18,8 +18,7 @@ import javax.annotation.Resource;
 import java.util.*;
 
 @Service("BatchStartAndRecoveryService")
-public class BatchStartAndRecoveryServiceImpl
-        implements BatchStartAndRecoveryService {
+public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoveryService {
 
     private static final String ILLEGAL_STATE_MSG = "Illegal state (only happens on a race condition): "
             + "%s with name=%s and parameters=%s";
@@ -166,6 +165,7 @@ public class BatchStartAndRecoveryServiceImpl
         return list;
     }
 
+    @Override
     public BatchStatus getStatus(Long jobInstanceId) throws NoSuchJobInstanceException {
         BatchStatus status = BatchStatus.UNKNOWN;
         JobInstance jobInstance = jobExplorer.getJobInstance(jobInstanceId);
@@ -265,13 +265,16 @@ public class BatchStartAndRecoveryServiceImpl
 
     @Override
     public JobExecution startNewInstance(String jobName, JobParameters jobParameters) throws NoSuchJobException,
-            JobParametersInvalidException, JobInstanceAlreadyExistsException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
+            JobParametersInvalidException,
+            JobInstanceAlreadyExistsException,
+            JobExecutionAlreadyRunningException,
+            JobRestartException,
+            JobInstanceAlreadyCompleteException {
         return start(jobName, jobParameters, true);
     }
 
     @Override
-    public JobExecution stop(Long jobExecutionId) throws NoSuchJobExecutionException,
-            JobExecutionNotRunningException {
+    public JobExecution stop(Long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException {
         JobExecution jobExecution = findExecutionById(jobExecutionId);
         // Indicate the execution should be stopped by setting it's status to
         // 'STOPPING'. It is assumed that
@@ -294,9 +297,14 @@ public class BatchStartAndRecoveryServiceImpl
     }
 
     @Override
-    public JobExecution abandon(Long jobExecutionId)
-            throws NoSuchJobExecutionException,
-            JobExecutionAlreadyRunningException {
+    public JobExecution refresh(JobExecution jobExecution) throws NoSuchJobExecutionException {
+        Assert.notNull(jobExecution);
+
+        return findExecutionById(jobExecution.getId());
+    }
+
+    @Override
+    public JobExecution abandon(Long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionAlreadyRunningException {
         JobExecution jobExecution = findExecutionById(jobExecutionId);
 
         if (jobExecution.getStatus().isLessThan(BatchStatus.STOPPING)) {
@@ -313,5 +321,20 @@ public class BatchStartAndRecoveryServiceImpl
         return jobExecution;
     }
 
+    public void setJobRegistry(JobRegistry jobRegistry) {
+        this.jobRegistry = jobRegistry;
+    }
+
+    public void setJobExplorer(JobExplorer jobExplorer) {
+        this.jobExplorer = jobExplorer;
+    }
+
+    public void setJobRepository(JobRepository jobRepository) {
+        this.jobRepository = jobRepository;
+    }
+
+    public void setJobLauncher(JobLauncher jobLauncher) {
+        this.jobLauncher = jobLauncher;
+    }
 }
 

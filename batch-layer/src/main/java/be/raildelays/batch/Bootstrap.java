@@ -9,14 +9,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.step.job.JobParametersExtractor;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.util.Assert;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -40,7 +37,6 @@ public class Bootstrap {
         options.addOption("date", false, "search delays for only on date passed as parameter");
 
         final CommandLine cmd = parser.parse(options, args);
-        final boolean online = !cmd.hasOption("offline");
         final boolean recovery = !cmd.hasOption("norecovery");
         final String searchDate = cmd.getOptionValue("date", "");
 
@@ -50,8 +46,7 @@ public class Bootstrap {
             dates = generateListOfDates();
         }
 
-        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext(
-                contextPaths);
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext(contextPaths);
 
         //-- Initialize contexts
         applicationContext.registerShutdownHook(); // Register close of this Spring context to shutdown of the JVM

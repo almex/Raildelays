@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration monitorInterval="30">
+
+    <Properties>
+        <Property name="jobExecutionId">default</Property>
+        <Property name="jobInstanceId">default</Property>
+        <Property name="dateParameter">default</Property>
+        <Property name="stepName">step1</Property>
+        <Property name="trainId">default</Property>
+        <Property name="isThreadContextMapInheritable ">true</Property>
+    </Properties>
+
+    <appenders>
+
+        <RollingFile name="console" fileName="logs/output.log"
+                     filePattern="logs/backup/output-%d{MM-dd-yyyy}-%i.log.gz" append="true">
+            <PatternLayout pattern="%d{DATE} %-5p: %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="1 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+
+        <RollingFile name="jdbc"
+                     fileName="logs/jdbc.log"
+                     filePattern="logs/backup/jdbc-%d{MM-dd-yyyy}-%i.log.gz"
+                     append="true">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %level - %m%n%ex%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="1 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+
+        <RollingFile name="error"
+                     fileName="logs/error.log"
+                     filePattern="logs/backup/error-%d{MM-dd-yyyy}-%i.log.gz"
+                     append="true">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %level - %m%n%ex%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="1 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+
+        <RollingFile name="springbatch"
+                     fileName="logs/springbatch.log"
+                     filePattern="logs/backup/springbatch-%d{MM-dd-yyyy}-%i.log.gz"
+                     append="true">
+            <PatternLayout pattern="%d{DATE} %-5p: %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="1 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+
+        <Routing name="step1Reader">
+            <Routes pattern="$${ctx:dateParameter}$${ctx:trainId}">
+                <Route>
+                    <RollingFile name="rolling-step1Reader"
+                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/${ctx:trainId}Reader.log"
+                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/${ctx:trainId}Reader-%d{MM-dd-yyyy}-%i.log.gz"
+                                 append="true">
+                        <PatternLayout pattern="%m%n"/>
+                        <Policies>
+                            <TimeBasedTriggeringPolicy/>
+                            <SizeBasedTriggeringPolicy size="1 MB"/>
+                        </Policies>
+                        <DefaultRolloverStrategy max="5"/>
+                    </RollingFile>
+                </Route>
+            </Routes>
+        </Routing>
+
+        <Routing name="step1Processor">
+            <Routes pattern="$${ctx:dateParameter}$${ctx:trainId}">
+                <Route>
+                    <RollingFile name="rolling-step1Processor"
+                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/${ctx:trainId}Processor.log"
+                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/${ctx:trainId}Processor-%d{MM-dd-yyyy}-%i.log.gz"
+                                 append="true">
+                        <PatternLayout pattern="%m%n"/>
+                        <Policies>
+                            <TimeBasedTriggeringPolicy/>
+                            <SizeBasedTriggeringPolicy size="1 MB"/>
+                        </Policies>
+                        <DefaultRolloverStrategy max="5"/>
+                    </RollingFile>
+                </Route>
+            </Routes>
+        </Routing>
+
+        <Routing name="step1Writer">
+            <Routes pattern="$${ctx:dateParameter}$${ctx:trainId}">
+                <Route>
+                    <RollingFile name="rolling-step1Writer"
+                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/${ctx:trainId}Writer.log"
+                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/${ctx:trainId}Writer-%d{MM-dd-yyyy}-%i.log.gz"
+                                 append="true">
+                        <PatternLayout pattern="%m%n"/>
+                        <Policies>
+                            <TimeBasedTriggeringPolicy/>
+                            <SizeBasedTriggeringPolicy size="1 MB"/>
+                        </Policies>
+                        <DefaultRolloverStrategy max="5"/>
+                    </RollingFile>
+                </Route>
+            </Routes>
+        </Routing>
+
+        <Routing name="step2Reader">
+            <Routes pattern="$${ctx:dateParameter}">
+                <Route>
+                    <RollingFile name="rolling-step2Reader"
+                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/step2Reader.log"
+                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/step2Reader-%d{MM-dd-yyyy}-%i.log.gz"
+                                 append="true">
+                        <PatternLayout pattern="%m%n"/>
+                        <Policies>
+                            <TimeBasedTriggeringPolicy/>
+                            <SizeBasedTriggeringPolicy size="1 MB"/>
+                        </Policies>
+                        <DefaultRolloverStrategy max="5"/>
+                    </RollingFile>
+                </Route>
+            </Routes>
+        </Routing>
+
+        <Routing name="step2Processor">
+            <Routes pattern="$${ctx:dateParameter}">
+                <Route>
+                    <RollingFile name="rolling-step2Processor"
+                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/step2Processor.log"
+                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/step2Processor-%d{MM-dd-yyyy}-%i.log.gz"
+                                 append="true">
+                        <PatternLayout pattern="%m%n"/>
+                        <Policies>
+                            <TimeBasedTriggeringPolicy/>
+                            <SizeBasedTriggeringPolicy size="1 MB"/>
+                        </Policies>
+                        <DefaultRolloverStrategy max="5"/>
+                    </RollingFile>
+                </Route>
+            </Routes>
+        </Routing>
+
+        <Routing name="step2Writer">
+            <Routes pattern="$${ctx:dateParameter}">
+                <Route>
+                    <RollingFile name="rolling-step2Writer"
+                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/step2Writer.log"
+                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/step2Writer-%d{MM-dd-yyyy}-%i.log.gz"
+                                 append="true">
+                        <PatternLayout pattern="%c{1} %m%n"/>
+                        <Policies>
+                            <TimeBasedTriggeringPolicy/>
+                            <SizeBasedTriggeringPolicy size="1 MB"/>
+                        </Policies>
+                        <DefaultRolloverStrategy max="5"/>
+                    </RollingFile>
+                </Route>
+            </Routes>
+        </Routing>
+
+        <Routing name="step2SkippedItems">
+            <Routes pattern="$${ctx:dateParameter}">
+                <Route>
+                    <RollingFile name="rolling-step2SkippedItems"
+                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/step2SkippedItems.log"
+                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/step2SkippedItems-%d{MM-dd-yyyy}-%i.log.gz"
+                                 append="true">
+                        <PatternLayout pattern="%m%n"/>
+                        <Policies>
+                            <TimeBasedTriggeringPolicy/>
+                            <SizeBasedTriggeringPolicy size="1 MB"/>
+                        </Policies>
+                        <DefaultRolloverStrategy max="5"/>
+                    </RollingFile>
+                </Route>
+            </Routes>
+        </Routing>
+    </appenders>
+
+    <loggers>
+
+        <logger name="be.raildelays.spring.batch.Bootstrap" level="trace" additivity="false">
+            <appender-ref ref="console"/>
+        </logger>
+        <logger name="be.raildelays.spring.batch.reader.CompositeRailtimeItemReader" level="trace" additivity="false">
+            <appender-ref ref="step1Reader"/>
+        </logger>
+        <logger name="be.raildelays.spring.batch.reader.TrainIdPartitioner" level="trace" additivity="false">
+            <appender-ref ref="step1Reader"/>
+        </logger>
+        <logger name="be.raildelays.httpclient" level="trace" additivity="false">
+            <appender-ref ref="step1Reader"/>
+        </logger>
+        <logger name="be.raildelays.parser" level="trace" additivity="false">
+            <appender-ref ref="step1Reader"/>
+        </logger>
+        <logger name="be.raildelays.spring.batch.processor.LineStopMapperProcessor" level="trace" additivity="false">
+            <appender-ref ref="step1Processor"/>
+        </logger>
+        <logger name="be.raildelays.spring.batch.listener.LogStep1ItemProcessorListener" level="trace"
+                additivity="false">
+            <appender-ref ref="step1Processor"/>
+        </logger>
+        <logger name="org.springframework.spring.batch.item.database.JpaItemWriter" level="trace" additivity="false">
+            <appender-ref ref="step1Writer"/>
+        </logger>
+
+        <logger name="be.raildelays.repository" level="trace" additivity="false">
+            <appender-ref ref="step2Reader"/>
+        </logger>
+        <logger name="be.raildelays.service" level="trace" additivity="false">
+            <appender-ref ref="step2Reader"/>
+        </logger>
+        <logger name="be.raildelays.spring.batch.reader.CompositeRaildelaysItemReader" level="trace" additivity="false">
+            <appender-ref ref="step2Reader"/>
+        </logger>
+        <logger name="be.raildelays.spring.batch.listener.LogStep2ItemProcessorListener" level="trace"
+                additivity="false">
+            <appender-ref ref="step2Processor"/>
+        </logger>
+        <logger name="be.raildelays.spring.batch.processor.FilterTwoSensPerDayProcessor" level="trace"
+                additivity="false">
+            <appender-ref ref="step2Processor"/>
+        </logger>
+        <logger name="be.raildelays.spring.batch.processor.FilterSmallDelaysProcessor" level="trace" additivity="false">
+            <appender-ref ref="step2Processor"/>
+        </logger>
+        <logger name="be.raildelays.spring.batch.processor.BatchExcelRowMapperProcessor" level="trace"
+                additivity="false">
+            <appender-ref ref="step2Processor"/>
+        </logger>
+        <logger name="be.raildelays.spring.batch.processor.SearchNextTrainProcessor" level="trace" additivity="false">
+            <appender-ref ref="step2Processor"/>
+        </logger>
+        <logger name="be.raildelays.spring.batch.processor.AggregateExpectedTimeProcessor" level="trace"
+                additivity="false">
+            <appender-ref ref="step2Processor"/>
+        </logger>
+        <logger name="be.raildelays.spring.batch.processor.StoreDelayGreaterThanThresholdInContextProcessor"
+                level="trace"
+                additivity="false">
+            <appender-ref ref="step2Processor"/>
+        </logger>
+        <logger name="org.springframework.spring.batch.item.file.FlatFileItemWriter" level="trace" additivity="false">
+            <appender-ref ref="step2Writer"/>
+        </logger>
+        <logger name="org.springframework.spring.batch.item.file.ExcelSheetItemWriter" level="trace" additivity="false">
+            <appender-ref ref="step2Writer"/>
+        </logger>
+        <logger name="org.springframework.spring.batch.item.support.MultiResourceMaxItemCountItemWriter" level="trace"
+                additivity="false">
+            <appender-ref ref="step2Writer"/>
+        </logger>
+        <logger name="org.springframework.spring.batch.item.support.SortedItemStreamWriter" level="trace"
+                additivity="false">
+            <appender-ref ref="step2Writer"/>
+        </logger>
+        <logger name="be.raildelays.spring.batch.writer.BatchExcelRowAggregator" level="trace" additivity="false">
+            <appender-ref ref="step2Writer"/>
+        </logger>
+
+        <logger name="be.raildelays.spring.batch.listener.LogSkippedItemListener" level="trace" additivity="false">
+            <appender-ref ref="step2SkippedItems"/>
+        </logger>
+
+        <logger name="be.raildelays.spring.batch.processor.FilterWithThresholdDelayProcessor" level="trace"
+                additivity="false">
+            <appender-ref ref="step2SkippedItems"/>
+        </logger>
+
+        <logger name="org.springframework.batch" level="debug" additivity="false">
+            <appender-ref ref="springbatch"/>
+        </logger>
+        <!-- Configuration for Log4JDBC -->
+        <!--logger name="log4jdbc.log4j2" level="info" additivity="false">
+            <MarkerFilter marker="LOG4JDBC_AUDIT" onMatch="ACCEPT" onMismatch="NEUTRAL"/>
+            <MarkerFilter marker="LOG4JDBC_RESULTSETTABLE" onMatch="ACCEPT" onMismatch="NEUTRAL"/>
+            <appender-ref ref="jdbc"/>
+        </logger-->
+
+        <root level="error">
+            <appender-ref ref="error"/>
+        </root>
+    </loggers>
+</configuration>
+
