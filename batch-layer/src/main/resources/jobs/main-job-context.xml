@@ -71,6 +71,7 @@
                         <include class="be.raildelays.batch.exception.ArrivalDepartureEqualsException"/>
                     </skippable-exception-classes>
                     <listeners merge="true">
+                        <!-- Keep trace of skipped/filtered items -->
                         <listener ref="logSkippedItemListener"/>
                         <!-- To compute file name of the Excel file after filtering -->
                         <listener ref="resourceLocatorListener"/>
@@ -191,70 +192,6 @@
         <property name="backOffPolicy" ref="railtimeReaderBackOffPolicy"/>
     </bean>
 
-    <!--<bean id="compositeRailtimeItemReader"
-          class="be.raildelays.batch.reader.CompositeRailtimeItemReader"
-          scope="step">
-        <property name="departureReader">
-            <bean class="be.raildelays.batch.reader.ScraperItemReader"
-                  scope="step">
-                <property name="request">
-                    <bean class="be.raildelays.httpclient.impl.DelaysRequest">
-                        <constructor-arg value="#{stepExecutionContext['trainId']}"/>
-                        <constructor-arg value="#{jobParameters['date']}"/>
-                        <constructor-arg>
-                            <util:constant static-field="be.raildelays.domain.Sens.DEPARTURE"/>
-                        </constructor-arg>
-                        <constructor-arg>
-                            <bean class="be.raildelays.domain.Language" factory-method="valueOf">
-                                <constructor-arg>
-                                    <value>#{jobParameters['language']?.toUpperCase()}</value>
-                                </constructor-arg>
-                            </bean>
-                        </constructor-arg>
-                    </bean>
-                </property>
-                <property name="streamer">
-                    <bean class="be.raildelays.httpclient.impl.DelaysRequestStreamer"/>
-                </property>
-                <property name="parser">
-                    <bean class="be.raildelays.parser.impl.DelaysStreamParser"/>
-                </property>
-                <property name="retryPolicy" ref="railtimeReaderRetryPolicy"/>
-                <property name="backOffPolicy" ref="railtimeReaderBackOffPolicy"/>
-            </bean>
-        </property>
-        <property name="arrivalReader">
-            <bean class="be.raildelays.batch.reader.ScraperItemReader"
-                  scope="step">
-                <property name="request">
-                    <bean class="be.raildelays.httpclient.impl.DelaysRequest">
-                        <constructor-arg value="#{stepExecutionContext['trainId']}"/>
-                        <constructor-arg value="#{jobParameters['date']}"/>
-                        <constructor-arg>
-                            <util:constant static-field="be.raildelays.domain.Sens.ARRIVAL"/>
-                        </constructor-arg>
-                        <constructor-arg>
-                            <bean class="be.raildelays.domain.Language" factory-method="valueOf">
-                                <constructor-arg>
-                                    <value>#{jobParameters['language']?.toUpperCase()}</value>
-                                </constructor-arg>
-                            </bean>
-                        </constructor-arg>
-                    </bean>
-                </property>
-                <property name="streamer">
-                    <bean class="be.raildelays.httpclient.impl.DelaysRequestStreamer"/>
-                </property>
-                <property name="parser">
-                    <bean class="be.raildelays.parser.impl.DelaysStreamParser"/>
-                </property>
-                <property name="retryPolicy" ref="railtimeReaderRetryPolicy"/>
-                <property name="backOffPolicy" ref="railtimeReaderBackOffPolicy"/>
-            </bean>
-        </property>
-    </bean>-->
-
-
     <bean id="railtimeReaderRetryPolicy"
           class="org.springframework.retry.policy.SimpleRetryPolicy"
           scope="step">
@@ -326,16 +263,6 @@
     <!-- ================================================================================================== -->
     <!-- =====================================       PROCESSORS       ===================================== -->
     <!-- ================================================================================================== -->
-
-    <!--<bean id="chainedProcessorsForRailtime"
-          class="org.springframework.batch.item.support.CompositeItemProcessor">
-        <property name="delegates">
-            <list>
-                <ref bean="lineStopMapperProcessor"/>
-                <ref bean="validatorProcessor"/>
-            </list>
-        </property>
-    </bean>-->
 
     <bean id="chainedProcessorsForAfas"
           class="org.springframework.batch.item.support.CompositeItemProcessor">

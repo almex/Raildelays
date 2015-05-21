@@ -12,62 +12,45 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.step.job.JobParametersExtractor;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.Date;
 
 public class BatchScheduledService extends ScheduledService<Integer> {
     private IntegerProperty count = new SimpleIntegerProperty();
-
-    private ClassPathXmlApplicationContext applicationContext;
     private JobParametersExtractor propertiesExtractor;
     private BatchStartAndRecoveryService service;
     private JobExecution jobExecution;
+    private String jobName;
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchScheduledService.class);
 
-    public BatchScheduledService(ClassPathXmlApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-
-        //-- Initialize contexts
-        applicationContext.registerShutdownHook(); // Register close of this Spring context to shutdown of the JVM
-        applicationContext.start();
-
-        propertiesExtractor = applicationContext.getBean("jobParametersFromPropertiesExtractor",
-                JobParametersExtractor.class);
-        service = applicationContext.getBean("BatchStartAndRecoveryService", BatchStartAndRecoveryService.class);
-        jobExecution = null;
+    public BatchScheduledService() {
+        this.jobExecution = null;
     }
 
-    @Override
-    public void start() {
+    public void start(String jobName, Date date) {
         if (!isStarted()) {
             JobParameters jobParameters = propertiesExtractor.getJobParameters(null, null);
             JobParametersBuilder builder = new JobParametersBuilder(jobParameters);
 
-            builder.addDate("date", new Date());
+            builder.addDate("date", date);
 
             try {
-                jobExecution = service.start("mainJob", builder.toJobParameters());
+                jobExecution = service.start(jobName, builder.toJobParameters());
             } catch (Exception e) {
                 LOGGER.error("Error when starting the job: ", e);
             }
         }
 
+        start();
+    }
+
+    @Override
+    public void start() {
+
         super.start();
     }
 
-    public final Integer getCount() {
-        return count.get();
-    }
-
-    public final JobExecution getJobExecution() {
-        return jobExecution;
-    }
-
-    public final IntegerProperty countProperty() {
-        return count;
-    }
-
+    @Override
     protected Task<Integer> createTask() {
         return new Task<Integer>() {
             protected Integer call() {
@@ -93,8 +76,17 @@ public class BatchScheduledService extends ScheduledService<Integer> {
         jobExecution = null;
     }
 
-    public boolean isStarted() {
-        return jobExecution != null;
+    @Override
+    public void restart() {
+        try {
+            if (isStarted()) {
+                jobExecution = service.restart(jobExecution.getId());
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error when restarting the job execution!", e);
+        }
+
+        super.restart();
     }
 
     public boolean stop() {
@@ -112,19 +104,6 @@ public class BatchScheduledService extends ScheduledService<Integer> {
         return result;
     }
 
-    @Override
-    public void restart() {
-        try {
-            if (isStarted()) {
-                jobExecution = service.restart(jobExecution.getId());
-            }
-        } catch (Exception e) {
-            LOGGER.error("Error when restarting the job execution!", e);
-        }
-
-        super.restart();
-    }
-
     public boolean abandon() {
         boolean result = false;
 
@@ -138,5 +117,29 @@ public class BatchScheduledService extends ScheduledService<Integer> {
         }
 
         return result;
+    }
+
+    public boolean isStarted() {
+        return jobExecution != null;
+    }
+
+    public final Integer getCount() {
+        return count.get();
+    }
+
+    public final JobExecution getJobExecution() {
+        return jobExecution;
+    }
+
+    public final IntegerProperty countProperty() {
+        return count;
+    }
+
+    public void setPropertiesExtractor(JobParametersExtractor propertiesExtractor) {
+        this.propertiesExtractor = propertiesExtractor;
+    }
+
+    public void setService(BatchStartAndRecoveryService service) {
+        this.service = service;
     }
 }

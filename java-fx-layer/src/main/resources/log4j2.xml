@@ -187,13 +187,13 @@
 
     <loggers>
 
-        <logger name="be.raildelays.spring.batch.Bootstrap" level="trace" additivity="false">
+        <logger name="be.raildelays.batch.Bootstrap" level="trace" additivity="false">
             <appender-ref ref="console"/>
         </logger>
-        <logger name="be.raildelays.spring.batch.reader.CompositeRailtimeItemReader" level="trace" additivity="false">
+        <logger name="be.raildelays.batch.reader.CompositeRailtimeItemReader" level="trace" additivity="false">
             <appender-ref ref="step1Reader"/>
         </logger>
-        <logger name="be.raildelays.spring.batch.reader.TrainIdPartitioner" level="trace" additivity="false">
+        <logger name="be.raildelays.batch.reader.TrainIdPartitioner" level="trace" additivity="false">
             <appender-ref ref="step1Reader"/>
         </logger>
         <logger name="be.raildelays.httpclient" level="trace" additivity="false">
@@ -202,14 +202,13 @@
         <logger name="be.raildelays.parser" level="trace" additivity="false">
             <appender-ref ref="step1Reader"/>
         </logger>
-        <logger name="be.raildelays.spring.batch.processor.LineStopMapperProcessor" level="trace" additivity="false">
+        <logger name="be.raildelays.batch.processor.LineStopMapperProcessor" level="trace" additivity="false">
             <appender-ref ref="step1Processor"/>
         </logger>
-        <logger name="be.raildelays.spring.batch.listener.LogStep1ItemProcessorListener" level="trace"
-                additivity="false">
+        <logger name="be.raildelays.batch.listener.LogStep1ItemProcessorListener" level="trace" additivity="false">
             <appender-ref ref="step1Processor"/>
         </logger>
-        <logger name="org.springframework.spring.batch.item.database.JpaItemWriter" level="trace" additivity="false">
+        <logger name="org.springframework.batch.item.database.JpaItemWriter" level="trace" additivity="false">
             <appender-ref ref="step1Writer"/>
         </logger>
 
@@ -219,60 +218,53 @@
         <logger name="be.raildelays.service" level="trace" additivity="false">
             <appender-ref ref="step2Reader"/>
         </logger>
-        <logger name="be.raildelays.spring.batch.reader.CompositeRaildelaysItemReader" level="trace" additivity="false">
+        <logger name="be.raildelays.batch.reader.CompositeRaildelaysItemReader" level="trace" additivity="false">
             <appender-ref ref="step2Reader"/>
         </logger>
-        <logger name="be.raildelays.spring.batch.listener.LogStep2ItemProcessorListener" level="trace"
+        <logger name="be.raildelays.batch.listener.LogStep2ItemProcessorListener" level="trace" additivity="false">
+            <appender-ref ref="step2Processor"/>
+        </logger>
+        <logger name="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor" level="trace" additivity="false">
+            <appender-ref ref="step2Processor"/>
+        </logger>
+        <logger name="be.raildelays.batch.processor.FilterSmallDelaysProcessor" level="trace" additivity="false">
+            <appender-ref ref="step2Processor"/>
+        </logger>
+        <logger name="be.raildelays.batch.processor.BatchExcelRowMapperProcessor" level="trace" additivity="false">
+            <appender-ref ref="step2Processor"/>
+        </logger>
+        <logger name="be.raildelays.batch.processor.SearchNextTrainProcessor" level="trace" additivity="false">
+            <appender-ref ref="step2Processor"/>
+        </logger>
+        <logger name="be.raildelays.batch.processor.AggregateExpectedTimeProcessor" level="trace" additivity="false">
+            <appender-ref ref="step2Processor"/>
+        </logger>
+        <logger name="be.raildelays.batch.processor.StoreDelayGreaterThanThresholdInContextProcessor" level="trace"
                 additivity="false">
             <appender-ref ref="step2Processor"/>
         </logger>
-        <logger name="be.raildelays.spring.batch.processor.FilterTwoSensPerDayProcessor" level="trace"
-                additivity="false">
-            <appender-ref ref="step2Processor"/>
-        </logger>
-        <logger name="be.raildelays.spring.batch.processor.FilterSmallDelaysProcessor" level="trace" additivity="false">
-            <appender-ref ref="step2Processor"/>
-        </logger>
-        <logger name="be.raildelays.spring.batch.processor.BatchExcelRowMapperProcessor" level="trace"
-                additivity="false">
-            <appender-ref ref="step2Processor"/>
-        </logger>
-        <logger name="be.raildelays.spring.batch.processor.SearchNextTrainProcessor" level="trace" additivity="false">
-            <appender-ref ref="step2Processor"/>
-        </logger>
-        <logger name="be.raildelays.spring.batch.processor.AggregateExpectedTimeProcessor" level="trace"
-                additivity="false">
-            <appender-ref ref="step2Processor"/>
-        </logger>
-        <logger name="be.raildelays.spring.batch.processor.StoreDelayGreaterThanThresholdInContextProcessor"
-                level="trace"
-                additivity="false">
-            <appender-ref ref="step2Processor"/>
-        </logger>
-        <logger name="org.springframework.spring.batch.item.file.FlatFileItemWriter" level="trace" additivity="false">
+        <logger name="org.springframework.batch.item.file.FlatFileItemWriter" level="trace" additivity="false">
             <appender-ref ref="step2Writer"/>
         </logger>
-        <logger name="org.springframework.spring.batch.item.file.ExcelSheetItemWriter" level="trace" additivity="false">
+        <logger name="org.springframework.batch.item.file.ExcelSheetItemWriter" level="trace" additivity="false">
             <appender-ref ref="step2Writer"/>
         </logger>
-        <logger name="org.springframework.spring.batch.item.support.MultiResourceMaxItemCountItemWriter" level="trace"
+        <logger name="org.springframework.batch.item.support.MultiResourceMaxItemCountItemWriter" level="trace"
                 additivity="false">
             <appender-ref ref="step2Writer"/>
         </logger>
-        <logger name="org.springframework.spring.batch.item.support.SortedItemStreamWriter" level="trace"
-                additivity="false">
+        <logger name="org.springframework.batch.item.support.SortedItemStreamWriter" level="trace" additivity="false">
             <appender-ref ref="step2Writer"/>
         </logger>
-        <logger name="be.raildelays.spring.batch.writer.BatchExcelRowAggregator" level="trace" additivity="false">
+        <logger name="be.raildelays.batch.writer.BatchExcelRowAggregator" level="trace" additivity="false">
             <appender-ref ref="step2Writer"/>
         </logger>
 
-        <logger name="be.raildelays.spring.batch.listener.LogSkippedItemListener" level="trace" additivity="false">
+        <logger name="be.raildelays.batch.listener.LogSkippedItemListener" level="trace" additivity="false">
             <appender-ref ref="step2SkippedItems"/>
         </logger>
 
-        <logger name="be.raildelays.spring.batch.processor.FilterWithThresholdDelayProcessor" level="trace"
-                additivity="false">
+        <logger name="be.raildelays.batch.processor.FilterItemInContextProcessor" level="trace" additivity="false">
             <appender-ref ref="step2SkippedItems"/>
         </logger>
 

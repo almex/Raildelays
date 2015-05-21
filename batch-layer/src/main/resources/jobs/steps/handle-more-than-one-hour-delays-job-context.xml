@@ -26,7 +26,7 @@
         </step>
         <step id="sendByEmailDelayMoreThanOneHour" parent="parentStep" next="removeDelayMoreThanOneHour">
             <tasklet transaction-manager="batchTransactionManager">
-                <chunk reader="excelSheetWithOneHourDelayItemReader"
+                <chunk reader="oneHourDelayItemReader"
                        processor="chainedProcessorsForMoreThanOneHourDelay"
                        writer="emailWriter"
                        commit-interval="1">
@@ -45,11 +45,13 @@
         </step>
         <step id="removeDelayMoreThanOneHour" parent="parentStep" next="deleteFile">
             <tasklet transaction-manager="batchTransactionManager">
-                <chunk reader="excelSheetWithOneHourDelayItemReader"
+                <chunk reader="oneHourDelayItemReader"
                        processor="chainedProcessorsForLessThanOneHourDelay"
-                       writer="excelSheetWithOneHourDelayItemWriter"
+                       writer="oneHourMultiResourceItemWriter"
                        commit-interval="${excel.sheet0.maxitemcount}">
                     <listeners merge="true">
+                        <!-- To compute file name of the Excel file after filtering -->
+                        <listener ref="resourceLocatorListener"/>
                         <!-- Put in a log file skipped items -->
                         <listener ref="logSkippedItemListener"/>
                     </listeners>
@@ -88,10 +90,10 @@
     <!-- =====================================         READERS        ===================================== -->
     <!-- ================================================================================================== -->
 
-    <bean id="excelSheetWithOneHourDelayItemReader"
+    <bean id="oneHourDelayItemReader"
           class="org.springframework.batch.item.file.ExcelSheetItemReader"
           scope="step">
-        <property name="name" value="excelSheetWithOneHourDelayItemReader"/>
+        <property name="name" value="oneHourDelayItemReader"/>
         <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
         <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
         <property name="rowMapper">
@@ -99,7 +101,8 @@
                 <property name="language" value="#{jobParameters['language']}"/>
             </bean>
         </property>
-        <property name="resource" value="file:#{jobParameters['more.than.one.hour.excel.path']}"/>
+        <property name="resource"
+                  value="file:#{jobParameters['excel.output.path']}/moreThanOneHourBackup/#{jobParameters['excel.file.name']}.#{jobParameters['excel.file.extension']}"/>
     </bean>
 
     <!-- ================================================================================================== -->
@@ -157,6 +160,35 @@
     <!-- =====================================         WRITERS        ===================================== -->
     <!-- ================================================================================================== -->
 
+    <bean id="oneHourMultiResourceItemWriter"
+          class="org.springframework.batch.item.support.MultiResourceMaxItemCountItemWriter"
+          scope="step">
+        <property name="delegate" ref="oneHourSortedItemWriter"/>
+        <property name="name" value="oneHourMultiResourceItemWriter"/>
+        <property name="resourceLocator" ref="oneHourItemWriterResourceLocator"/>
+    </bean>
+
+    <bean id="oneHourSortedItemWriter"
+          class="org.springframework.batch.item.support.SortedItemStreamWriter"
+          scope="step">
+        <property name="reader">
+            <bean class="org.springframework.batch.item.file.ExcelSheetItemReader">
+                <property name="name" value="excelSheetItemReader2"/>
+                <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
+                <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
+                <property name="rowMapper">
+                    <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
+                        <property name="language" value="#{jobParameters['language']}"/>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+        <property name="comparator">
+            <bean class="be.raildelays.batch.bean.TimeBasedExcelRowComparator"/>
+        </property>
+        <property name="writer" ref="excelSheetWithOneHourDelayItemWriter"/>
+    </bean>
+
     <bean id="excelSheetWithOneHourDelayItemWriter"
           class="org.springframework.batch.item.file.ExcelSheetItemWriter"
           scope="step">
@@ -172,7 +204,6 @@
         <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
         <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
         <property name="template" value="file:#{jobParameters['excel.template.path']}"/>
-        <property name="resource" ref="itemWriterResourceWithOneHourDelay"/>
     </bean>
 
     <bean id="emailWriter"
@@ -195,13 +226,7 @@
     <!-- =====================================        RESOURCES       ===================================== -->
     <!-- ================================================================================================== -->
 
-    <bean id="itemWriterResourceWithOneHourDelay"
-          class="org.springframework.batch.item.support.ResourceLocatorAdapter"
-          scope="step">
-        <property name="resourceLocator" ref="itemWriterResourceLocatorWithOneHourDelay"/>
-    </bean>
-
-    <bean id="itemWriterResourceLocatorWithOneHourDelay"
+    <bean id="oneHourItemWriterResourceLocator"
           class="be.raildelays.batch.support.ToWriteExcelResourceLocator"
           scope="step">
         <property name="resource"
