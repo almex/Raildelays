@@ -28,11 +28,11 @@ public class SkipUniqueKeyViolationPolicy implements SkipPolicy {
 
     @Override
     public boolean shouldSkip(Throwable t, int skipCount) throws SkipLimitExceededException {
-        boolean result = true;
+        boolean result = false;
 
-        if (skipCount < 0) {
-            if (isExpectedException(t) && !isExpectedViolation(t)) {
-                result = false;
+        if (skipCount >= 0) {
+            if (isExpectedException(t) || isExpectedViolation(t)) {
+                result = true;
             }
         }
 
