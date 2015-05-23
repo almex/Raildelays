@@ -1,4 +1,4 @@
-package be.raildelays.javafx;
+package be.raildelays.javafx.service;
 
 import be.raildelays.batch.service.BatchStartAndRecoveryService;
 import javafx.beans.property.IntegerProperty;

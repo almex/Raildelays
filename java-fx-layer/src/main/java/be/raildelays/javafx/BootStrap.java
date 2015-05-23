@@ -1,78 +1,102 @@
 package be.raildelays.javafx;
 
 import be.raildelays.batch.service.BatchStartAndRecoveryService;
-import be.raildelays.javafx.control.BatchControlPanel;
+import be.raildelays.javafx.controller.BatchController;
+import be.raildelays.javafx.service.BatchScheduledService;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.application.Preloader;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.step.job.JobParametersExtractor;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.io.IOException;
+import java.net.URL;
+
 /**
  * @author Almex
  */
-public class BootStrap extends Application {
+public class Bootstrap extends Application {
 
-    private MenuItem calculateItem;
+    private BatchController controller;
+    private FXMLLoader fxmlLoader;
+    private TabPane root;
+    private Stage stage;
     private Scene scene;
-    private BatchControlPanel panel;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(BootStrap.class);
-
+    private ClassPathXmlApplicationContext applicationContext;
+    private static final Logger LOGGER = LoggerFactory.getLogger(Bootstrap.class);
 
     @Override
-    public void start(Stage primaryStage) {
-        final Menu exitItem = new Menu("Exit");
-        final Menu actionMenu = new Menu("Action");
-        final MenuBar menuBar = new MenuBar();
-        final BorderPane root = new BorderPane();
+    public void start(Stage primaryStage) throws IOException {
+        notifyPreloader(new PreLoaderHandoverEvent(root,
+                null,
+                new Task<Void>() {
+                    @Override
+                    protected Void call() throws Exception {
+                        doStart(primaryStage);
+
+                        return null;
+                    }
+                }));
+    }
+
+    @Override
+    public void init() throws Exception {
         final String[] contextPaths = new String[]{"/spring/bootstrap-fx-context.xml"};
-        final ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext(contextPaths);
+        URL location = getClass().getResource("/index.fxml");
         final BatchScheduledService scheduledService = new BatchScheduledService();
 
-        //-- Initialize contexts
+        fxmlLoader = new FXMLLoader(location);
+        root = fxmlLoader.load();
+
+        Platform.runLater(() -> scene = new Scene(root, 640, 480));
+
+        applicationContext = new ClassPathXmlApplicationContext(contextPaths);
         applicationContext.registerShutdownHook(); // Register close of this Spring context to shutdown of the JVM
         applicationContext.start();
 
-        final JobParametersExtractor propertiesExtractor = applicationContext
-                .getBean("jobParametersFromPropertiesExtractor", JobParametersExtractor.class);
-        final BatchStartAndRecoveryService batchStartAndRecoveryService = applicationContext
-                .getBean("BatchStartAndRecoveryService", BatchStartAndRecoveryService.class);
+        scheduledService.setPropertiesExtractor(applicationContext
+                .getBean("jobParametersFromPropertiesExtractor", JobParametersExtractor.class));
+        scheduledService.setService(applicationContext
+                .getBean("BatchStartAndRecoveryService", BatchStartAndRecoveryService.class));
 
+        controller = fxmlLoader.getController();
+        controller.setService(scheduledService);
+        controller.setJobName("mainJob");
+        controller.initialize();
+    }
 
-        scheduledService.setPropertiesExtractor(propertiesExtractor);
-        scheduledService.setService(batchStartAndRecoveryService);
+    private void doStart(Stage primaryStage) throws IOException {
+        this.stage = primaryStage;
+        this.stage.setTitle("Raildelays");
+        this.stage.setScene(scene);
+        this.stage.show();
 
-        panel = new BatchControlPanel(scheduledService, "mainJob");
-        calculateItem = new MenuItem("Compute");
-        scene = new Scene(root, 640, 480);
-
-        exitItem.setOnAction(event -> Platform.exit());
-
-        actionMenu.getItems().add(calculateItem);
-        menuBar.getMenus().setAll(exitItem, actionMenu);
-
-        root.setTop(menuBar);
-        root.setCenter(panel.getPane());
-        primaryStage.setTitle("Test");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        notifyPreloader(new Preloader.StateChangeNotification(
+                Preloader.StateChangeNotification.Type.BEFORE_START));
     }
 
     @Override
     public void stop() throws Exception {
-        panel.shutdownService();
+        if (controller != null) {
+            controller.shutdownService();
+        }
         super.stop();
     }
 
     public static void main(String[] args) {
+        // Simulate standalone mode via a system property
+        System.setProperty("javafx.preloader", DataPreLoader.class.getName());
         launch(args);
     }
 }

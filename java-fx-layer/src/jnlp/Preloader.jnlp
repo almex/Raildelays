@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="FancyPreloader.jnlp">
+    <information>
+        <title>FancyPreloader</title>
+        <vendor>msi</vendor>
+        <description>Sample JavaFX 2.0 application.</description>
+        <offline-allowed/>
+    </information>
+    <resources>
+        <jfx:javafx-runtime version="2.0+"
+                            href="http://javadl.sun.com/webapps/download/GetFile/javafx-latest/windows-i586/javafx2.jnlp"/>
+    </resources>
+    <!--resources>
+      <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+      <jar href="lib/FancyPreloader-Preloader.jar" size="13597" download="progress" />
+      <jar href="FancyPreloader.jar" size="1576351" download="eager" />
+    </resources-->
+    <applet-desc width="685" height="500" main-class="com.javafx.main.NoJavaFXFallback" name="FancyPreloader">
+        <param name="requiredFXVersion" value="2.0+"/>
+    </applet-desc>
+    <jfx:javafx-desc width="685" height="500" main-class="be.raildelays.javafx.Bootstrap" name="Bootstrap"
+                     preloader-class="be.raildelays.javafx.DataPreLoader"/>
+    <update check="always"/>
+</jnlp>

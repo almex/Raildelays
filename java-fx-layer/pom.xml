@@ -36,13 +36,13 @@
                 <configuration>
                     <workingDirectory>${project.build.directory}</workingDirectory>
                     <executable>java</executable>
-                    <mainClass>be.raildelays.javafx.BootStrap</mainClass>
+                    <mainClass>be.raildelays.javafx.Bootstrap</mainClass>
                     <classpathScope>compile</classpathScope>
                     <arguments>
                         <argument>-Djava.library.path=${project.build.directory}/dependency</argument>
                         <argument>-jar</argument>
                         <argument>${project.build.finalName}.jar</argument>
-                        <argument>be.raildelays.javafx.BootStrap</argument>
+                        <argument>be.raildelays.javafx.Bootstrap</argument>
                     </arguments>
                 </configuration>
                 <executions>

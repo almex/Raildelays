@@ -1,8 +1,10 @@
-package be.raildelays.javafx.control;
+package be.raildelays.javafx.controller;
 
-import be.raildelays.javafx.BatchScheduledService;
+import be.raildelays.javafx.service.BatchScheduledService;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -16,40 +18,50 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
 
+import java.net.URL;
 import java.util.Date;
+import java.util.ResourceBundle;
 
 /**
  * @author Almex
  * @since 1.2
  */
-public class BatchControlPanel {
+public class BatchController implements Initializable {
 
     private BatchScheduledService service;
+    @FXML
     private Button startButton;
+    @FXML
     private Button stopButton;
+    @FXML
     private Button restartButton;
+    @FXML
     private Button abandonButton;
+    @FXML
     private ProgressBar progressBar;
+    @FXML
     private ProgressIndicator progressIndicator;
+    @FXML
     private Label progressLabel;
     private StackPane progressBarWithLabel;
     private String jobName;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BatchControlPanel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BatchController.class);
 
-    public BatchControlPanel(BatchScheduledService service, String jobName) {
-        this.jobName = jobName;
-        this.service = service;
-        initializeSkin();
-        initializeBehavior();
-    }
-
-    private void initializeBehavior() {
+    private void bindEvents() {
         startButton.setOnAction(event -> doStart());
         stopButton.setOnAction(event -> doStop());
         abandonButton.setOnAction(event -> doAbandon());
         restartButton.setOnAction(event -> doRestart());
+    }
 
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+
+    }
+
+    public void initialize() {
         service.setOnSucceeded((event) -> doRefreshProgress());
         service.setOnFailed((event) -> {
             final Throwable error = service.getException();
@@ -198,5 +210,13 @@ public class BatchControlPanel {
         progressBar.setProgress(progress);
         progressIndicator.setProgress(progress);
         progressLabel.setText(status);
+    }
+
+    public void setService(BatchScheduledService service) {
+        this.service = service;
+    }
+
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
     }
 }

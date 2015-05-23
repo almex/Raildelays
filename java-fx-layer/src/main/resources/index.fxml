@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<TabPane tabClosingPolicy="UNAVAILABLE" fx:controller="be.raildelays.javafx.controller.BatchController"
+         xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <tabs>
+        <Tab text="mainJob">
+            <content>
+                <VBox>
+                    <children>
+                        <ProgressIndicator fx:id="progressIndicator" progress="0.0"/>
+                        <Pane>
+                            <children>
+                                <ProgressBar fx:id="progressBar" prefHeight="39.0" prefWidth="598.0" progress="0.0"/>
+                                <Label fx:id="progressLabel" alignment="CENTER" prefHeight="39.0" prefWidth="598.0" text="Label"/>
+                            </children>
+                        </Pane>
+                        <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                              minWidth="-Infinity" prefHeight="39.0" prefWidth="600.0">
+                            <children>
+                                <Button fx:id="startButton" mnemonicParsing="false" text="Start" onAction="#doStart"/>
+                                <Button fx:id="stopButton" mnemonicParsing="false" text="Stop" onAction="#doStop"/>
+                                <Button fx:id="restartButton" mnemonicParsing="false" text="Restart" onAction="#doRestart"/>
+                                <Button fx:id="abandonButton" mnemonicParsing="false" text="Abandon" onAction="#doAbandon"/>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </content>
+        </Tab>
+        <Tab text="handleMaxMonthsJob">
+            <content>
+                <VBox>
+                    <children>
+                        <ProgressIndicator progress="0.0"/>
+                        <Pane>
+                            <children>
+                                <ProgressBar prefHeight="39.0" prefWidth="598.0" progress="0.0"/>
+                                <Label alignment="CENTER" prefHeight="39.0" prefWidth="598.0" text="Label"/>
+                            </children>
+                        </Pane>
+                        <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                              minWidth="-Infinity" prefHeight="39.0" prefWidth="600.0">
+                            <children>
+                                <Button mnemonicParsing="false" text="Start" onAction="#doStart"/>
+                                <Button mnemonicParsing="false" text="Stop" onAction="#doStop"/>
+                                <Button mnemonicParsing="false" text="Restart" onAction="#doRestart"/>
+                                <Button mnemonicParsing="false" text="Abandon" onAction="#doAbandon"/>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </content>
+        </Tab>
+        <Tab text="handleOneHourDelayJob">
+            <content>
+                <VBox>
+                    <children>
+                        <ProgressIndicator progress="0.0"/>
+                        <Pane>
+                            <children>
+                                <ProgressBar prefHeight="39.0" prefWidth="598.0" progress="0.0"/>
+                                <Label alignment="CENTER" prefHeight="39.0" prefWidth="598.0" text="Label"/>
+                            </children>
+                        </Pane>
+                        <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                              minWidth="-Infinity" prefHeight="39.0" prefWidth="600.0">
+                            <children>
+                                <Button mnemonicParsing="false" text="Start" onAction="#doStart"/>
+                                <Button mnemonicParsing="false" text="Stop" onAction="#doStop"/>
+                                <Button mnemonicParsing="false" text="Restart" onAction="#doRestart"/>
+                                <Button mnemonicParsing="false" text="Abandon" onAction="#doAbandon"/>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </content>
+        </Tab>
+    </tabs>
+</TabPane>
