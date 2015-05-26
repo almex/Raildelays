@@ -96,7 +96,6 @@ public class Bootstrap extends Application {
 
     public static void main(String[] args) {
         // Simulate standalone mode via a system property
-        System.setProperty("javafx.preloader", DataPreLoader.class.getName());
-        launch(args);
+        LauncherImpl.launchApplication(Bootstrap.class, DataPreLoader.class, args);
     }
 }
