@@ -1,19 +1,19 @@
 package be.raildelays.javafx;
 
-import javafx.animation.Interpolator;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.application.Preloader;
-import javafx.scene.Parent;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.image.Image;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.util.Duration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Almex
@@ -23,16 +23,14 @@ public class DataPreLoader extends Preloader {
 
     private ProgressBar progressBar;
     private StackPane root;
-    private StackPane background;
-    private Scene preLoaderScene;
     private Stage preLoaderStage;
     private long startDownload = -1;
-    private Timeline simulatorTimeline;
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataPreLoader.class);
 
     @Override
     public void handleApplicationNotification(PreloaderNotification info) {
         if (info instanceof PreLoaderHandoverEvent) {
-            // handover from preloader to application
+            // handover from pre-loader to application
             final PreLoaderHandoverEvent event = (PreLoaderHandoverEvent) info;
 
             Platform.runLater(event.getDataLoadingTask());
@@ -40,51 +38,68 @@ public class DataPreLoader extends Preloader {
                 ((StateChangeNotification) info).getType() == StateChangeNotification.Type.BEFORE_START) {
             //hide after get any state update from application
             preLoaderStage.hide();
+
+            LOGGER.info("Finished pre-loading!");
         }
     }
 
     @Override
     public void handleStateChangeNotification(StateChangeNotification info) {
+        /*Timeline simulatorTimeline = new Timeline();
+
         if (info.getType() == StateChangeNotification.Type.BEFORE_INIT) {
             // check for fast download and restart progress
             if ((System.currentTimeMillis() - startDownload) < 500) {
-                progressBar.setProgress(0);
-            }
-            // we have finished downloading application, now we are
-            // running application init() method, as we have no way
-            // of calculating real progress
-            // simplate pretend progress here
-            simulatorTimeline = new Timeline();
-            simulatorTimeline.getKeyFrames().add(
+                progressBar.setProgress(0);a
+            }*/
+        /**
+         * We have finished downloading application. Now, we are
+         * running application init() method. As we have no way
+         * to calculate real progress, we simulate a pretended
+         * progress here.
+         */
+        /*simulatorTimeline.getKeyFrames().add(
                     new KeyFrame(Duration.seconds(15),
                             new KeyValue(progressBar.progressProperty(), 1)));
             simulatorTimeline.play();
-        }
+        }*/
     }
 
     @Override
     public void handleProgressNotification(ProgressNotification info) {
         if (startDownload == -1) {
             startDownload = System.currentTimeMillis();
+            progressBar.setProgress(-1);
+        } else {
+            progressBar.setProgress(-1);
         }
-        progressBar.setProgress(info.getProgress() * 0.5);
     }
 
     @Override
     public void init() throws Exception {
+        Image image = new Image(getClass().getResource("/splash-screen-350x240.jpg").toString());
+        BackgroundImage backgroundImage = new BackgroundImage(image, null, null, null, null);
+        StackPane stackPane = new StackPane();
+
         root = new StackPane();
         progressBar = new ProgressBar(0.0);
-        background = new StackPane();
-        background.setId("Window");
-        background.setCache(true);
-        root.getChildren().addAll(background, progressBar);
-        Platform.runLater(() -> preLoaderScene = new Scene(root, 300, 200));
+        progressBar.setMaxHeight(3);
+        progressBar.setMinWidth(350);
+        stackPane.setId("Window");
+        stackPane.setCache(true);
+        stackPane.setBackground(new Background(backgroundImage));
+        root.setAlignment(Pos.BOTTOM_CENTER);
+        root.getChildren().addAll(stackPane, progressBar);
+
+        LOGGER.info("Pre-loader initialized!");
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        this.preLoaderStage = primaryStage;
+        Scene preLoaderScene = new Scene(root, 350, 240);
+
         preLoaderScene.setFill(Color.TRANSPARENT);
+        preLoaderStage = primaryStage;
         preLoaderStage.initStyle(StageStyle.TRANSPARENT);
         preLoaderStage.setScene(preLoaderScene);
         preLoaderStage.show();

@@ -1,15 +1,13 @@
 package be.raildelays.javafx;
 
 import be.raildelays.batch.service.BatchStartAndRecoveryService;
-import be.raildelays.javafx.controller.BatchController;
+import be.raildelays.javafx.controller.AbstractBatchController;
 import be.raildelays.javafx.service.BatchScheduledService;
+import be.raildelays.javafx.spring.CountBeanPostProcessor;
+import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.application.Preloader;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -24,11 +22,14 @@ import java.io.IOException;
 import java.net.URL;
 
 /**
+ * Bootstrap for JavaFX UI.
+ *
  * @author Almex
+ * @since 1.2
  */
 public class Bootstrap extends Application {
 
-    private BatchController controller;
+    private AbstractBatchController controller;
     private FXMLLoader fxmlLoader;
     private TabPane root;
     private Stage stage;
@@ -95,7 +96,9 @@ public class Bootstrap extends Application {
     }
 
     public static void main(String[] args) {
-        // Simulate standalone mode via a system property
+        // Force the load of the CountBeanPostProcessor in the same ClassLoader as LauncherImpl
+        Bootstrap.class.getClassLoader().getResource(CountBeanPostProcessor.class.getName());
+        // Simulate standalone mode
         LauncherImpl.launchApplication(Bootstrap.class, DataPreLoader.class, args);
     }
 }

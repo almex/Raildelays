@@ -13,6 +13,8 @@
         <property name="resource" value="classpath:raildelays.properties"/>
     </bean>
 
+    <bean class="be.raildelays.javafx.spring.CountBeanPostProcessor" />
+
     <import resource="classpath:spring/batch/raildelays-javafx-integration-context.xml"/>
 
 </beans>

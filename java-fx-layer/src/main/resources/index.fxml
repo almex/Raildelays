@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.paint.*?>
 <?import javafx.scene.control.*?>
-<?import java.lang.*?>
 <?import javafx.scene.layout.*?>
-
-
-<TabPane tabClosingPolicy="UNAVAILABLE" fx:controller="be.raildelays.javafx.controller.BatchController"
-         xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<TabPane tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+         fx:controller="be.raildelays.javafx.controller.MainJobBatchControllerImpl">
     <tabs>
         <Tab text="mainJob">
             <content>
-                <VBox>
+                <VBox alignment="CENTER">
                     <children>
                         <ProgressIndicator fx:id="progressIndicator" progress="0.0"/>
-                        <Pane>
+                        <Pane centerShape="true">
                             <children>
                                 <ProgressBar fx:id="progressBar" prefHeight="39.0" prefWidth="598.0" progress="0.0"/>
-                                <Label fx:id="progressLabel" alignment="CENTER" prefHeight="39.0" prefWidth="598.0" text="Label"/>
+                                <Label fx:id="progressLabel" alignment="CENTER" prefHeight="39.0" prefWidth="598.0"
+                                       text="Label"/>
                             </children>
                         </Pane>
                         <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
                               minWidth="-Infinity" prefHeight="39.0" prefWidth="600.0">
                             <children>
-                                <Button fx:id="startButton" mnemonicParsing="false" text="Start" onAction="#doStart"/>
-                                <Button fx:id="stopButton" mnemonicParsing="false" text="Stop" onAction="#doStop"/>
-                                <Button fx:id="restartButton" mnemonicParsing="false" text="Restart" onAction="#doRestart"/>
-                                <Button fx:id="abandonButton" mnemonicParsing="false" text="Abandon" onAction="#doAbandon"/>
+                                <DatePicker fx:id="date" showWeekNumbers="false" />
+                                <Button fx:id="startButton" mnemonicParsing="false" onAction="#doStart" text="Start"/>
+                                <Button fx:id="stopButton" mnemonicParsing="false" onAction="#doStop" text="Stop"/>
+                                <Button fx:id="restartButton" mnemonicParsing="false" onAction="#doRestart"
+                                        text="Restart"/>
+                                <Button fx:id="abandonButton" mnemonicParsing="false" onAction="#doAbandon"
+                                        text="Abandon"/>
                             </children>
                         </HBox>
                     </children>
@@ -47,10 +47,10 @@
                         <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
                               minWidth="-Infinity" prefHeight="39.0" prefWidth="600.0">
                             <children>
-                                <Button mnemonicParsing="false" text="Start" onAction="#doStart"/>
-                                <Button mnemonicParsing="false" text="Stop" onAction="#doStop"/>
-                                <Button mnemonicParsing="false" text="Restart" onAction="#doRestart"/>
-                                <Button mnemonicParsing="false" text="Abandon" onAction="#doAbandon"/>
+                                <Button mnemonicParsing="false" onAction="#doStart" text="Start"/>
+                                <Button mnemonicParsing="false" onAction="#doStop" text="Stop"/>
+                                <Button mnemonicParsing="false" onAction="#doRestart" text="Restart"/>
+                                <Button mnemonicParsing="false" onAction="#doAbandon" text="Abandon"/>
                             </children>
                         </HBox>
                     </children>
@@ -71,10 +71,10 @@
                         <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
                               minWidth="-Infinity" prefHeight="39.0" prefWidth="600.0">
                             <children>
-                                <Button mnemonicParsing="false" text="Start" onAction="#doStart"/>
-                                <Button mnemonicParsing="false" text="Stop" onAction="#doStop"/>
-                                <Button mnemonicParsing="false" text="Restart" onAction="#doRestart"/>
-                                <Button mnemonicParsing="false" text="Abandon" onAction="#doAbandon"/>
+                                <Button mnemonicParsing="false" onAction="#doStart" text="Start"/>
+                                <Button mnemonicParsing="false" onAction="#doStop" text="Stop"/>
+                                <Button mnemonicParsing="false" onAction="#doRestart" text="Restart"/>
+                                <Button mnemonicParsing="false" onAction="#doAbandon" text="Abandon"/>
                             </children>
                         </HBox>
                     </children>
