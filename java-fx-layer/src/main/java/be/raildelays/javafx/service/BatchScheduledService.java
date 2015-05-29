@@ -46,7 +46,6 @@ public class BatchScheduledService extends ScheduledService<Integer> {
 
     @Override
     public void start() {
-
         super.start();
     }
 
@@ -101,6 +100,8 @@ public class BatchScheduledService extends ScheduledService<Integer> {
             LOGGER.error("Error when stopping the job execution!", e);
         }
 
+        cancel();
+
         return result;
     }
 
@@ -115,6 +116,8 @@ public class BatchScheduledService extends ScheduledService<Integer> {
         } catch (Exception e) {
             LOGGER.error("Error when stopping the job execution!", e);
         }
+
+        cancel();
 
         return result;
     }
