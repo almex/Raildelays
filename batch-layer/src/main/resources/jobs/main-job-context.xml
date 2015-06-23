@@ -205,9 +205,8 @@
     </bean>
 
     <bean id="railtimeReaderBackOffPolicy"
-          class="org.springframework.retry.backoff.FixedBackOffPolicy"
+          class="org.springframework.retry.backoff.ExponentialRandomBackOffPolicy"
           scope="step">
-        <property name="backOffPeriod" value="5000"/>
     </bean>
 
     <bean id="delaysItemReader"
