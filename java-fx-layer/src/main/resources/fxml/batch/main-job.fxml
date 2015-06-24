@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox alignment="CENTER" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="be.raildelays.javafx.controller.batch.MainJobBatchControllerImpl">
+    <children>
+        <ProgressIndicator fx:id="progressIndicator" progress="0.0"/>
+        <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+              minWidth="-Infinity" prefHeight="39.0" prefWidth="600.0">
+            <Pane centerShape="true">
+                <children>
+                    <ProgressBar fx:id="progressBar" prefHeight="39.0" prefWidth="598.0"
+                                 progress="0.0"/>
+                    <Label fx:id="progressLabel" alignment="CENTER" prefHeight="39.0" prefWidth="598.0"
+                           text="Label"/>
+                </children>
+            </Pane>
+        </HBox>
+        <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+              minWidth="-Infinity" prefHeight="39.0" prefWidth="600.0">
+            <children>
+                <DatePicker fx:id="date" showWeekNumbers="false"/>
+                <Button fx:id="startButton" mnemonicParsing="false" onAction="#doStart" text="Start"/>
+                <Button fx:id="stopButton" mnemonicParsing="false" onAction="#doStop" text="Stop"/>
+                <Button fx:id="restartButton" mnemonicParsing="false" onAction="#doRestart"
+                        text="Restart"/>
+                <Button fx:id="abandonButton" mnemonicParsing="false" onAction="#doAbandon"
+                        text="Abandon"/>
+            </children>
+        </HBox>
+    </children>
+</VBox>

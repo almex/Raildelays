@@ -1,19 +1,18 @@
-package be.raildelays.javafx.controller;
+package be.raildelays.javafx.controller.batch;
 
+import be.raildelays.javafx.service.BatchScheduledService;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
-import org.springframework.batch.core.JobExecution;
 
-import java.time.Duration;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.chrono.Chronology;
-import java.time.temporal.TemporalAmount;
 import java.util.Date;
+import java.util.ResourceBundle;
 
 /**
  * @author Almex
@@ -45,7 +44,8 @@ public class MainJobBatchControllerImpl extends AbstractBatchController {
     }
 
     @Override
-    public void initialize() {
+    public void initialize(URL location, ResourceBundle resources){
+        setJobName("mainJob");
         date.setValue(LocalDate.now());
         date.setDayCellFactory(param -> new DateCell() {
 
@@ -59,7 +59,7 @@ public class MainJobBatchControllerImpl extends AbstractBatchController {
                 }
             }
         });
-        super.initialize();
+        super.initialize(location, resources);
     }
 
     @Override

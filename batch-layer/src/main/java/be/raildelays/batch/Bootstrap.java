@@ -27,7 +27,7 @@ public class Bootstrap {
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
-        final String[] contextPaths = new String[]{"/spring/bootstrap-context.xml"};
+        final String[] contextPaths = new String[]{"/spring/bootstrap-context.xml", "/jobs/main-job-context.xml"};
         final CommandLineParser parser = new BasicParser();
         final Options options = new Options();
         final List<Date> dates;

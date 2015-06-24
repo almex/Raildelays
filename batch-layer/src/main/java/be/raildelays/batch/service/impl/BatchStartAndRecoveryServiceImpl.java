@@ -27,16 +27,9 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
 
     private static final ExitStatus RECOVERY_STATUS = new ExitStatus("FAILED_FOR_RECOVERY", "Setted as failed in order to allow to restart this job instance");
 
-    @Resource
     private JobRegistry jobRegistry;
-
-    @Resource
     private JobExplorer jobExplorer;
-
-    @Resource
     private JobRepository jobRepository;
-
-    @Resource
     private JobLauncher jobLauncher;
 
     @Override

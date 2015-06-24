@@ -1,4 +1,4 @@
-package be.raildelays.javafx.controller;
+package be.raildelays.javafx.controller.batch;
 
 import be.raildelays.javafx.service.BatchScheduledService;
 import javafx.beans.value.ChangeListener;
@@ -23,7 +23,7 @@ import java.util.ResourceBundle;
  * @author Almex
  * @since 1.2
  */
-public abstract class AbstractBatchController implements Initializable {
+public abstract class AbstractBatchController implements Initializable, BatchController {
 
     @FXML
     protected Button startButton;
@@ -55,19 +55,18 @@ public abstract class AbstractBatchController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        this.service = service;
 
-    }
-
-    public void initialize() {
-        service.setOnSucceeded((event) -> doRefreshProgress());
-        service.setOnFailed((event) -> {
+        this.service.setOnSucceeded((event) -> doRefreshProgress());
+        this.service.setOnFailed((event) -> {
             final Throwable error = service.getException();
             progressLabel.setText("ERROR");
             LOGGER.error("An error occurred!", error);
         });
-        service.setDelay(Duration.seconds(1));
-        service.setPeriod(Duration.seconds(1));
-        service.stateProperty().addListener(getStateChangeListener());
+        this.service.setDelay(Duration.seconds(1));
+        this.service.setPeriod(Duration.seconds(1));
+        this.service.stateProperty().addListener(getStateChangeListener());
+
         resetButtons();
     }
 
@@ -184,7 +183,8 @@ public abstract class AbstractBatchController implements Initializable {
 
     abstract void doStart();
 
-    public void shutdownService() {
+    @Override
+    public void destroy() {
         service.stop();
         service.cancel();
         service.reset();

@@ -5,13 +5,16 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <!-- Service annotation config -->
-    <context:annotation-config/>
-
     <bean id="BatchStartAndRecoveryService"
           class="be.raildelays.batch.service.impl.BatchStartAndRecoveryServiceImpl"
-          destroy-method="stopAllRunningJobs"/>
+          destroy-method="stopAllRunningJobs">
+        <property name="jobRegistry" ref="jobRegistry"/>
+        <property name="jobExplorer" ref="jobExplorer"/>
+        <property name="jobRepository" ref="jobRepository"/>
+        <property name="jobLauncher" ref="jobLauncher"/>
+    </bean>
 
-    <bean id="jobRegistry"
-          class="org.springframework.batch.core.configuration.support.MapJobRegistry"/>
+    <bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry"/>
+
+    <bean id="stepRegistry" class="org.springframework.batch.core.configuration.support.MapStepRegistry"/>
 </beans>

@@ -1,7 +1,9 @@
 package be.raildelays.javafx;
 
 import be.raildelays.batch.service.BatchStartAndRecoveryService;
-import be.raildelays.javafx.controller.AbstractBatchController;
+import be.raildelays.javafx.controller.batch.BatchController;
+import be.raildelays.javafx.controller.batch.BatchIndexController;
+import be.raildelays.javafx.controller.batch.MainJobBatchControllerImpl;
 import be.raildelays.javafx.service.BatchScheduledService;
 import be.raildelays.javafx.spring.CountBeanPostProcessor;
 import com.sun.javafx.application.LauncherImpl;
@@ -17,9 +19,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.step.job.JobParametersExtractor;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import sun.reflect.misc.ReflectUtil;
 
 import java.io.IOException;
-import java.net.URL;
 
 /**
  * Bootstrap for JavaFX UI.
@@ -29,8 +31,7 @@ import java.net.URL;
  */
 public class Bootstrap extends Application {
 
-    private AbstractBatchController controller;
-    private FXMLLoader fxmlLoader;
+    private BatchController controller;
     private TabPane root;
     private Stage stage;
     private Scene scene;
@@ -53,12 +54,28 @@ public class Bootstrap extends Application {
 
     @Override
     public void init() throws Exception {
-        final String[] contextPaths = new String[]{"/spring/bootstrap-fx-context.xml"};
-        URL location = getClass().getResource("/index.fxml");
+        final String[] contextPaths = new String[]{
+                "/spring/bootstrap-fx-context.xml",
+                "/jobs/main-job-context.xml",
+                "/jobs/steps/handle-max-months-job-context.xml"
+        };
         final BatchScheduledService scheduledService = new BatchScheduledService();
 
-        fxmlLoader = new FXMLLoader(location);
-        root = fxmlLoader.load();
+        FXMLLoader rootLoader = new FXMLLoader(getClass().getResource("/fxml/batch/index.fxml"));
+        rootLoader.setControllerFactory(clazz -> {
+            BatchController controller = null;
+
+            if (clazz.isAssignableFrom(MainJobBatchControllerImpl.class)) {
+                controller = new MainJobBatchControllerImpl();
+                controller.setService(scheduledService);
+            } else if (clazz.isAssignableFrom(BatchIndexController.class)) {
+                controller = new BatchIndexController();
+                controller.setService(scheduledService);
+            }
+
+            return controller;
+        });
+        root = rootLoader.load();
 
         Platform.runLater(() -> scene = new Scene(root, 640, 480));
 
@@ -70,11 +87,6 @@ public class Bootstrap extends Application {
                 .getBean("jobParametersFromPropertiesExtractor", JobParametersExtractor.class));
         scheduledService.setService(applicationContext
                 .getBean("BatchStartAndRecoveryService", BatchStartAndRecoveryService.class));
-
-        controller = fxmlLoader.getController();
-        controller.setService(scheduledService);
-        controller.setJobName("mainJob");
-        controller.initialize();
     }
 
     private void doStart(Stage primaryStage) throws IOException {
@@ -90,7 +102,7 @@ public class Bootstrap extends Application {
     @Override
     public void stop() throws Exception {
         if (controller != null) {
-            controller.shutdownService();
+            controller.destroy();
         }
         super.stop();
     }
