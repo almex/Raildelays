@@ -39,33 +39,23 @@ public abstract class AbstractBatchController implements Initializable, BatchCon
     protected ProgressIndicator progressIndicator;
     @FXML
     protected Label progressLabel;
-    protected StackPane progressBarWithLabel;
     protected String jobName;
     protected BatchScheduledService service;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractBatchController.class);
 
-    private void bindEvents() {
-        startButton.setOnAction(event -> doStart());
-        stopButton.setOnAction(event -> doStop());
-        abandonButton.setOnAction(event -> doAbandon());
-        restartButton.setOnAction(event -> doRestart());
-    }
-
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.service = service;
-
-        this.service.setOnSucceeded((event) -> doRefreshProgress());
-        this.service.setOnFailed((event) -> {
+        service.setOnSucceeded((event) -> doRefreshProgress());
+        service.setOnFailed((event) -> {
             final Throwable error = service.getException();
             progressLabel.setText("ERROR");
             LOGGER.error("An error occurred!", error);
         });
-        this.service.setDelay(Duration.seconds(1));
-        this.service.setPeriod(Duration.seconds(1));
-        this.service.stateProperty().addListener(getStateChangeListener());
+        service.setDelay(Duration.seconds(1));
+        service.setPeriod(Duration.seconds(1));
+        service.stateProperty().addListener(getStateChangeListener());
+        progressLabel.setText("");
 
         resetButtons();
     }
@@ -128,30 +118,6 @@ public abstract class AbstractBatchController implements Initializable, BatchCon
         restartButton.setDisable(true);
     }
 
-    private void initializeSkin() {
-        progressBarWithLabel = new StackPane();
-        progressLabel = new Label();
-        startButton = new Button("Start");
-        stopButton = new Button("Stop");
-        restartButton = new Button("Restart");
-        abandonButton = new Button("Abandon");
-        progressBar = new ProgressBar(0.0);
-        progressIndicator = new ProgressIndicator(0.0);
-        progressBar.setMinWidth(150);
-        progressBarWithLabel.getChildren().addAll(progressBar, progressLabel);
-    }
-
-    public Pane getPane() {
-        final HBox hBox = new HBox();
-
-        hBox.setSpacing(5);
-        hBox.setAlignment(Pos.CENTER);
-        hBox.setFillHeight(false);
-        hBox.getChildren().addAll(startButton, stopButton, restartButton, abandonButton, progressBarWithLabel, progressIndicator);
-
-        return hBox;
-    }
-
     public void doRestart() {
         service.restart();
         startButton.setDisable(true);
@@ -181,7 +147,7 @@ public abstract class AbstractBatchController implements Initializable, BatchCon
         }
     }
 
-    abstract void doStart();
+    public abstract void doStart();
 
     @Override
     public void destroy() {

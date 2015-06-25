@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <VBox alignment="CENTER" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="be.raildelays.javafx.controller.batch.MainJobBatchControllerImpl">
+      fx:controller="be.raildelays.javafx.controller.batch.HandleOneHourDelayBatchController">
     <children>
         <ProgressIndicator fx:id="progressIndicator" progress="0.0"/>
         <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"

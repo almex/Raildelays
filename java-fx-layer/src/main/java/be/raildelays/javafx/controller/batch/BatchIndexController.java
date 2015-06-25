@@ -16,27 +16,25 @@ public class BatchIndexController implements BatchController, Initializable {
     private VBox mainJob;
 
     @FXML
-    private BatchController mainJobController;
+    private MainBatchController mainJobController;
 
     @FXML
     private VBox handleMaxMonthsJob;
 
     @FXML
-    private BatchController handleMaxMonthsJobController;
+    private HandleMaxMonthsBatchController handleMaxMonthsJobController;
 
     @FXML
     private VBox handleOneHourDelayJob;
 
     @FXML
-    private BatchController handleOneHourDelayJobController;
+    private HandleOneHourDelayBatchController handleOneHourDelayJobController;
 
     private BatchScheduledService service;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        mainJobController.setService(service);
-        handleMaxMonthsJobController.setService(service);
-        handleOneHourDelayJobController.setService(service);
+        //noop
     }
 
     @Override

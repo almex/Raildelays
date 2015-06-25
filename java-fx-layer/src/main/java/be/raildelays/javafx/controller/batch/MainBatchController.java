@@ -18,10 +18,11 @@ import java.util.ResourceBundle;
  * @author Almex
  * @since 1.2
  */
-public class MainJobBatchControllerImpl extends AbstractBatchController {
+public class MainBatchController extends AbstractBatchController {
     @FXML
     private DatePicker date;
 
+    @Override
     public void doStart() {
         if (date.getValue() != null) {
             startButton.setDisable(true);

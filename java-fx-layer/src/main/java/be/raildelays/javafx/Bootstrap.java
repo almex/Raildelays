@@ -1,9 +1,7 @@
 package be.raildelays.javafx;
 
 import be.raildelays.batch.service.BatchStartAndRecoveryService;
-import be.raildelays.javafx.controller.batch.BatchController;
-import be.raildelays.javafx.controller.batch.BatchIndexController;
-import be.raildelays.javafx.controller.batch.MainJobBatchControllerImpl;
+import be.raildelays.javafx.controller.batch.*;
 import be.raildelays.javafx.service.BatchScheduledService;
 import be.raildelays.javafx.spring.CountBeanPostProcessor;
 import com.sun.javafx.application.LauncherImpl;
@@ -19,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.step.job.JobParametersExtractor;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import sun.reflect.misc.ReflectUtil;
 
 import java.io.IOException;
 
@@ -59,17 +56,34 @@ public class Bootstrap extends Application {
                 "/jobs/main-job-context.xml",
                 "/jobs/steps/handle-max-months-job-context.xml"
         };
-        final BatchScheduledService scheduledService = new BatchScheduledService();
 
         FXMLLoader rootLoader = new FXMLLoader(getClass().getResource("/fxml/batch/index.fxml"));
+
+        applicationContext = new ClassPathXmlApplicationContext(contextPaths);
+        applicationContext.registerShutdownHook(); // Register close of this Spring context to shutdown of the JVM
+        applicationContext.start();
+
         rootLoader.setControllerFactory(clazz -> {
             BatchController controller = null;
+            BatchScheduledService scheduledService = new BatchScheduledService();
 
-            if (clazz.isAssignableFrom(MainJobBatchControllerImpl.class)) {
-                controller = new MainJobBatchControllerImpl();
-                controller.setService(scheduledService);
-            } else if (clazz.isAssignableFrom(BatchIndexController.class)) {
+
+            scheduledService.setPropertiesExtractor(applicationContext
+                    .getBean("jobParametersFromPropertiesExtractor", JobParametersExtractor.class));
+            scheduledService.setService(applicationContext
+                    .getBean("BatchStartAndRecoveryService", BatchStartAndRecoveryService.class));
+
+            if (clazz.isAssignableFrom(BatchIndexController.class)) {
                 controller = new BatchIndexController();
+                controller.setService(scheduledService);
+            } else if (clazz.isAssignableFrom(MainBatchController.class)) {
+                controller = new MainBatchController();
+                controller.setService(scheduledService);
+            } else if (clazz.isAssignableFrom(HandleOneHourDelayBatchController.class)) {
+                controller = new HandleOneHourDelayBatchController();
+                controller.setService(scheduledService);
+            } else if (clazz.isAssignableFrom(HandleMaxMonthsBatchController.class)) {
+                controller = new HandleMaxMonthsBatchController();
                 controller.setService(scheduledService);
             }
 
@@ -79,14 +93,6 @@ public class Bootstrap extends Application {
 
         Platform.runLater(() -> scene = new Scene(root, 640, 480));
 
-        applicationContext = new ClassPathXmlApplicationContext(contextPaths);
-        applicationContext.registerShutdownHook(); // Register close of this Spring context to shutdown of the JVM
-        applicationContext.start();
-
-        scheduledService.setPropertiesExtractor(applicationContext
-                .getBean("jobParametersFromPropertiesExtractor", JobParametersExtractor.class));
-        scheduledService.setService(applicationContext
-                .getBean("BatchStartAndRecoveryService", BatchStartAndRecoveryService.class));
     }
 
     private void doStart(Stage primaryStage) throws IOException {
@@ -108,8 +114,6 @@ public class Bootstrap extends Application {
     }
 
     public static void main(String[] args) {
-        // Force the load of the CountBeanPostProcessor in the same ClassLoader as LauncherImpl
-        Bootstrap.class.getClassLoader().getResource(CountBeanPostProcessor.class.getName());
         // Simulate standalone mode
         LauncherImpl.launchApplication(Bootstrap.class, DataPreLoader.class, args);
     }
