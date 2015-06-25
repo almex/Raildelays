@@ -54,7 +54,8 @@ public class Bootstrap extends Application {
         final String[] contextPaths = new String[]{
                 "/spring/bootstrap-fx-context.xml",
                 "/jobs/main-job-context.xml",
-                "/jobs/steps/handle-max-months-job-context.xml"
+                "/jobs/steps/handle-max-months-job-context.xml",
+                "/jobs/steps/handle-more-than-one-hour-delays-job-context.xml"
         };
 
         FXMLLoader rootLoader = new FXMLLoader(getClass().getResource("/fxml/batch/index.fxml"));

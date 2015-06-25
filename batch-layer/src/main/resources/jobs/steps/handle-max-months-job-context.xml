@@ -94,7 +94,28 @@
         <step id="sendEmail">
             <tasklet transaction-manager="batchTransactionManager" ref="sendExcelFilesByEmail"/>
         </step>
+        <validator ref="handleMaxMonthsJobParametersValidator"/>
     </job>
+
+
+    <bean id="handleMaxMonthsJobParametersValidator" class="org.springframework.batch.core.job.DefaultJobParametersValidator">
+        <property name="requiredKeys">
+            <list>
+                <value>excel.output.path</value>
+                <value>excel.file.name</value>
+                <value>excel.file.extension</value>
+                <value>excel.template.path</value>
+                <value>excel.archive.path</value>
+                <value>language</value>
+                <value>mail.account.username</value>
+                <value>mail.account.password</value>
+                <value>mail.server.host</value>
+                <value>mail.server.port</value>
+                <value>mail.account.address</value>
+                <value>threshold.date</value>
+            </list>
+        </property>
+    </bean>
 
     <!-- ================================================================================================== -->
     <!-- =====================================         DECIDERS       ===================================== -->
