@@ -67,26 +67,24 @@ public class Bootstrap extends Application {
         rootLoader.setControllerFactory(clazz -> {
             BatchController controller = null;
             BatchScheduledService scheduledService = new BatchScheduledService();
+            JobParametersExtractor propertiesExtractor = applicationContext
+                    .getBean("jobParametersFromPropertiesExtractor", JobParametersExtractor.class);
 
-
-            scheduledService.setPropertiesExtractor(applicationContext
-                    .getBean("jobParametersFromPropertiesExtractor", JobParametersExtractor.class));
             scheduledService.setService(applicationContext
                     .getBean("BatchStartAndRecoveryService", BatchStartAndRecoveryService.class));
 
             if (clazz.isAssignableFrom(BatchIndexController.class)) {
                 controller = new BatchIndexController();
-                controller.setService(scheduledService);
             } else if (clazz.isAssignableFrom(MainBatchController.class)) {
                 controller = new MainBatchController();
-                controller.setService(scheduledService);
             } else if (clazz.isAssignableFrom(HandleOneHourDelayBatchController.class)) {
                 controller = new HandleOneHourDelayBatchController();
-                controller.setService(scheduledService);
             } else if (clazz.isAssignableFrom(HandleMaxMonthsBatchController.class)) {
                 controller = new HandleMaxMonthsBatchController();
-                controller.setService(scheduledService);
             }
+
+            controller.setService(scheduledService);
+            controller.setPropertiesExtractor(propertiesExtractor);
 
             return controller;
         });

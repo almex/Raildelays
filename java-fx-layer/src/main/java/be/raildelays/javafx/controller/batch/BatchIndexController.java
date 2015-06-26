@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.VBox;
+import org.springframework.batch.core.step.job.JobParametersExtractor;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -47,5 +48,10 @@ public class BatchIndexController implements BatchController, Initializable {
         mainJobController.destroy();
         handleOneHourDelayJobController.destroy();
         handleMaxMonthsJobController.destroy();
+    }
+
+    @Override
+    public void setPropertiesExtractor(JobParametersExtractor propertiesExtractor) {
+
     }
 }

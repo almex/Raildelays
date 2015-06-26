@@ -15,6 +15,7 @@ import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.step.job.JobParametersExtractor;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -41,6 +42,7 @@ public abstract class AbstractBatchController implements Initializable, BatchCon
     protected Label progressLabel;
     protected String jobName;
     protected BatchScheduledService service;
+    protected JobParametersExtractor propertiesExtractor;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractBatchController.class);
 
@@ -183,5 +185,9 @@ public abstract class AbstractBatchController implements Initializable, BatchCon
 
     public void setJobName(String jobName) {
         this.jobName = jobName;
+    }
+
+    public void setPropertiesExtractor(JobParametersExtractor propertiesExtractor) {
+        this.propertiesExtractor = propertiesExtractor;
     }
 }

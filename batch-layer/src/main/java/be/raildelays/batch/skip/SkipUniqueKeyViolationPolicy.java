@@ -6,12 +6,13 @@ import org.springframework.batch.core.step.skip.SkipPolicy;
 
 import javax.persistence.PersistenceException;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.Locale;
 
 /**
  * This {@link org.springframework.batch.core.step.skip.SkipPolicy} is dedicated to determine if we have an exceptional
  * duplicate key exception coming from the database when we insert new {@code LineStop}.
  * The {@code Exception} that we should match would be the {@link org.hibernate.exception.ConstraintViolationException} or
- * the {@link java.sql.SQLIntegrityConstraintViolationException} but unforunatly Hibernate convert this {@code class} into
+ * the {@link java.sql.SQLIntegrityConstraintViolationException} but unfortunately Hibernate convert this {@code class} into
  * more generic one called {@link javax.persistence.PersistenceException}.
  *
  * @author Almex
@@ -19,34 +20,17 @@ import java.sql.SQLIntegrityConstraintViolationException;
  */
 public class SkipUniqueKeyViolationPolicy implements SkipPolicy {
 
-    private static final String CONSTRAINT_NAME = "LineStopUniqueBusinessKeyConstraint".toUpperCase();
-
-    private static Class<? extends Throwable>[] expected = new Class[]{ConstraintViolationException.class,
-            SQLIntegrityConstraintViolationException.class,
-            PersistenceException.class};
+    public static final String CONSTRAINT_NAME = "LineStopUniqueBusinessKeyConstraint".toUpperCase();
 
 
     @Override
     public boolean shouldSkip(Throwable t, int skipCount) throws SkipLimitExceededException {
         boolean result = false;
 
-        if (skipCount >= 0) {
-            if (isExpectedException(t) || isExpectedViolation(t)) {
-                result = true;
-            }
-        }
-
-        return result;
-    }
-
-    private static boolean isExpectedException(Throwable e) {
-        boolean result = false;
-
-        for (Class<? extends Throwable> expected : SkipUniqueKeyViolationPolicy.expected) {
-            if (expected.isAssignableFrom(e.getClass())) {
-                result = true;
-                break;
-            }
+        if (skipCount < 0) {
+            result = true; // We gracefully skip in case where the caller of this method gives us skipCount<0
+        } else if (isExpectedViolation(t)) {
+            result = true;
         }
 
         return result;
@@ -56,11 +40,19 @@ public class SkipUniqueKeyViolationPolicy implements SkipPolicy {
         boolean result = false;
 
         if (e instanceof ConstraintViolationException) {
-            result = ((ConstraintViolationException) e).getConstraintName().toUpperCase().equals(CONSTRAINT_NAME);
+            // We must ignore accent (we use Local.ENGLISH for that) and case
+            result = ((ConstraintViolationException) e).getConstraintName().toUpperCase(Locale.ENGLISH).equals(CONSTRAINT_NAME);
         } else if (e instanceof SQLIntegrityConstraintViolationException) {
-            result = e.getMessage().toUpperCase().contains(CONSTRAINT_NAME);
-        } else if (e.getCause() != null) {
-            result = isExpectedViolation(e.getCause());
+            // We must ignore accent (we use Local.ENGLISH for that) and case
+            result = e.getMessage().toUpperCase(Locale.ENGLISH).contains(CONSTRAINT_NAME);
+        } else if (e instanceof PersistenceException) {
+            /**
+             * We are in the case where Hibernate encapsulate the Exception into a PersistenceException.
+             * Then we must check recursively into causes.
+             */
+            if (e.getCause() != null) {
+                result = isExpectedViolation(e.getCause());
+            }
         }
 
         return result;

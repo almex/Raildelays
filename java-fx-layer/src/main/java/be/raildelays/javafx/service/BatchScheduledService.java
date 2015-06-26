@@ -17,7 +17,6 @@ import java.util.Date;
 
 public class BatchScheduledService extends ScheduledService<Integer> {
     private IntegerProperty count = new SimpleIntegerProperty();
-    private JobParametersExtractor propertiesExtractor;
     private BatchStartAndRecoveryService service;
     private JobExecution jobExecution;
     private String jobName;
@@ -27,15 +26,10 @@ public class BatchScheduledService extends ScheduledService<Integer> {
         this.jobExecution = null;
     }
 
-    public void start(String jobName, Date date) {
+    public void start(String jobName, JobParameters jobParameters) {
         if (!isStarted()) {
-            JobParameters jobParameters = propertiesExtractor.getJobParameters(null, null);
-            JobParametersBuilder builder = new JobParametersBuilder(jobParameters);
-
-            builder.addDate("date", date);
-
             try {
-                jobExecution = service.start(jobName, builder.toJobParameters());
+                jobExecution = service.start(jobName, jobParameters);
             } catch (Exception e) {
                 LOGGER.error("Error when starting the job: ", e);
             }
@@ -136,10 +130,6 @@ public class BatchScheduledService extends ScheduledService<Integer> {
 
     public final IntegerProperty countProperty() {
         return count;
-    }
-
-    public void setPropertiesExtractor(JobParametersExtractor propertiesExtractor) {
-        this.propertiesExtractor = propertiesExtractor;
     }
 
     public void setService(BatchStartAndRecoveryService service) {

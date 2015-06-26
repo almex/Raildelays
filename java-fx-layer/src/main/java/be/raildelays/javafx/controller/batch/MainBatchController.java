@@ -7,6 +7,8 @@ import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 
 import java.net.URL;
 import java.time.LocalDate;
@@ -25,6 +27,9 @@ public class MainBatchController extends AbstractBatchController {
     @Override
     public void doStart() {
         if (date.getValue() != null) {
+            JobParameters jobParameters = propertiesExtractor.getJobParameters(null, null);
+            JobParametersBuilder builder = new JobParametersBuilder(jobParameters);
+
             startButton.setDisable(true);
             stopButton.setDisable(false);
             abandonButton.setDisable(true);
@@ -37,8 +42,10 @@ public class MainBatchController extends AbstractBatchController {
                 service.cancel();
             }
 
+            builder.addDate("date", Date.from(date.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+
             service.reset();
-            service.start(jobName, Date.from(date.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            service.start(jobName, builder.toJobParameters());
 
             doRefreshProgress();
         }
