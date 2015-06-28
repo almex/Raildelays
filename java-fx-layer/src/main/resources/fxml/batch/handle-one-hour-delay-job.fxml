@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
 <VBox alignment="CENTER" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="be.raildelays.javafx.controller.batch.HandleOneHourDelayBatchController">
     <children>
@@ -20,7 +22,7 @@
         <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
               minWidth="-Infinity" prefHeight="39.0" prefWidth="600.0">
             <children>
-                <DatePicker fx:id="date" showWeekNumbers="false"/>
+                <Button fx:id="browse" onAction="#onBrowse" text="Browse"/>
                 <Button fx:id="startButton" mnemonicParsing="false" onAction="#doStart" text="Start"/>
                 <Button fx:id="stopButton" mnemonicParsing="false" onAction="#doStop" text="Stop"/>
                 <Button fx:id="restartButton" mnemonicParsing="false" onAction="#doRestart"

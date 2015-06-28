@@ -1,18 +1,13 @@
 package be.raildelays.javafx.controller.batch;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
-import javafx.scene.control.DateCell;
-import javafx.scene.control.DatePicker;
+import javafx.scene.control.Button;
+import javafx.stage.FileChooser;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 
+import java.io.File;
 import java.net.URL;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.ResourceBundle;
 
 /**
@@ -21,11 +16,13 @@ import java.util.ResourceBundle;
  */
 public class HandleOneHourDelayBatchController extends AbstractBatchController {
     @FXML
-    private DatePicker date;
+    private Button browse;
+
+    private File file;
 
     @Override
     public void doStart() {
-        if (date.getValue() != null) {
+        if (file != null) {
             JobParameters jobParameters = propertiesExtractor.getJobParameters(null, null);
             JobParametersBuilder builder = new JobParametersBuilder(jobParameters);
 
@@ -41,7 +38,7 @@ public class HandleOneHourDelayBatchController extends AbstractBatchController {
                 service.cancel();
             }
 
-            builder.addDate("threshold.date", Date.from(date.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            builder.addString("more.than.one.hour.excel.path", file.getAbsolutePath());
 
             service.reset();
             service.start(jobName, builder.toJobParameters());
@@ -50,40 +47,24 @@ public class HandleOneHourDelayBatchController extends AbstractBatchController {
         }
     }
 
+    public void onBrowse() {
+        FileChooser fileChooser = new FileChooser();
+        File directory = new File(propertiesExtractor.getJobParameters(null, null).getString("excel.output.path"));
+        fileChooser.setInitialDirectory(directory);
+
+        fileChooser.setTitle("Choose the Excel file to parse");
+
+        //Show open file dialog
+        file = fileChooser.showOpenDialog(null);
+    }
+
     @Override
-    public void initialize(URL location, ResourceBundle resources){
+    public void initialize(URL location, ResourceBundle resources) {
         setJobName("handleMoreThanOneHourDelaysJob");
-        date.setValue(LocalDate.now());
-        date.setDayCellFactory(param -> new DateCell() {
-
-            @Override
-            public void updateItem(LocalDate item, boolean empty) {
-                super.updateItem(item, empty);
-
-                if (item.isBefore(LocalDate.now().minusDays(6)) ||
-                        item.isAfter(LocalDate.now())) {
-                    setDisable(true);
-                }
-            }
-        });
         super.initialize(location, resources);
     }
 
-    @Override
-    protected ChangeListener<Worker.State> getStateChangeListener() {
-
-        return (ObservableValue<? extends Worker.State> observable,
-                Worker.State oldValue,
-                Worker.State newValue) -> {
-            super.getStateChangeListener().changed(observable, oldValue, newValue);
-            date.setDisable(startButton.isDisable());
-        };
-
-    }
-
-    @Override
-    protected void resetButtons() {
-        super.resetButtons();
-        date.setDisable(startButton.isDisable());
+    public void setBrowse(Button browse) {
+        this.browse = browse;
     }
 }

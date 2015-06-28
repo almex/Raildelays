@@ -104,7 +104,8 @@
 
     <bean id="moreThanOneHourDelaysDecider"
           class="be.raildelays.batch.decider.MoreThanOneHourDelayDecider">
-        <property name="keyName" value="${excel.item.max.key}"/>
+        <property name="keyName" value="more.than.one.hour.excel.path"/>
+        <property name="reader" ref="allExcelFilesItemReader"/>
     </bean>
 
     <!-- ================================================================================================== -->
@@ -124,6 +125,26 @@
         </property>
         <property name="resource"
                   value="file:#{jobParameters['excel.output.path']}/moreThanOneHourBackup/#{jobParameters['excel.file.name']}.#{jobParameters['excel.file.extension']}"/>
+    </bean>
+
+    <bean id="allExcelFilesItemReader"
+          class="org.springframework.batch.item.file.MultiResourceItemReader"
+          scope="step">
+        <property name="delegate">
+            <bean class="org.springframework.batch.item.file.ExcelSheetItemReader"
+                  scope="step">
+                <property name="name" value="allExcelFilesToSplitItemReader"/>
+                <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
+                <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
+                <property name="rowMapper">
+                    <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
+                        <property name="language" value="#{jobParameters['language']}"/>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+        <property name="resources"
+                  value="file:#{jobParameters['excel.output.path']}/*.#{jobParameters['excel.file.extension']}"/>
     </bean>
 
     <!-- ================================================================================================== -->

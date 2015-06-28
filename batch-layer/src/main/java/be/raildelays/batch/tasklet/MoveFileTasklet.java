@@ -6,14 +6,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.support.ResourceLocator;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  *
@@ -39,6 +39,17 @@ public class MoveFileTasklet implements Tasklet, InitializingBean {
         // Moving to a null destination is equivalent to delete the file
         if (destination != null) {
             File newFile = destination.getFile();
+            Path directory = null;
+
+            if (newFile.isDirectory()) {
+                directory = newFile.toPath();
+            } else {
+                directory = newFile.getParentFile().toPath();
+            }
+
+            // We must create the destination directory if it does not exists
+            Files.createDirectories(directory);
+
             /*
              * If the destination file exists but is writable then it will be overwrite.
              */

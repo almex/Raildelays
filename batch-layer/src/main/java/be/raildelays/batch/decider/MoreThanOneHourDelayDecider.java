@@ -1,14 +1,16 @@
 package be.raildelays.batch.decider;
 
+import be.raildelays.domain.xls.ExcelRow;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
-import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.batch.support.ResourceAwareItemStream;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
+
+import java.nio.file.Paths;
 
 /**
  * This {@link JobExecutionDecider} is responsible to return a custom {@link FlowExecutionStatus}
@@ -19,50 +21,42 @@ import org.springframework.util.Assert;
  * @author Almex
  * @see be.raildelays.batch.processor.StoreDelayGreaterThanThresholdInContextProcessor
  */
-public class MoreThanOneHourDelayDecider extends AbstractJobExecutionDeciderTasklet implements InitializingBean {
+public class MoreThanOneHourDelayDecider extends AbstractReadAndDecideTasklet<ExcelRow> implements InitializingBean {
 
+    public static final ExitStatus COMPLETED_WITH_60_M_DELAY = new ExitStatus("COMPLETED_WITH_60M_DELAY");
     private String keyName;
+    private long thresholdDelay;
 
     @Override
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(this.keyName, "The 'keyName' property must be provided");
+        Assert.notNull(this.thresholdDelay, "The 'thresholdDelay' property must be provided");
     }
 
     @Override
-    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        ExecutionContext executionContext = chunkContext.getStepContext().getStepExecution().getExecutionContext();
+    protected ExitStatus doRead(StepContribution contribution, ExecutionContext context, ExcelRow item) throws Exception {
+        ExitStatus result = ExitStatus.EXECUTING;
 
-        /*
-         * The Spring Batch documentation is not clear but from what I can understand :
-         * if the previous step is COMPLETED then the stepExecution contains already that status
-         * if the previous step FAILED then the the stepExecution have respectively STARTED/UNKNOWN as
-         * BatchStatus/ExitStatus combination.
-         * So I presume that no matter what the JobExectionDecider return, if an error occurs (an uncatched Exception)
-         * then the step will FAILED. But the JobExectionDecider can return a custom FlowExecutionStatus
-         * which will be interpreted as a failure by the flow.
-         * ex:
-         * <batch:decision id="decision" decider="myDecider">
-         *      <batch:next on="FILE_NOT_FOUND" to="createFile"/>
-         *      <batch:fail on="FILE_CORRUPTED"/>
-         *      <batch:end on="FILE_ALREADY_EXISTS"/>
-         * </batch:decision>
-         *
-         * So I presume that no matter what I return here if the step FAILED it will not be overrided.
-         */
+        if (item.getDelay() >= thresholdDelay) {
+            if (reader instanceof ResourceAwareItemStream) {
+                // We store the file path in the context
+                context.put(keyName, Paths.get(((ResourceAwareItemStream) reader).getResource().getURI()));
 
-        // Only if the context contains what we expect we return our specific status
-        if (executionContext.containsKey(keyName)) {
-            contribution.setExitStatus(new ExitStatus("COMPLETED_WITH_60M_DELAY"));
-        } else {
-            // The default status will be COMPLETED (we arbitrary kept the original keyword to mark this step as succeed)
-            contribution.setExitStatus(ExitStatus.COMPLETED);
+                // We keep trace that we've stored something
+                contribution.incrementWriteCount(1);
+                result = COMPLETED_WITH_60_M_DELAY;
+            }
         }
 
-        return RepeatStatus.FINISHED;
+        return result;
     }
 
 
     public void setKeyName(String keyName) {
         this.keyName = keyName;
+    }
+
+    public void setThresholdDelay(long thresholdDelay) {
+        this.thresholdDelay = thresholdDelay;
     }
 }

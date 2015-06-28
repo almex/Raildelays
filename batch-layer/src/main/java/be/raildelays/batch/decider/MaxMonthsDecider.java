@@ -7,7 +7,6 @@ import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -79,10 +78,6 @@ public class MaxMonthsDecider extends AbstractReadAndDecideTasklet<ExcelRow> imp
         }
 
         return result;
-    }
-
-    public void setReader(ItemStreamReader<ExcelRow> reader) {
-        this.reader = reader;
     }
 
     public void setMaxNumberOfMonth(long maxNumberOfMonth) {

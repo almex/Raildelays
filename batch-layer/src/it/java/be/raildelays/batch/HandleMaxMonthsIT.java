@@ -74,11 +74,11 @@ public class HandleMaxMonthsIT extends AbstractContextIT {
         parameters.put("language", new JobParameter("en"));
         parameters.put("threshold.date", new JobParameter(Date.from(LocalDate.of(2014, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC))));
         // We don't test the last step sendEmail
-//        parameters.put("mail.server.host", new JobParameter(""));
-//        parameters.put("mail.server.port", new JobParameter(25L));
-//        parameters.put("mail.account.username", new JobParameter(""));
-//        parameters.put("mail.account.password", new JobParameter(""));
-//        parameters.put("mail.account.address", new JobParameter(""));
+        parameters.put("mail.server.host", new JobParameter(""));
+        parameters.put("mail.server.port", new JobParameter(25L));
+        parameters.put("mail.account.username", new JobParameter(""));
+        parameters.put("mail.account.password", new JobParameter(""));
+        parameters.put("mail.account.address", new JobParameter(""));
 
         JobExecution jobExecution = getJobLauncherTestUtils().launchJob(new JobParameters(parameters));
 

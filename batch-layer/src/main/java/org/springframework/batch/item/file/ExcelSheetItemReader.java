@@ -12,6 +12,7 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.ReaderNotOpenException;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
+import org.springframework.batch.support.ResourceAwareItemStream;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -41,7 +42,7 @@ import java.io.*;
  * @since 1.1
  */
 public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
-        implements IndexedResourceAwareItemStreamReader<T>, InitializingBean {
+        implements IndexedResourceAwareItemStreamReader<T>, InitializingBean, ResourceAwareItemStream {
 
     private static Logger LOGGER = LoggerFactory.getLogger(ExcelSheetItemReader.class);
     private RowMapper<T> rowMapper;
@@ -201,6 +202,10 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
     @Override
     public void setResource(Resource resource) {
         this.resource = resource;
+    }
+
+    public Resource getResource() {
+        return resource;
     }
 
     /**
