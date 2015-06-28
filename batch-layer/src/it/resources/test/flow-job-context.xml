@@ -23,5 +23,8 @@
     <bean id="delayMoreThanOneHourDecider"
           class="be.raildelays.batch.decider.MoreThanOneHourDelayDecider">
         <property name="keyName" value="foo"/>
+        <property name="reader">
+            <bean class="be.raildelays.batch.test.DummyItemStreamReader"/>
+        </property>
     </bean>
 </beans>

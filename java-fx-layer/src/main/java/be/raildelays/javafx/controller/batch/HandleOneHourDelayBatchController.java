@@ -50,8 +50,8 @@ public class HandleOneHourDelayBatchController extends AbstractBatchController {
     public void onBrowse() {
         FileChooser fileChooser = new FileChooser();
         File directory = new File(propertiesExtractor.getJobParameters(null, null).getString("excel.output.path"));
-        fileChooser.setInitialDirectory(directory);
 
+        fileChooser.setInitialDirectory(directory);
         fileChooser.setTitle("Choose the Excel file to parse");
 
         //Show open file dialog
