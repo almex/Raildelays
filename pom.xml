@@ -30,9 +30,9 @@
         </developer>
     </developers>
 
-    <scm>
-        <url>scm:git:git@github.com:almex/Raildelays.git</url>
-        <connection>scm:git:git@github.com:almex/Raildelays.git</connection>
+    <scm>        
+        <url>https://github.com/almex/Raildelays.git</url>
+        <connection>scm:git:https://github.com/almex/Raildelays.git</connection>
         <developerConnection>scm:git:git@github.com:almex/Raildelays.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
@@ -684,7 +684,7 @@
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <useReleaseProfile>false</useReleaseProfile>
-                    <releaseProfiles>release,it,assembly</releaseProfiles>
+                    <releaseProfiles>release,it</releaseProfiles>
                     <goals>deploy</goals>
                 </configuration>
             </plugin>
