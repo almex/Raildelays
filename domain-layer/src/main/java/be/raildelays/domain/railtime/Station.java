@@ -20,7 +20,9 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */.raildelays.domain.railtime;
+ */
+
+package be.raildelays.domain.railtime;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;

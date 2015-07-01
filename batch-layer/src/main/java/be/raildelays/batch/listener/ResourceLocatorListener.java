@@ -20,7 +20,9 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */.raildelays.batch.listener;
+ */
+
+package be.raildelays.batch.listener;
 
 import be.raildelays.batch.bean.BatchExcelRow;
 import org.springframework.batch.core.StepExecution;
