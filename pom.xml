@@ -32,8 +32,8 @@
     </developers>
 
     <scm>
-        <url>https://github.com/almex/Raildelays.git</url>
-        <connection>scm:git:https://github.com/almex/Raildelays.git</connection>
+        <url>scm:git:git@github.com:almex/Raildelays.git</url>
+        <connection>scm:git:git@github.com:almex/Raildelays.git</connection>
         <developerConnection>scm:git:git@github.com:almex/Raildelays.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
