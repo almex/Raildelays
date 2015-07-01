@@ -42,6 +42,9 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
  * <p>
  * Note : A {@link JobExecutionDecider} can be more readable but only a {@link Tasklet} can have access to
  * {@code scope="step"}.
+ *
+ * @author Almex
+ * @since 1.2
  */
 public abstract class AbstractJobExecutionDeciderTasklet implements JobExecutionDecider, Tasklet {
 

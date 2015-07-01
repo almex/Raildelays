@@ -34,11 +34,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.step.job.JobParametersExtractor;
 
-import java.util.Date;
-
+/**
+ * {@link ScheduledService} to do unsynchronized call to {@link BatchStartAndRecoveryService}.
+ *
+ * @author Almex
+ * @since 1.2
+ */
 public class BatchScheduledService extends ScheduledService<Integer> {
     private IntegerProperty count = new SimpleIntegerProperty();
     private BatchStartAndRecoveryService service;

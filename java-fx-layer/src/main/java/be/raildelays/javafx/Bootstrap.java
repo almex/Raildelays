@@ -54,6 +54,7 @@ public class Bootstrap extends Application {
     private BatchController controller;
     private TabPane root;
     private Scene scene;
+    private Stage stage;
     private ClassPathXmlApplicationContext applicationContext;
     private static final Logger LOGGER = LoggerFactory.getLogger(Bootstrap.class);
 
@@ -119,6 +120,8 @@ public class Bootstrap extends Application {
     }
 
     private void doStart(Stage primaryStage) throws IOException {
+        this.stage = primaryStage; // We must keep reference to the Stage otherwise we get strage behaviour
+
         primaryStage.setTitle("Raildelays");
         primaryStage.setScene(scene);
         primaryStage.show();

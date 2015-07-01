@@ -33,7 +33,8 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.InitializingBean;
 
 /**
- * Created by xbmc on 09-05-15.
+ * @author Almex
+ * @since 1.2
  */
 public abstract class AbstractReadAndDecideTasklet<T> extends AbstractJobExecutionDeciderTasklet implements InitializingBean {
     protected ItemStreamReader<T> reader;
@@ -46,7 +47,7 @@ public abstract class AbstractReadAndDecideTasklet<T> extends AbstractJobExecuti
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        ExecutionContext context = chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext();
+        ExecutionContext context = chunkContext.getStepContext().getStepExecution().getExecutionContext();
         RepeatStatus result;
 
         if (!opened) {
