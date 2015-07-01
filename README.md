@@ -1,22 +1,8 @@
 # Raildelays
 
-Raildelays is a multi-module application including an API, front-ends and input/output modules.
-Main goal of this application is to collect all train delays from Belgian railway company called 
-[NMBS](http://www.belgianrail.be/nl)/[SNCB](http://www.belgianrail.be/fr).
-It was developed with extensibility in mind and is able to deal with other railway company or other vehicules
+Raildelays is mainly a Java application which accumulates train delays from the Belgian railway company called [NMBS](http://www.belgianrail.be/nl)/[SNCB](http://www.belgianrail.be/fr).
+In futur development, we will extend possibilities to be able to deal with other railway company or other vehicles
  (i.e: bus, airplane, truck, cars,...).
-
-## Comparing to iRail
-
-If you talk about position and time of any vehicule traject you can view those data under multiple aspects :
-* Timetable
-* Liveboard
-* Route log
-
-[iRail project](http://project.irail.be/) is an other project on which a lot of Belgian train application are based
-It can query a timetable per train and per date or a liveboard per station. In contrario, Raildelays API query only 
-the route logs. iRail API is capabale to give route log for a vehicule but only for the date of the day and only
-the effective time. iRail can't search delays within the past while Raildelays can.
 
 ### Timetable (futur)
 When we talk about train timetable or scheduling we only talk about what is the planed route for a train.
@@ -69,18 +55,18 @@ or, you can execute integration tests via:
 
 ## Front-end
 * non-interactive batch engine (mobile or desktop)
+* desktop UI (Java FX)
 * mobile UI (Android) <not implemented yet>
-* desktop UI (Java FX) <not implemented yet>
 
 # Application Architecture
 
 To be able to analyze data from an external system (e.g. : www.railtime.be), we have to persist them in our 
 data model.
 
-## Langages
+## Languages
 
-* Java: choosen for its portability and its power.
-* Groovy: choosen for its easyness to parse DOM documents (XML, XHTML,...).
+* Java: chosen for its portability and its power.
+* Groovy: chosen for its easiness to parse DOM documents (XML, XHTML,...).
 
 ## Frameworks
 

@@ -10,6 +10,9 @@
     <name>Raildelays</name>
     <url>https://github.com/almex/Raildelays</url>
     <inceptionYear>2012</inceptionYear>
+    <description>
+        Raildelays is mainly a Java application which accumulates train delays from the Belgian railway company called NMBS/SNCB.
+    </description>
 
     <licenses>
 		<license>
