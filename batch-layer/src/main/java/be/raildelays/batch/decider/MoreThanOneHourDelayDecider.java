@@ -25,7 +25,7 @@ public class MoreThanOneHourDelayDecider extends AbstractReadAndDecideTasklet<Ex
 
     public static final ExitStatus COMPLETED_WITH_60_M_DELAY = new ExitStatus("COMPLETED_WITH_60M_DELAY");
     private String keyName;
-    private long thresholdDelay;
+    private Long thresholdDelay;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -56,7 +56,7 @@ public class MoreThanOneHourDelayDecider extends AbstractReadAndDecideTasklet<Ex
         this.keyName = keyName;
     }
 
-    public void setThresholdDelay(long thresholdDelay) {
+    public void setThresholdDelay(Long thresholdDelay) {
         this.thresholdDelay = thresholdDelay;
     }
 }

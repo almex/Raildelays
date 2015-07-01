@@ -1,7 +1,6 @@
 package be.raildelays.batch.decider;
 
 import be.raildelays.batch.AbstractContextIT;
-import be.raildelays.batch.test.MockStatusTasklet;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
@@ -29,22 +28,20 @@ public class MoreThanOneHourDelayDeciderIT extends AbstractContextIT {
     public void testCompleted() throws Exception {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(
                 new JobParameters(
-                        Collections.singletonMap("status", new JobParameter(
-                                MockStatusTasklet.Status.COMPLETED.name()))));
+                        Collections.singletonMap("thresholdDelay", new JobParameter(100L))));
 
         Assert.assertFalse(jobExecution.getStatus().isUnsuccessful());
-        Assert.assertEquals(1, jobExecution.getStepExecutions().size());
+        Assert.assertEquals(2, jobExecution.getStepExecutions().size());
     }
 
     @Test
     public void testCompletedWith60mDelay() throws Exception {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(
                 new JobParameters(
-                        Collections.singletonMap("status", new JobParameter(
-                                MockStatusTasklet.Status.COMPLETED_WITH_60M_DELAY.name()))));
+                        Collections.singletonMap("thresholdDelay", new JobParameter(60L))));
 
         Assert.assertFalse(jobExecution.getStatus().isUnsuccessful());
-        Assert.assertEquals(2, jobExecution.getStepExecutions().size());
+        Assert.assertEquals(3, jobExecution.getStepExecutions().size());
     }
 
 
@@ -52,8 +49,7 @@ public class MoreThanOneHourDelayDeciderIT extends AbstractContextIT {
     public void testFailed() throws Exception {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(
                 new JobParameters(
-                        Collections.singletonMap("status", new JobParameter(
-                                MockStatusTasklet.Status.FAILED.name()))));
+                        Collections.singletonMap("thresholdDelay", new JobParameter(-1L))));
 
         Assert.assertTrue(jobExecution.getStatus().isUnsuccessful());
         Assert.assertEquals(1, jobExecution.getStepExecutions().size());

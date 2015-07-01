@@ -3,7 +3,6 @@ package be.raildelays.javafx;
 import be.raildelays.batch.service.BatchStartAndRecoveryService;
 import be.raildelays.javafx.controller.batch.*;
 import be.raildelays.javafx.service.BatchScheduledService;
-import be.raildelays.javafx.spring.CountBeanPostProcessor;
 import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -30,7 +29,6 @@ public class Bootstrap extends Application {
 
     private BatchController controller;
     private TabPane root;
-    private Stage stage;
     private Scene scene;
     private ClassPathXmlApplicationContext applicationContext;
     private static final Logger LOGGER = LoggerFactory.getLogger(Bootstrap.class);
@@ -65,7 +63,6 @@ public class Bootstrap extends Application {
         applicationContext.start();
 
         rootLoader.setControllerFactory(clazz -> {
-            BatchController controller = null;
             BatchScheduledService scheduledService = new BatchScheduledService();
             JobParametersExtractor propertiesExtractor = applicationContext
                     .getBean("jobParametersFromPropertiesExtractor", JobParametersExtractor.class);
@@ -83,22 +80,24 @@ public class Bootstrap extends Application {
                 controller = new HandleMaxMonthsBatchController();
             }
 
-            controller.setService(scheduledService);
-            controller.setPropertiesExtractor(propertiesExtractor);
+            if (controller != null) {
+                controller.setService(scheduledService);
+                controller.setPropertiesExtractor(propertiesExtractor);
+            }
+
+            LOGGER.info("The factory built a controller.");
 
             return controller;
         });
         root = rootLoader.load();
 
         Platform.runLater(() -> scene = new Scene(root, 640, 480));
-
     }
 
     private void doStart(Stage primaryStage) throws IOException {
-        this.stage = primaryStage;
-        this.stage.setTitle("Raildelays");
-        this.stage.setScene(scene);
-        this.stage.show();
+        primaryStage.setTitle("Raildelays");
+        primaryStage.setScene(scene);
+        primaryStage.show();
 
         notifyPreloader(new Preloader.StateChangeNotification(
                 Preloader.StateChangeNotification.Type.BEFORE_START));

@@ -5,24 +5,34 @@
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
 
 
+    <bean class="org.springframework.batch.core.scope.StepScope"/>
+
     <job id="flowJob" xmlns="http://www.springframework.org/schema/batch">
         <step id="step1" next="decision">
             <tasklet ref="mock" transaction-manager="batchTransactionManager"/>
         </step>
-        <decision id="decision" decider="delayMoreThanOneHourDecider">
+        <step id="decision">
+            <tasklet ref="delayMoreThanOneHourDecider" transaction-manager="batchTransactionManager" />
+            <fail on="FAILED"/>
             <next on="COMPLETED_WITH_60M_DELAY" to="step2"/>
             <end on="COMPLETED"/>
-        </decision>
+        </step>
         <step id="step2">
             <tasklet ref="noop" transaction-manager="batchTransactionManager"/>
         </step>
     </job>
 
-    <bean id="mock" class="be.raildelays.batch.test.MockStatusTasklet"/>
+    <bean id="mock"
+          class="be.raildelays.batch.test.FailOnNegativeThresholdDateTasklet"
+          scope="step">
+        <property name="thresholdDelay" value="#{jobParameters['thresholdDelay']}"/>
+    </bean>
     <bean id="noop" class="be.raildelays.batch.test.NoopTasklet"/>
     <bean id="delayMoreThanOneHourDecider"
-          class="be.raildelays.batch.decider.MoreThanOneHourDelayDecider">
+          class="be.raildelays.batch.decider.MoreThanOneHourDelayDecider"
+          scope="step">
         <property name="keyName" value="foo"/>
+        <property name="thresholdDelay" value="#{jobParameters['thresholdDelay']}"/>
         <property name="reader">
             <bean class="be.raildelays.batch.test.DummyItemStreamReader"/>
         </property>

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!-- Needed if we use a AutomaticJobRegistrar -->
+    <context:annotation-config/>
+    <!-- To make the embedded step to use scope="step" -->
+    <bean class="org.springframework.batch.core.scope.StepScope"/>
+
+    <import resource="classpath:/jobs/parent-job-context.xml"/>
+
+
+    <job id="retrieveDataFromAfasJob" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+        <step id="retrieveDataFromAfasSubStep" parent="parentStep" >
+            <partition partitioner="partitioner">
+                <handler task-executor="taskExecutor"/>
+                <step>
+                    <tasklet transaction-manager="batchTransactionManager">
+                        <chunk reader="afasItemReader"
+                               processor="chainedProcessorsForAfas"
+                               writer="jpaItemWriter"
+                               commit-interval="10" retry-limit="3">
+                            <retryable-exception-classes>
+                                <include class="org.springframework.dao.OptimisticLockingFailureException"/>
+                            </retryable-exception-classes>
+                            <skip-policy>
+                                <bean xmlns="http://www.springframework.org/schema/beans"
+                                      class="org.springframework.batch.core.step.skip.CompositeSkipPolicy">
+                                    <property name="skipPolicies">
+                                        <array xmlns="http://www.springframework.org/schema/beans">
+                                            <bean class="org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy">
+                                                <property name="skipLimit" value="10"/>
+                                                <property name="skippableExceptionMap">
+                                                    <map>
+                                                        <entry key="org.springframework.batch.item.validator.ValidationException"
+                                                               value="true"/>
+                                                    </map>
+                                                </property>
+                                            </bean>
+                                            <bean class="be.raildelays.batch.skip.SkipUniqueKeyViolationPolicy"/>
+                                        </array>
+                                    </property>
+                                </bean>
+                            </skip-policy>
+                            <listeners merge="true">
+                                <listener ref="logStep1ItemProcessorListener"/>
+                            </listeners>
+                        </chunk>
+                        <no-rollback-exception-classes>
+                            <include class="org.springframework.batch.item.validator.ValidationException"/>
+                        </no-rollback-exception-classes>
+                        <transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
+                    </tasklet>
+                    <listeners merge="true">
+                        <listener ref="loggerContextStepListener"/>
+                    </listeners>
+                </step>
+            </partition>
+        </step>
+        <validator ref="handleMaxMonthsJobParametersValidator"/>
+    </job>
+
+    <bean id="partitioner"
+          class="be.raildelays.batch.reader.TrainIdPartitioner">
+        <property name="trainListReader" ref="trainListReader"/>
+    </bean>
+
+    <bean id="taskExecutor"
+          class="be.raildelays.concurrent.scheduling.MdcThreadPoolTaskExecutor">
+        <property name="corePoolSize" value="2"/>
+        <property name="maxPoolSize" value="4"/>
+        <property name="allowCoreThreadTimeOut" value="true"/>
+        <property name="waitForTasksToCompleteOnShutdown" value="true"/>
+    </bean>
+
+
+    <bean id="handleMaxMonthsJobParametersValidator" class="org.springframework.batch.core.job.DefaultJobParametersValidator">
+        <property name="requiredKeys">
+            <list>
+                <value>excel.output.path</value>
+                <value>excel.file.name</value>
+                <value>excel.file.extension</value>
+                <value>excel.template.path</value>
+                <value>excel.archive.path</value>
+                <value>language</value>
+                <value>mail.account.username</value>
+                <value>mail.account.password</value>
+                <value>mail.server.host</value>
+                <value>mail.server.port</value>
+                <value>mail.account.address</value>
+                <value>threshold.date</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- ================================================================================================== -->
+    <!-- =====================================         DECIDERS       ===================================== -->
+    <!-- ================================================================================================== -->
+
+    <!-- ================================================================================================== -->
+    <!-- =====================================         READERS        ===================================== -->
+    <!-- ================================================================================================== -->
+
+
+    <bean id="afasItemReader" class="be.raildelays.batch.reader.ScraperItemReader"
+          scope="step">
+        <property name="request">
+            <bean class="be.raildelays.httpclient.impl.DelaysRequestV2">
+                <constructor-arg value="#{stepExecutionContext['trainId']}"/>
+                <constructor-arg value="#{jobParameters['date']}"/>
+                <constructor-arg>
+                    <bean class="be.raildelays.domain.Language" factory-method="valueOf">
+                        <constructor-arg>
+                            <value>#{jobParameters['language']?.toUpperCase()}</value>
+                        </constructor-arg>
+                    </bean>
+                </constructor-arg>
+            </bean>
+        </property>
+        <property name="streamer">
+            <bean class="be.raildelays.httpclient.impl.DelaysRequestStreamerV2"/>
+        </property>
+        <property name="parser">
+            <bean class="be.raildelays.parser.impl.DelaysStreamParserV2"/>
+        </property>
+        <property name="retryPolicy" ref="railtimeReaderRetryPolicy"/>
+        <property name="backOffPolicy" ref="railtimeReaderBackOffPolicy"/>
+    </bean>
+
+    <bean id="railtimeReaderRetryPolicy"
+          class="org.springframework.retry.policy.SimpleRetryPolicy"
+          scope="step">
+        <constructor-arg name="maxAttempts" value="3"/>
+        <constructor-arg name="retryableExceptions">
+            <map>
+                <entry key="java.io.IOException" value="true"/>
+            </map>
+        </constructor-arg>
+        <constructor-arg name="traverseCauses" value="true"/>
+    </bean>
+
+    <bean id="railtimeReaderBackOffPolicy"
+          class="org.springframework.retry.backoff.ExponentialRandomBackOffPolicy"
+          scope="step">
+    </bean>
+
+    <!-- ================================================================================================== -->
+    <!-- =====================================       PROCESSORS       ===================================== -->
+    <!-- ================================================================================================== -->
+
+
+    <bean id="chainedProcessorsForAfas"
+          class="org.springframework.batch.item.support.CompositeItemProcessor">
+        <property name="delegates">
+            <list>
+                <ref bean="validatorProcessor"/>
+            </list>
+        </property>
+    </bean>
+
+    <!-- ================================================================================================== -->
+    <!-- =====================================         WRITERS        ===================================== -->
+    <!-- ================================================================================================== -->
+
+    <bean id="jpaItemWriter"
+          class="org.springframework.batch.item.database.JpaItemWriter"
+          scope="step">
+        <property name="entityManagerFactory" ref="raildelaysEntityManagerFactory"/>
+    </bean>
+
+    <!-- ================================================================================================== -->
+    <!-- =====================================         TASKLET        ===================================== -->
+    <!-- ================================================================================================== -->
+
+
+
+
+
+</beans>

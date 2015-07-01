@@ -2,11 +2,31 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>be.raildelays</groupId>
+    <groupId>com.github.almex</groupId>
     <artifactId>raildelays-parent</artifactId>
     <version>1.1.1-SNAPSHOT</version>
-    <name>Raildelays</name>
     <packaging>pom</packaging>
+
+    <name>Raildelays</name>
+    <url>https://github.com/almex/Raildelays</url>
+    <inceptionYear>2012</inceptionYear>
+
+    <licenses>
+		<license>
+			<name>MIT License</name>
+			<url>http://www.opensource.org/licenses/mit-license.php</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+    
+    <developers>
+		<developer>
+			<email>soumagne_alexis@hotmail.com</email>
+			<name>Alexis SOUMAGNE</name>
+			<url>https://github.com/almex</url>
+			<id>almex</id>
+		</developer>
+	</developers>
 
     <scm>
         <url>scm:git:git@github.com:almex/Raildelays.git</url>
@@ -25,6 +45,11 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
+    
+    <issueManagement>
+        <url>https://github.com/almex/Raildelays/issues</url>
+        <system>GitHub</system>
+    </issueManagement>
 
     <modules>
         <module>domain-layer</module>
@@ -38,7 +63,7 @@
     </modules>
 
     <prerequisites>
-        <maven>3.0.0</maven>
+        <maven>3.2.0</maven>
     </prerequisites>
 
     <properties>

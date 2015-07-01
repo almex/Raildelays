@@ -11,27 +11,23 @@ import java.util.Map;
 /**
  * Created by Almex on 18/12/2014.
  */
-public class MockStatusTasklet implements Tasklet {
+public class FailOnNegativeThresholdDateTasklet implements Tasklet {
+
+    private Long thresholdDelay;
 
     public enum Status {COMPLETED, COMPLETED_WITH_60M_DELAY, FAILED}
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        Map<String, Object> jobParameters = chunkContext.getStepContext().getJobParameters();
-        ExecutionContext context = chunkContext.getStepContext().getStepExecution().getExecutionContext();
 
-        Status status = Status.valueOf((String) jobParameters.get("status"));
-
-        switch (status) {
-            case COMPLETED:
-                break;
-            case COMPLETED_WITH_60M_DELAY:
-                context.put("foo", "bar");
-                break;
-            case FAILED:
+         if (thresholdDelay < 0) {
                 throw new Exception("Failed");
-        }
+         }
 
         return RepeatStatus.FINISHED;
+    }
+
+    public void setThresholdDelay(Long thresholdDelay) {
+        this.thresholdDelay = thresholdDelay;
     }
 }

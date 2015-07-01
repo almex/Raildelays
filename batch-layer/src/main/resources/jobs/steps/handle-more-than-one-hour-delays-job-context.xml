@@ -106,6 +106,7 @@
           class="be.raildelays.batch.decider.MoreThanOneHourDelayDecider">
         <property name="keyName" value="more.than.one.hour.excel.path"/>
         <property name="reader" ref="allExcelFilesItemReader"/>
+        <property name="thresholdDelay" value="${excel.item.delay.max.threshold}" />
     </bean>
 
     <!-- ================================================================================================== -->
