@@ -1,27 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ The MIT License (MIT)
-  ~
-  ~ Copyright (c) 2015 Almex
-  ~
-  ~ Permission is hereby granted, free of charge, to any person obtaining a
-  ~ copy of this software and associated documentation files (the "Software"),
-  ~ to deal in the Software without restriction, including without limitation
-  ~ the rights to use, copy, modify, merge, publish, distribute, sublicense,
-  ~ and/or sell copies of the Software, and to permit persons to whom the
-  ~ Software is furnished to do so, subject to the following conditions:
-  ~
-  ~ The above copyright notice and this permission notice shall be included in
-  ~ all copies or substantial portions of the Software.
-  ~
-  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-  ~ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-  ~ IN THE SOFTWARE.
-  -->
 
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
@@ -43,10 +20,6 @@
     <job id="handleMoreThanOneHourDelaysJob" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
         <step id="moveFileStep" parent="parentStep" next="sendByEmailDelayMoreThanOneHour">
             <tasklet transaction-manager="batchTransactionManager" ref="moveFileTasklet"/>
-            <listeners merge="true">
-                <!-- Get back some information from previous step -->
-                <listener ref="demoteContextListener"/>
-            </listeners>
         </step>
         <step id="sendByEmailDelayMoreThanOneHour" parent="parentStep" next="removeDelayMoreThanOneHour">
             <tasklet transaction-manager="batchTransactionManager">
@@ -54,18 +27,8 @@
                        processor="chainedProcessorsForMoreThanOneHourDelay"
                        writer="emailWriter"
                        commit-interval="1">
-                    <listeners merge="true">
-                        <!-- Put in a log file skipped items -->
-                        <listener ref="logSkippedItemListener"/>
-                    </listeners>
                 </chunk>
             </tasklet>
-            <listeners merge="true">
-                <!-- To transfer some information for next steps -->
-                <listener ref="promoteContextListener"/>
-                <!-- Get back some information from previous step -->
-                <listener ref="demoteContextListener"/>
-            </listeners>
         </step>
         <step id="removeDelayMoreThanOneHour" parent="parentStep" next="deleteFile">
             <tasklet transaction-manager="batchTransactionManager">
@@ -82,22 +45,12 @@
                 </chunk>
             </tasklet>
             <listeners merge="true">
-                <!-- To transfer some information for next steps -->
-                <listener ref="promoteContextListener"/>
-                <!-- To compute file name of the Excel file after filtering (we could have removed the first row) -->
-                <listener ref="resourceLocatorListener"/>
                 <!-- Put in a log file skipped items -->
                 <listener ref="logSkippedItemListener"/>
-                <!-- Get back some information from previous step -->
-                <listener ref="demoteContextListener"/>
             </listeners>
         </step>
         <step id="deleteFile" parent="parentStep">
             <tasklet transaction-manager="batchTransactionManager" ref="deleteFileTasklet"/>
-            <listeners merge="true">
-                <!-- Get back some information from previous step -->
-                <listener ref="demoteContextListener"/>
-            </listeners>
         </step>
         <validator ref="handleMoreThanOneHourDelaysJobParametersValidator"/>
     </job>

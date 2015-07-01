@@ -57,7 +57,7 @@ public abstract class AbstractItemResourceLocator implements ResourceLocator {
     private ResourceItemSearch<BatchExcelRow> resourceItemSearch;
 
     protected File getFileBasedOnSuffix(ExecutionContext context) throws IOException {
-        String suffix = context.getString(ResourceLocatorListener.FILENAME_SUFFIX_KEY);
+        String suffix = context.getString(ResourceLocatorListener.FILENAME_SUFFIX_KEY, "");
         File result = resource.getFile(); // By default we return the resource itself
 
         if (suffix != null) {
