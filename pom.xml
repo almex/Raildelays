@@ -684,7 +684,7 @@
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <useReleaseProfile>false</useReleaseProfile>
-                    <releaseProfiles>release,it,assembly</releaseProfiles>
+                    <releaseProfiles>release,it</releaseProfiles>
                     <goals>deploy</goals>
                 </configuration>
             </plugin>
