@@ -102,3 +102,7 @@ of the application to a high level.
 To able to measure Code Quality, the application was configured to be used with [Sonar](www.sonasource.org).
 
 The JaCoCo Maven plug-in has been configured to measure code coverage separately for unit tests and integration tests.
+
+# Licensing
+
+This project is licensed under the terms of the MIT license.
