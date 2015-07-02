@@ -28,6 +28,24 @@
         <property name="tablePrefix" value="BATCH_"/>
     </bean>
 
+    <bean id="batchJobInstanceIncrementerFactory"
+          class="org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactory">
+        <constructor-arg ref="batchDataSource" />
+    </bean>
+
+    <bean id="batchJobInstanceIncrementer"
+          class="org.springframework.jdbc.support.incrementer.AbstractSequenceMaxValueIncrementer"
+          factory-bean="batchJobInstanceIncrementerFactory"
+          factory-method="getIncrementer">
+        <constructor-arg index="0" value="HSQL" />
+        <constructor-arg index="1" value="BATCH_INST_INCREMENT" />
+    </bean>
+
+    <bean id="batchJobParametersIncrementer"
+          class="org.springframework.batch.core.JobParametersSequenceIncrementer">
+        <property name="sequence" ref="batchJobInstanceIncrementer" />
+    </bean>
+
     <jdbc:initialize-database data-source="batchDataSource" ignore-failures="ALL">
         <jdbc:script execution="INIT" location="classpath:/ddl/schema-create-hsqldb.sql"/>
         <!--jdbc:script execution="DESTROY" location="classpath:/ddl/schema-drop-hsqldb.sql"/-->
