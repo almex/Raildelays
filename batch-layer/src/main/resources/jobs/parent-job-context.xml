@@ -11,7 +11,7 @@
 
     <context:property-placeholder location="classpath:application.properties" order="1" ignore-unresolvable="true"/>
 
-    <job id="parentJob" abstract="true" xmlns="http://www.springframework.org/schema/batch">
+    <job id="parentJob" incrementer="batchJobParametersIncrementer" abstract="true" xmlns="http://www.springframework.org/schema/batch">
     </job>
 
     <step id="parentStep" abstract="true" xmlns="http://www.springframework.org/schema/batch">
