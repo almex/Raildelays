@@ -70,6 +70,8 @@ public class ExecutionContextJobParametersExtractor extends DefaultJobParameters
                 builder.addDouble(entry.getKey(), (Double) value);
             } else if (value instanceof String) {
                 builder.addString(entry.getKey(), (String) value);
+            } else if (value instanceof Integer) {
+                builder.addLong(entry.getKey(), ((Integer) value).longValue());
             }
         }
 

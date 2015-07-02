@@ -53,9 +53,6 @@
                 </no-rollback-exception-classes>
                 <transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
             </tasklet>
-            <listeners merge="true">
-                <listener ref="loggerContextStepListener"/>
-            </listeners>
         </step>
         <validator ref="retrieveDataFromAfasJobParametersValidator"/>
     </job>
@@ -97,7 +94,7 @@
           scope="step">
         <property name="request">
             <bean class="be.raildelays.httpclient.impl.DelaysRequestV2">
-                <constructor-arg value="#{stepExecutionContext['trainId']}"/>
+                <constructor-arg value="#{jobParameters['trainId']}"/>
                 <constructor-arg value="#{jobParameters['date']}"/>
                 <constructor-arg>
                     <bean class="be.raildelays.domain.Language" factory-method="valueOf">

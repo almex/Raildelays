@@ -19,6 +19,9 @@
                 <handler task-executor="taskExecutor"/>
                 <step parent="parentStep">
                     <job job-parameters-extractor="jobParameterExtractor" ref="retrieveDataFromAfasJob"/>
+                    <listeners merge="true">
+                        <listener ref="loggerContextStepListener"/>
+                    </listeners>
                 </step>
             </partition>
         </step>
