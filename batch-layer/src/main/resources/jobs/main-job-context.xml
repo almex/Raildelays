@@ -15,10 +15,15 @@
 
     <job id="mainJob" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
         <step id="retrieveDataFromAfasStep" parent="parentStep" next="generateExcelFilesStep">
-            <job job-parameters-extractor="jobParameterExtractor" ref="retrieveDataFromAfasJob"/>
+            <partition partitioner="partitioner">
+                <handler task-executor="taskExecutor"/>
+                <step parent="parentStep">
+                    <job job-parameters-extractor="jobParameterExtractor" ref="retrieveDataFromAfasJob"/>
+                </step>
+            </partition>
         </step>
         <step id="generateExcelFilesStep" parent="parentStep" next="decideIfWeHaveAMoreThanOneHourDelay">
-            <job job-parameters-extractor="jobParameterExtractor" ref="generateExcelFilesJob" />
+            <job job-parameters-extractor="jobParameterExtractor" ref="generateExcelFilesJob"/>
         </step>
         <step id="decideIfWeHaveAMoreThanOneHourDelay" parent="parentStep">
             <tasklet transaction-manager="batchTransactionManager" ref="moreThanOneHourDelaysDecider"/>
@@ -87,20 +92,14 @@
     <!-- ================================================================================================== -->
 
 
-
-
     <!-- ================================================================================================== -->
     <!-- =====================================         WRITERS        ===================================== -->
     <!-- ================================================================================================== -->
 
 
-
     <!-- ================================================================================================== -->
     <!-- =====================================        RESOURCES       ===================================== -->
     <!-- ================================================================================================== -->
-
-
-
 
 
 </beans>

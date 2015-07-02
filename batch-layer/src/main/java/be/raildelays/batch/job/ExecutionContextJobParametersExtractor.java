@@ -33,7 +33,9 @@ import java.util.Map;
 
 /**
  * The goal is on top of the {@link DefaultJobParametersExtractor} behavior to extract
- * all keys from an {@link ExecutionContext} as a {@link JobParameter} for the embedded job.
+ * all keys from an {@link ExecutionContext} as a {@link JobParameter} for the embedded {@link Job}.
+ * If the {@link Job} have a {@link JobParametersIncrementer} the content of
+ * {@link JobParametersIncrementer#getNext(JobParameters)} is appended to the result.
  */
 public class ExecutionContextJobParametersExtractor extends DefaultJobParametersExtractor {
 
@@ -41,6 +43,11 @@ public class ExecutionContextJobParametersExtractor extends DefaultJobParameters
     public JobParameters getJobParameters(Job job, StepExecution stepExecution) {
         JobParameters jobParameters = super.getJobParameters(job, stepExecution);
         JobExecution jobExecution = stepExecution.getJobExecution();
+        JobParametersIncrementer jobParametersIncrementer = job.getJobParametersIncrementer();
+
+        if (jobParametersIncrementer != null) {
+            jobParameters = jobParametersIncrementer.getNext(jobParameters);
+        }
 
         jobParameters = addJobParametersFromContext(jobParameters, stepExecution.getExecutionContext());
         jobParameters = addJobParametersFromContext(jobParameters, jobExecution.getExecutionContext());

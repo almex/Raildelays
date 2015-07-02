@@ -16,51 +16,46 @@
 
 
     <job id="retrieveDataFromAfasJob" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-        <step id="retrieveDataFromAfasSubStep" parent="parentStep" >
-            <partition partitioner="partitioner">
-                <handler task-executor="taskExecutor"/>
-                <step>
-                    <tasklet transaction-manager="batchTransactionManager">
-                        <chunk reader="afasItemReader"
-                               processor="chainedProcessorsForAfas"
-                               writer="jpaItemWriter"
-                               commit-interval="10" retry-limit="3">
-                            <retryable-exception-classes>
-                                <include class="org.springframework.dao.OptimisticLockingFailureException"/>
-                            </retryable-exception-classes>
-                            <skip-policy>
-                                <bean xmlns="http://www.springframework.org/schema/beans"
-                                      class="org.springframework.batch.core.step.skip.CompositeSkipPolicy">
-                                    <property name="skipPolicies">
-                                        <array xmlns="http://www.springframework.org/schema/beans">
-                                            <bean class="org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy">
-                                                <property name="skipLimit" value="10"/>
-                                                <property name="skippableExceptionMap">
-                                                    <map>
-                                                        <entry key="org.springframework.batch.item.validator.ValidationException"
-                                                               value="true"/>
-                                                    </map>
-                                                </property>
-                                            </bean>
-                                            <bean class="be.raildelays.batch.skip.SkipUniqueKeyViolationPolicy"/>
-                                        </array>
-                                    </property>
-                                </bean>
-                            </skip-policy>
-                            <listeners merge="true">
-                                <listener ref="logStep1ItemProcessorListener"/>
-                            </listeners>
-                        </chunk>
-                        <no-rollback-exception-classes>
-                            <include class="org.springframework.batch.item.validator.ValidationException"/>
-                        </no-rollback-exception-classes>
-                        <transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
-                    </tasklet>
+        <step id="retrieveDataFromAfasSubStep">
+            <tasklet transaction-manager="batchTransactionManager">
+                <chunk reader="afasItemReader"
+                       processor="chainedProcessorsForAfas"
+                       writer="jpaItemWriter"
+                       commit-interval="10" retry-limit="3">
+                    <retryable-exception-classes>
+                        <include class="org.springframework.dao.OptimisticLockingFailureException"/>
+                    </retryable-exception-classes>
+                    <skip-policy>
+                        <bean xmlns="http://www.springframework.org/schema/beans"
+                              class="org.springframework.batch.core.step.skip.CompositeSkipPolicy">
+                            <property name="skipPolicies">
+                                <array xmlns="http://www.springframework.org/schema/beans">
+                                    <bean class="org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy">
+                                        <property name="skipLimit" value="10"/>
+                                        <property name="skippableExceptionMap">
+                                            <map>
+                                                <entry key="org.springframework.batch.item.validator.ValidationException"
+                                                       value="true"/>
+                                            </map>
+                                        </property>
+                                    </bean>
+                                    <bean class="be.raildelays.batch.skip.SkipUniqueKeyViolationPolicy"/>
+                                </array>
+                            </property>
+                        </bean>
+                    </skip-policy>
                     <listeners merge="true">
-                        <listener ref="loggerContextStepListener"/>
+                        <listener ref="logStep1ItemProcessorListener"/>
                     </listeners>
-                </step>
-            </partition>
+                </chunk>
+                <no-rollback-exception-classes>
+                    <include class="org.springframework.batch.item.validator.ValidationException"/>
+                </no-rollback-exception-classes>
+                <transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
+            </tasklet>
+            <listeners merge="true">
+                <listener ref="loggerContextStepListener"/>
+            </listeners>
         </step>
         <validator ref="retrieveDataFromAfasJobParametersValidator"/>
     </job>
@@ -167,9 +162,6 @@
     <!-- ================================================================================================== -->
     <!-- =====================================         TASKLET        ===================================== -->
     <!-- ================================================================================================== -->
-
-
-
 
 
 </beans>

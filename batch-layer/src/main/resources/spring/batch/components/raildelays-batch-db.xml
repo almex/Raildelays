@@ -16,8 +16,10 @@
     </bean>
 
     <batch:job-repository id="jobRepository"
-                          data-source="batchDataSource" transaction-manager="batchTransactionManager"
-                          isolation-level-for-create="DEFAULT" table-prefix="BATCH_"
+                          data-source="batchDataSource"
+                          transaction-manager="batchTransactionManager"
+                          isolation-level-for-create="REPEATABLE_READ"
+                          table-prefix="BATCH_"
                           max-varchar-length="1000"/>
 
     <bean id="jobExplorer"
@@ -26,14 +28,27 @@
         <property name="tablePrefix" value="BATCH_"/>
     </bean>
 
-    <!--<bean id="batchDatabaseLoader" class="be.raildelays.repository.LoadDatabase">
-        <property name="dataSource" ref="batchDataSource" />
-        <property name="initScriptPath" value="spring-batch-schema-derby.ddl" />
-        <property name="initScriptPath" value="org/springframework/batch/core/schema-hsqldb.sql" />
-    </bean>-->
+    <bean id="batchJobInstanceIncrementerFactory"
+          class="org.springframework.batch.item.database.support.EnhancedDataFieldMaxValueIncrementerFactory">
+        <constructor-arg ref="batchDataSource" />
+    </bean>
+
+    <bean id="batchJobInstanceIncrementer"
+          class="org.springframework.jdbc.support.incrementer.AbstractSequenceMaxValueIncrementer"
+          factory-bean="batchJobInstanceIncrementerFactory"
+          factory-method="getIncrementer">
+        <constructor-arg index="0" value="HSQL" />
+        <constructor-arg index="1" value="BATCH_INST_INCREMENT" />
+    </bean>
+
+    <bean id="batchJobParametersIncrementer"
+          class="org.springframework.batch.core.JobParametersSequenceIncrementer">
+        <property name="sequence" ref="batchJobInstanceIncrementer" />
+    </bean>
 
     <jdbc:initialize-database data-source="batchDataSource" ignore-failures="ALL">
-        <jdbc:script location="classpath:org/springframework/batch/core/schema-hsqldb.sql"/>
+        <jdbc:script execution="INIT" location="classpath:/ddl/schema-create-hsqldb.sql"/>
+        <!--jdbc:script execution="DESTROY" location="classpath:/ddl/schema-drop-hsqldb.sql"/-->
     </jdbc:initialize-database>
 
     <alias name="raildelaysTransactionManager" alias="batchTransactionManager"/>
