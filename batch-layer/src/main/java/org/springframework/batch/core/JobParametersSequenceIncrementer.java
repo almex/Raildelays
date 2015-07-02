@@ -3,7 +3,6 @@ package org.springframework.batch.core;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 
 import javax.annotation.Resource;
-import java.util.Collections;
 
 /**
  * In case of new instance for a job, this class provide the job parameters
@@ -23,11 +22,13 @@ public class JobParametersSequenceIncrementer implements JobParametersIncremente
     @Resource
     private DataFieldMaxValueIncrementer sequence;
 
-    /**
-     * {@inheritDoc}
-     */
-    public JobParameters getNext(final JobParameters parameters) {
-        return new JobParameters(Collections.singletonMap(INCREMENTER_PARAMETER_NAME, new JobParameter(sequence.nextLongValue())));
+    @Override
+    public JobParameters getNext(final JobParameters jobParameters) {
+        JobParametersBuilder builder = new JobParametersBuilder(jobParameters);
+
+        builder.addLong(INCREMENTER_PARAMETER_NAME, sequence.nextLongValue());
+
+        return builder.toJobParameters();
     }
 
     public void setSequence(final DataFieldMaxValueIncrementer sequence) {

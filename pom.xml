@@ -73,7 +73,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
 
-        <version.spring>4.1.6.RELEASE</version.spring>
+        <version.spring>4.1.7.RELEASE</version.spring>
         <version.spring.batch>3.0.4.RELEASE</version.spring.batch>
         <version.spring.data>1.8.0.RELEASE</version.spring.data>
         <version.spring.data.rest>2.3.0.RELEASE</version.spring.data.rest>
@@ -89,7 +89,7 @@
         <version.querydsl>3.4.2</version.querydsl>
         <version.validation.api>1.1.0.Final</version.validation.api>
         <version.javax.el-api>2.2.4</version.javax.el-api>
-        <version.hsqldb>2.3.2</version.hsqldb>
+        <version.hsqldb>2.3.3</version.hsqldb>
         <version.derby>10.10.1.1</version.derby>
         <version.servlet>3.1.0</version.servlet>
         <version.atomikos>3.9.2</version.atomikos>
