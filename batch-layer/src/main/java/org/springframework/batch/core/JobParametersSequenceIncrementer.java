@@ -2,13 +2,12 @@ package org.springframework.batch.core;
 
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 
-import javax.annotation.Resource;
-
 /**
- * In case of new instance for a job, this class provide the job parameters
- * incrementer by using a database sequence.
+ * In case of new {@code JobInstance}, this implementation provides an extra job parameter by using a database sequence.
+ * The main advantage of this implementation over the {@code RunIdIncrementer} is that in concurrent situation a
+ * database sequence call is <b>thread-safe</b> (ensure uniqueness of the returned ids).
  *
- * @see org.springframework.batch.core.JobParametersIncrementer
+ * @see org.springframework.batch.core.launch.support.RunIdIncrementer
  * @author Almex
  */
 public class JobParametersSequenceIncrementer implements JobParametersIncrementer {
@@ -19,7 +18,6 @@ public class JobParametersSequenceIncrementer implements JobParametersIncremente
      */
     private static final String INCREMENTER_PARAMETER_NAME = "run.id";
 
-    @Resource
     private DataFieldMaxValueIncrementer sequence;
 
     @Override
