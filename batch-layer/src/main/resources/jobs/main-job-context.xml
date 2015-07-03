@@ -109,19 +109,19 @@
 
 
     <bean id="step1JobParameterExtractor"
-          class="org.springframework.batch.core.step.job.DefaultJobParametersExtractor">
-        <property name="keys">
+          class="be.raildelays.batch.job.ExecutionContextJobParametersExtractor">
+        <!--<property name="keys">
             <list>
                 <value>trainId</value>
                 <value>language</value>
                 <value>date</value>
             </list>
-        </property>
+        </property>-->
     </bean>
 
     <bean id="step2JobParameterExtractor"
-          class="org.springframework.batch.core.step.job.DefaultJobParametersExtractor">
-        <property name="keys">
+          class="be.raildelays.batch.job.ExecutionContextJobParametersExtractor">
+        <!--<property name="keys">
             <list>
                 <value>station.departure</value>
                 <value>station.arrival</value>
@@ -134,12 +134,12 @@
                 <value>language</value>
                 <value>date</value>
             </list>
-        </property>
+        </property>-->
     </bean>
 
     <bean id="step3JobParameterExtractor"
-          class="org.springframework.batch.core.step.job.DefaultJobParametersExtractor">
-        <property name="keys">
+          class="be.raildelays.batch.job.ExecutionContextJobParametersExtractor">
+        <!--<property name="keys">
             <list>
                 <value>excel.output.path</value>
                 <value>excel.file.name</value>
@@ -154,12 +154,12 @@
                 <value>mail.server.port</value>
                 <value>mail.account.address</value>
             </list>
-        </property>
+        </property>-->
     </bean>
 
     <bean id="step4JobParameterExtractor"
-          class="org.springframework.batch.core.step.job.DefaultJobParametersExtractor">
-        <property name="keys">
+          class="be.raildelays.batch.job.ExecutionContextJobParametersExtractor">
+        <!--<property name="keys">
             <list>
                 <value>excel.output.path</value>
                 <value>excel.file.name</value>
@@ -174,8 +174,7 @@
                 <value>mail.account.address</value>
                 <value>threshold.date</value>
             </list>
-        </property>
+        </property>-->
     </bean>
 
 </beans>
-
