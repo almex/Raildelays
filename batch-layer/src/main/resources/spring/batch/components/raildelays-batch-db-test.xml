@@ -24,7 +24,7 @@
     </bean>
 
     <bean id="batchJobInstanceIncrementerFactory"
-          class="org.springframework.batch.item.database.support.DefaultSequenceMaxValueIncrementerFactory">
+          class="org.springframework.batch.database.support.DefaultSequenceMaxValueIncrementerFactory">
         <constructor-arg ref="batchDataSource"/>
     </bean>
 
