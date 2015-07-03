@@ -57,24 +57,12 @@
         <validator ref="retrieveDataFromAfasJobParametersValidator"/>
     </job>
 
-    <bean id="partitioner"
-          class="be.raildelays.batch.reader.TrainIdPartitioner">
-        <property name="trainListReader" ref="trainListReader"/>
-    </bean>
-
-    <bean id="taskExecutor"
-          class="be.raildelays.concurrent.scheduling.MdcThreadPoolTaskExecutor">
-        <property name="corePoolSize" value="2"/>
-        <property name="maxPoolSize" value="4"/>
-        <property name="allowCoreThreadTimeOut" value="true"/>
-        <property name="waitForTasksToCompleteOnShutdown" value="true"/>
-    </bean>
-
 
     <bean id="retrieveDataFromAfasJobParametersValidator"
           class="org.springframework.batch.core.job.DefaultJobParametersValidator">
         <property name="requiredKeys">
             <list>
+                <value>trainId</value>
                 <value>language</value>
                 <value>date</value>
             </list>
