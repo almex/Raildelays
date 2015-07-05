@@ -106,7 +106,8 @@
         <version.commons.dbcp>1.4</version.commons.dbcp>
         <version.dbunit>2.4.9</version.dbunit>
         <version.jodatime>2.3</version.jodatime>
-        <vesrion.animal.snifer>1.14</vesrion.animal.snifer>
+        <version.animal.snifer>1.14</version.animal.snifer>
+        <version.jacoco>0.7.4.201502262128</version.jacoco>
 
         <!-- Surefire/Failsafe settings -->
         <forkCount>1</forkCount>
@@ -120,13 +121,13 @@
         <sonar.jacoco.reportPath>${jacoco.test.destFile}</sonar.jacoco.reportPath>
         <sonar.surefire.reportsPath>${basedir}/target/surefire-reports</sonar.surefire.reportsPath>
         <sonar.junit.reportsPath>${sonar.surefire.reportsPath}</sonar.junit.reportsPath>
-        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-        <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+        <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
+        <!--sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis-->
         <sonar.language>java</sonar.language>
         <!-- groupId allow concurrent analyze -->
         <!--jacoco.test.destFile>${java.io.tmpdir}/${project.groupId}/jacoco-test.exec</jacoco.test.destFile -->
-        <jacoco.test.destFile>../target/jacoco-test.exec</jacoco.test.destFile>
-        <jacoco.it.destFile>../target/jacoco-it.exec</jacoco.it.destFile>
+        <jacoco.test.destFile>${java.io.tmpdir}/JaCoCo${version.jacoco}/jacoco-test.exec</jacoco.test.destFile>
+        <jacoco.it.destFile>${java.io.tmpdir}/JaCoCo${version.jacoco}/jacoco-it.exec</jacoco.it.destFile>
         <it.source.path>src/it/java</it.source.path>
         <it.resources.path>src/it/resources</it.resources.path>
     </properties>
@@ -781,7 +782,12 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.7.1.201405082137</version>
+                    <version>${version.jacoco}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>sonar-maven-plugin</artifactId>
+                    <version>2.6</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.groovy</groupId>
@@ -835,58 +841,6 @@
                     <version>1.6.5</version>
                 </plugin>
 
-                <!--This plugin's configuration is used to store Eclipse m2e settings
-                    only. It has no influence on the Maven build itself. -->
-                <plugin>
-                    <groupId>org.eclipse.m2e</groupId>
-                    <artifactId>lifecycle-mapping</artifactId>
-                    <version>1.0.0</version>
-                    <configuration>
-                        <lifecycleMappingMetadata>
-                            <pluginExecutions>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>org.jacoco</groupId>
-                                        <artifactId>
-                                            jacoco-maven-plugin
-                                        </artifactId>
-                                        <versionRange>
-                                            [0.6.2.201302030002,)
-                                        </versionRange>
-                                        <goals>
-                                            <goal>prepare-agent</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore />
-                                    </action>
-                                </pluginExecution>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>
-                                            org.apache.maven.plugins
-                                        </groupId>
-                                        <artifactId>
-                                            maven-dependency-plugin
-                                        </artifactId>
-                                        <versionRange>
-                                            [2.4,)
-                                        </versionRange>
-                                        <goals>
-                                            <goal>
-                                                copy-dependencies
-                                            </goal>
-                                            <goal>unpack</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore />
-                                    </action>
-                                </pluginExecution>
-                            </pluginExecutions>
-                        </lifecycleMappingMetadata>
-                    </configuration>
-                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -1197,7 +1151,7 @@
                 <dependency>
                     <groupId>org.codehaus.sonar-plugins.java</groupId>
                     <artifactId>sonar-jacoco-listeners</artifactId>
-                    <version>2.4</version>
+                    <version>3.2</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
