@@ -55,7 +55,7 @@ public class BatchScheduledService extends ScheduledService<Integer> {
     public void start(String jobName, JobParameters jobParameters) {
         if (!isStarted()) {
             try {
-                jobExecution = service.start(jobName, jobParameters);
+                jobExecution = service.startNewInstance(jobName, jobParameters);
             } catch (Exception e) {
                 LOGGER.error("Error when starting the job: ", e);
             }

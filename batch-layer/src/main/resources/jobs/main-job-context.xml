@@ -20,6 +20,7 @@
                 <step parent="parentStep">
                     <job job-parameters-extractor="step1JobParameterExtractor" ref="retrieveDataFromAfasJob"/>
                     <listeners merge="true">
+                        <!-- Register some ID's in the MDC -->
                         <listener ref="loggerContextStepListener"/>
                     </listeners>
                 </step>

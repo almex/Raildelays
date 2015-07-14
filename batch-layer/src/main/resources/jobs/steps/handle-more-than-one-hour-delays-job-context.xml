@@ -35,18 +35,18 @@
                 <chunk reader="oneHourDelayItemReader"
                        processor="chainedProcessorsForLessThanOneHourDelay"
                        writer="oneHourMultiResourceItemWriter"
-                       commit-interval="${excel.sheet0.maxitemcount}">
+                       commit-interval="1">
                     <listeners merge="true">
                         <!-- To compute file name of the Excel file after filtering -->
                         <listener ref="resourceLocatorListener"/>
-                        <!-- Put in a log file skipped items -->
-                        <listener ref="logSkippedItemListener"/>
                     </listeners>
                 </chunk>
             </tasklet>
             <listeners merge="true">
                 <!-- Put in a log file skipped items -->
                 <listener ref="logSkippedItemListener"/>
+                <!-- Register some ID's in the MDC -->
+                <listener ref="loggerContextStepListener"/>
             </listeners>
         </step>
         <step id="deleteFile" parent="parentStep">
@@ -220,7 +220,7 @@
             </bean>
         </property>
         <property name="name" value="excelSheetWithOneHourDelayItemWriter"/>
-        <property name="shouldDeleteIfExists" value="true"/>
+        <property name="shouldDeleteIfExists" value="false"/>
         <property name="useItemIndex" value="false"/>
         <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
         <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>

@@ -67,15 +67,21 @@ public class HandleOneHourDelayBatchController extends AbstractBatchController {
             service.reset();
             service.start(jobName, builder.toJobParameters());
 
+            file = null;
+
             doRefreshProgress();
         }
     }
 
     public void onBrowse() {
         FileChooser fileChooser = new FileChooser();
-        File directory = new File(propertiesExtractor.getJobParameters(null, null).getString("excel.output.path"));
+        JobParameters jobParameters = propertiesExtractor.getJobParameters(null, null);
+        File directory = new File(jobParameters.getString("excel.output.path"));
 
         fileChooser.setInitialDirectory(directory);
+        FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Excel files", "*.xls", "*.xlsx");
+        fileChooser.getExtensionFilters().add(extensionFilter);
+        fileChooser.setSelectedExtensionFilter(extensionFilter);
         fileChooser.setTitle("Choose the Excel file to parse");
 
         //Show open file dialog
