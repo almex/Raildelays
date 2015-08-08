@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.almex</groupId>
@@ -10,7 +11,8 @@
     <url>https://github.com/almex/Raildelays</url>
     <inceptionYear>2012</inceptionYear>
     <description>
-        Raildelays is mainly a Java application which accumulates train delays from the Belgian railway company called NMBS/SNCB.
+        Raildelays is mainly a Java application which accumulates train delays from the Belgian railway company called
+        NMBS/SNCB.
     </description>
 
     <licenses>
@@ -30,7 +32,7 @@
         </developer>
     </developers>
 
-    <scm>        
+    <scm>
         <url>https://github.com/almex/Raildelays.git</url>
         <connection>scm:git:https://github.com/almex/Raildelays.git</connection>
         <developerConnection>scm:git:git@github.com:almex/Raildelays.git</developerConnection>
@@ -246,7 +248,7 @@
             <dependency>
                 <groupId>org.easymock</groupId>
                 <artifactId>easymock</artifactId>
-                <version>3.2</version>
+                <version>3.3.1</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -626,6 +628,11 @@
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -1182,7 +1189,7 @@
             </build>
         </profile>
 
-        <profile> 
+        <profile>
             <!-- Release profile dedicated to release on Maven Central Repository -->
             <id>release</id>
             <build>

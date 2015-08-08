@@ -65,11 +65,6 @@ public class BatchScheduledService extends ScheduledService<Integer> {
     }
 
     @Override
-    public void start() {
-        super.start();
-    }
-
-    @Override
     protected Task<Integer> createTask() {
         return new Task<Integer>() {
             protected Integer call() {
@@ -97,15 +92,19 @@ public class BatchScheduledService extends ScheduledService<Integer> {
 
     @Override
     public void restart() {
+        // We backup the last execution before a reset
+        JobExecution lastExecution = jobExecution;
+
+        // This will call reset()
+        super.restart();
+
         try {
-            if (isStarted()) {
-                jobExecution = service.restart(jobExecution.getId());
+            if (lastExecution != null) {
+                jobExecution = service.restart(lastExecution.getId());
             }
         } catch (Exception e) {
             LOGGER.error("Error when restarting the job execution!", e);
         }
-
-        super.restart();
     }
 
     public boolean stop() {

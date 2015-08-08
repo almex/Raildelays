@@ -8,13 +8,10 @@ import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Collections;
 
-@DirtiesContext
-// Because of issue [SPR-8849] (https://jira.springsource.org/browse/SPR-8849)
 @ContextConfiguration(locations = {"/test/flow-job-context.xml"})
 public class MoreThanOneHourDelayDeciderIT extends AbstractContextIT {
 

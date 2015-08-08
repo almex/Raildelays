@@ -33,7 +33,6 @@ import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Calendar;
@@ -41,8 +40,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-@DirtiesContext
-// Because of issue [SPR-8849] (https://jira.springsource.org/browse/SPR-8849)
 @ContextConfiguration(locations = {
         "/jobs/steps/retrieve-data-from-afas-job-context.xml"})
 public class RetrieveDataFromAfasJobIT extends AbstractContextIT {

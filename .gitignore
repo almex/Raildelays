@@ -107,3 +107,4 @@ data
 *.log
 
 output.xlsx
+*.dat

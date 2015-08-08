@@ -35,6 +35,7 @@ public class  AbstractFileTest {
     protected void copyFile() throws IOException {
         Path source = new ClassPathResource(EXCEL_FILE_NAME).getFile().toPath();
         Path destination = Paths.get(CURRENT_PATH + EXCEL_FILE_NAME);
+
         Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
     }
 

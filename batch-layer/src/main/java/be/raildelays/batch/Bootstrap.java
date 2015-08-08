@@ -35,7 +35,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.JobParametersInvalidException;
+import org.springframework.batch.core.launch.JobInstanceAlreadyExistsException;
+import org.springframework.batch.core.launch.NoSuchJobException;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.step.job.JobParametersExtractor;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -45,6 +50,10 @@ import java.util.*;
 public class Bootstrap {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Bootstrap.class);
+
+    private Bootstrap() {
+        // N/A for a main() method
+    }
 
     /**
      * @param args
@@ -92,17 +101,7 @@ public class Bootstrap {
 
             //-- Launch one Job per date
             for (Date date : dates) {
-                JobParameters jobParameters = propertiesExtractor.getJobParameters(null, null);
-                JobParametersBuilder builder = new JobParametersBuilder(jobParameters);
-
-
-                builder.addDate("date", date);
-
-                try {
-                    service.start("mainJob", builder.toJobParameters());
-                } catch (JobInstanceAlreadyCompleteException e) {
-                    LOGGER.warn("Job already completed for this date {}", new SimpleDateFormat("dd/MM/yyyy").format(date));
-                }
+                startMainJob(service, propertiesExtractor, date);
             }
         } catch (Exception e) {
             LOGGER.error("Error occur in the Bootstrap", e);
@@ -111,13 +110,25 @@ public class Bootstrap {
                 service.stopAllRunningJobs();
             }
 
-            if (applicationContext != null) {
-                applicationContext.stop();
-                applicationContext.close();
-            }
+            applicationContext.stop();
+            applicationContext.close();
         }
 
         System.exit(0);
+    }
+
+    private static void startMainJob(BatchStartAndRecoveryService service, JobParametersExtractor propertiesExtractor, Date date) throws JobInstanceAlreadyExistsException, NoSuchJobException, JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException {
+        JobParameters jobParameters = propertiesExtractor.getJobParameters(null, null);
+        JobParametersBuilder builder = new JobParametersBuilder(jobParameters);
+
+
+        builder.addDate("date", date);
+
+        try {
+            service.start("mainJob", builder.toJobParameters());
+        } catch (JobInstanceAlreadyCompleteException e) {
+            LOGGER.warn("Job already completed for this date " + new SimpleDateFormat("dd/MM/yyyy").format(date), e);
+        }
     }
 
     /**

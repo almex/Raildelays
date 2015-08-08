@@ -19,8 +19,8 @@ import java.util.List;
 /**
  * @author Almex
  */
-public class AggregateExpectedTimeProcessorTest {
 
+public class AggregateExpectedTimeProcessorTest {
     public static final Train TRAIN = new Train("0");
     private static final SimpleDateFormat F = new SimpleDateFormat("HH:mm");
     private static final Date TODAY = new Date();

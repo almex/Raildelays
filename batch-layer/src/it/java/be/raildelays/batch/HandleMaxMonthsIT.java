@@ -11,7 +11,6 @@ import org.springframework.batch.item.file.ExcelSheetItemWriter;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.io.File;
@@ -23,8 +22,6 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.*;
 
-@DirtiesContext
-// Because of issue [SPR-8849] (https://jira.springsource.org/browse/SPR-8849)
 @ContextConfiguration(locations = {"/jobs/steps/handle-max-months-job-context.xml"})
 public class HandleMaxMonthsIT extends AbstractContextIT {
 

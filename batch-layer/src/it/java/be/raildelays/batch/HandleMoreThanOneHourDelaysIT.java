@@ -9,7 +9,6 @@ import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.item.file.ExcelSheetItemWriter;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.io.File;
@@ -21,8 +20,6 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.*;
 
-@DirtiesContext
-// Because of issue [SPR-8849] (https://jira.springsource.org/browse/SPR-8849)
 @ContextConfiguration(locations = {"/jobs/steps/handle-more-than-one-hour-delays-job-context.xml"})
 public class HandleMoreThanOneHourDelaysIT extends AbstractContextIT {
 
