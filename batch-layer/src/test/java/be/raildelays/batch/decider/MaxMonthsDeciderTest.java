@@ -86,6 +86,7 @@ public class MaxMonthsDeciderTest {
 
         FlowExecutionStatus status = decider.decide(jobExecution, stepExecution);
 
+        Assert.assertTrue(stepExecution.getExecutionContext().entrySet().stream().anyMatch(stringObjectEntry -> stringObjectEntry.getKey().equals("threshold.date")));
         Assert.assertEquals(new FlowExecutionStatus(MaxMonthsDecider.COMPLETED_WITH_MAX_MONTHS.getExitCode()), status);
     }
 }

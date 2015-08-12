@@ -33,8 +33,8 @@ public class ExecutionContextJobParametersExtractorTest {
 
         stepExecution.getExecutionContext().put("foo2", "bar2");
         stepExecution.getExecutionContext().put("foo3", 1L);
-        stepExecution.getExecutionContext().put("foo4", 2.2);
-        stepExecution.getExecutionContext().put("foo5", new Date());
+        stepExecution.getJobExecution().getExecutionContext().put("foo4", 2.2);
+        stepExecution.getJobExecution().getExecutionContext().put("foo5", new Date());
 
         JobParameters jobParameters = jobParametersExtractor.getJobParameters(new SimpleJob("foo"), stepExecution);
         Assert.assertNotNull(jobParameters);
