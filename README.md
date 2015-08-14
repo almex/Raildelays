@@ -1,4 +1,4 @@
-# Raildelays
+# Raildelays [![Build Status](https://drone.io/github.com/almex/Raildelays/status.png)](https://drone.io/github.com/almex/Raildelays/latest)
 
 Raildelays is mainly a Java application which accumulates train delays from the Belgian railway company called [NMBS](http://www.belgianrail.be/nl)/[SNCB](http://www.belgianrail.be/fr).
 In futur development, we will extend possibilities to be able to deal with other railway company or other vehicles
