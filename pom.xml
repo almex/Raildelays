@@ -756,7 +756,8 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.3</version>
+                    <!-- We are stuck to version 3.1 until this is solved https://issues.apache.org/jira/browse/MCOMPILER-236 -->
+                    <version>3.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
