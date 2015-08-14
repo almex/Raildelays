@@ -76,11 +76,12 @@
 
         <version.spring>4.1.7.RELEASE</version.spring>
         <version.spring.batch>3.0.4.RELEASE</version.spring.batch>
-        <version.spring.data>1.8.0.RELEASE</version.spring.data>
-        <version.spring.data.rest>2.3.0.RELEASE</version.spring.data.rest>
-        <version.spring.data.commons>1.10.0.RELEASE</version.spring.data.commons>
+        <version.spring.data>1.8.2.RELEASE</version.spring.data>
+        <version.spring.data.rest>2.3.2.RELEASE</version.spring.data.rest>
+        <version.spring.data.commons>1.10.2.RELEASE</version.spring.data.commons>
+        <version.spring.hateoas>0.18.0.RELEASE</version.spring.hateoas>
         <version.spring.mock>2.0.8</version.spring.mock>
-        <version.spring.boot>1.1.7.RELEASE</version.spring.boot>
+        <version.spring.boot>1.2.5.RELEASE</version.spring.boot>
         <version.spring.dbunit>1.4.0</version.spring.dbunit>
         <version.xbean.spring>3.16</version.xbean.spring>
         <version.hibernate>4.3.8.Final</version.hibernate>
@@ -93,6 +94,10 @@
         <version.hsqldb>2.3.3</version.hsqldb>
         <version.derby>10.10.1.1</version.derby>
         <version.servlet>3.1.0</version.servlet>
+        <version.undertow>1.2.10.Final</version.undertow>
+
+        <version.jersey>2.19</version.jersey>
+
         <version.atomikos>3.9.2</version.atomikos>
         <version.log4j>2.2</version.log4j>
         <version.slf4j>1.7.5</version.slf4j>
@@ -349,6 +354,11 @@
                 <artifactId>spring-data-commons</artifactId>
                 <version>${version.spring.data.commons}</version>
             </dependency>
+            <dependency>
+                <groupId>org.springframework.hateoas</groupId>
+                <artifactId>spring-hateoas</artifactId>
+                <version>${version.spring.hateoas}</version>
+            </dependency>
 
             <dependency>
                 <groupId>commons-pool</groupId>
@@ -511,6 +521,11 @@
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-undertow</artifactId>
+                <version>${version.spring.boot}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
                 <version>${version.spring.boot}</version>
             </dependency>
@@ -557,6 +572,28 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-web</artifactId>
                 <version>${version.spring}</version>
+            </dependency>
+
+            <!-- Servlet Container related -->
+            <dependency>
+                <groupId>io.undertow</groupId>
+                <artifactId>undertow-core</artifactId>
+                <version>${version.undertow}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.undertow</groupId>
+                <artifactId>undertow-servlet</artifactId>
+                <version>${version.undertow}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.undertow</groupId>
+                <artifactId>undertow-websockets-jsr</artifactId>
+                <version>${version.undertow}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.containers</groupId>
+                <artifactId>jersey-container-servlet-core</artifactId>
+                <version>${version.jersey}</version>
             </dependency>
 
             <!-- Scheduling -->
