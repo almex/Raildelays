@@ -693,6 +693,7 @@
                     <useReleaseProfile>false</useReleaseProfile>
                     <releaseProfiles>release,it</releaseProfiles>
                     <goals>deploy nexus-staging:release</goals>
+                    <tagNameFormat>v@{project.version}</tagNameFormat>
                 </configuration>
             </plugin>
         </plugins>
