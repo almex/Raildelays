@@ -55,13 +55,12 @@
     </issueManagement>
 
     <modules>
-        <module>domain-layer</module>
-        <module>repository-layer</module>
-        <module>httpclient-layer</module>
-        <module>parser-layer</module>
-        <module>service-layer</module>
-        <module>batch-layer</module>
-        <module>java-fx-layer</module>
+        <module>domain</module>
+        <module>repository</module>
+        <module>scraper</module>
+        <module>service</module>
+        <module>batch</module>
+        <module>java-fx-ui</module>
         <module>assembly</module>
     </modules>
 

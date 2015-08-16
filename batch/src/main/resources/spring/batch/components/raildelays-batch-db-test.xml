@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
+
+    <jdbc:embedded-database id="batchDataSource" type="HSQL">
+        <jdbc:script execution="INIT" location="classpath:/ddl/schema-create-hsqldb.sql"/>
+        <!--jdbc:script execution="DESTROY" location="classpath:/ddl/schema-drop-hsqldb.sql"/-->
+    </jdbc:embedded-database>
+
+    <!-- <bean id="jobExplorer"
+          class="org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean">
+        <property name="repositoryFactory" ref="&amp;jobRepository"/>
+    </bean> -->
+    
+    <bean id="jobExplorer"
+          class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean">
+        <property name="dataSource" ref="batchDataSource"/>
+        <property name="tablePrefix" value="BATCH_"/>
+    </bean>
+
+    <bean id="batchJobInstanceIncrementerFactory"
+          class="org.springframework.batch.database.support.DefaultSequenceMaxValueIncrementerFactory">
+        <constructor-arg ref="batchDataSource"/>
+    </bean>
+
+    <bean id="batchJobInstanceIncrementer"
+          class="org.springframework.jdbc.support.incrementer.AbstractSequenceMaxValueIncrementer"
+          factory-bean="batchJobInstanceIncrementerFactory"
+          factory-method="getIncrementer">
+        <constructor-arg index="0" value="HSQL"/>
+        <constructor-arg index="1" value="BATCH_INST_INCREMENT"/>
+    </bean>
+
+    <bean id="batchJobParametersIncrementer"
+          class="org.springframework.batch.core.JobParametersSequenceIncrementer">
+        <property name="sequence" ref="batchJobInstanceIncrementer"/>
+    </bean>
+
+    <!-- <bean id="jobRepository"
+          class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+        <property name="transactionManager" ref="batchTransactionManager"/>
+    </bean> -->
+    
+    <batch:job-repository id="jobRepository"
+                          data-source="batchDataSource" transaction-manager="batchTransactionManager"
+                          isolation-level-for-create="DEFAULT" table-prefix="BATCH_"
+                          max-varchar-length="1000"/>
+
+    <bean id="batchTransactionManager"
+          class="org.springframework.batch.support.transaction.ResourcelessTransactionManager">
+    </bean>
+
+</beans>

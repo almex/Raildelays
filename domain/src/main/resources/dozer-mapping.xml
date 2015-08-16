@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://dozer.sourceforge.net"
+          xsi:schemaLocation="http://dozer.sourceforge.net
+          http://dozer.sourceforge.net/schema/beanmapping.xsd">
+
+    <mapping map-null="false">
+        <class-a>be.raildelays.domain.railtime.Step</class-a>
+        <class-b>be.raildelays.domain.entities.LineStop</class-b>
+    </mapping>
+
+
+    <mapping map-null="false">
+        <class-a>be.raildelays.domain.entities.LineStop</class-a>
+        <class-b>be.raildelays.domain.entities.LineStop</class-b>
+        <field-exclude>
+            <a>next</a>
+            <b>next</b>
+        </field-exclude>
+        <field-exclude>
+            <a>previous</a>
+            <b>previous</b>
+        </field-exclude>
+        <field-exclude>
+            <a>id</a>
+            <b>id</b>
+        </field-exclude>
+        <field-exclude>
+            <a>train</a>
+            <b>train</b>
+        </field-exclude>
+        <field-exclude>
+            <a>station</a>
+            <b>station</b>
+        </field-exclude>
+        <field-exclude>
+            <a>date</a>
+            <b>date</b>
+        </field-exclude>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>be.raildelays.domain.dto.ServedStopDTO</class-a>
+        <class-b>be.raildelays.domain.entities.LineStop</class-b>
+        <field>
+            <a>stationName</a>
+            <b>station.englishName</b>
+        </field>
+        <field>
+            <a>departureTime</a>
+            <b>departureTime.expected</b>
+        </field>
+        <field>
+            <a>departureDelay</a>
+            <b>departureTime.delay</b>
+        </field>
+        <field>
+            <a>arrivalTime</a>
+            <b>arrivalTime.expected</b>
+        </field>
+        <field>
+            <a>arrivalDelay</a>
+            <b>arrivalTime.delay</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>be.raildelays.domain.railtime.Train</class-a>
+        <class-b>be.raildelays.domain.entities.Train</class-b>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>be.raildelays.domain.railtime.Station</class-a>
+        <class-b>be.raildelays.domain.entities.Station</class-b>
+    </mapping>
+
+</mappings>
