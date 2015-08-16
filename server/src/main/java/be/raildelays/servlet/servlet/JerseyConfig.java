@@ -22,33 +22,28 @@
  * IN THE SOFTWARE.
  */
 
-package be.raildelays.servlet;
+package be.raildelays.servlet.servlet;
 
 import org.glassfish.jersey.server.ResourceConfig;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.web.SpringBootServletInitializer;
-import org.springframework.context.annotation.ImportResource;
+import org.springframework.context.annotation.Profile;
+import org.springframework.hateoas.config.EnableEntityLinks;
+import org.springframework.hateoas.config.EnableHypermediaSupport;
+import org.springframework.stereotype.Component;
 
-import javax.inject.Named;
+import javax.ws.rs.ApplicationPath;
 
 /**
  * @author Almex
  * @since 2.0
  */
-@SpringBootApplication
-@ImportResource({"/spring/bootstrap-context.xml", "/jobs/main-job-context.xml"})
-public class Application extends SpringBootServletInitializer {
+@Profile("hateoas")
+@Component
+@ApplicationPath("/")
+@EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
+@EnableEntityLinks
+public class JerseyConfig extends ResourceConfig {
 
-    @Named
-    public static class JerseyConfig extends ResourceConfig {
-
-        public JerseyConfig() {
-            this.register(LineStopController.class);
-        }
-    }
-
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+    public JerseyConfig() {
+        register(LineStopController.class);
     }
 }

@@ -22,7 +22,7 @@
  * IN THE SOFTWARE.
  */
 
-package be.raildelays.servlet;
+package be.raildelays.servlet.servlet;
 
 import io.undertow.Handlers;
 import io.undertow.Undertow;

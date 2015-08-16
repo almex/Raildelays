@@ -22,21 +22,45 @@
  * IN THE SOFTWARE.
  */
 
-package be.raildelays.servlet;
+package be.raildelays.servlet.servlet;
 
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.servlet.ServletContainer;
+import be.raildelays.domain.entities.LineStop;
+import be.raildelays.repository.LineStopDao;
+import org.springframework.hateoas.Resources;
+import org.springframework.hateoas.jaxrs.JaxRsLinkBuilder;
+import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 /**
  * @author Almex
  * @since 2.0
  */
-public class JaxRsServlet extends ServletContainer {
-    public JaxRsServlet() {
-        super();
+@Component
+@Path("/lineStop")
+@Produces(MediaType.APPLICATION_JSON)
+public class LineStopController {
+
+    @Inject
+    private LineStopDao lineStopDao;
+
+    @GET
+    public Response findAll() {
+        Resources<LineStop> resources = new Resources<>(
+                lineStopDao.findAll(),
+                JaxRsLinkBuilder
+                        .linkTo(LineStopController.class)
+                        .withSelfRel()
+        );
+        return Response.ok(resources).build();
     }
 
-    public JaxRsServlet(ResourceConfig resourceConfig) {
-        super(resourceConfig);
+    public void setLineStopDao(LineStopDao lineStopDao) {
+        this.lineStopDao = lineStopDao;
     }
 }

@@ -61,6 +61,7 @@
         <module>service</module>
         <module>batch</module>
         <module>java-fx-ui</module>
+        <module>server</module>
         <module>assembly</module>
     </modules>
 
@@ -159,12 +160,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>raildelays-httpclient</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>raildelays-parser</artifactId>
+                <artifactId>raildelays-scraper</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -179,7 +175,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>admin-presentation</artifactId>
+                <artifactId>raildelays-server</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
