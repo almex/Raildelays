@@ -19,47 +19,47 @@ public class DelayMatcher {
     public static <T extends Comparable<T>, V> boolean difference(OrderingComparison<T> comparison,
                                                                   ValueMatcher<Class<V>> matcher) {
         comparison.setOperator(OrderingComparison.Operator.EQUAL);
+
         if (matcher.match(Long.class)) {
             comparison.setValue((Long) matcher.getValue());
         }
+
         return comparison.match(null);
     }
 
-//    public static <T> boolean is(Matcher<? extends T> matcher) {
-//        return matcher.match(null);
-//    }
+    public static OrderingComparison<TimestampDelay> between(TimestampDelay from) {
+        return new OrderingComparison<>(from);
+    }
 
-    public static OrderingComparison<TimestampDelay> between(TimestampDelay from, TimestampDelay to) {
-        return new OrderingComparison<>(from, to);
+    public static OrderingComparison<TimestampDelay> between(Date from) {
+        return new OrderingComparison<>(new TimestampDelay(from));
     }
 
     public static ValueMatcher<Class<Long>> equalTo(Long value) {
         return new ValueMatcher<>(value);
     }
 
-    public static <T extends Comparable<T>> Matcher<T> greaterThan(Date date) {
-        return new OrderingComparison<>(null, null);
-    }
+//    public static <T extends Comparable<T>> Matcher<T> greaterThan(Date date) {
+//        return new OrderingComparison<>(null);
+//    }
 
-    private static class OrderingComparison<T extends Comparable<T>> implements Matcher<T> {
+    public static class OrderingComparison<T extends Comparable<T>> implements Matcher<T> {
 
         private TimestampDelay from;
-
-        ;
         private TimestampDelay to;
         private Operator operator;
         private Long value = 0L;
-        public OrderingComparison(Long value) {
+
+        protected OrderingComparison(Long value) {
             this.value = value;
         }
 
-        public OrderingComparison(Operator operator) {
+        protected OrderingComparison(Operator operator) {
             this.operator = operator;
         }
 
-        public OrderingComparison(TimestampDelay from, TimestampDelay to) {
+        protected OrderingComparison(TimestampDelay from) {
             this.from = from;
-            this.to = to;
         }
 
         @Override
@@ -88,40 +88,52 @@ public class DelayMatcher {
             return result;
         }
 
-        public TimestampDelay getFrom() {
+        protected TimestampDelay getFrom() {
             return from;
         }
 
-        public void setFrom(TimestampDelay from) {
+        protected void setFrom(TimestampDelay from) {
             this.from = from;
         }
 
-        public TimestampDelay getTo() {
+        protected TimestampDelay getTo() {
             return to;
         }
 
-        public void setTo(TimestampDelay to) {
+        protected void setTo(TimestampDelay to) {
             this.to = to;
         }
 
-        public Operator getOperator() {
+        protected Operator getOperator() {
             return operator;
         }
 
-        public void setOperator(Operator operator) {
+        protected void setOperator(Operator operator) {
             this.operator = operator;
         }
 
-        public Long getValue() {
+        protected Long getValue() {
             return value;
         }
 
-        public void setValue(Long value) {
+        protected void setValue(Long value) {
             this.value = value;
         }
 
         enum Operator {
             GREATER, LESS, EQUAL, GREATER_OR_EQUAL, LESS_OR_EQUAL;
+        }
+
+        public OrderingComparison<T> and(TimestampDelay to) {
+            this.setTo(to);
+
+            return this;
+        }
+
+        public OrderingComparison<T> and(Date to) {
+            this.setTo(new TimestampDelay(to));
+
+            return this;
         }
     }
 
@@ -134,11 +146,11 @@ public class DelayMatcher {
         }
 
         @Override
-        public boolean match(Class<?> classe) {
+        public boolean match(Class<?> clazz) {
             boolean result = false;
 
-            if (classe != null) {
-                result = classe.isInstance(value);
+            if (clazz != null) {
+                result = clazz.isInstance(value);
             }
 
             return result;
