@@ -1,9 +1,9 @@
 package be.raildelays.delays;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
@@ -15,10 +15,15 @@ import java.util.Date;
  */
 public final class TimestampDelay implements Serializable, Comparable<TimestampDelay> {
 
+    public static final long DEFAULT_DELAY = 0L;
     private static final long serialVersionUID = -1026179811764044178L;
-
+    /**
+     * We keep an arbitrary reference to an instance of {@link LocalDate} in case of conversion from
+     * {@link java.sql.Time} into {@link LocalDateTime} to be sure that it's the same date between two
+     * call to {@link #toLocalDateTime()}.
+     */
+    private static final LocalDate DATE = LocalDate.now();
     protected final Date expectedTime;
-
     protected final Long delay; // in number of milliseconds
 
     /**
@@ -27,7 +32,7 @@ public final class TimestampDelay implements Serializable, Comparable<TimestampD
      */
     private TimestampDelay() {
         this.expectedTime = new Date();
-        this.delay = 0L;
+        this.delay = DEFAULT_DELAY;
     }
 
     /**
@@ -38,7 +43,7 @@ public final class TimestampDelay implements Serializable, Comparable<TimestampD
      */
     private TimestampDelay(Date expectedTime, Long delay) {
         this.expectedTime = (Date) expectedTime.clone();
-        this.delay = delay;
+        this.delay = delay != null ? delay : DEFAULT_DELAY;
     }
 
     /**
@@ -58,7 +63,7 @@ public final class TimestampDelay implements Serializable, Comparable<TimestampD
      * {@code null} if the {@code expectedTime} is {@code null}.
      */
     public static TimestampDelay of(Date expectedTime) {
-        return expectedTime != null ? new TimestampDelay(expectedTime, 0L) : null;
+        return expectedTime != null ? new TimestampDelay(expectedTime, DEFAULT_DELAY) : null;
     }
 
     /**
@@ -97,7 +102,6 @@ public final class TimestampDelay implements Serializable, Comparable<TimestampD
         return result;
     }
 
-
     /**
      * Create a clone of {@link TimestampDelay} for which we provide a new {@code delay}.
      *
@@ -107,6 +111,32 @@ public final class TimestampDelay implements Serializable, Comparable<TimestampD
      */
     public static TimestampDelay from(TimestampDelay timestampDelay, Long delay) {
         return new TimestampDelay(timestampDelay.getExpectedTime(), delay);
+    }
+
+    /**
+     * Create a clone of {@link TimestampDelay} for which we have 0 {@code delay}.
+     *
+     * @param timestampDelay we take only into account the {@code expectedTime} from this {@link TimestampDelay}
+     * @return a non-null {@link TimestampDelay} with the {@code expectedTime} and 0 {@code delay}.
+     */
+    public static TimestampDelay from(TimestampDelay timestampDelay) {
+        return new TimestampDelay(timestampDelay.getExpectedTime(), DEFAULT_DELAY);
+    }
+
+    static LocalDateTime toLocalDateTime(Date expectedTime) {
+        LocalDateTime result;
+
+        if (expectedTime instanceof java.sql.Time) {
+            result = ((java.sql.Time) expectedTime).toLocalTime().atDate(DATE);
+        } else if (expectedTime instanceof java.sql.Date) {
+            result = ((java.sql.Date) expectedTime).toLocalDate().atStartOfDay();
+        } else if (expectedTime instanceof java.sql.Timestamp) {
+            result = ((java.sql.Timestamp) expectedTime).toLocalDateTime();
+        } else {
+            result = LocalDateTime
+                    .ofInstant(expectedTime.toInstant(), ZoneId.systemDefault());
+        }
+        return result;
     }
 
     @Override
@@ -144,14 +174,14 @@ public final class TimestampDelay implements Serializable, Comparable<TimestampD
     public int hashCode() {
         int hash = 1;
 
-        hash = hash * 7 + (delay != null ? delay.hashCode() : 0);
-        hash = hash * 3 + (expectedTime != null ? expectedTime.hashCode() : 0);
+        hash = hash * 7 + delay.hashCode();
+        hash = hash * 3 + expectedTime.hashCode();
 
         return hash;
     }
 
     public final Date getExpectedTime() {
-        return (Date) (expectedTime != null ? expectedTime.clone() : null);
+        return (Date) expectedTime.clone();
     }
 
     public final Long getDelay() {
@@ -229,15 +259,25 @@ public final class TimestampDelay implements Serializable, Comparable<TimestampD
     }
 
     /**
+     * Translate a {@link TimestampDelay} into a {@link LocalDateTime}.
+     *
+     * @return a non-null {@link LocalDateTime} which is a combination of {@code expectedTime}
+     * plus its {@code delay}.
+     */
+    public LocalDateTime toLocalDateTime() {
+        return toLocalDateTime(expectedTime).plus(delay, ChronoUnit.MILLIS);
+    }
+
+    /**
      * Translate a {@link TimestampDelay} into a {@link Date}.
      *
-     * @return a non-null {@link Date} in {@code ZoneOffset.UTC} which is a combination of {@code expectedTime}
+     * @return a non-null {@link Date} with {@link ZoneId#systemDefault()} which is a combination of {@code expectedTime}
      * plus its {@code delay}.
      */
     public Date toDate() {
-        LocalDateTime result = LocalDateTime.from(expectedTime.toInstant().atZone(ZoneId.systemDefault()))
-                .plus(delay, ChronoUnit.MILLIS);
-
-        return Date.from(result.toInstant(ZoneOffset.UTC));
+        return Date.from(toLocalDateTime()
+                        .atZone(ZoneId.systemDefault())
+                        .toInstant()
+        );
     }
 }

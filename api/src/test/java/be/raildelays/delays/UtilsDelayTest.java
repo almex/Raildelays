@@ -123,4 +123,28 @@ public class UtilsDelayTest {
 
         Assert.assertThat(UtilsDelay.compareTime(departureA, departureB), is(lessThan(0L)));
     }
+
+    @Test
+    public void testCompareTimeWithTwoEqualsDates() throws Exception {
+        Date departureA = new Date();
+        Date departureB = departureA;
+
+        Assert.assertThat(UtilsDelay.compareTime(departureA, departureB), is(equalTo(0L)));
+    }
+
+    @Test
+    public void testComputeZeroDelay() throws Exception {
+        Date departureA = new Date();
+        Date departureB = departureA;
+
+        Assert.assertThat(UtilsDelay.computeDelay(departureA, departureB), is(equalTo(0L)));
+    }
+
+    @Test
+    public void testComputeNonZeroDelay() throws Exception {
+        Date departureA = new Date();
+        Date departureB = TimestampDelay.of(departureA, 15L).toDate();
+
+        Assert.assertThat(UtilsDelay.computeDelay(departureA, departureB), is(equalTo(15L)));
+    }
 }

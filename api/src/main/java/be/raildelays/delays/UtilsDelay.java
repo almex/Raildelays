@@ -1,9 +1,7 @@
 package be.raildelays.delays;
 
 import java.time.Duration;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -43,23 +41,8 @@ public final class UtilsDelay {
 
         if (timestampA != null && timestampB != null) {
             if (timestampA.getExpectedTime() != null && timestampB.getExpectedTime() != null) {
-                LocalTime start = timestampA.getExpectedTime()
-                        .toInstant()
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalTime();
-                LocalTime end = timestampB.getExpectedTime()
-                        .toInstant()
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalTime();
-
-                if (timestampA.getDelay() != null) {
-                    start = start.plus(timestampA.getDelay(), ChronoUnit.MILLIS);
-                }
-
-                if (timestampB.getDelay() != null) {
-                    end = end.plus(timestampB.getDelay(), ChronoUnit.MILLIS);
-                }
-
+                LocalDateTime start = timestampA.toLocalDateTime();
+                LocalDateTime end = timestampB.toLocalDateTime();
                 Duration duration = Duration.between(start, end);
 
                 result = -duration.toMillis(); // The difference is the opposite of a duration
@@ -162,8 +145,8 @@ public final class UtilsDelay {
         Long result = 0L;
 
         if (expectedTime != null && effectiveTime != null) {
-            LocalTime expected = LocalTime.from(expectedTime.toInstant().atZone(ZoneId.systemDefault()));
-            LocalTime effective = LocalTime.from(effectiveTime.toInstant().atZone(ZoneId.systemDefault()));
+            LocalDateTime expected = TimestampDelay.toLocalDateTime(expectedTime);
+            LocalDateTime effective = TimestampDelay.toLocalDateTime(effectiveTime);
             Duration duration = Duration.between(expected, effective);
 
             result = duration.toMillis();
