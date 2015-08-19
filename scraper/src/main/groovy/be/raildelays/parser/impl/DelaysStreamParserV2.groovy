@@ -24,10 +24,11 @@
 
 package be.raildelays.parser.impl
 
+import be.raildelays.delays.TimestampDelay
 import be.raildelays.domain.Language
 import be.raildelays.domain.entities.LineStop
 import be.raildelays.domain.entities.Station
-import be.raildelays.domain.entities.TimestampDelay
+
 import be.raildelays.domain.entities.Train
 import be.raildelays.httpclient.Stream
 import be.raildelays.httpclient.impl.DelaysRequestV2
@@ -102,7 +103,7 @@ class DelaysStreamParserV2 implements StreamParser<LineStop, DelaysRequestV2> {
         TimestampDelay result = null;
 
         if (object.csDt != null) {
-            result = new TimestampDelay(parser.parse(object.csDt), object.dD != null ? object.dD : 0);
+            result = TimestampDelay.of(parser.parse(object.csDt), object.dD != null ? object.dD : 0);
         }
 
         return result;
@@ -113,7 +114,7 @@ class DelaysStreamParserV2 implements StreamParser<LineStop, DelaysRequestV2> {
         TimestampDelay result = null;
 
         if (object.csAt != null) {
-            result = new TimestampDelay(parser.parse(object.csAt), object.dA != null ? object.dA : 0);
+            result = TimestampDelay.of(parser.parse(object.csAt), object.dA != null ? object.dA : 0);
         }
 
         return result;

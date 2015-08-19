@@ -3,6 +3,7 @@ package be.raildelays.delays;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 /**
@@ -20,12 +21,12 @@ import java.util.Date;
  * @author Almex
  * @since 2.0
  */
-public final class DelayUtils {
+public final class UtilsDelay {
 
     /**
      * Default constructor.
      */
-    private DelayUtils() {
+    private UtilsDelay() {
         // No instantiation is possible.
     }
 
@@ -41,30 +42,30 @@ public final class DelayUtils {
         long result = 0;
 
         if (timestampA != null && timestampB != null) {
-            if (timestampA.getExpected() != null && timestampB.getExpected() != null) {
-                LocalTime start = timestampA.getExpected()
+            if (timestampA.getExpectedTime() != null && timestampB.getExpectedTime() != null) {
+                LocalTime start = timestampA.getExpectedTime()
                         .toInstant()
                         .atZone(ZoneId.systemDefault())
                         .toLocalTime();
-                LocalTime end = timestampB.getExpected()
+                LocalTime end = timestampB.getExpectedTime()
                         .toInstant()
                         .atZone(ZoneId.systemDefault())
                         .toLocalTime();
 
                 if (timestampA.getDelay() != null) {
-                    start = start.plusMinutes(timestampA.getDelay());
+                    start = start.plus(timestampA.getDelay(), ChronoUnit.MILLIS);
                 }
 
                 if (timestampB.getDelay() != null) {
-                    end = end.plusMinutes(timestampB.getDelay());
+                    end = end.plus(timestampB.getDelay(), ChronoUnit.MILLIS);
                 }
 
                 Duration duration = Duration.between(start, end);
 
-                result = -duration.toMillis(); // The result should be the opposite of a duration
-            } else if (timestampA.getExpected() != null) {
+                result = -duration.toMillis(); // The difference is the opposite of a duration
+            } else if (timestampA.getExpectedTime() != null) {
                 result = 1;
-            } else if (timestampB.getExpected() != null) {
+            } else if (timestampB.getExpectedTime() != null) {
                 result = -1;
             }
         } else if (timestampA != null) {
@@ -85,7 +86,7 @@ public final class DelayUtils {
      * @return number of milliseconds between <code>date</code> and <code>timestamp</code>
      */
     public static long compareTimeAndDelay(Date date, TimestampDelay timestamp) {
-        return compareTimeAndDelay(new TimestampDelay(date), timestamp);
+        return compareTimeAndDelay(TimestampDelay.of(date), timestamp);
     }
 
     /**
@@ -97,7 +98,7 @@ public final class DelayUtils {
      * @return number of milliseconds between <code>timestamp</code> and <code>date</code>
      */
     public static long compareTimeAndDelay(TimestampDelay timestamp, Date date) {
-        return compareTimeAndDelay(timestamp, new TimestampDelay(date));
+        return compareTimeAndDelay(timestamp, TimestampDelay.of(date));
     }
 
     /**
@@ -109,7 +110,7 @@ public final class DelayUtils {
      * @return number of milliseconds between <code>timestampA</code> and <code>timestampB</code>
      */
     public static long compareTime(TimestampDelay timestampA, TimestampDelay timestampB) {
-        return compareTimeAndDelay(timestampA != null ? new TimestampDelay(timestampA.getExpected()) : null, timestampB != null ? new TimestampDelay(timestampB.getExpected()) : null);
+        return compareTimeAndDelay(timestampA != null ? TimestampDelay.of(timestampA.getExpectedTime()) : null, timestampB != null ? TimestampDelay.of(timestampB.getExpectedTime()) : null);
     }
 
     /**
@@ -121,7 +122,7 @@ public final class DelayUtils {
      * @return number of milliseconds between <code>timestamp</code> and <code>date</code>
      */
     public static long compareTime(TimestampDelay timestamp, Date date) {
-        return compareTimeAndDelay(timestamp != null ? new TimestampDelay(timestamp.getExpected()) : null, new TimestampDelay(date));
+        return compareTimeAndDelay(timestamp != null ? TimestampDelay.of(timestamp.getExpectedTime()) : null, TimestampDelay.of(date));
     }
 
     /**
@@ -133,6 +134,41 @@ public final class DelayUtils {
      * @return number of milliseconds between <code>date</code> and <code>timestamp</code>
      */
     public static long compareTime(Date date, TimestampDelay timestamp) {
-        return compareTimeAndDelay(new TimestampDelay(date), timestamp != null ? new TimestampDelay(timestamp.getExpected()) : null);
+        return compareTimeAndDelay(TimestampDelay.of(date), timestamp != null ? TimestampDelay.of(timestamp.getExpectedTime()) : null);
+    }
+
+    /**
+     * Compare two {@link Date} and compute duration between those two.
+     *
+     * @param dateA a {@link Date}
+     * @param dateB a {@link Date}
+     * @return number of milliseconds between <code>dateA</code> and <code>dateB</code>
+     */
+    public static long compareTime(Date dateA, Date dateB) {
+        return compareTimeAndDelay(TimestampDelay.of(dateA), TimestampDelay.of(dateB));
+    }
+
+    /**
+     * Compute a delay between two {@link Date}.
+     * This method give a way to translate from Java {@link Date} API into our Domain-specific language based on
+     * {@link TimestampDelay}.
+     *
+     * @param expectedTime  the expectedTime time
+     * @param effectiveTime the effective time
+     * @return the number of milliseconds between the {@code expectedTime} and the {@code effectiveTime},
+     * 0 if the {@code expectedTime} or the {@code expectedTime} is {@code null}.
+     */
+    public static Long computeDelay(Date expectedTime, Date effectiveTime) {
+        Long result = 0L;
+
+        if (expectedTime != null && effectiveTime != null) {
+            LocalTime expected = LocalTime.from(expectedTime.toInstant().atZone(ZoneId.systemDefault()));
+            LocalTime effective = LocalTime.from(effectiveTime.toInstant().atZone(ZoneId.systemDefault()));
+            Duration duration = Duration.between(expected, effective);
+
+            result = duration.toMillis();
+        }
+
+        return result;
     }
 }

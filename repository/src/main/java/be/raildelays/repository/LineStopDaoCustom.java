@@ -58,14 +58,14 @@ public interface LineStopDaoCustom {
                                      long delayThreshold);
 
     /**
-     * Search a the next trains which is expected to arrive after a certain
+     * Search a the next trains which is expectedTime to arrive after a certain
      * time.
      *
      * @param station for which you do a search
      * @param date    a line stops must be of the same day of the year of this date
-     *                and must have the expected departure time greater than the the
+     *                and must have the expectedTime departure time greater than the the
      *                hour specified into that date
-     * @return a list of line stops of the same day in order of expected arrival
+     * @return a list of line stops of the same day in order of expectedTime arrival
      * time
      */
     List<LineStop> findNextExpectedArrivalTime(Station station, Date date);
@@ -76,7 +76,7 @@ public interface LineStopDaoCustom {
      *
      * @param train   which stop the the <code>station</code>
      * @param station representing the stop of the line
-     * @return the first line stop from a list ascending ordered by expected arrival time
+     * @return the first line stop from a list ascending ordered by expectedTime arrival time
      */
     LineStop findFistScheduledLine(Train train, Station station);
 

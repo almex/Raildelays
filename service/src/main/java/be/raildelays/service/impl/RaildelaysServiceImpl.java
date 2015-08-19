@@ -24,12 +24,12 @@
 
 package be.raildelays.service.impl;
 
+import be.raildelays.delays.TimestampDelay;
 import be.raildelays.domain.Language;
 import be.raildelays.domain.dto.RouteLogDTO;
 import be.raildelays.domain.dto.ServedStopDTO;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.TimestampDelay;
 import be.raildelays.domain.entities.Train;
 import be.raildelays.repository.LineStopDao;
 import be.raildelays.repository.RailtimeTrainDao;
@@ -105,7 +105,7 @@ public class RaildelaysServiceImpl implements RaildelaysService {
         TimestampDelay result = null;
 
         if (timestamp != null) {
-            result = new TimestampDelay(timestamp.getExpected(), 0L);
+            result = TimestampDelay.from(timestamp, 0L);
         }
 
         return result;
@@ -160,10 +160,8 @@ public class RaildelaysServiceImpl implements RaildelaysService {
                 trainId, language));
         Station persistedStation = saveOrRetrieveStation(new Station(
                 stop.getStationName(), language));
-        TimestampDelay arrivalTime = new TimestampDelay(stop.getArrivalTime(),
-                stop.getArrivalDelay());
-        TimestampDelay departureTime = new TimestampDelay(
-                stop.getDepartureTime(), stop.getDepartureDelay());
+        TimestampDelay arrivalTime = TimestampDelay.of(stop.getArrivalTime(), stop.getArrivalDelay());
+        TimestampDelay departureTime = TimestampDelay.of(stop.getDepartureTime(), stop.getDepartureDelay());
         LineStop lineStop = new LineStop.Builder() //
                 .date(date) //
                 .station(persistedStation) //
@@ -248,21 +246,6 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 
         return result;
     }
-
-//    private RailtimeTrain saveOrRetrieveRailtimeTrain(RailtimeTrain train) {
-//        RailtimeTrain result = null;
-//        RailtimeTrain persistedTrain = railtimeTrainDao.findByRailtimeId(train
-//                .getRailtimeId());
-//
-//        if (persistedTrain == null) {
-//            validator.validate(train);
-//            result = railtimeTrainDao.save(train);
-//        } else {
-//            result = persistedTrain;
-//        }
-//
-//        return result;
-//    }
 
     @Override
     @Transactional(readOnly = true)

@@ -24,8 +24,8 @@
 
 package be.raildelays.batch.processor;
 
+import be.raildelays.delays.TimestampDelay;
 import be.raildelays.domain.entities.LineStop;
-import be.raildelays.domain.entities.TimestampDelay;
 import be.raildelays.logging.Logger;
 import be.raildelays.logging.LoggerFactory;
 import be.raildelays.service.RaildelaysService;
@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * If one stop is not deserved (canceled) then we have no expected time. We must
+ * If one stop is not deserved (canceled) then we have no expectedTime time. We must
  * therefore find another way to retrieve line scheduling before persisting a
  * <code>RouteLog</code>.
  *
@@ -74,7 +74,7 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, L
         /*
          * I would prefer to check if it lacks some information instead of checking if it's canceled or not
          * but the thing is that Railtime gives wrong information when a line stop is canceled.
-         * Sometimes it gives an expected arrival time equal to the expected departure time.
+         * Sometimes it gives an expectedTime arrival time equal to the expectedTime departure time.
          */
         if (hasAnyCanceled(item)) {
             LOGGER.info("have_canceled_stop", item);
@@ -134,7 +134,7 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, L
         LineStop.Builder result = new LineStop.Builder(item, false, false);
         LineStop candidate = service.searchScheduledLine(item.getTrain(), item.getStation());
 
-        //-- If we cannot retrieve one of the expected time then this item is corrupted we must filter it.
+        //-- If we cannot retrieve one of the expectedTime time then this item is corrupted we must filter it.
         if (candidate == null) {
             LOGGER.trace("no_candidate", item);
 
@@ -143,8 +143,10 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, L
             LOGGER.debug("candidate", candidate);
         }
 
-        final TimestampDelay departureTime = new TimestampDelay(candidate.getDepartureTime().getExpected(), item.getDepartureTime().getDelay());
-        final TimestampDelay arrivalTime = new TimestampDelay(candidate.getArrivalTime().getExpected(), item.getArrivalTime().getDelay());
+        Long departureDelay = item.getDepartureTime() != null ? item.getDepartureTime().getDelay() : 0L;
+        Long arrivalDelay = item.getArrivalTime() != null ? item.getArrivalTime().getDelay() : 0L;
+        TimestampDelay departureTime = TimestampDelay.of(candidate.getDepartureTime().getExpectedTime(), departureDelay);
+        TimestampDelay arrivalTime = TimestampDelay.of(candidate.getArrivalTime().getExpectedTime(), arrivalDelay);
 
         result.departureTime(departureTime) //
                 .arrivalTime(arrivalTime);

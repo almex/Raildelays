@@ -74,7 +74,7 @@ public class HandleMoreThanOneHourDelaysIT extends AbstractContextIT {
         Assert.assertEquals(1, getExcelFiles().size());
 
         getExcelFiles().forEach(file ->
-                Assert.assertTrue("The file name is not one of those expected",
+                Assert.assertTrue("The file name is not one of those expectedTime",
                         FILES_NAMES.stream().anyMatch(s -> file.getName().contains(s))));
     }
 

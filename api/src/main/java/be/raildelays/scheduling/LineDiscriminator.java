@@ -1,7 +1,7 @@
 package be.raildelays.scheduling;
 
 /**
- * In Belgium a train can is a LineDiscriminator
+ * In Belgium a train can be a LineDiscriminator
  *
  * @author Almex
  */

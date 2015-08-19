@@ -24,6 +24,7 @@
 
 package be.raildelays.domain.entities;
 
+import be.raildelays.delays.TimestampDelay;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -76,13 +77,13 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(column = @Column(name = "ARRIVAL_TIME_EXPECTED"), name = "expected"),
+            @AttributeOverride(column = @Column(name = "ARRIVAL_TIME_EXPECTED"), name = "expectedTime"),
             @AttributeOverride(column = @Column(name = "ARRIVAL_TIME_DELAY"), name = "delay")})
     protected TimestampDelay arrivalTime;
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(column = @Column(name = "DEPARTURE_TIME_EXPECTED"), name = "expected"),
+            @AttributeOverride(column = @Column(name = "DEPARTURE_TIME_EXPECTED"), name = "expectedTime"),
             @AttributeOverride(column = @Column(name = "DEPARTURE_TIME_DELAY"), name = "delay")})
     protected TimestampDelay departureTime;
 
@@ -282,10 +283,6 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
         this.date = date;
     }
 
-    /**
-     * Use {@link #isCanceledDeparture} or {@link #isCanceledArrival} instead.
-     */
-    @Deprecated
     public boolean isCanceled() {
         return canceledDeparture || canceledArrival;
     }

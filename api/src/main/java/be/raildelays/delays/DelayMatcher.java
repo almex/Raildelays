@@ -6,81 +6,130 @@ import java.util.Date;
  * @author Almex
  * @since 2.0
  */
-public class DelayMatcher {
+public class DelayMatcher<T> implements Matcher<T> {
 
-    public static <T> Matcher<T> is(Matcher<T> matcher) {
+    enum Operator {
+        GREATER, LESS, EQUAL, GREATER_OR_EQUAL, LESS_OR_EQUAL
+    }
+
+    public static OperatorMatcher<Long> is(OperatorMatcher<Long> matcher) {
         return matcher;
     }
 
-    public static <V> ValueMatcher<Class<V>> is(ValueMatcher<Class<V>> matcher) {
-        return matcher;
+    public static OperatorMatcher<Long> is(Long value) {
+        return is(equalTo(value));
     }
 
-    public static <T extends Comparable<T>, V> boolean difference(OrderingComparison<T> comparison,
-                                                                  ValueMatcher<Class<V>> matcher) {
-        comparison.setOperator(OrderingComparison.Operator.EQUAL);
+    public static OperatorMatcher<Long> equalTo(Long value) {
+        return OperatorMatcher.operator(Operator.EQUAL, ValueMatcher.value(value));
+    }
 
-        if (matcher.match(Long.class)) {
-            comparison.setValue((Long) matcher.getValue());
+    public static OperatorMatcher<Long> equal() {
+        return OperatorMatcher.operator(Operator.EQUAL, ValueMatcher.value(0L));
+    }
+
+    public static OperatorMatcher<Long> greaterThan(Long value) {
+        return OperatorMatcher.operator(Operator.GREATER, ValueMatcher.value(value));
+    }
+
+    public static OperatorMatcher<Long> after() {
+        return greaterThan(0L);
+    }
+
+    public static OperatorMatcher<Long> lessThan(Long value) {
+        return OperatorMatcher.operator(Operator.LESS, ValueMatcher.value(value));
+    }
+
+    public static OperatorMatcher<Long> before() {
+        return lessThan(0L);
+    }
+
+    public static boolean difference(OrderingComparison comparison,
+                                     OperatorMatcher<Long> matcher) {
+        comparison.setOperator(matcher.getOperator());
+
+        return comparison.match(matcher.getValueMatcher().getValue());
+    }
+
+    public static boolean duration(OrderingComparison comparison,
+                                   OperatorMatcher<Long> matcher) {
+        // A duration is the opposite of a difference
+        return difference(comparison, opposite(matcher));
+    }
+
+    /**
+     * Create a {@link OperatorMatcher} containing the {@link ValueMatcher} with an opposite {@code value} and the
+     * opposite {@link be.raildelays.delays.DelayMatcher.Operator}.
+     *
+     * @param matcher the {@link OperatorMatcher} to clone
+     * @return a {@link OperatorMatcher} containing the {@link ValueMatcher} with an opposite {@code value} and the
+     * opposite {@link be.raildelays.delays.DelayMatcher.Operator}.
+     */
+    private static OperatorMatcher<Long> opposite(OperatorMatcher<Long> matcher) {
+        Operator operator = matcher.getOperator();
+        ValueMatcher<Long> valueMatcher = ValueMatcher.value(-matcher.getValueMatcher().getValue());
+
+        switch (operator) {
+            case GREATER:
+                operator = Operator.LESS;
+                break;
+            case LESS:
+                operator = Operator.GREATER;
+                break;
+            case GREATER_OR_EQUAL:
+                operator = Operator.LESS_OR_EQUAL;
+                break;
+            case LESS_OR_EQUAL:
+                operator = Operator.GREATER_OR_EQUAL;
+                break;
         }
 
-        return comparison.match(null);
+        return OperatorMatcher.operator(operator, valueMatcher);
     }
 
-    public static OrderingComparison<TimestampDelay> between(TimestampDelay from) {
-        return new OrderingComparison<>(from);
+    public static OrderingComparison between(TimestampDelay from) {
+        return new OrderingComparison(from);
     }
 
-    public static OrderingComparison<TimestampDelay> between(Date from) {
-        return new OrderingComparison<>(new TimestampDelay(from));
+    public static OrderingComparison between(Date from) {
+        return new OrderingComparison(TimestampDelay.of(from));
     }
 
-    public static ValueMatcher<Class<Long>> equalTo(Long value) {
-        return new ValueMatcher<>(value);
+
+    @Override
+    public boolean match(T object) {
+        return false;
     }
 
-//    public static <T extends Comparable<T>> Matcher<T> greaterThan(Date date) {
-//        return new OrderingComparison<>(null);
-//    }
-
-    public static class OrderingComparison<T extends Comparable<T>> implements Matcher<T> {
+    public static class OrderingComparison implements Matcher<Long> {
 
         private TimestampDelay from;
         private TimestampDelay to;
         private Operator operator;
-        private Long value = 0L;
-
-        protected OrderingComparison(Long value) {
-            this.value = value;
-        }
-
-        protected OrderingComparison(Operator operator) {
-            this.operator = operator;
-        }
 
         protected OrderingComparison(TimestampDelay from) {
             this.from = from;
         }
 
         @Override
-        public boolean match(T object) {
+        public boolean match(Long value) {
             boolean result = false;
 
             switch (operator) {
                 case EQUAL:
-                    result = DelayUtils.compareTimeAndDelay(from, to) == value;
+                    result = UtilsDelay.compareTimeAndDelay(from, to) == value;
                     break;
                 case GREATER:
-                    result = DelayUtils.compareTimeAndDelay(from, to) > value;
+                    result = UtilsDelay.compareTimeAndDelay(from, to) > value;
                     break;
                 case GREATER_OR_EQUAL:
-                    result = DelayUtils.compareTimeAndDelay(from, to) >= value;
+                    result = UtilsDelay.compareTimeAndDelay(from, to) >= value;
                     break;
                 case LESS:
-                    result = DelayUtils.compareTimeAndDelay(from, to) < value;
+                    result = UtilsDelay.compareTimeAndDelay(from, to) < value;
                     break;
                 case LESS_OR_EQUAL:
-                    result = DelayUtils.compareTimeAndDelay(from, to) <= value;
+                    result = UtilsDelay.compareTimeAndDelay(from, to) <= value;
                     break;
 
             }
@@ -104,72 +153,82 @@ public class DelayMatcher {
             this.to = to;
         }
 
-        protected Operator getOperator() {
-            return operator;
-        }
-
         protected void setOperator(Operator operator) {
             this.operator = operator;
         }
 
-        protected Long getValue() {
-            return value;
-        }
-
-        protected void setValue(Long value) {
-            this.value = value;
-        }
-
-        enum Operator {
-            GREATER, LESS, EQUAL, GREATER_OR_EQUAL, LESS_OR_EQUAL;
-        }
-
-        public OrderingComparison<T> and(TimestampDelay to) {
+        public OrderingComparison and(TimestampDelay to) {
             this.setTo(to);
 
             return this;
         }
 
-        public OrderingComparison<T> and(Date to) {
-            this.setTo(new TimestampDelay(to));
+        public OrderingComparison and(Date to) {
+            this.setTo(TimestampDelay.of(to));
 
             return this;
         }
     }
 
-    private static class ValueMatcher<T> implements Matcher<Class<?>> {
+    private static class ValueMatcher<V> implements Matcher<V> {
 
-        private Object value;
+        private V value;
 
-        private ValueMatcher(Object value) {
+        private ValueMatcher(V value) {
             this.value = value;
         }
 
         @Override
-        public boolean match(Class<?> clazz) {
+        public boolean match(V target) {
             boolean result = false;
 
-            if (clazz != null) {
-                result = clazz.isInstance(value);
+            if (value != null) {
+                result = value.equals(target);
+            } else if (target == null) {
+                result = true;
             }
 
             return result;
         }
 
-        public Object getValue() {
+        public V getValue() {
             return value;
         }
 
-        public void setValue(Object value) {
+        public static <V> ValueMatcher<V> value(V value) {
+            return new ValueMatcher<>(value);
+        }
+
+        public void setValue(V value) {
             this.value = value;
         }
     }
 
-    private static class OperatorMatcher<T> implements Matcher<T> {
+    private static class OperatorMatcher<V> implements Matcher<Operator> {
+
+        private Operator operator;
+        private ValueMatcher<V> valueMatcher;
+
+        private OperatorMatcher(Operator operator, ValueMatcher<V> valueMatcher) {
+            this.operator = operator;
+            this.valueMatcher = valueMatcher;
+        }
+
+        public static <V> OperatorMatcher<V> operator(Operator operator, ValueMatcher<V> matcher) {
+            return new OperatorMatcher<>(operator, matcher);
+        }
 
         @Override
-        public boolean match(T object) {
-            return false;
+        public boolean match(Operator target) {
+            return operator.equals(target);
+        }
+
+        public ValueMatcher<V> getValueMatcher() {
+            return valueMatcher;
+        }
+
+        public Operator getOperator() {
+            return operator;
         }
     }
 }

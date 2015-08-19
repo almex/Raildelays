@@ -181,7 +181,7 @@ public class ExcelRow implements Comparable<ExcelRow>, Serializable {
         } else if (excelRow == null) {
             result = 1;
         } else {
-            // We give only a chronological order based on expected time
+            // We give only a chronological order based on expectedTime time
             result = new CompareToBuilder()
                     .append(this.getDate(), excelRow.getDate())
                     .append(this.getExpectedDepartureTime(), excelRow.getExpectedDepartureTime())

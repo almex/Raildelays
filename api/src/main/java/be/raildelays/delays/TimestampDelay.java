@@ -1,6 +1,10 @@
 package be.raildelays.delays;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 /**
@@ -9,47 +13,105 @@ import java.util.Date;
  * @author Almex
  * @since 2.0
  */
-public class TimestampDelay implements Serializable, Comparable<TimestampDelay> {
+public final class TimestampDelay implements Serializable, Comparable<TimestampDelay> {
 
     private static final long serialVersionUID = -1026179811764044178L;
 
-    protected final Date expected;
+    protected final Date expectedTime;
 
     protected final Long delay; // in number of milliseconds
 
     /**
      * Default constructor.
-     * Build an expected time with current date and 0 delay
+     * Build an {@code expectedTime} with current date and 0 delay.
      */
-    public TimestampDelay() {
-        this.expected = new Date();
+    private TimestampDelay() {
+        this.expectedTime = new Date();
         this.delay = 0L;
     }
 
     /**
      * Initialization constructor.
      *
-     * @param expected time expected
-     * @param delay    delay in milliseconds
+     * @param expectedTime the expected time such as : 1st January 2000 at 12:00
+     * @param delay        delay in milliseconds counting from the {@code expectedTime}
      */
-    public TimestampDelay(final Date expected, final Long delay) {
-        this.expected = (Date) (expected != null ? expected.clone() : null);
+    private TimestampDelay(Date expectedTime, Long delay) {
+        this.expectedTime = (Date) expectedTime.clone();
         this.delay = delay;
     }
 
     /**
-     * Initialization constructor with 0 delay.
+     * Create an an instance of {@link TimestampDelay} with the current {@link Date} for the expectedTime time and 0 delay.
      *
-     * @param expected time expected
+     * @return a non-null {@link TimestampDelay} with the current {@link Date} and 0 delay.
      */
-    public TimestampDelay(final Date expected) {
-        this.expected = (Date) (expected != null ? expected.clone() : null);
-        this.delay = 0L;
+    public static TimestampDelay now() {
+        return new TimestampDelay();
+    }
+
+    /**
+     * Create an an instance of {@link TimestampDelay} with the {@code expectedTime} and 0 delay.
+     *
+     * @param expectedTime the expected time such as : 1st January 2000 at 12:00
+     * @return a {@link TimestampDelay} with the {@code expectedTime} and 0 delay,
+     * {@code null} if the {@code expectedTime} is {@code null}.
+     */
+    public static TimestampDelay of(Date expectedTime) {
+        return expectedTime != null ? new TimestampDelay(expectedTime, 0L) : null;
+    }
+
+    /**
+     * Create an an instance of {@link TimestampDelay} with the {@code expectedTime} and the {@code delay}.
+     *
+     * @param expectedTime the expected time such as : 1st January 2000 at 12:00
+     * @param delay        delay in milliseconds counting from the {@code expectedTime}
+     * @return a {@link TimestampDelay} with the {@code expectedTime} and the {@code delay},
+     * {@code null} if the {@code expectedTime} is {@code null}.
+     */
+    public static TimestampDelay of(Date expectedTime, Long delay) {
+        return expectedTime != null ? new TimestampDelay(expectedTime, delay) : null;
+    }
+
+    /**
+     * Create an an instance of {@link TimestampDelay} from two {@link Date} :
+     * <ul>
+     * <li>the expected time</li>
+     * <li>the effective time</li>
+     * </ul>
+     *
+     * @param expectedTime  the expected time of this instance of {@link TimestampDelay}
+     * @param effectiveTime the effective time used to compute delay
+     * @return a {@link TimestampDelay} with the computed delay between those two {@link Date},
+     * {@code null} if the {@code expectedTime} is {@code null}.
+     */
+    public static TimestampDelay from(Date expectedTime, Date effectiveTime) {
+        TimestampDelay result = null;
+
+        if (expectedTime != null) {
+            Long delay = UtilsDelay.computeDelay(expectedTime, effectiveTime);
+
+            result = new TimestampDelay(expectedTime, delay);
+        }
+
+        return result;
+    }
+
+
+    /**
+     * Create a clone of {@link TimestampDelay} for which we provide a new {@code delay}.
+     *
+     * @param timestampDelay we take only into account the {@code expectedTime} from this {@link TimestampDelay}
+     * @param delay          delay in milliseconds counting from the {@code expectedTime}
+     * @return a non-null {@link TimestampDelay} with the {@code expectedTime} and the {@code delay}.
+     */
+    public static TimestampDelay from(TimestampDelay timestampDelay, Long delay) {
+        return new TimestampDelay(timestampDelay.getExpectedTime(), delay);
     }
 
     @Override
     public String toString() {
-        return expected != null ? expected.toString() + " +" + delay + "ms" : "null";
+        return expectedTime != null ? expectedTime.toString() + " +" + delay + "ms" : "null";
     }
 
     @Override
@@ -61,15 +123,16 @@ public class TimestampDelay implements Serializable, Comparable<TimestampDelay> 
         } else if (obj instanceof TimestampDelay) {
             TimestampDelay target = (TimestampDelay) obj;
 
-            if (this.expected != null && this.delay != null) {
-                result = this.expected.equals(target.expected) && this.delay.equals(target.delay);
+            //FIXME should use Date#equals(Date) instead
+            if (this.expectedTime != null && this.delay != null) {
+                result = this.expectedTime.equals(target.expectedTime) && this.delay.equals(target.delay);
             } else {
-                if (this.expected != null) {
-                    result = this.expected.equals(target.expected) && target.delay == null;
+                if (this.expectedTime != null) {
+                    result = this.expectedTime.equals(target.expectedTime) && target.delay == null;
                 } else if (this.delay != null) {
-                    result = target.expected == null && this.delay.equals(target.delay);
+                    result = target.expectedTime == null && this.delay.equals(target.delay);
                 } else {
-                    result = target.expected == null && target.delay == null;
+                    result = target.expectedTime == null && target.delay == null;
                 }
             }
         }
@@ -82,13 +145,13 @@ public class TimestampDelay implements Serializable, Comparable<TimestampDelay> 
         int hash = 1;
 
         hash = hash * 7 + (delay != null ? delay.hashCode() : 0);
-        hash = hash * 3 + (expected != null ? expected.hashCode() : 0);
+        hash = hash * 3 + (expectedTime != null ? expectedTime.hashCode() : 0);
 
         return hash;
     }
 
-    public final Date getExpected() {
-        return (Date) (expected != null ? expected.clone() : null);
+    public final Date getExpectedTime() {
+        return (Date) (expectedTime != null ? expectedTime.clone() : null);
     }
 
     public final Long getDelay() {
@@ -96,23 +159,24 @@ public class TimestampDelay implements Serializable, Comparable<TimestampDelay> 
     }
 
     @Override
-    public int compareTo(@SuppressWarnings("NullableProblems") TimestampDelay target) {
+    public int compareTo(TimestampDelay target) {
         int result;
 
         if (target == null) {
             result = -1;
         } else {
-            if (this.expected != null && this.delay != null) {
-                result = this.expected.compareTo(target.expected);
+            //FIXME should use Date#compareTo(Date) instead
+            if (this.expectedTime != null && this.delay != null) {
+                result = this.expectedTime.compareTo(target.expectedTime);
 
                 if (result == 0) {
                     result = this.delay.compareTo(target.delay);
                 }
             } else {
-                if (this.expected == null) {
-                    result = (target.expected == null ? 0 : 1);
+                if (this.expectedTime == null) {
+                    result = (target.expectedTime == null ? 0 : 1);
                 } else {
-                    result = this.expected.compareTo(target.expected);
+                    result = this.expectedTime.compareTo(target.expectedTime);
 
                     if (result == 0) {
                         result = (target.delay == null ? 0 : 1);
@@ -122,5 +186,58 @@ public class TimestampDelay implements Serializable, Comparable<TimestampDelay> 
         }
 
         return result;
+    }
+
+    /**
+     * Compare if {@code this} {@link TimestampDelay} is after the {@code target} {@link TimestampDelay}.
+     *
+     * @param target the {@link TimestampDelay}  to compare with
+     * @return {@code true} if {@code this} is after the{@code target}, {@code false} otherwise
+     */
+    public boolean after(TimestampDelay target) {
+        return compareTo(target) > 0;
+    }
+
+    /**
+     * Compare if {@code this} {@link TimestampDelay} is before the {@code target} {@link TimestampDelay}.
+     *
+     * @param target the {@link TimestampDelay}  to compare with
+     * @return {@code true} if {@code this} is before the{@code target}, {@code false} otherwise
+     */
+    public boolean before(TimestampDelay target) {
+        return compareTo(target) < 0;
+    }
+
+    /**
+     * Compare if {@code this} {@link TimestampDelay} is after or equal to the {@code target} {@link TimestampDelay}.
+     *
+     * @param target the {@link TimestampDelay} to compare with
+     * @return {@code true} if {@code this} is after or equal to the{@code target}, {@code false} otherwise
+     */
+    public boolean afterOrEqual(TimestampDelay target) {
+        return compareTo(target) >= 0;
+    }
+
+    /**
+     * Compare if {@code this} {@link TimestampDelay} is before or equal to the {@code target} {@link TimestampDelay}.
+     *
+     * @param target the {@link TimestampDelay} to compare with
+     * @return {@code true} if {@code this} is before or equal to the{@code target}, {@code false} otherwise
+     */
+    public boolean beforeOrEqual(TimestampDelay target) {
+        return compareTo(target) <= 0;
+    }
+
+    /**
+     * Translate a {@link TimestampDelay} into a {@link Date}.
+     *
+     * @return a non-null {@link Date} in {@code ZoneOffset.UTC} which is a combination of {@code expectedTime}
+     * plus its {@code delay}.
+     */
+    public Date toDate() {
+        LocalDateTime result = LocalDateTime.from(expectedTime.toInstant().atZone(ZoneId.systemDefault()))
+                .plus(delay, ChronoUnit.MILLIS);
+
+        return Date.from(result.toInstant(ZoneOffset.UTC));
     }
 }

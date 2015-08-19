@@ -7,14 +7,14 @@ public class TimestampDelayTest {
 
     @Test
     public void testGetExpected() throws Exception {
-        TimestampDelay timestamp = new TimestampDelay();
+        TimestampDelay timestamp = TimestampDelay.now();
 
-        Assert.assertNotNull(timestamp.getExpected());
+        Assert.assertNotNull(timestamp.getExpectedTime());
     }
 
     @Test
     public void testGetDelay() throws Exception {
-        TimestampDelay timestamp = new TimestampDelay();
+        TimestampDelay timestamp = TimestampDelay.now();
 
         Assert.assertEquals(0L, (long) timestamp.getDelay());
     }

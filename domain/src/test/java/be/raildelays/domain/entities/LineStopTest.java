@@ -1,5 +1,6 @@
 package be.raildelays.domain.entities;
 
+import be.raildelays.delays.TimestampDelay;
 import be.raildelays.test.AbstractObjectTest;
 import org.junit.Before;
 import org.junit.experimental.theories.DataPoint;
@@ -28,8 +29,8 @@ public class LineStopTest extends AbstractObjectTest {
         SimpleDateFormat f = new SimpleDateFormat("HH:mm");
         Train train = new Train("466");
         Station station = new Station("Liège (Liège-Guillemins)");
-        TimestampDelay arrivalTime = new TimestampDelay(f.parse("12:00"), 5L);
-        TimestampDelay departureTime = new TimestampDelay(f.parse("12:05"), 5L);
+        TimestampDelay arrivalTime = TimestampDelay.of(f.parse("12:00"), 5L);
+        TimestampDelay departureTime = TimestampDelay.of(f.parse("12:05"), 5L);
         Date date = new Date();
 
         DATA_POINT1 = new LineStop.Builder().date(date).train(train)

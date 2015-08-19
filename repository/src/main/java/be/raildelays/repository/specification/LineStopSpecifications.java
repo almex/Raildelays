@@ -24,6 +24,7 @@
 
 package be.raildelays.repository.specification;
 
+import be.raildelays.delays.TimestampDelay_;
 import be.raildelays.domain.entities.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
@@ -42,7 +43,7 @@ import java.util.Locale;
 public class LineStopSpecifications {
 
     /**
-     * Creates a specification used to find LineStop whose Station equals the expected one.
+     * Creates a specification used to find LineStop whose Station equals the expectedTime one.
      *
      * @param station for which we should match the name
      * @return a predicate or null if all of name in each language are null
@@ -69,7 +70,7 @@ public class LineStopSpecifications {
     }
 
     /**
-     * Creates a specification used to find LineStop whose Train equals the expected one.
+     * Creates a specification used to find LineStop whose Train equals the expectedTime one.
      *
      * @param train for which we should match the name
      * @return a predicate or null if all of name in each language are null
@@ -96,7 +97,7 @@ public class LineStopSpecifications {
     }
 
     /**
-     * Creates a specification used to find LineStop whose date equals the expected one.
+     * Creates a specification used to find LineStop whose date equals the expectedTime one.
      *
      * @param date for which we should have a match
      * @return a predicate
@@ -113,18 +114,18 @@ public class LineStopSpecifications {
      */
     public static Specification<LineStop> arrivalTimeIsNotNull() {
 
-        return (root, query, builder) -> root.get(LineStop_.arrivalTime).get(TimestampDelay_.expected).isNotNull();
+        return (root, query, builder) -> root.get(LineStop_.arrivalTime).get(TimestampDelay_.expectedTime).isNotNull();
     }
 
     /**
-     * Creates a specification used to find LineStop whose arrival time greater than the expected one.
+     * Creates a specification used to find LineStop whose arrival time greater than the expectedTime one.
      *
-     * @param date the expected date
+     * @param date the expectedTime date
      * @return a predicate
      */
     public static Specification<LineStop> arrivalTimeGreaterThan(final Date date) {
 
-        return (root, query, builder) -> builder.greaterThan(root.get(LineStop_.arrivalTime).get(TimestampDelay_.expected), date);
+        return (root, query, builder) -> builder.greaterThan(root.get(LineStop_.arrivalTime).get(TimestampDelay_.expectedTime), date);
     }
 
     /**
@@ -138,9 +139,9 @@ public class LineStopSpecifications {
     }
 
     /**
-     * Creates a specification used to find LineStop whose arrival delay is greater than the expected one.
+     * Creates a specification used to find LineStop whose arrival delay is greater than the expectedTime one.
      *
-     * @param delay the expected delay
+     * @param delay the expectedTime delay
      * @return a predicate
      */
     public static Specification<LineStop> arrivalDelayGreaterThan(final Long delay) {
@@ -149,9 +150,9 @@ public class LineStopSpecifications {
     }
 
     /**
-     * Creates a specification used to find LineStop whose arrival delay is greater than the expected one.
+     * Creates a specification used to find LineStop whose arrival delay is greater than the expectedTime one.
      *
-     * @param delay the expected delay
+     * @param delay the expectedTime delay
      * @return a predicate
      */
     public static Specification<LineStop> arrivalDelayGreaterThanOrEqualTo(final Long delay) {
@@ -166,18 +167,18 @@ public class LineStopSpecifications {
      */
     public static Specification<LineStop> departureTimeIsNotNull() {
 
-        return (root, query, builder) -> root.get(LineStop_.departureTime).get(TimestampDelay_.expected).isNotNull();
+        return (root, query, builder) -> root.get(LineStop_.departureTime).get(TimestampDelay_.expectedTime).isNotNull();
     }
 
     /**
-     * Creates a specification used to find LineStop whose departure time greater than the expected one.
+     * Creates a specification used to find LineStop whose departure time greater than the expectedTime one.
      *
-     * @param date the expected date
+     * @param date the expectedTime date
      * @return a predicate
      */
     public static Specification<LineStop> departureTimeGreaterThan(final Date date) {
 
-        return (root, query, builder) -> builder.greaterThan(root.get(LineStop_.departureTime).get(TimestampDelay_.expected), date);
+        return (root, query, builder) -> builder.greaterThan(root.get(LineStop_.departureTime).get(TimestampDelay_.expectedTime), date);
     }
 
     /**
@@ -191,9 +192,9 @@ public class LineStopSpecifications {
     }
 
     /**
-     * Creates a specification used to find LineStop whose departure delay is greater than the expected one.
+     * Creates a specification used to find LineStop whose departure delay is greater than the expectedTime one.
      *
-     * @param delay the expected delay
+     * @param delay the expectedTime delay
      * @return a predicate
      */
     public static Specification<LineStop> departureDelayGreaterThan(final Long delay) {

@@ -24,10 +24,10 @@
 
 package be.raildelays.batch.processor;
 
+import be.raildelays.delays.TimestampDelay;
 import be.raildelays.domain.Language;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.TimestampDelay;
 import be.raildelays.domain.entities.Train;
 import be.raildelays.domain.railtime.Direction;
 import be.raildelays.domain.railtime.Step;
@@ -112,8 +112,8 @@ public class LineStopMapperProcessor implements ItemProcessor<TwoDirections, Lin
         LineStop result;
         Train train = mergeTrain(new Train(direction.getTrain().getIdRailtime(), lang));
         Station station = mergeStation(new Station(arrivalStep.getStation().getName(), lang));
-        TimestampDelay arrivalTime = new TimestampDelay(arrivalStep.getTimestamp(), arrivalStep.getDelay());
-        TimestampDelay departureTime = new TimestampDelay(departureStep.getTimestamp(), departureStep.getDelay());
+        TimestampDelay arrivalTime = TimestampDelay.of(arrivalStep.getTimestamp(), arrivalStep.getDelay());
+        TimestampDelay departureTime = TimestampDelay.of(departureStep.getTimestamp(), departureStep.getDelay());
 
         result = new LineStop.Builder()
                 .date(date)
@@ -121,7 +121,8 @@ public class LineStopMapperProcessor implements ItemProcessor<TwoDirections, Lin
                 .station(station)
                 .arrivalTime(arrivalTime)
                 .departureTime(departureTime)
-                .canceled(arrivalStep.isCanceled() || departureStep.isCanceled())
+                .canceledArrival(arrivalStep.isCanceled())
+                .canceledDeparture(departureStep.isCanceled())
                 .build();
 
         LOGGER.debug("processing_done", result);

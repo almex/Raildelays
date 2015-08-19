@@ -1,5 +1,6 @@
 package be.raildelays.domain.entities;
 
+import be.raildelays.delays.TimestampDelay;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,8 +33,8 @@ public class LineStopBuilderTest {
                 .train(new Train())
                 .station(new Station())
                 .date(new Date())
-                .arrivalTime(new TimestampDelay())
-                .departureTime(new TimestampDelay())
+                .arrivalTime(TimestampDelay.now())
+                .departureTime(TimestampDelay.now())
                 .canceled(true);
 
         Assert.assertNotNull(builder.build());

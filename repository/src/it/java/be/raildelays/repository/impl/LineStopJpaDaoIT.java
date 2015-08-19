@@ -1,8 +1,8 @@
 package be.raildelays.repository.impl;
 
+import be.raildelays.delays.TimestampDelay;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.TimestampDelay;
 import be.raildelays.domain.entities.Train;
 import be.raildelays.repository.LineStopDao;
 import be.raildelays.repository.RailtimeTrainDao;
@@ -34,8 +34,8 @@ public class LineStopJpaDaoIT extends AbstractIT {
                 lineStopDao.save(new LineStop.Builder().date(new Date())
                         .train(new Train("466"))
                         .station(new Station("Liège-Guillemins"))
-                        .arrivalTime(new TimestampDelay())
-                        .departureTime(new TimestampDelay()).canceled(false)
+                        .arrivalTime(TimestampDelay.now())
+                        .departureTime(TimestampDelay.now()).canceled(false)
                         .build()));
     }
 
@@ -46,14 +46,14 @@ public class LineStopJpaDaoIT extends AbstractIT {
         LineStop expectedLineStop = lineStopDao.save(new LineStop.Builder().date(date)
                 .train(train)
                 .station(new Station("Liège-Guillemins"))
-                .arrivalTime(new TimestampDelay())
-                .departureTime(new TimestampDelay())
+                .arrivalTime(TimestampDelay.now())
+                .departureTime(TimestampDelay.now())
                 .canceled(false)
                 .build());
         List<LineStop> lineStops = lineStopDao.findByTrainAndDate(train, date);
 
         assertEquals("You should have a certain number of results.", 1, lineStops.size());
-        assertEquals("You should have the same result as expected.", expectedLineStop, lineStops.get(0));
+        assertEquals("You should have the same result as expectedTime.", expectedLineStop, lineStops.get(0));
     }
 
     @Test
@@ -63,12 +63,12 @@ public class LineStopJpaDaoIT extends AbstractIT {
         LineStop expectedLineStop = lineStopDao.save(new LineStop.Builder().date(date)
                 .train(train)
                 .station(new Station("Liège-Guillemins"))
-                .arrivalTime(new TimestampDelay())
-                .departureTime(new TimestampDelay())
+                .arrivalTime(TimestampDelay.now())
+                .departureTime(TimestampDelay.now())
                 .canceled(false)
                 .build());
         LineStop lineStop = lineStopDao.findByTrainIdAndDate(expectedLineStop.getTrain().getId(), date);
 
-        assertEquals("You should have the same result as expected.", expectedLineStop, lineStop);
+        assertEquals("You should have the same result as expectedTime.", expectedLineStop, lineStop);
     }
 }

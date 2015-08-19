@@ -123,7 +123,7 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
         return findAll(where(dateEquals(date))
                 .and(arrivalTimeIsNotNull())
                 .and(arrivalTimeGreaterThan(date))
-                .and(stationEquals(station)), new Sort(Sort.Direction.ASC, "arrivalTime.expected"));
+                .and(stationEquals(station)), new Sort(Sort.Direction.ASC, "arrivalTime.expectedTime"));
 
     }
 

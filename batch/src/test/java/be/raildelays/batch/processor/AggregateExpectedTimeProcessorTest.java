@@ -1,8 +1,8 @@
 package be.raildelays.batch.processor;
 
+import be.raildelays.delays.TimestampDelay;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.TimestampDelay;
 import be.raildelays.domain.entities.Train;
 import be.raildelays.service.RaildelaysService;
 import org.easymock.EasyMock;
@@ -46,40 +46,44 @@ public class AggregateExpectedTimeProcessorTest {
 
         item = new LineStop.Builder().date(TODAY)
                 .train(TRAIN).station(INTERMEDIATE_STATION)
-                .arrivalTime(new TimestampDelay(F.parse("18:20"), 0L))
-                .departureTime(new TimestampDelay(F.parse("18:20"), 0L))
-                .canceled(true)
+                .arrivalTime(TimestampDelay.of(F.parse("18:20"), 0L))
+                .departureTime(TimestampDelay.of(F.parse("18:20"), 0L))
+                .canceledDeparture(true)
+                .canceledArrival(true)
                 .addNext(new LineStop.Builder().date(TODAY)
                         .train(TRAIN).station(ARRIVAL_STATION)
-                        .arrivalTime(new TimestampDelay(null, 0L))
-                        .departureTime(new TimestampDelay(null, 0L))
-                        .canceled(true))
+                        .arrivalTime(TimestampDelay.of(null, 0L))
+                        .departureTime(TimestampDelay.of(null, 0L))
+                        .canceledDeparture(true)
+                        .canceledArrival(true))
                 .addPrevious(new LineStop.Builder().date(TODAY)
                         .train(TRAIN).station(DEPARTURE_STATION)
-                        .arrivalTime(new TimestampDelay(null, 0L))
-                        .departureTime(new TimestampDelay(null, 0L))
-                        .canceled(true))
+                        .arrivalTime(TimestampDelay.of(null, 0L))
+                        .departureTime(TimestampDelay.of(null, 0L))
+                        .canceledArrival(true))
                 .build();
 
         expected = new LineStop.Builder().date(TODAY)
                 .train(TRAIN).station(INTERMEDIATE_STATION)
-                .arrivalTime(new TimestampDelay(F.parse("18:20"), 0L))
-                .departureTime(new TimestampDelay(F.parse("18:21"), 0L))
-                .canceled(true)
+                .arrivalTime(TimestampDelay.of(F.parse("18:20"), 0L))
+                .departureTime(TimestampDelay.of(F.parse("18:21"), 0L))
+                .canceledDeparture(true)
+                .canceledArrival(true)
                 .addNext(new LineStop.Builder().date(TODAY)
                         .train(new Train("1")).station(ARRIVAL_STATION)
-                        .arrivalTime(new TimestampDelay(F.parse("18:30"), 0L))
-                        .departureTime(new TimestampDelay(F.parse("18:31"), 0L))
-                        .canceled(false))
+                        .arrivalTime(TimestampDelay.of(F.parse("18:30"), 0L))
+                        .departureTime(TimestampDelay.of(F.parse("18:31"), 0L))
+                        .canceledDeparture(true)
+                        .canceledArrival(true))
                 .addPrevious(new LineStop.Builder().date(TODAY)
                         .train(new Train("1")).station(DEPARTURE_STATION)
-                        .arrivalTime(new TimestampDelay(F.parse("17:00"), 0L))
-                        .departureTime(new TimestampDelay(F.parse("17:01"), 0L))
-                        .canceled(false))
+                        .arrivalTime(TimestampDelay.of(F.parse("17:00"), 0L))
+                        .departureTime(TimestampDelay.of(F.parse("17:01"), 0L))
+                        .canceledDeparture(true))
                 .build();
 
 		/*
-         * Note: when we mock the service we must respect order of expected
+         * Note: when we mock the service we must respect order of expectedTime
 		 * arrival time.
 		 */
         nextLineStops = Arrays.asList(new LineStop[]{item, expected});
@@ -109,12 +113,12 @@ public class AggregateExpectedTimeProcessorTest {
 
         Assert.assertNotNull(result);
 
-        Assert.assertEquals(F.parse("17:00"), result.getPrevious().getArrivalTime().getExpected());
-        Assert.assertEquals(F.parse("17:01"), result.getPrevious().getDepartureTime().getExpected());
-        Assert.assertEquals(F.parse("18:20"), result.getArrivalTime().getExpected());
-        Assert.assertEquals(F.parse("18:21"), result.getDepartureTime().getExpected());
-        Assert.assertEquals(F.parse("18:30"), result.getNext().getArrivalTime().getExpected());
-        Assert.assertEquals(F.parse("18:31"), result.getNext().getDepartureTime().getExpected());
+        Assert.assertEquals(F.parse("17:00"), result.getPrevious().getArrivalTime().getExpectedTime());
+        Assert.assertEquals(F.parse("17:01"), result.getPrevious().getDepartureTime().getExpectedTime());
+        Assert.assertEquals(F.parse("18:20"), result.getArrivalTime().getExpectedTime());
+        Assert.assertEquals(F.parse("18:21"), result.getDepartureTime().getExpectedTime());
+        Assert.assertEquals(F.parse("18:30"), result.getNext().getArrivalTime().getExpectedTime());
+        Assert.assertEquals(F.parse("18:31"), result.getNext().getDepartureTime().getExpectedTime());
 
         EasyMock.verify(raildelaysServiceMock);
     }

@@ -6,20 +6,20 @@ In futur development, we will extend possibilities to be able to deal with other
 
 ### Timetable (futur)
 When we talk about train timetable or scheduling we only talk about what is the planed route for a train.
-Meaning that a certain train will move from one station to another and the timetable show you the expected arrival 
+Meaning that a certain train will move from one station to another and the timetable show you the expectedTime arrival
 time and the exepected departure time for each stop.
 
 ### Liveboard (present)
-We use a liveboard to know directly if your train is on time or not. It gives you the expected time and the delay 
-comparing to what is expected. It only show trains which are not arrived yet to a certain station.
+We use a liveboard to know directly if your train is on time or not. It gives you the expectedTime time and the delay
+comparing to what is expectedTime. It only show trains which are not arrived yet to a certain station.
 
 ### Route log (past)
-Give you the expected time, the effective time and if a stop was deserved or not.
+Give you the expectedTime time, the effective time and if a stop was deserved or not.
 
 In practical with NMBS/SNCB trains, you should be able to know the timetable of a train based on its collected 
 route log because timetables remain commonly the same for every day of a week and are subject to unfrequent changes.
 But, you should consider all of those views as seperate source of data. You can have change of a timetable
-leading to different versions and then a route log should used, as expected time, the last version of the timetable.
+leading to different versions and then a route log should used, as expectedTime time, the last version of the timetable.
 A liveboard is a little in between but it gives you information only for a certain station and you cannot follow
 the complete train traject.
 

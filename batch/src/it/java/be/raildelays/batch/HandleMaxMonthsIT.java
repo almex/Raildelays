@@ -87,7 +87,7 @@ public class HandleMaxMonthsIT extends AbstractContextIT {
         Assert.assertEquals(3, getExcelFiles().size());
 
         getExcelFiles().forEach(file -> {
-            Assert.assertTrue("The file name is not one of those expected",
+            Assert.assertTrue("The file name is not one of those expectedTime",
                     FILES_NAMES.stream().anyMatch(s -> file.getName().contains(s)));
         });
     }

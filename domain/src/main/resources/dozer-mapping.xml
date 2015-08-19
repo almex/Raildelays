@@ -47,7 +47,7 @@
         </field>
         <field>
             <a>departureTime</a>
-            <b>departureTime.expected</b>
+            <b>departureTime.expectedTime</b>
         </field>
         <field>
             <a>departureDelay</a>
@@ -55,7 +55,7 @@
         </field>
         <field>
             <a>arrivalTime</a>
-            <b>arrivalTime.expected</b>
+            <b>arrivalTime.expectedTime</b>
         </field>
         <field>
             <a>arrivalDelay</a>

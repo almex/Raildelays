@@ -25,17 +25,14 @@
 package be.raildelays.batch.processor;
 
 import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.delays.TimestampDelay;
+import be.raildelays.delays.UtilsDelay;
 import be.raildelays.domain.Language;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.TimestampDelay;
 import be.raildelays.logging.Logger;
 import be.raildelays.logging.LoggerFactory;
 import be.raildelays.service.RaildelaysService;
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -44,6 +41,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import static be.raildelays.delays.DelayMatcher.*;
 
 /**
  * Search next train which allow you to arrive earlier to your destination.
@@ -60,52 +59,6 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
     private RaildelaysService service;
 
     private String language = Language.EN.name();
-
-    public static long compareTime(TimestampDelay departureB, Date departureA) {
-        return compareTime(departureA, departureB.getExpected());
-    }
-
-    public static long compareTime(Date departureA, Date departureB) {
-        long result = 0;
-
-        if (departureA == null && departureB != null) {
-            result = 1;
-        } else if (departureA != null && departureB == null) {
-            result = -1;
-        } else if (departureB != null) {
-            LocalTime start = new LocalTime(departureA.getTime());
-            LocalTime end = new LocalTime(departureB.getTime());
-
-            Duration duration = new Duration(start.toDateTimeToday(), end.toDateTimeToday());
-
-            result = -duration.getMillis(); // A comparison is the opposite of a duration
-        }
-
-        return result;
-    }
-
-    public static long compareTimeAndDelay(TimestampDelay departureB, Date departureA) {
-        return -compareTimeAndDelay(departureA, departureB);
-    }
-
-    public static long compareTimeAndDelay(Date departureA, TimestampDelay departureB) {
-        long result = 0;
-
-        if (departureA == null && departureB != null) {
-            result = 1;
-        } else if (departureA != null && departureB == null) {
-            result = -1;
-        } else if (departureB != null) {
-            LocalTime start = new LocalTime(departureA.getTime());
-            LocalTime end = new LocalTime(departureB.getExpected()).plusMinutes(departureB.getDelay().intValue());
-
-            Duration duration = new Duration(start.toDateTimeToday(), end.toDateTimeToday());
-
-            result = -duration.getMillis(); // A comparison is an opposite of a duration
-        }
-
-        return result;
-    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -126,14 +79,12 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
     public BatchExcelRow process(final BatchExcelRow item) throws Exception {
         BatchExcelRow result = item; // By default we return the item itself
         List<LineStop> candidates;
-        LocalDate date = new LocalDate(item.getDate());
-        LocalTime time = new LocalTime(item.getExpectedArrivalTime());
-        DateTime dateTime = date.toDateTime(time);
+        TimestampDelay timestampDelay = TimestampDelay.from(item.getDate(), item.getExpectedArrivalTime());
         Language lang = Language.valueOf(language.toUpperCase(Locale.US));
 
         LOGGER.trace("item", item);
 
-        candidates = service.searchNextTrain(item.getArrivalStation(), dateTime.toDate());
+        candidates = service.searchNextTrain(item.getArrivalStation(), timestampDelay.toDate());
 
         LOGGER.trace("candidates_arrival", candidates);
 
@@ -173,9 +124,7 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
     }
 
     private BatchExcelRow aggregate(final BatchExcelRow item, final BatchExcelRow fasterItem) {
-        DateTime expectedArrivalTime = new DateTime(item.getExpectedArrivalTime());
-        DateTime effectiveArrivalTime = new DateTime(fasterItem.getEffectiveArrivalTime());
-        Duration delay = new Duration(expectedArrivalTime, effectiveArrivalTime);
+        Long delay = UtilsDelay.computeDelay(item.getExpectedArrivalTime(), fasterItem.getEffectiveArrivalTime());
 
         return new BatchExcelRow.Builder(item.getDate(), item.getSens())
                 .arrivalStation(item.getArrivalStation())
@@ -188,7 +137,7 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
                 .expectedArrivalTime(item.getExpectedArrivalTime())
                 .effectiveDepartureTime(fasterItem.getEffectiveDepartureTime())
                 .effectiveArrivalTime(fasterItem.getEffectiveArrivalTime())
-                .delay(delay.getMillis() / 1000 / 60)
+                .delay(delay / 1000 / 60)
                 .build();
     }
 
@@ -243,19 +192,24 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
             /*
              * Do not take into account candidate which leaves after the item.
              */
-            if (compareTimeAndDelay(candidateDeparture.getDepartureTime(), item.getEffectiveDepartureTime()) > 0) {
+            if (candidateDeparture.getDepartureTime().after(TimestampDelay.of(item.getEffectiveDepartureTime()))
+            /*duration(between(candidateDeparture.getDepartureTime())
+                    .and(item.getEffectiveDepartureTime()), is(greaterThan(0L)))*/
+                    /*compareTimeAndDelay(candidateDeparture.getDepartureTime(), item.getEffectiveDepartureTime()) > 0*/) {
                 LOGGER.trace("filter_after_departure", candidateDeparture);
                 continue; // candidate leaves after item
             }
 
             /*
-             * A candidate is faster if its expected arrival time minus the actual item delay at departure
-             * is before the expected arrival of the item. Or in other words, if the difference between the candidate expected arrival time
-             * and the item expected arrival time is lower than the difference between the effective and the expected departure
+             * A candidate is faster if its expectedTime arrival time minus the actual item delay at departure
+             * is before the expectedTime arrival of the item. Or in other words, if the difference between the candidate expectedTime arrival time
+             * and the item expectedTime arrival time is lower than the difference between the effective and the expectedTime departure
              * time of the item (its delay).
              */
-            if (compareTime(candidateArrival.getArrivalTime(), item.getExpectedArrivalTime()) <
-                    compareTime(item.getEffectiveDepartureTime(), item.getExpectedDepartureTime())) {
+            if (UtilsDelay.compareTime(candidateArrival.getArrivalTime(), item.getExpectedArrivalTime()) <
+                    UtilsDelay.compareTime(item.getEffectiveDepartureTime(), item.getExpectedDepartureTime())
+            /*compareTime(candidateArrival.getArrivalTime(), item.getExpectedArrivalTime()) <
+                    compareTime(item.getEffectiveDepartureTime(), item.getExpectedDepartureTime())*/) {
                 LOGGER.debug("faster_delay_train_arrival", candidateArrival);
                 fastestTrain = candidateArrival;
                 break; // candidate arrives before item
