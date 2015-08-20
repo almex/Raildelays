@@ -24,7 +24,7 @@
 
 package be.raildelays.service.impl;
 
-import be.raildelays.delays.TimestampDelay;
+import be.raildelays.delays.TimeDelay;
 import be.raildelays.domain.Language;
 import be.raildelays.domain.dto.RouteLogDTO;
 import be.raildelays.domain.dto.ServedStopDTO;
@@ -46,8 +46,9 @@ import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import javax.validation.Validator;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -101,11 +102,11 @@ public class RaildelaysServiceImpl implements RaildelaysService {
         return result;
     }
 
-    static private TimestampDelay removeDelay(TimestampDelay timestamp) {
-        TimestampDelay result = null;
+    static private TimeDelay removeDelay(TimeDelay timeDelay) {
+        TimeDelay result = null;
 
-        if (timestamp != null) {
-            result = TimestampDelay.from(timestamp, 0L);
+        if (timeDelay != null) {
+            result = timeDelay.withDelay(0L);
         }
 
         return result;
@@ -126,7 +127,9 @@ public class RaildelaysServiceImpl implements RaildelaysService {
                 routeLog.getStops());
     }
 
-    private List<LineStop> persist(final Date date, final String trainId, final Language language,
+    private List<LineStop> persist(final LocalDate date,
+                                   final String trainId,
+                                   final Language language,
                                    List<? extends ServedStopDTO> stops) {
         List<LineStop> result = new ArrayList<>();
         LineStop previous = null;
@@ -143,8 +146,11 @@ public class RaildelaysServiceImpl implements RaildelaysService {
         return result;
     }
 
-    private LineStop saveServedStop(final Date date, final String trainId, final Language language,
-                                    final ServedStopDTO stop, final LineStop previous) {
+    private LineStop saveServedStop(final LocalDate date,
+                                    final String trainId,
+                                    final Language language,
+                                    final ServedStopDTO stop,
+                                    final LineStop previous) {
 
         LOGGER.debug("Saving timetable for train={}, date={} and stop={}...",
                 new Object[]{trainId, date, stop});
@@ -160,15 +166,17 @@ public class RaildelaysServiceImpl implements RaildelaysService {
                 trainId, language));
         Station persistedStation = saveOrRetrieveStation(new Station(
                 stop.getStationName(), language));
-        TimestampDelay arrivalTime = TimestampDelay.of(stop.getArrivalTime(), stop.getArrivalDelay());
-        TimestampDelay departureTime = TimestampDelay.of(stop.getDepartureTime(), stop.getDepartureDelay());
+        TimeDelay arrivalTime = TimeDelay.of(stop.getArrivalTime(), stop.getArrivalDelay());
+        TimeDelay departureTime = TimeDelay.of(stop.getDepartureTime(), stop.getDepartureDelay());
+
         LineStop lineStop = new LineStop.Builder() //
                 .date(date) //
                 .station(persistedStation) //
                 .train(persistedTrain) //
                 .arrivalTime(arrivalTime) //
                 .departureTime(departureTime) //
-                .canceled(stop.isCanceled()) //
+                .canceledArrival(stop.isCanceled()) //
+                .canceledDeparture(stop.isCanceled())
                 .addPrevious(previous) //
                 .build();
 
@@ -224,8 +232,8 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<LineStop> searchDelaysBetween(Date date, Station stationA,
-                                              Station stationB, int delayThreshold) {
+    public List<LineStop> searchDelaysBetween(LocalDate date, Station stationA,
+                                              Station stationB, long delayThreshold) {
         List<LineStop> result = new ArrayList<>();
 
         LOGGER.info("Searching line stops for date={} stationA={} stationB={} delayThreshold={}",
@@ -249,8 +257,8 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Date> searchAllDates(Date from, Date to) {
-        List<Date> result = null;
+    public List<LocalDate> searchAllDates(LocalDate from, LocalDate to) {
+        List<LocalDate> result = null;
 
         if (from == null && to == null) {
             result = lineStopDao.findAllUniqueDates();
@@ -263,8 +271,8 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Date> searchAllDates(Date lastDate) {
-        List<Date> result = null;
+    public List<LocalDate> searchAllDates(LocalDate lastDate) {
+        List<LocalDate> result = null;
 
         if (lastDate == null) {
             result = lineStopDao.findAllUniqueDates();
@@ -327,8 +335,8 @@ public class RaildelaysServiceImpl implements RaildelaysService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<LineStop> searchNextTrain(Station station, Date date) {
-        return lineStopDao.findNextExpectedArrivalTime(station, date);
+    public List<LineStop> searchNextTrain(Station station, LocalDateTime dateTime) {
+        return lineStopDao.findNextExpectedArrivalTime(station, dateTime);
     }
 
     @Override
@@ -345,7 +353,7 @@ public class RaildelaysServiceImpl implements RaildelaysService {
     }
 
     @Override
-    public LineStop searchLineStopByTrain(Long trainId, Date date) {
+    public LineStop searchLineStopByTrain(Long trainId, LocalDate date) {
         LineStop result = null;
 
         if (trainId != null && date != null) {

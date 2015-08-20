@@ -30,9 +30,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 public final class RouteLogDTO implements Serializable {
@@ -43,7 +43,7 @@ public final class RouteLogDTO implements Serializable {
     private final String trainId;
 
     @NotNull
-    private final Date date;
+    private final LocalDate date;
 
     @NotNull
     private final Language language;
@@ -52,7 +52,7 @@ public final class RouteLogDTO implements Serializable {
     @Size(min = 1)
     private final List<ServedStopDTO> stops;
 
-    public RouteLogDTO(final String trainId, final Date date, final Language language) {
+    public RouteLogDTO(final String trainId, final LocalDate date, final Language language) {
         this.trainId = trainId;
         this.language = language;
         this.date = date;
@@ -67,8 +67,8 @@ public final class RouteLogDTO implements Serializable {
         return trainId;
     }
 
-    public Date getDate() {
-        return (Date) (date != null ? date.clone() : null);
+    public LocalDate getDate() {
+        return date;
     }
 
     public List<ServedStopDTO> getStops() {

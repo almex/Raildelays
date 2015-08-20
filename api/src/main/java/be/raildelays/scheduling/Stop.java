@@ -1,6 +1,6 @@
 package be.raildelays.scheduling;
 
-import be.raildelays.delays.TimestampDelay;
+import be.raildelays.delays.TimeDelay;
 import be.raildelays.location.Location;
 
 /**
@@ -10,7 +10,7 @@ public interface Stop {
 
     Location getLocation();
 
-    TimestampDelay getDepartureTime();
+    TimeDelay getDepartureTime();
 
-    TimestampDelay getArrivalTime();
+    TimeDelay getArrivalTime();
 }

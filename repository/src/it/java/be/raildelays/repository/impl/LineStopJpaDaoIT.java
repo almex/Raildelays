@@ -1,6 +1,6 @@
 package be.raildelays.repository.impl;
 
-import be.raildelays.delays.TimestampDelay;
+import be.raildelays.delays.TimeDelay;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
@@ -10,7 +10,7 @@ import be.raildelays.repository.TrainDao;
 import org.junit.Test;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -31,24 +31,27 @@ public class LineStopJpaDaoIT extends AbstractIT {
     public void testSave() {
         assertNotNull(
                 "Creation should return a result",
-                lineStopDao.save(new LineStop.Builder().date(new Date())
+                lineStopDao.save(new LineStop.Builder().date(LocalDate.now())
                         .train(new Train("466"))
                         .station(new Station("Liège-Guillemins"))
-                        .arrivalTime(TimestampDelay.now())
-                        .departureTime(TimestampDelay.now()).canceled(false)
+                        .arrivalTime(TimeDelay.now())
+                        .departureTime(TimeDelay.now())
+                        .canceledDeparture(false)
+                        .canceledArrival(false)
                         .build()));
     }
 
     @Test
     public void testFindByTrainAndDate() {
-        Date date = new Date();
+        LocalDate date = LocalDate.now();
         Train train = trainDao.saveAndFlush(new Train("466"));
         LineStop expectedLineStop = lineStopDao.save(new LineStop.Builder().date(date)
                 .train(train)
                 .station(new Station("Liège-Guillemins"))
-                .arrivalTime(TimestampDelay.now())
-                .departureTime(TimestampDelay.now())
-                .canceled(false)
+                .arrivalTime(TimeDelay.now())
+                .departureTime(TimeDelay.now())
+                .canceledArrival(false)
+                .canceledDeparture(false)
                 .build());
         List<LineStop> lineStops = lineStopDao.findByTrainAndDate(train, date);
 
@@ -58,14 +61,15 @@ public class LineStopJpaDaoIT extends AbstractIT {
 
     @Test
     public void testFindByTrainIdAndDate() {
-        Date date = new Date();
+        LocalDate date = LocalDate.now();
         Train train = trainDao.saveAndFlush(new Train("466"));
         LineStop expectedLineStop = lineStopDao.save(new LineStop.Builder().date(date)
                 .train(train)
                 .station(new Station("Liège-Guillemins"))
-                .arrivalTime(TimestampDelay.now())
-                .departureTime(TimestampDelay.now())
-                .canceled(false)
+                .arrivalTime(TimeDelay.now())
+                .departureTime(TimeDelay.now())
+                .canceledArrival(false)
+                .canceledDeparture(false)
                 .build());
         LineStop lineStop = lineStopDao.findByTrainIdAndDate(expectedLineStop.getTrain().getId(), date);
 

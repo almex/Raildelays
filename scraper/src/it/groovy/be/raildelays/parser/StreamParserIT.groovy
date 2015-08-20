@@ -46,10 +46,10 @@ class StreamParserIT {
         Step[] steps = (Step[]) direction.getSteps().toArray();
         Assert.assertEquals("Step1 should from station", "Gouvy", steps[0].getStation().getName());
         Assert.assertEquals("Step12 should have a delay of", 0, steps[0].getDelay());
-        Assert.assertEquals("Step12 should have timestamp of", ParsingUtil.parseTimestamp("13/01/201205:07"), steps[0].getTimestamp());
+        Assert.assertEquals("Step12 should have dateTime of", ParsingUtil.parseTimestamp("13/01/201205:07"), steps[0].getDateTime());
         Assert.assertEquals("Step12 should from station", "Liège-Guillemins", steps[12].getStation().getName());
         Assert.assertEquals("Step12 should have a delay of", 0, steps[12].getDelay());
-        Assert.assertEquals("Step12 should have timestamp of", ParsingUtil.parseTimestamp("13/01/201206:34"), steps[12].getTimestamp());
+        Assert.assertEquals("Step12 should have dateTime of", ParsingUtil.parseTimestamp("13/01/201206:34"), steps[12].getDateTime());
         Assert.assertTrue("Step15 should be canceled", steps[13].isCanceled());
         Assert.assertTrue("Step15 should be canceled", steps[14].isCanceled());
         Assert.assertTrue("Step15 should be canceled", steps[15].isCanceled());
@@ -67,13 +67,13 @@ class StreamParserIT {
         Step[] steps = (Step[]) direction.getSteps().toArray();
         Assert.assertEquals("Step1 should from station", "Brussels (Bruxelles)-Midi", steps[0].getStation().getName());
         Assert.assertEquals("Step12 should have a delay of", 19, steps[0].getDelay());
-        Assert.assertEquals("Step12 should have timestamp of", ParsingUtil.parseTimestamp("11/01/201216:24"), steps[0].getTimestamp());
+        Assert.assertEquals("Step12 should have dateTime of", ParsingUtil.parseTimestamp("11/01/201216:24"), steps[0].getDateTime());
         Assert.assertEquals("Step12 should from station", "Brussels (Bruxelles)-Central", steps[1].getStation().getName());
         Assert.assertEquals("Step12 should have a delay of", 22, steps[1].getDelay());
-        Assert.assertEquals("Step12 should have timestamp of", ParsingUtil.parseTimestamp("11/01/201216:28"), steps[1].getTimestamp());
+        Assert.assertEquals("Step12 should have dateTime of", ParsingUtil.parseTimestamp("11/01/201216:28"), steps[1].getDateTime());
         Assert.assertEquals("Step12 should from station", "Brussels (Bruxelles)-Nord", steps[2].getStation().getName());
         Assert.assertEquals("Step12 should have a delay of", 22, steps[2].getDelay());
-        Assert.assertEquals("Step12 should have timestamp of", ParsingUtil.parseTimestamp("11/01/201216:33"), steps[2].getTimestamp());
+        Assert.assertEquals("Step12 should have dateTime of", ParsingUtil.parseTimestamp("11/01/201216:33"), steps[2].getDateTime());
         Assert.assertTrue("Step15 should be canceled", steps[4].isCanceled());
         Assert.assertTrue("Step15 should be canceled", steps[5].isCanceled());
     }

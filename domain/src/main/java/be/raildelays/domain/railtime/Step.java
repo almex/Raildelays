@@ -24,13 +24,14 @@
 
 package be.raildelays.domain.railtime;
 
+import be.raildelays.delays.TimeDelay;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class Step extends Stop implements Serializable, Comparable<Step> {
 
@@ -42,9 +43,9 @@ public class Step extends Stop implements Serializable, Comparable<Step> {
 
     private Integer ordinance;
 
-    public Step(Integer ordinance, String stationName, Date timestamp,
+    public Step(Integer ordinance, String stationName, LocalDateTime dateTime,
                 Long delay, boolean canceled) {
-        super(stationName, timestamp);
+        super(stationName, dateTime);
         this.ordinance = ordinance;
         this.delay = delay;
         this.canceled = canceled;
@@ -76,16 +77,13 @@ public class Step extends Stop implements Serializable, Comparable<Step> {
         if (this.isCanceled()) {
             builder.append("canceled=true");
         } else {
-            SimpleDateFormat formater = new SimpleDateFormat("HH:mm");
-            Calendar effectiveTime = Calendar.getInstance();
-            effectiveTime.setTime(getTimestamp());
-            effectiveTime.add(Calendar.MINUTE, delay.intValue());
+            LocalTime effectiveTime = TimeDelay.of(getDateTime().toLocalTime(), delay).toLocalTime();
 
             builder.append("scheduledTime=");
-            builder.append(formater.format(getTimestamp()));
+            builder.append(getDateTime().toLocalTime().format(DateTimeFormatter.ISO_TIME));
             builder.append(", ");
             builder.append("effectiveTime=");
-            builder.append(formater.format(effectiveTime.getTime()));
+            builder.append(effectiveTime.format(DateTimeFormatter.ISO_TIME));
         }
 
         builder.append("]");

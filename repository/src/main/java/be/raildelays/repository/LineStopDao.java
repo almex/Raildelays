@@ -32,7 +32,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -49,7 +49,7 @@ public interface LineStopDao extends JpaRepository<LineStop, Long>, LineStopDaoC
      * @param date  day of the year for which you do the search
      * @return a list of line stop
      */
-    LineStop findByTrainAndDateAndStation(Train train, Date date, Station station);
+    LineStop findByTrainAndDateAndStation(Train train, LocalDate date, Station station);
 
     /**
      * Search a list of line stops that belong to a train for a certain day.
@@ -62,7 +62,7 @@ public interface LineStopDao extends JpaRepository<LineStop, Long>, LineStopDaoC
             + "FROM LineStop o "
             + "WHERE o.date = :date "
             + "AND o.train.id = :trainId ")
-    LineStop findByTrainIdAndDate(@Param("trainId") Long trainId, @Param("date") Date date);
+    LineStop findByTrainIdAndDate(@Param("trainId") Long trainId, @Param("date") LocalDate date);
 
 
     /**
@@ -72,41 +72,41 @@ public interface LineStopDao extends JpaRepository<LineStop, Long>, LineStopDaoC
      * @param date  day of the year for which you do the search
      * @return a list of line stop
      */
-    List<LineStop> findByTrainAndDate(Train train, Date date);
+    List<LineStop> findByTrainAndDate(Train train, LocalDate date);
 
     /**
      * Search all dates containing a line stop already stored in the database.
      *
      * @param after  all dates returned must be greater or equals than after
      * @param before all dates returned must be smaller or equals than before
-     * @return a list of {@link Date}
+     * @return a list of {@link LocalDate}
      */
     @Query("SELECT DISTINCT o.date "
             + "FROM LineStop o "
             + "WHERE o.date >= :after "
             + "AND o.date <= :before "
             + "ORDER BY o.date ASC")
-    List<Date> findAllUniqueDates(@Param("after") Date after, @Param("before") Date before);
+    List<LocalDate> findAllUniqueDates(@Param("after") LocalDate after, @Param("before") LocalDate before);
 
     /**
      * Search all dates containing a line stop already stored in the database.
      *
-     * @return a list of {@link Date}
+     * @return a list of {@link LocalDate}
      */
     @Query("SELECT DISTINCT o.date "
             + "FROM LineStop o "
             + "ORDER BY o.date ASC")
-    List<Date> findAllUniqueDates();
+    List<LocalDate> findAllUniqueDates();
 
     /**
      * Search all dates containing a line stop already stored in the database.
      *
      * @param lastDate all dates returned must be smaller or equals than last date
-     * @return a list of {@link Date}
+     * @return a list of {@link LocalDate}
      */
     @Query("SELECT DISTINCT o.date "
             + "FROM LineStop o "
             + "WHERE o.date <= :before "
             + "ORDER BY o.date ASC")
-    List<Date> findAllUniqueDates(@Param("before") Date lastDate);
+    List<LocalDate> findAllUniqueDates(@Param("before") LocalDate lastDate);
 }

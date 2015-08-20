@@ -1,12 +1,12 @@
 package be.raildelays.domain.entities;
 
-import be.raildelays.delays.TimestampDelay;
+import be.raildelays.delays.TimeDelay;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @RunWith(BlockJUnit4ClassRunner.class)
 public class LineStopBuilderTest {
@@ -21,7 +21,7 @@ public class LineStopBuilderTest {
         final LineStop.Builder builder = new LineStop.Builder()
                 .train(new Train())
                 .station(new Station())
-                .date(new Date());
+                .date(LocalDate.now());
 
         Assert.assertNotNull(builder.build());
     }
@@ -32,18 +32,19 @@ public class LineStopBuilderTest {
                 .id(1L)
                 .train(new Train())
                 .station(new Station())
-                .date(new Date())
-                .arrivalTime(TimestampDelay.now())
-                .departureTime(TimestampDelay.now())
-                .canceled(true);
+                .date(LocalDate.now())
+                .arrivalTime(TimeDelay.now())
+                .departureTime(TimeDelay.now())
+                .canceledArrival(true)
+                .canceledDeparture(true);
 
         Assert.assertNotNull(builder.build());
     }
 
     @Test
     public void testTwoSubsequentBuilds() {
-        final Date firstDate = new Date(0);
-        final Date secondDate = new Date(5000);
+        final LocalDate firstDate = LocalDate.ofEpochDay(0);
+        final LocalDate secondDate = LocalDate.ofEpochDay(5000);
         final LineStop.Builder builder = new LineStop.Builder()
                 .train(new Train())
                 .station(new Station())
@@ -61,15 +62,15 @@ public class LineStopBuilderTest {
         final LineStop.Builder builder = new LineStop.Builder()
                 .train(new Train())
                 .station(new Station())
-                .date(new Date())
+                .date(LocalDate.now())
                 .addNext(new LineStop.Builder()
                         .train(new Train())
                         .station(new Station())
-                        .date(new Date()))
+                        .date(LocalDate.now()))
                 .addNext(new LineStop.Builder()
                         .train(new Train())
                         .station(new Station())
-                        .date(new Date()));
+                        .date(LocalDate.now()));
 
         Assert.assertNotNull(builder.build().getNext());
         Assert.assertNotNull(builder.build().getNext().getNext());
@@ -84,16 +85,16 @@ public class LineStopBuilderTest {
         final LineStop.Builder builder = new LineStop.Builder()
                 .train(new Train())
                 .station(new Station())
-                .date(new Date())
+                .date(LocalDate.now())
                 .addNext(new LineStop.Builder()
                         .train(new Train())
                         .station(new Station())
-                        .date(new Date())
+                        .date(LocalDate.now())
                         .build())
                 .addNext(new LineStop.Builder()
                         .train(new Train())
                         .station(new Station())
-                        .date(new Date())
+                        .date(LocalDate.now())
                         .build());
 
         Assert.assertNotNull(builder.build().getNext());
@@ -105,15 +106,15 @@ public class LineStopBuilderTest {
         final LineStop.Builder builder = new LineStop.Builder()
                 .train(new Train())
                 .station(new Station())
-                .date(new Date())
+                .date(LocalDate.now())
                 .addPrevious(new LineStop.Builder()
                         .train(new Train())
                         .station(new Station())
-                        .date(new Date()))
+                        .date(LocalDate.now()))
                 .addPrevious(new LineStop.Builder()
                         .train(new Train())
                         .station(new Station())
-                        .date(new Date()));
+                        .date(LocalDate.now()));
 
         Assert.assertNotNull(builder.build().getPrevious());
         Assert.assertNotNull(builder.build().getPrevious().getPrevious());
@@ -124,16 +125,16 @@ public class LineStopBuilderTest {
         final LineStop.Builder builder = new LineStop.Builder()
                 .train(new Train())
                 .station(new Station())
-                .date(new Date())
+                .date(LocalDate.now())
                 .addPrevious(new LineStop.Builder()
                         .train(new Train())
                         .station(new Station())
-                        .date(new Date())
+                        .date(LocalDate.now())
                         .build())
                 .addPrevious(new LineStop.Builder()
                         .train(new Train())
                         .station(new Station())
-                        .date(new Date())
+                        .date(LocalDate.now())
                         .build());
 
         Assert.assertNotNull(builder.build().getPrevious());

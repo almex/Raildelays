@@ -24,7 +24,7 @@
 
 package be.raildelays.batch.processor;
 
-import be.raildelays.delays.TimestampDelay;
+import be.raildelays.delays.TimeDelay;
 import be.raildelays.domain.Language;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
@@ -112,8 +112,8 @@ public class LineStopMapperProcessor implements ItemProcessor<TwoDirections, Lin
         LineStop result;
         Train train = mergeTrain(new Train(direction.getTrain().getIdRailtime(), lang));
         Station station = mergeStation(new Station(arrivalStep.getStation().getName(), lang));
-        TimestampDelay arrivalTime = TimestampDelay.of(arrivalStep.getTimestamp(), arrivalStep.getDelay());
-        TimestampDelay departureTime = TimestampDelay.of(departureStep.getTimestamp(), departureStep.getDelay());
+        TimeDelay arrivalTime = TimeDelay.of(arrivalStep.getDateTime(), arrivalStep.getDelay());
+        TimeDelay departureTime = TimeDelay.of(departureStep.getDateTime(), departureStep.getDelay());
 
         result = new LineStop.Builder()
                 .date(date)

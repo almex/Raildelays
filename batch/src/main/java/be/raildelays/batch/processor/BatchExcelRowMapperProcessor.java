@@ -27,7 +27,6 @@ package be.raildelays.batch.processor;
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.bean.BatchExcelRow.Builder;
 import be.raildelays.batch.exception.ArrivalDepartureEqualsException;
-import be.raildelays.delays.TimestampDelay;
 import be.raildelays.domain.Language;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.LineStop;
@@ -35,7 +34,6 @@ import be.raildelays.domain.entities.Station;
 import be.raildelays.logging.Logger;
 import be.raildelays.logging.LoggerFactory;
 import org.apache.commons.lang.Validate;
-import org.apache.commons.lang.time.DateUtils;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -50,16 +48,6 @@ public class BatchExcelRowMapperProcessor implements ItemProcessor<LineStop, Bat
     private String stationB;
 
     private String language = Language.EN.name();
-
-    protected static Date computeEffectiveTime(TimestampDelay timestampDelay) {
-        Date result = null;
-
-        if (timestampDelay.getExpectedTime() != null) {
-            result = DateUtils.addMinutes(timestampDelay.getExpectedTime(), timestampDelay.getDelay().intValue());
-        }
-
-        return result;
-    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -161,8 +149,8 @@ public class BatchExcelRowMapperProcessor implements ItemProcessor<LineStop, Bat
      * @return a {@link BatchExcelRow} containing the combination of {@code lineStopFrom} and {@code lineStopTo}
      */
     protected BatchExcelRow map(LineStop lineStopFrom, LineStop lineStopTo, Sens sens) {
-        Date effectiveDepartureTime = computeEffectiveTime(lineStopFrom.getDepartureTime());
-        Date effectiveArrivalTime = computeEffectiveTime(lineStopTo.getArrivalTime());
+        Date effectiveDepartureTime = lineStopFrom.getDepartureTime() != null ? lineStopFrom.getDepartureTime().toDate() : null;
+        Date effectiveArrivalTime = lineStopTo.getArrivalTime() != null ? lineStopTo.getArrivalTime().toDate() : null;
 
         return new Builder(lineStopFrom.getDate(), sens) //
                 .departureStation(lineStopFrom.getStation()) //
@@ -174,7 +162,7 @@ public class BatchExcelRowMapperProcessor implements ItemProcessor<LineStop, Bat
                 .effectiveArrivalTime(effectiveArrivalTime) //
                 .effectiveTrain1(lineStopTo.getTrain()) //
                 .delay(lineStopTo.getArrivalTime().getDelay()) //
-                .canceled(lineStopFrom.isCanceledDeparture() || lineStopTo.isCanceledArrival())
+                .canceled(lineStopFrom.isCanceled())
                 .build(false);
     }
 

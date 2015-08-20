@@ -24,9 +24,10 @@
 
 package be.raildelays.util;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Utility class simplifying parsing.
@@ -45,51 +46,27 @@ public final class ParsingUtil {
         // No instantiation is possible.
     }
 
-    public static Date parseTimestamp(String value) {
-        final SimpleDateFormat sdc = new SimpleDateFormat(TIMESTAMP_FORMAT);
-
-        try {
-            return sdc.parse(value);
-        } catch (ParseException e) {
-            return null;
-        }
+    public static LocalDateTime parseTimestamp(String value) {
+        return LocalDateTime.parse(value, DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT));
     }
 
-    public static Date parseTime(String value) {
-        final SimpleDateFormat sdc = new SimpleDateFormat(TIME_FORMAT);
-
-        try {
-            return sdc.parse(value);
-        } catch (ParseException e) {
-            return null;
-        }
+    public static LocalTime parseTime(String value) {
+        return LocalTime.parse(value, DateTimeFormatter.ofPattern(TIME_FORMAT));
     }
 
-    public static Date parseDate(String value) {
-        final SimpleDateFormat sdc = new SimpleDateFormat(DATE_FORMAT);
-
-        try {
-            return sdc.parse(value);
-        } catch (ParseException e) {
-            return null;
-        }
+    public static LocalDate parseDate(String value) {
+        return LocalDate.parse(value, DateTimeFormatter.ofPattern(DATE_FORMAT));
     }
 
-    public static String formatTimestamp(Date value) {
-        final SimpleDateFormat sdc = new SimpleDateFormat(TIMESTAMP_FORMAT);
-
-        return sdc.format(value);
+    public static String formatTimestamp(LocalDateTime value) {
+        return value.format(DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT));
     }
 
-    public static String formatTime(Date value) {
-        final SimpleDateFormat sdc = new SimpleDateFormat(TIME_FORMAT);
-
-        return sdc.format(value);
+    public static String formatTime(LocalTime value) {
+        return value.format(DateTimeFormatter.ofPattern(TIME_FORMAT));
     }
 
-    public static String formatDate(Date value) {
-        final SimpleDateFormat sdc = new SimpleDateFormat(DATE_FORMAT);
-
-        return sdc.format(value);
+    public static String formatDate(LocalDate value) {
+        return value.format(DateTimeFormatter.ofPattern(DATE_FORMAT));
     }
 }

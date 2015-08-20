@@ -30,7 +30,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalTime;
 
 public final class ServedStopDTO implements Serializable, Cloneable {
 
@@ -40,10 +40,10 @@ public final class ServedStopDTO implements Serializable, Cloneable {
     private final String stationName;
 
     @NotNull
-    private final Date arrivalTime;
+    private final LocalTime arrivalTime;
 
     @NotNull
-    private final Date departureTime;
+    private final LocalTime departureTime;
 
     private final long arrivalDelay;
 
@@ -51,9 +51,12 @@ public final class ServedStopDTO implements Serializable, Cloneable {
 
     private final boolean canceled;
 
-    public ServedStopDTO(final String stationName, final Date departure,
-                         final long departureDelay, final Date arrival,
-                         final long arrivalDelay, final boolean canceled) {
+    public ServedStopDTO(final String stationName,
+                         final LocalTime departure,
+                         final long departureDelay,
+                         final LocalTime arrival,
+                         final long arrivalDelay,
+                         final boolean canceled) {
         this.stationName = stationName;
         this.canceled = canceled;
         this.departureTime = departure;
@@ -123,12 +126,12 @@ public final class ServedStopDTO implements Serializable, Cloneable {
         return stationName;
     }
 
-    public Date getArrivalTime() {
-        return (Date) (arrivalTime != null ? arrivalTime.clone() : null);
+    public LocalTime getArrivalTime() {
+        return arrivalTime;
     }
 
-    public Date getDepartureTime() {
-        return (Date) (departureTime != null ? departureTime.clone() : null);
+    public LocalTime getDepartureTime() {
+        return departureTime;
     }
 
     public long getArrivalDelay() {

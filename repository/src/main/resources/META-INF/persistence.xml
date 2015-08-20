@@ -25,6 +25,9 @@
         <class>be.raildelays.domain.entities.RailtimeTrain</class>
         <class>be.raildelays.domain.entities.Station</class>
         <class>be.raildelays.domain.entities.Train</class>
+        <!-- AttributeConverter to handle java.time API with JPA -->
+        <class>be.raildelays.jpa.LocalDateAttributeConverter</class>
+        <class>be.raildelays.jpa.LocalTimeAttributeConverter</class>
 
 
         <properties>
