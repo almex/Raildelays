@@ -37,7 +37,7 @@ import org.apache.commons.lang.Validate;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
 
-import java.util.Date;
+import java.time.LocalTime;
 
 public class BatchExcelRowMapperProcessor implements ItemProcessor<LineStop, BatchExcelRow>, InitializingBean {
 
@@ -149,8 +149,8 @@ public class BatchExcelRowMapperProcessor implements ItemProcessor<LineStop, Bat
      * @return a {@link BatchExcelRow} containing the combination of {@code lineStopFrom} and {@code lineStopTo}
      */
     protected BatchExcelRow map(LineStop lineStopFrom, LineStop lineStopTo, Sens sens) {
-        Date effectiveDepartureTime = lineStopFrom.getDepartureTime() != null ? lineStopFrom.getDepartureTime().toDate() : null;
-        Date effectiveArrivalTime = lineStopTo.getArrivalTime() != null ? lineStopTo.getArrivalTime().toDate() : null;
+        LocalTime effectiveDepartureTime = lineStopFrom.getDepartureTime() != null ? lineStopFrom.getDepartureTime().toLocalTime() : null;
+        LocalTime effectiveArrivalTime = lineStopTo.getArrivalTime() != null ? lineStopTo.getArrivalTime().toLocalTime() : null;
 
         return new Builder(lineStopFrom.getDate(), sens) //
                 .departureStation(lineStopFrom.getStation()) //

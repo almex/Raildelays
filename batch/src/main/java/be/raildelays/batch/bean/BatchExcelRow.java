@@ -31,7 +31,8 @@ import be.raildelays.domain.xls.ExcelRow;
 import org.springframework.batch.item.ItemCountAware;
 import org.springframework.batch.item.ItemIndexAware;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class BatchExcelRow extends ExcelRow implements ItemIndexAware, ItemCountAware {
 
@@ -71,7 +72,7 @@ public class BatchExcelRow extends ExcelRow implements ItemIndexAware, ItemCount
         protected boolean canceled;
         protected Long index;
 
-        public Builder(Date date, Sens sens) {
+        public Builder(LocalDate date, Sens sens) {
             super(date, sens);
         }
 
@@ -116,14 +117,14 @@ public class BatchExcelRow extends ExcelRow implements ItemIndexAware, ItemCount
 
         @Override
         public Builder expectedDepartureTime(
-                final Date expectedDepartureTime) {
+                final LocalTime expectedDepartureTime) {
             super.expectedDepartureTime(expectedDepartureTime);
             return this;
         }
 
         @Override
         public Builder expectedArrivalTime(
-                final Date expectedArrivalTime) {
+                final LocalTime expectedArrivalTime) {
             super.expectedArrivalTime(expectedArrivalTime);
             return this;
         }
@@ -142,14 +143,14 @@ public class BatchExcelRow extends ExcelRow implements ItemIndexAware, ItemCount
 
         @Override
         public Builder effectiveDepartureTime(
-                final Date effectiveDepartureTime) {
+                final LocalTime effectiveDepartureTime) {
             super.effectiveDepartureTime(effectiveDepartureTime);
             return this;
         }
 
         @Override
         public Builder effectiveArrivalTime(
-                final Date effectiveArrivalTime) {
+                final LocalTime effectiveArrivalTime) {
             super.effectiveArrivalTime(effectiveArrivalTime);
             return this;
         }

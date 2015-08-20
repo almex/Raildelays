@@ -45,8 +45,11 @@ import javax.validation.ValidatorFactory;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Simple {@link org.springframework.batch.item.file.RowMapper} matching our use case to deal with our
@@ -155,50 +158,36 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
         return result;
     }
 
-    private Date getDate(Row row, final int cellIndex) {
-        return getValue(row, cellIndex, new CellParser<Date>() {
-            @Override
-            public Date getValue(Cell cell) {
-                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-                Date result = null;
+    private LocalDate getDate(Row row, final int cellIndex) {
+        return getValue(row, cellIndex, cell -> {
+            LocalDate result = null;
 
-                try {
-                    switch (cell.getCellType()) {
-                        case Cell.CELL_TYPE_NUMERIC:
-                            result = cell.getDateCellValue();
-                            break;
-                        case Cell.CELL_TYPE_STRING:
-                            result = formatter.parse(cell.getStringCellValue());
-                            break;
-                        default:
-                            LOGGER.error("Cannot convert rowIndex={} cellIndex={} of type={} into Date", cell.getRowIndex(), cell.getColumnIndex(), cell.getCellType());
-                    }
-                } catch (ParseException e) {
-                    LOGGER.error("Parsing exception: cannot convert into date rowIndex={} cellIndex={}, exception={}", cell.getRowIndex(), cellIndex, e.getMessage());
-                }
-
-                return result;
+            switch (cell.getCellType()) {
+                case Cell.CELL_TYPE_NUMERIC:
+                    result = LocalDateTime.ofInstant(cell.getDateCellValue().toInstant(), ZoneId.systemDefault()).toLocalDate();
+                    break;
+                case Cell.CELL_TYPE_STRING:
+                    result = LocalDate.parse(cell.getStringCellValue(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                    break;
+                default:
+                    LOGGER.error("Cannot convert rowIndex={} cellIndex={} of type={} into Date", cell.getRowIndex(), cell.getColumnIndex(), cell.getCellType());
             }
+
+            return result;
         });
     }
 
-    private Date getHHMM(Row row, int hhCellIndex, int mmCellIndex) {
-        Date result = null;
-        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
+    private LocalTime getHHMM(Row row, int hhCellIndex, int mmCellIndex) {
+        LocalTime result = null;
         NumberFormat numberFormat = new DecimalFormat("##");
-
         Integer hours = getTime(row, hhCellIndex);
         Integer minutes = getTime(row, mmCellIndex);
 
-        try {
-            if (hours != null && minutes != null && hours >= 0 && minutes >= 0) {
-                String hh = numberFormat.format(hours);
-                String mm = numberFormat.format(minutes);
+        if (hours != null && minutes != null && hours >= 0 && minutes >= 0) {
+            String hh = numberFormat.format(hours);
+            String mm = numberFormat.format(minutes);
 
-                result = formatter.parse(hh + ":" + mm);
-            }
-        } catch (ParseException e) {
-            LOGGER.error("Parsing exception: cannot convert into date rowIndex={} hhCellIndex={} mmCellIndex={}, exception={}", row.getRowNum(), hhCellIndex, mmCellIndex, e.getMessage());
+            result = LocalTime.parse(hh + ":" + mm);
         }
 
         return result;

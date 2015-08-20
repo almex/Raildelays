@@ -33,7 +33,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -41,7 +41,7 @@ import java.util.List;
  *
  * @author Almex
  */
-public class DatabaseDatesItemReader extends AbstractItemCountingItemStreamItemReader<Date> implements InitializingBean {
+public class DatabaseDatesItemReader extends AbstractItemCountingItemStreamItemReader<LocalDate> implements InitializingBean {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(DatabaseDatesItemReader.class);
@@ -49,9 +49,9 @@ public class DatabaseDatesItemReader extends AbstractItemCountingItemStreamItemR
     @Resource
     private RaildelaysService service;
 
-    private Date lastDate;
+    private LocalDate lastDate;
 
-    private List<Date> dates;
+    private List<LocalDate> dates;
 
     /**
      * Default constructor.
@@ -82,8 +82,8 @@ public class DatabaseDatesItemReader extends AbstractItemCountingItemStreamItemR
     }
 
     @Override
-    protected Date doRead() throws Exception {
-        Date result = null;
+    protected LocalDate doRead() throws Exception {
+        LocalDate result = null;
 
         if (getCurrentItemCount() <= dates.size()) {
             result = dates.get(getCurrentItemCount() - 1);
@@ -94,11 +94,11 @@ public class DatabaseDatesItemReader extends AbstractItemCountingItemStreamItemR
         return result;
     }
 
-    public Date getLastDate() {
+    public LocalDate getLastDate() {
         return lastDate;
     }
 
-    public void setLastDate(Date lastDate) {
+    public void setLastDate(LocalDate lastDate) {
         this.lastDate = lastDate;
     }
 

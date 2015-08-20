@@ -37,7 +37,7 @@ import java.time.format.DateTimeFormatter;
 public final class ParsingUtil {
 
     public static final String DATE_FORMAT = "dd/MM/yyyy";
-    public static final String TIME_FORMAT = "hh:mm";
+    public static final String TIME_FORMAT = "HH:mm";
     public static final String TIMESTAMP_FORMAT = DATE_FORMAT + TIME_FORMAT;
     /**
      * Default constructor.

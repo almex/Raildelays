@@ -40,7 +40,9 @@ import org.slf4j.Marker;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -107,13 +109,13 @@ public class RaildelaysLogger implements Logger {
     private Delegator<Step> stepDelegator = new Delegator<Step>() {
         @Override
         public String logLine(String message, Step object) {
-            TimeDelay departureTime = TimeDelay.of(object.getDateTime(), object.getDelay());
+            TimeDelay departureTime = TimeDelay.of(object.getDateTime().toLocalTime(), object.getDelay());
 
             return new LogLineBuilder()
                     .message(message)
                     .departureStation(object.getStation() != null ? object.getStation().getName() : null)
-                    .expectedDepartureTime(object.getDateTime())
-                    .effectiveDepartureTime(departureTime != null ? departureTime.toDate() : null)
+                    .expectedDepartureTime(object.getDateTime().toLocalTime())
+                    .effectiveDepartureTime(departureTime != null ? departureTime.toLocalTime() : null)
                     .canceledDeparture(object.isCanceled())
                     .canceledArrival(object.isCanceled())
                     .build();
@@ -135,8 +137,8 @@ public class RaildelaysLogger implements Logger {
                     .departureStation(getStationName(object.getStation()))
                     .expectedDepartureTime(object.getArrivalTime() != null ? object.getArrivalTime().getExpectedTime() : null)
                     .expectedArrivalTime(object.getDepartureTime() != null ? object.getDepartureTime().getExpectedTime() : null)
-                    .effectiveDepartureTime(object.getArrivalTime() != null ? object.getArrivalTime().toDate() : null)
-                    .effectiveArrivalTime(object.getDepartureTime() != null ? object.getDepartureTime().toDate() : null)
+                    .effectiveDepartureTime(object.getArrivalTime() != null ? object.getArrivalTime().toLocalTime() : null)
+                    .effectiveArrivalTime(object.getDepartureTime() != null ? object.getDepartureTime().toLocalTime() : null)
                     .canceledDeparture(object.isCanceledArrival())
                     .canceledArrival(object.isCanceledDeparture())
                     .idPrevious(object.getPrevious() != null ? object.getPrevious().getId() : null)
@@ -188,8 +190,8 @@ public class RaildelaysLogger implements Logger {
                     .departureStation(object.getStationName())
                     .expectedDepartureTime(object.getArrivalTime())
                     .expectedArrivalTime(object.getDepartureTime())
-                    .effectiveDepartureTime(arrivalTime != null ? arrivalTime.toDate() : null)
-                    .effectiveArrivalTime(departureTime != null ? departureTime.toDate() : null)
+                    .effectiveDepartureTime(arrivalTime != null ? arrivalTime.toLocalTime() : null)
+                    .effectiveArrivalTime(departureTime != null ? departureTime.toLocalTime() : null)
                     .canceledDeparture(object.isCanceled())
                     .canceledArrival(object.isCanceled())
                     .build();
@@ -687,15 +689,15 @@ public class RaildelaysLogger implements Logger {
 
         private String message;
         private Long id;
-        private Date date;
+        private LocalDate date;
         private Long expectedTrain;
         private Long effectiveTrain;
         private String departureStation;
         private String arrivalStation;
-        private Date expectedDepartureTime;
-        private Date expectedArrivalTime;
-        private Date effectiveDepartureTime;
-        private Date effectiveArrivalTime;
+        private LocalTime expectedDepartureTime;
+        private LocalTime expectedArrivalTime;
+        private LocalTime effectiveDepartureTime;
+        private LocalTime effectiveArrivalTime;
         private Long idPrevious;
         private Long idNext;
         private boolean canceledDeparture;
@@ -725,7 +727,7 @@ public class RaildelaysLogger implements Logger {
             return this;
         }
 
-        public LogLineBuilder date(Date date) {
+        public LogLineBuilder date(LocalDate date) {
             this.date = date;
 
             return this;
@@ -755,25 +757,25 @@ public class RaildelaysLogger implements Logger {
             return this;
         }
 
-        public LogLineBuilder expectedDepartureTime(Date expectedDepartureTime) {
+        public LogLineBuilder expectedDepartureTime(LocalTime expectedDepartureTime) {
             this.expectedDepartureTime = expectedDepartureTime;
 
             return this;
         }
 
-        public LogLineBuilder expectedArrivalTime(Date expectedArrivalTime) {
+        public LogLineBuilder expectedArrivalTime(LocalTime expectedArrivalTime) {
             this.expectedArrivalTime = expectedArrivalTime;
 
             return this;
         }
 
-        public LogLineBuilder effectiveDepartureTime(Date effectiveDepartureTime) {
+        public LogLineBuilder effectiveDepartureTime(LocalTime effectiveDepartureTime) {
             this.effectiveDepartureTime = effectiveDepartureTime;
 
             return this;
         }
 
-        public LogLineBuilder effectiveArrivalTime(Date effectiveArrivalTime) {
+        public LogLineBuilder effectiveArrivalTime(LocalTime effectiveArrivalTime) {
             this.effectiveArrivalTime = effectiveArrivalTime;
 
             return this;
@@ -838,13 +840,13 @@ public class RaildelaysLogger implements Logger {
             return builder.toString();
         }
 
-        public String formatEffectiveTime(Date effectiveTime, boolean canceled) {
-            final SimpleDateFormat timeFormat = new SimpleDateFormat(TIME_FORMAT);
-            final SimpleDateFormat canceledTimeFormat = new SimpleDateFormat("HH'x'mm");
+        public String formatEffectiveTime(LocalTime effectiveTime, boolean canceled) {
+            final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern(TIME_FORMAT);
+            final DateTimeFormatter canceledTimeFormat = DateTimeFormatter.ofPattern("HH'x'mm");
             final String result;
 
             if (effectiveTime != null) {
-                result = StringUtils.rightPad((canceled ? canceledTimeFormat : timeFormat).format(effectiveTime), TIME_FORMAT.length());
+                result = StringUtils.rightPad(effectiveTime.format(canceled ? canceledTimeFormat : timeFormat), TIME_FORMAT.length());
             } else {
                 result = StringUtils.center(canceled ? "x" : "", TIME_FORMAT.length());
             }

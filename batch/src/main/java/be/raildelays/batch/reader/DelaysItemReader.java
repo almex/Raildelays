@@ -38,7 +38,11 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Search delays for train going from A to B or B to A for a certain date.
@@ -59,7 +63,7 @@ public class DelaysItemReader implements ItemReader<LineStop>, InitializingBean 
 
     private String stationB;
 
-    private Date date;
+    private LocalDate date;
 
     private Integer threshold;
 
@@ -101,7 +105,7 @@ public class DelaysItemReader implements ItemReader<LineStop>, InitializingBean 
         this.stationB = stationB;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

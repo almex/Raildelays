@@ -43,7 +43,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Set;
 
 /**
@@ -61,11 +62,10 @@ public class ExcelRow implements Comparable<ExcelRow>, Serializable {
     @Column(name = "ID")
     private Long id;
 
-    @Temporal(TemporalType.DATE)
     @Column(name = "DATE")
     @NotNull
     @Past
-    private Date date;
+    private LocalDate date;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "ARRIVAL_STATION_ID")
@@ -81,16 +81,14 @@ public class ExcelRow implements Comparable<ExcelRow>, Serializable {
     @JoinColumn(name = "LINK_STATION_ID")
     private Station linkStation;
 
-    @Temporal(TemporalType.TIME)
     @Column(name = "EXPECTED_DEPARTURE_TIME")
     @NotNull
-    private Date expectedDepartureTime;
+    private LocalTime expectedDepartureTime;
 
-    @Temporal(TemporalType.TIME)
     @Column(name = "EXPECTED_ARRIVAL_TIME")
     @NotNull
     @Past
-    private Date expectedArrivalTime;
+    private LocalTime expectedArrivalTime;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "EXPEXTED_TRAIN1_ID")
@@ -101,17 +99,15 @@ public class ExcelRow implements Comparable<ExcelRow>, Serializable {
     @JoinColumn(name = "EXPEXTED_TRAIN2_ID")
     private Train expectedTrain2;
 
-    @Temporal(TemporalType.TIME)
     @Column(name = "EFFECTIVE_DEPARTURE_TIME")
     @NotNull
     @Past
-    private Date effectiveDepartureTime;
+    private LocalTime effectiveDepartureTime;
 
-    @Temporal(TemporalType.TIME)
     @Column(name = "EFFECTIVE_ARRIVAL_TIME")
     @NotNull
     @Past
-    private Date effectiveArrivalTime;
+    private LocalTime effectiveArrivalTime;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "EFFECTIVE_TRAIN1_ID")
@@ -192,11 +188,11 @@ public class ExcelRow implements Comparable<ExcelRow>, Serializable {
         return result;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
@@ -224,19 +220,19 @@ public class ExcelRow implements Comparable<ExcelRow>, Serializable {
         this.linkStation = linkStation;
     }
 
-    public Date getExpectedDepartureTime() {
+    public LocalTime getExpectedDepartureTime() {
         return expectedDepartureTime;
     }
 
-    public void setExpectedDepartureTime(Date expectedDepartureTime) {
+    public void setExpectedDepartureTime(LocalTime expectedDepartureTime) {
         this.expectedDepartureTime = expectedDepartureTime;
     }
 
-    public Date getExpectedArrivalTime() {
+    public LocalTime getExpectedArrivalTime() {
         return expectedArrivalTime;
     }
 
-    public void setExpectedArrivalTime(Date expectedArrivalTime) {
+    public void setExpectedArrivalTime(LocalTime expectedArrivalTime) {
         this.expectedArrivalTime = expectedArrivalTime;
     }
 
@@ -256,19 +252,19 @@ public class ExcelRow implements Comparable<ExcelRow>, Serializable {
         this.expectedTrain2 = expectedTrain2;
     }
 
-    public Date getEffectiveDepartureTime() {
+    public LocalTime getEffectiveDepartureTime() {
         return effectiveDepartureTime;
     }
 
-    public void setEffectiveDepartureTime(Date effectiveDepartureTime) {
+    public void setEffectiveDepartureTime(LocalTime effectiveDepartureTime) {
         this.effectiveDepartureTime = effectiveDepartureTime;
     }
 
-    public Date getEffectiveArrivalTime() {
+    public LocalTime getEffectiveArrivalTime() {
         return effectiveArrivalTime;
     }
 
-    public void setEffectiveArrivalTime(Date effectiveArrivalTime) {
+    public void setEffectiveArrivalTime(LocalTime effectiveArrivalTime) {
         this.effectiveArrivalTime = effectiveArrivalTime;
     }
 
@@ -382,23 +378,23 @@ public class ExcelRow implements Comparable<ExcelRow>, Serializable {
     public static class Builder {
 
         private static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-        protected final Date date;
+        protected final LocalDate date;
         protected final Sens sens;
         protected Station arrivalStation;
         protected Station departureStation;
         protected Station linkStation;
-        protected Date expectedDepartureTime;
-        protected Date expectedArrivalTime;
+        protected LocalTime expectedDepartureTime;
+        protected LocalTime expectedArrivalTime;
         protected Train expectedTrain1;
         protected Train expectedTrain2;
-        protected Date effectiveDepartureTime;
-        protected Date effectiveArrivalTime;
+        protected LocalTime effectiveDepartureTime;
+        protected LocalTime effectiveArrivalTime;
         protected Train effectiveTrain1;
         protected Train effectiveTrain2;
         protected Long delay;
 
-        public Builder(final Date date, final Sens sens) {
-            this.date = (Date) (date != null ? date.clone() : null);
+        public Builder(final LocalDate date, final Sens sens) {
+            this.date = date;
             this.sens = sens;
         }
 
@@ -418,13 +414,13 @@ public class ExcelRow implements Comparable<ExcelRow>, Serializable {
         }
 
         public Builder expectedDepartureTime(
-                final Date expectedDepartureTime) {
+                final LocalTime expectedDepartureTime) {
             this.expectedDepartureTime = expectedDepartureTime;
             return this;
         }
 
         public Builder expectedArrivalTime(
-                final Date expectedArrivalTime) {
+                final LocalTime expectedArrivalTime) {
             this.expectedArrivalTime = expectedArrivalTime;
             return this;
         }
@@ -440,16 +436,14 @@ public class ExcelRow implements Comparable<ExcelRow>, Serializable {
         }
 
         public Builder effectiveDepartureTime(
-                final Date effectiveDepartureTime) {
-            this.effectiveDepartureTime = (Date) (effectiveDepartureTime != null ? effectiveDepartureTime
-                    .clone() : null);
+                final LocalTime effectiveDepartureTime) {
+            this.effectiveDepartureTime = effectiveDepartureTime;
             return this;
         }
 
         public Builder effectiveArrivalTime(
-                final Date effectiveArrivalTime) {
-            this.effectiveArrivalTime = (Date) (effectiveArrivalTime != null ? effectiveArrivalTime
-                    .clone() : null);
+                final LocalTime effectiveArrivalTime) {
+            this.effectiveArrivalTime = effectiveArrivalTime;
             return this;
         }
 

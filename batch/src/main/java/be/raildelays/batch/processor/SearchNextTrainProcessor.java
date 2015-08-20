@@ -37,6 +37,7 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -76,12 +77,12 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
     public BatchExcelRow process(final BatchExcelRow item) throws Exception {
         BatchExcelRow result = item; // By default we return the item itself
         List<LineStop> candidates;
-        TimeDelay timeDelay = TimeDelay.computeFrom(item.getDate(), item.getExpectedArrivalTime());
+        LocalDateTime dateTime = LocalDateTime.of(item.getDate(), item.getExpectedArrivalTime());
         Language lang = Language.valueOf(language.toUpperCase(Locale.US));
 
         LOGGER.trace("item", item);
 
-        candidates = service.searchNextTrain(item.getArrivalStation(), timeDelay.toDate());
+        candidates = service.searchNextTrain(item.getArrivalStation(), dateTime);
 
         LOGGER.trace("candidates_arrival", candidates);
 
