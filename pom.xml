@@ -1201,6 +1201,15 @@
                         <configuration>
                             <repoToken>g9PRdWtGBudopOiM4Mzb8KMF7DMLV9BLb</repoToken>
                         </configuration>
+                        <executions>
+                            <execution>
+                                <id>coveralls</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
 
                 </plugins>
