@@ -1198,9 +1198,6 @@
                     <plugin>
                         <groupId>org.eluder.coveralls</groupId>
                         <artifactId>coveralls-maven-plugin</artifactId>
-                        <configuration>
-                            <repoToken>g9PRdWtGBudopOiM4Mzb8KMF7DMLV9BLb</repoToken>
-                        </configuration>
                         <executions>
                             <execution>
                                 <id>coveralls</id>
@@ -1208,6 +1205,13 @@
                                 <goals>
                                     <goal>report</goal>
                                 </goals>
+                                <configuration>
+                                    <repoToken>g9PRdWtGBudopOiM4Mzb8KMF7DMLV9BLb</repoToken>
+                                    <jacocoReports>
+                                        <jacocoReport>${jacoco.test.destFile}</jacocoReport>
+                                        <jacocoReport>${jacoco.it.destFile}</jacocoReport>
+                                    </jacocoReports>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
