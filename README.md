@@ -1,4 +1,5 @@
-# Raildelays  [![Coverage Status](https://coveralls.io/repos/almex/Raildelays/badge.svg?branch=master&service=github)](https://coveralls.io/github/almex/Raildelays?branch=master) [![Build Status](https://travis-ci.org/almex/Raildelays.svg)](https://travis-ci.org/almex/Raildelays) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.almex/raildelays-assembly-descriptor/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.almex/raildelays-assembly-descriptor)
+# Raildelays 
+[![Coverage Status](https://coveralls.io/repos/almex/Raildelays/badge.svg?branch=master&service=github)](https://coveralls.io/github/almex/Raildelays?branch=master) [![Build Status](https://travis-ci.org/almex/Raildelays.svg)](https://travis-ci.org/almex/Raildelays) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.almex/raildelays-assembly-descriptor/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.almex/raildelays-assembly-descriptor)
 
 Raildelays is mainly a Java application which accumulates train delays from the Belgian railway company called [NMBS](http://www.belgianrail.be/nl)/[SNCB](http://www.belgianrail.be/fr).
 In futur development, we will extend possibilities to be able to deal with other railway company or other vehicles
