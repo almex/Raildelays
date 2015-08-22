@@ -29,7 +29,8 @@ import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -54,45 +55,46 @@ public interface RaildelaysService {
      * date. This search is done no matter the direction of your ride (e.g.:
      * from A to B/from B to a).
      *
-     * @param date          for which delays are recorded
-     * @param stationA      a certain station which could be your departure or arrival
-     *                      station depending moment within the day
-     * @param stationB      a certain station which could be your departure or arrival
-     *                      station depending moment within the day
-     * @param delayTreshold minimum delay (in minutes)
+     * @param delayThreshold minimum delay (in minutes)
+     * @param date           for which delays are recorded
+     * @param stationA       a certain station which could be your departure or arrival
+     *                       station depending moment within the day
+     * @param stationB       a certain station which could be your departure or arrival
+     *                       station depending moment within the day
+     * @param delayThreshold
      * @return a list of {@link LineStop} linked each other following a
      * direction
      */
-    List<LineStop> searchDelaysBetween(final Date date, final Station stationA,
-                                       final Station stationB, final int delayTreshold);
+    List<LineStop> searchDelaysBetween(final LocalDate date, final Station stationA,
+                                       final Station stationB, final long delayThreshold);
 
     /**
      * Search all dates already stored within the database between two dates.
      *
      * @param from all dates after from
      * @param to   all dates before to
-     * @return a list of unique {@link Date}
+     * @return a list of unique {@link LocalDate}
      */
-    List<Date> searchAllDates(Date from, Date to);
+    List<LocalDate> searchAllDates(LocalDate from, LocalDate to);
 
     /**
      * Search all dates already stored within the database until a last date.
      *
      * @param lastDate all dates before to
-     * @return a list of unique {@link Date}
+     * @return a list of unique {@link LocalDate}
      */
-    List<Date> searchAllDates(Date lastDate);
+    List<LocalDate> searchAllDates(LocalDate lastDate);
 
     /**
-     * Search next train to go from A to B for a certain date.
+     * Search next train to go from A to B for a certain dateTime.
      *
-     * @param station station where you want to go
-     * @param date    from which we do a search (format taken into account dd/MM/yyyy hh:mm)
-     *                e.g.: next train must be the same day (dd/MM/yyyy) but after that time (hh:mm).
+     * @param station  station where you want to go
+     * @param dateTime from which we do a search (format taken into account dd/MM/yyyy hh:mm)
+     *                 e.g.: next train must be the same day (dd/MM/yyyy) but after that time (hh:mm).
      * @return a list of {@link LineStop} corresponding to the direction of the
      * next train
      */
-    List<LineStop> searchNextTrain(Station station, Date date);
+    List<LineStop> searchNextTrain(Station station, LocalDateTime dateTime);
 
     /**
      * Search scheduling for a train line.
@@ -111,5 +113,5 @@ public interface RaildelaysService {
      * @return null if not found or if one of its parameter is null otherwise return the expectedTime LineStop
      * @since 1.2
      */
-    LineStop searchLineStopByTrain(Long trainId, Date date);
+    LineStop searchLineStopByTrain(Long trainId, LocalDate date);
 }

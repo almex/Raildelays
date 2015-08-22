@@ -12,8 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @DataSet(value = "classpath:FindArrivalDelaysIT.xml",
@@ -28,7 +27,7 @@ public class FindArrivalDelaysIT extends AbstractIT {
     @Test
     public void testFindArrivalDelays() throws ParseException {
         Station station = new Station("Bruxelles-Central");
-        Date date = new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01");
+        LocalDate date = LocalDate.parse("2000-01-01");
 
         List<LineStop> lineStops = lineStopDao.findArrivalDelays(date, station, 15);
 

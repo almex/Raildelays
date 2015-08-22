@@ -56,7 +56,7 @@ public class MaxMonthsDecider extends AbstractReadAndDecideTasklet<ExcelRow> imp
 
     public static final ExitStatus COMPLETED_WITH_MAX_MONTHS = new ExitStatus("COMPLETED_WITH_MAX_MONTHS");
     private long maxNumberOfMonth;
-    private Date firstDate;
+    private LocalDate firstDate;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -68,11 +68,11 @@ public class MaxMonthsDecider extends AbstractReadAndDecideTasklet<ExcelRow> imp
     @Override
     protected ExitStatus doRead(StepContribution contribution, ExecutionContext context, ExcelRow item) {
         ExitStatus result = ExitStatus.EXECUTING;
-        Date thresholdDate = getMaxMonthsThresholdDate(item);
+        LocalDate thresholdDate = getMaxMonthsThresholdDate(item);
 
         if (thresholdDate != null) {
             // We store the threshold date in the context
-            context.put("threshold.date", thresholdDate);
+            context.put("threshold.date", Date.from(thresholdDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
             // We keep trace that we've stored something
             contribution.incrementWriteCount(1);
             result = COMPLETED_WITH_MAX_MONTHS;
@@ -81,15 +81,15 @@ public class MaxMonthsDecider extends AbstractReadAndDecideTasklet<ExcelRow> imp
         return result;
     }
 
-    private Date getMaxMonthsThresholdDate(ExcelRow item) {
-        Date result = null;
+    private LocalDate getMaxMonthsThresholdDate(ExcelRow item) {
+        LocalDate result = null;
 
         if (item.getDate() != null) {
-            if (firstDate == null || firstDate.after(item.getDate())) {
+            if (firstDate == null || firstDate.isAfter(item.getDate())) {
                 firstDate = item.getDate();
             }
 
-            final LocalDate startDate = firstDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            final LocalDate startDate = firstDate;
             final LocalDate endDate = LocalDate.now();
             final Period period = Period.between(startDate, endDate);
 
@@ -97,7 +97,7 @@ public class MaxMonthsDecider extends AbstractReadAndDecideTasklet<ExcelRow> imp
              * If the period between the first date and today is greater or equal to maxNumberOfMonth
              */
             if (period.get(ChronoUnit.MONTHS) >= maxNumberOfMonth) {
-                result = Date.from(endDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+                result = endDate;
             }
         }
 

@@ -28,7 +28,8 @@ import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface LineStopDaoCustom {
@@ -42,7 +43,7 @@ public interface LineStopDaoCustom {
      * @param delayThreshold minimum delay (in minutes)
      * @return a collection of {@link LineStop} belonging to departure
      */
-    List<LineStop> findDepartureDelays(Date date, Station station,
+    List<LineStop> findDepartureDelays(LocalDate date, Station station,
                                        long delayThreshold);
 
     /**
@@ -54,7 +55,7 @@ public interface LineStopDaoCustom {
      * @param delayThreshold minimum delay (in minutes)
      * @return a collection of {@link LineStop} belonging to arrival
      */
-    List<LineStop> findArrivalDelays(Date date, Station station,
+    List<LineStop> findArrivalDelays(LocalDate date, Station station,
                                      long delayThreshold);
 
     /**
@@ -62,13 +63,13 @@ public interface LineStopDaoCustom {
      * time.
      *
      * @param station for which you do a search
-     * @param date    a line stops must be of the same day of the year of this date
+     * @param dateTime    a line stops must be of the same day of the year of this dateTime
      *                and must have the expectedTime departure time greater than the the
-     *                hour specified into that date
+     *                hour specified into that dateTime
      * @return a list of line stops of the same day in order of expectedTime arrival
      * time
      */
-    List<LineStop> findNextExpectedArrivalTime(Station station, Date date);
+    List<LineStop> findNextExpectedArrivalTime(Station station, LocalDateTime dateTime);
 
     /**
      * Return the first {@link be.raildelays.domain.entities.LineStop } for a certain

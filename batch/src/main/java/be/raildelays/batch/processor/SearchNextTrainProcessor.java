@@ -25,8 +25,8 @@
 package be.raildelays.batch.processor;
 
 import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.delays.TimestampDelay;
-import be.raildelays.delays.UtilsDelay;
+import be.raildelays.delays.Delays;
+import be.raildelays.delays.TimeDelay;
 import be.raildelays.domain.Language;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
@@ -37,12 +37,10 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
-import static be.raildelays.delays.DelayMatcher.*;
 
 /**
  * Search next train which allow you to arrive earlier to your destination.
@@ -79,12 +77,12 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
     public BatchExcelRow process(final BatchExcelRow item) throws Exception {
         BatchExcelRow result = item; // By default we return the item itself
         List<LineStop> candidates;
-        TimestampDelay timestampDelay = TimestampDelay.from(item.getDate(), item.getExpectedArrivalTime());
+        LocalDateTime dateTime = LocalDateTime.of(item.getDate(), item.getExpectedArrivalTime());
         Language lang = Language.valueOf(language.toUpperCase(Locale.US));
 
         LOGGER.trace("item", item);
 
-        candidates = service.searchNextTrain(item.getArrivalStation(), timestampDelay.toDate());
+        candidates = service.searchNextTrain(item.getArrivalStation(), dateTime);
 
         LOGGER.trace("candidates_arrival", candidates);
 
@@ -124,7 +122,7 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
     }
 
     private BatchExcelRow aggregate(final BatchExcelRow item, final BatchExcelRow fasterItem) {
-        Long delay = UtilsDelay.computeDelay(item.getExpectedArrivalTime(), fasterItem.getEffectiveArrivalTime());
+        Long delay = Delays.computeDelay(item.getExpectedArrivalTime(), fasterItem.getEffectiveArrivalTime());
 
         return new BatchExcelRow.Builder(item.getDate(), item.getSens())
                 .arrivalStation(item.getArrivalStation())
@@ -192,7 +190,7 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
             /*
              * Do not take into account candidate which leaves after the item.
              */
-            if (candidateDeparture.getDepartureTime().after(TimestampDelay.of(item.getEffectiveDepartureTime()))
+            if (candidateDeparture.getDepartureTime().after(TimeDelay.of(item.getEffectiveDepartureTime()))
             /*duration(between(candidateDeparture.getDepartureTime())
                     .and(item.getEffectiveDepartureTime()), is(greaterThan(0L)))*/
                     /*compareTimeAndDelay(candidateDeparture.getDepartureTime(), item.getEffectiveDepartureTime()) > 0*/) {
@@ -206,8 +204,8 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
              * and the item expectedTime arrival time is lower than the difference between the effective and the expectedTime departure
              * time of the item (its delay).
              */
-            if (UtilsDelay.compareTime(candidateArrival.getArrivalTime(), item.getExpectedArrivalTime()) <
-                    UtilsDelay.compareTime(item.getEffectiveDepartureTime(), item.getExpectedDepartureTime())
+            if (Delays.compareTime(candidateArrival.getArrivalTime(), item.getExpectedArrivalTime()) <
+                    Delays.compareTime(item.getEffectiveDepartureTime(), item.getExpectedDepartureTime())
             /*compareTime(candidateArrival.getArrivalTime(), item.getExpectedArrivalTime()) <
                     compareTime(item.getEffectiveDepartureTime(), item.getExpectedDepartureTime())*/) {
                 LOGGER.debug("faster_delay_train_arrival", candidateArrival);

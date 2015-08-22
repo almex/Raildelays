@@ -28,8 +28,8 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Utility class helpful to build all what is related to Excel file location/path/name.
@@ -39,10 +39,10 @@ import java.util.Date;
  */
 public class ExcelFileUtils extends FileUtils {
 
-    public static File getFile(File directory, String prefix, Date date, String extension) throws IOException {
+    public static File getFile(File directory, String prefix, LocalDate date, String extension) throws IOException {
         assert date != null : "You must provide a date!";
 
-        String suffix = new SimpleDateFormat("yyyyMMdd").format(date);
+        String suffix = date.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
         return getFile(directory, prefix, suffix, extension);
     }

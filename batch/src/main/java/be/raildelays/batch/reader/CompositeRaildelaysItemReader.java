@@ -36,8 +36,8 @@ import org.springframework.batch.item.support.CompositeItemStream;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -66,7 +66,7 @@ public class CompositeRaildelaysItemReader extends CompositeItemStream implement
     public List<LineStop> read() throws Exception, UnexpectedInputException,
             ParseException, NonTransientResourceException {
         List<LineStop> result = null; // The end of this reader is when we have no more date
-        Date date = datesItemReader.read();
+        LocalDate date = datesItemReader.read();
 
         if (date != null) {
             delaysItemReader.setDate(date);

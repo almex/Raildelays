@@ -13,8 +13,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 
 @RunWith(BlockJUnit4ClassRunner.class)
@@ -38,9 +38,6 @@ public class BatchExcelRowAggregatorTest {
 
     @Before
     public void setUp() throws Exception {
-        DateFormat timeFormat = new SimpleDateFormat("HH:mm");
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
         workbook = new HSSFWorkbook();
         row = workbook.createSheet(SHEET_NAME).createRow(ROW_INDEX);
         row.createCell(2).setCellValue(new Date());
@@ -61,15 +58,15 @@ public class BatchExcelRowAggregatorTest {
         row.createCell(51).setCellValue("477");
         row.createCell(54).setCellValue(17L);
 
-        item = new BatchExcelRow.Builder(dateFormat.parse("01/01/2000"), null) //
+        item = new BatchExcelRow.Builder(LocalDate.parse("2000-01-01"), null) //
                 .departureStation(new Station("BRUXELLES-CENTRAL")) //
                 .arrivalStation(new Station("LIEGE-GUILLEMINS")) //
-                .expectedDepartureTime(timeFormat.parse("14:00")) //
-                .expectedArrivalTime(timeFormat.parse("15:00")) //
+                .expectedDepartureTime(LocalTime.parse("14:00")) //
+                .expectedArrivalTime(LocalTime.parse("15:00")) //
                 .expectedTrain1(new Train(TRAIN1)) //
                 .expectedTrain2(new Train(TRAIN2)) //
-                .effectiveDepartureTime(timeFormat.parse("14:05")) //
-                .effectiveArrivalTime(timeFormat.parse("15:15")) //
+                .effectiveDepartureTime(LocalTime.parse("14:05")) //
+                .effectiveArrivalTime(LocalTime.parse("15:15")) //
                 .effectiveTrain1(new Train(TRAIN1)) //
                 .effectiveTrain2(new Train(TRAIN2)) //
                 .delay(DELAY) //

@@ -1,13 +1,13 @@
 package be.raildelays.domain.entities;
 
-import be.raildelays.delays.TimestampDelay;
+import be.raildelays.delays.TimeDelay;
 import be.raildelays.test.AbstractObjectTest;
 import org.junit.Before;
 import org.junit.experimental.theories.DataPoint;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class LineStopTest extends AbstractObjectTest {
 
@@ -26,28 +26,40 @@ public class LineStopTest extends AbstractObjectTest {
     @Override
     @Before
     public void setUp() throws ParseException {
-        SimpleDateFormat f = new SimpleDateFormat("HH:mm");
         Train train = new Train("466");
         Station station = new Station("Liège (Liège-Guillemins)");
-        TimestampDelay arrivalTime = TimestampDelay.of(f.parse("12:00"), 5L);
-        TimestampDelay departureTime = TimestampDelay.of(f.parse("12:05"), 5L);
-        Date date = new Date();
+        TimeDelay arrivalTime = TimeDelay.of(LocalTime.parse("12:00"), 5L);
+        TimeDelay departureTime = TimeDelay.of(LocalTime.parse("12:05"), 5L);
+        LocalDate date = LocalDate.now();
 
-        DATA_POINT1 = new LineStop.Builder().date(date).train(train)
-                .station(station).arrivalTime(arrivalTime)
-                .departureTime(departureTime).canceled(false).build();
+        DATA_POINT1 = new LineStop.Builder()
+                .date(date)
+                .train(train)
+                .station(station)
+                .arrivalTime(arrivalTime)
+                .departureTime(departureTime)
+                .canceledArrival(false)
+                .canceledDeparture(false)
+                .build();
 
         DATA_POINT2 = DATA_POINT1;
 
         DATA_POINT3 = new LineStop.Builder().date(date).train(train)
-                .station(station).arrivalTime(arrivalTime)
-                .departureTime(departureTime).canceled(false).build();
+                .station(station)
+                .arrivalTime(arrivalTime)
+                .departureTime(departureTime)
+                .canceledArrival(false)
+                .canceledDeparture(false)
+                .build();
 
-        DATA_POINT4 = new LineStop.Builder().date(new Date())
+        DATA_POINT4 = new LineStop.Builder().date(LocalDate.now())
                 .train(new Train("469"))
                 .station(new Station("Brussels (Bruxelles-central)"))
-                .arrivalTime(arrivalTime).departureTime(departureTime)
-                .canceled(false).build();
+                .arrivalTime(arrivalTime)
+                .departureTime(departureTime)
+                .canceledArrival(false)
+                .canceledDeparture(false)
+                .build();
     }
 
 }

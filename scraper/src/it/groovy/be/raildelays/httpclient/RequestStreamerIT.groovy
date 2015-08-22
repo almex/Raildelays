@@ -8,6 +8,8 @@ import be.raildelays.httpclient.impl.StationListRequest
 import be.raildelays.httpclient.impl.StationListRequestStreamer
 import org.junit.Test
 
+import java.time.LocalDate
+
 import static org.junit.Assert.assertNotNull
 
 class RequestStreamerIT {
@@ -19,7 +21,7 @@ class RequestStreamerIT {
 
     @Test(timeout = 15000L)
     void testGetDelays() {
-        assertNotNull("The request should return a result", new DelaysRequestStreamer().stream(new DelaysRequest('466', new Date(), Sens.DEPARTURE, Language.EN)));
+        assertNotNull("The request should return a result", new DelaysRequestStreamer().stream(new DelaysRequest('466', LocalDate.now(), Sens.DEPARTURE, Language.EN)));
     }
 
 }

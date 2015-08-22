@@ -6,7 +6,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public class FilterSmallDelaysProcessorTest {
 
@@ -22,7 +22,7 @@ public class FilterSmallDelaysProcessorTest {
     @Test
     public void testFilter() throws Exception {
         Assert.assertNull(processor.process(new BatchExcelRow
-                .Builder(new Date(), Sens.ARRIVAL)
+                .Builder(LocalDate.now(), Sens.ARRIVAL)
                 .delay(14L)
                 .build(false)));
     }
@@ -30,7 +30,7 @@ public class FilterSmallDelaysProcessorTest {
     @Test
     public void testNotFilter() throws Exception {
         Assert.assertNotNull(processor.process(new BatchExcelRow
-                .Builder(new Date(), Sens.ARRIVAL)
+                .Builder(LocalDate.now(), Sens.ARRIVAL)
                 .delay(15L)
                 .build(false)));
     }

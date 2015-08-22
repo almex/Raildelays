@@ -24,7 +24,7 @@
 
 package be.raildelays.domain.entities;
 
-import be.raildelays.delays.TimestampDelay;
+import be.raildelays.delays.TimeDelay;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -34,8 +34,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
 
 /**
@@ -70,22 +70,21 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
     @Column(name = "CANCELED_ARRIVAL")
     protected boolean canceledArrival;
 
-    @Temporal(TemporalType.DATE)
     @Column(name = "DATE")
     @NotNull
-    protected Date date;
+    protected LocalDate date;
 
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(column = @Column(name = "ARRIVAL_TIME_EXPECTED"), name = "expectedTime"),
             @AttributeOverride(column = @Column(name = "ARRIVAL_TIME_DELAY"), name = "delay")})
-    protected TimestampDelay arrivalTime;
+    protected TimeDelay arrivalTime;
 
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(column = @Column(name = "DEPARTURE_TIME_EXPECTED"), name = "expectedTime"),
             @AttributeOverride(column = @Column(name = "DEPARTURE_TIME_DELAY"), name = "delay")})
-    protected TimestampDelay departureTime;
+    protected TimeDelay departureTime;
 
     @OneToOne(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER, optional = true)
     @JoinColumn(name = "PREVIOUS_ID")
@@ -110,7 +109,7 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
 
     private LineStop(Builder builder) {
         this.id = builder.id;
-        this.date = (Date) (builder.date != null ? builder.date.clone() : null);
+        this.date = builder.date != null ? builder.date : null;
         this.train = builder.train;
         this.station = builder.station;
         this.arrivalTime = builder.arrivalTime;
@@ -127,7 +126,7 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
                 .append("{ ") //
                 .append("id: ").append(id).append(", ")  //
                 .append("date: ")
-                .append(new SimpleDateFormat("dd/MM/yyyy").format(date))
+                .append(date.format(DateTimeFormatter.ISO_DATE))
                 .append(", ") //
                 .append("train: {").append(train) //
                 .append("}, ") //
@@ -243,19 +242,19 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
         return id;
     }
 
-    public TimestampDelay getArrivalTime() {
+    public TimeDelay getArrivalTime() {
         return arrivalTime;
     }
 
-    public void setArrivalTime(TimestampDelay arrivalTime) {
+    public void setArrivalTime(TimeDelay arrivalTime) {
         this.arrivalTime = arrivalTime;
     }
 
-    public TimestampDelay getDepartureTime() {
+    public TimeDelay getDepartureTime() {
         return departureTime;
     }
 
-    public void setDepartureTime(TimestampDelay departureTime) {
+    public void setDepartureTime(TimeDelay departureTime) {
         this.departureTime = departureTime;
     }
 
@@ -275,11 +274,11 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
         this.station = station;
     }
 
-    public Date getDate() {
-        return (Date) (date != null ? date.clone() : null);
+    public LocalDate getDate() {
+        return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
@@ -346,9 +345,9 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
         private Station station;
         private boolean canceledDeparture;
         private boolean canceledArrival;
-        private Date date;
-        private TimestampDelay arrivalTime;
-        private TimestampDelay departureTime;
+        private LocalDate date;
+        private TimeDelay arrivalTime;
+        private TimeDelay departureTime;
         private Builder previous;
         private Builder next;
 
@@ -399,8 +398,8 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
                         .station(nextLineStop.station)
                         .arrivalTime(nextLineStop.arrivalTime)
                         .departureTime(nextLineStop.departureTime)
-                        .canceledDeparture(previousLineStop.canceledDeparture)
-                        .canceledArrival(previousLineStop.canceledArrival)
+                        .canceledDeparture(nextLineStop.canceledDeparture)
+                        .canceledArrival(nextLineStop.canceledArrival)
                         .addPrevious(forwardBuilder);
 
                 forwardBuilder = forwardBuilder.next;
@@ -484,19 +483,19 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
             return this;
         }
 
-        public Builder arrivalTime(TimestampDelay arrivalTime) {
+        public Builder arrivalTime(TimeDelay arrivalTime) {
             this.arrivalTime = arrivalTime;
 
             return this;
         }
 
-        public Builder departureTime(TimestampDelay departureTime) {
+        public Builder departureTime(TimeDelay departureTime) {
             this.departureTime = departureTime;
 
             return this;
         }
 
-        public Builder date(Date date) {
+        public Builder date(LocalDate date) {
             this.date = date;
 
             return this;

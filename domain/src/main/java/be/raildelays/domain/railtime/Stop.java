@@ -26,7 +26,7 @@ package be.raildelays.domain.railtime;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class Stop implements Serializable {
 
@@ -36,11 +36,11 @@ public class Stop implements Serializable {
     protected Station station;
 
     @NotNull
-    protected Date timestamp;
+    protected LocalDateTime dateTime;
 
-    public Stop(String stationName, Date timestamp) {
+    public Stop(String stationName, LocalDateTime dateTime) {
         this.station = new Station(stationName);
-        this.timestamp = timestamp;
+        this.dateTime = dateTime;
     }
 
     public Station getStation() {
@@ -51,12 +51,12 @@ public class Stop implements Serializable {
         this.station = station;
     }
 
-    public Date getTimestamp() {
-        return timestamp;
+    public LocalDateTime getDateTime() {
+        return dateTime;
     }
 
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
     }
 
 }

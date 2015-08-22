@@ -24,7 +24,7 @@
 
 package be.raildelays.batch.processor;
 
-import be.raildelays.delays.TimestampDelay;
+import be.raildelays.delays.TimeDelay;
 import be.raildelays.domain.Language;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
@@ -41,7 +41,8 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Locale;
 
 /**
@@ -63,7 +64,7 @@ public class LineStopMapperProcessor implements ItemProcessor<TwoDirections, Lin
     @Resource
     private StationDao stationDao;
 
-    private Date date;
+    private LocalDate date;
 
     private String language = Language.EN.name();
 
@@ -112,8 +113,8 @@ public class LineStopMapperProcessor implements ItemProcessor<TwoDirections, Lin
         LineStop result;
         Train train = mergeTrain(new Train(direction.getTrain().getIdRailtime(), lang));
         Station station = mergeStation(new Station(arrivalStep.getStation().getName(), lang));
-        TimestampDelay arrivalTime = TimestampDelay.of(arrivalStep.getTimestamp(), arrivalStep.getDelay());
-        TimestampDelay departureTime = TimestampDelay.of(departureStep.getTimestamp(), departureStep.getDelay());
+        TimeDelay arrivalTime = getTimeDelay(arrivalStep.getDateTime(), arrivalStep.getDelay());
+        TimeDelay departureTime = getTimeDelay(departureStep.getDateTime(), departureStep.getDelay());
 
         result = new LineStop.Builder()
                 .date(date)
@@ -128,6 +129,10 @@ public class LineStopMapperProcessor implements ItemProcessor<TwoDirections, Lin
         LOGGER.debug("processing_done", result);
 
         return result;
+    }
+
+    public TimeDelay getTimeDelay(LocalDateTime dateTime, Long delay) {
+        return TimeDelay.of(dateTime != null ? dateTime.toLocalTime() : null, delay);
     }
 
     private Train mergeTrain(Train train) {
@@ -182,7 +187,7 @@ public class LineStopMapperProcessor implements ItemProcessor<TwoDirections, Lin
         return result;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

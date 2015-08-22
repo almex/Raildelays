@@ -40,7 +40,8 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static be.raildelays.repository.specification.LineStopSpecifications.*;
@@ -54,7 +55,7 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
     private EntityManager entityManager;
 
     @Override
-    public List<LineStop> findDepartureDelays(Date date, Station station,
+    public List<LineStop> findDepartureDelays(LocalDate date, Station station,
                                               long delayThreshold) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
@@ -87,7 +88,7 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<LineStop> findArrivalDelays(Date date, Station station,
+    public List<LineStop> findArrivalDelays(LocalDate date, Station station,
                                             long delayThreshold) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
@@ -119,10 +120,10 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
     }
 
     @Override
-    public List<LineStop> findNextExpectedArrivalTime(Station station, Date date) {
-        return findAll(where(dateEquals(date))
+    public List<LineStop> findNextExpectedArrivalTime(Station station, LocalDateTime dateTime) {
+        return findAll(where(dateEquals(dateTime.toLocalDate()))
                 .and(arrivalTimeIsNotNull())
-                .and(arrivalTimeGreaterThan(date))
+                .and(arrivalTimeGreaterThan(dateTime.toLocalTime()))
                 .and(stationEquals(station)), new Sort(Sort.Direction.ASC, "arrivalTime.expectedTime"));
 
     }

@@ -17,20 +17,18 @@ import org.springframework.batch.test.MetaDataInstanceFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import java.util.Date;
 
 @RunWith(BlockJUnit4ClassRunner.class)
 public class MaxMonthsDeciderTest {
 
     private static final SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
+    private static final LocalDate NOW = LocalDate.now();
     // The S.U.T.
     private MaxMonthsDecider decider;
     private JobExecution jobExecution;
     private StepExecution stepExecution;
-    private static final LocalDate NOW = LocalDate.now();
 
     @Before
     public void setUp() throws ParseException {
@@ -43,19 +41,13 @@ public class MaxMonthsDeciderTest {
     @Test
     public void testCompleted() throws ParseException {
         decider.setReader(new ItemStreamItemReaderDelegator<>(new IteratorItemReader<>(Arrays.asList(
-                new ExcelRow.Builder(Date.from(NOW
-                        .minus(1, ChronoUnit.MONTHS)
-                        .atStartOfDay(ZoneId.systemDefault())
-                        .toInstant() // 1 month before Now
-                ), Sens.ARRIVAL)
+                new ExcelRow.Builder(NOW.minus(1, ChronoUnit.MONTHS) // 1 month before Now
+                        , Sens.ARRIVAL)
                         .build(false),
                 new ExcelRow.Builder(null, Sens.ARRIVAL) // To test null value
                         .build(false),
-                new ExcelRow.Builder(Date.from(NOW
-                        .plus(1, ChronoUnit.MONTHS)
-                        .atStartOfDay(ZoneId.systemDefault())
-                        .toInstant() // 1 month after Now
-                ), Sens.ARRIVAL)
+                new ExcelRow.Builder(NOW.plus(1, ChronoUnit.MONTHS) // 1 month after Now
+                        , Sens.ARRIVAL)
                         .build(false)
         ))));
 
@@ -68,19 +60,13 @@ public class MaxMonthsDeciderTest {
     @Test
     public void testCompletedWithMaxMonths() throws ParseException {
         decider.setReader(new ItemStreamItemReaderDelegator<>(new IteratorItemReader<>(Arrays.asList(
-                new ExcelRow.Builder(Date.from(NOW
-                        .minus(6, ChronoUnit.MONTHS)
-                        .atStartOfDay(ZoneId.systemDefault())
-                        .toInstant() // 6 month before Now
-                ), Sens.ARRIVAL)
+                new ExcelRow.Builder(NOW.minus(6, ChronoUnit.MONTHS) // 6 month before Now
+                        , Sens.ARRIVAL)
                         .build(false),
                 new ExcelRow.Builder(null, Sens.ARRIVAL) // To test null value
                         .build(false),
-                new ExcelRow.Builder(Date.from(NOW
-                        .plus(2, ChronoUnit.MONTHS)
-                        .atStartOfDay(ZoneId.systemDefault())
-                        .toInstant() // 2 month after Now
-                ), Sens.ARRIVAL)
+                new ExcelRow.Builder(NOW.plus(2, ChronoUnit.MONTHS) // 2 month after Now
+                        , Sens.ARRIVAL)
                         .build(false)
         ))));
 

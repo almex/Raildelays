@@ -13,10 +13,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 
 @RunWith(BlockJUnit4ClassRunner.class)
@@ -74,18 +74,16 @@ public class BatchExcelRowMapperTest {
 
     @Test
     public void testRoundTrip() throws Exception {
-        final DateFormat timeFormat = new SimpleDateFormat("HH:mm");
-        final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-        BatchExcelRow expected = new BatchExcelRow.Builder(dateFormat.parse("01/01/2000"), null) //
+        BatchExcelRow expected = new BatchExcelRow.Builder(LocalDate.parse("2000-01-01"), null) //
                 .departureStation(new Station("BRUXELLES-CENTRAL")) //
                 .arrivalStation(new Station("LIEGE-GUILLEMINS")) //
-                .expectedDepartureTime(timeFormat.parse("14:00")) //
-                .expectedArrivalTime(timeFormat.parse("15:00")) //
+                .expectedDepartureTime(LocalTime.parse("14:00")) //
+                .expectedArrivalTime(LocalTime.parse("15:00")) //
                 .expectedTrain1(new Train("529")) //
                 .expectedTrain2(new Train("516")) //
-                .effectiveDepartureTime(timeFormat.parse("14:05")) //
-                .effectiveArrivalTime(timeFormat.parse("15:15")) //
+                .effectiveDepartureTime(LocalTime.parse("14:05")) //
+                .effectiveArrivalTime(LocalTime.parse("15:15")) //
                 .effectiveTrain1(new Train("529")) //
                 .effectiveTrain2(new Train("516")) //
                 .delay(10L) //

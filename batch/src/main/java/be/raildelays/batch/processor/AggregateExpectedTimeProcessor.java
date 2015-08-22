@@ -24,7 +24,7 @@
 
 package be.raildelays.batch.processor;
 
-import be.raildelays.delays.TimestampDelay;
+import be.raildelays.delays.TimeDelay;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.logging.Logger;
 import be.raildelays.logging.LoggerFactory;
@@ -145,8 +145,8 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, L
 
         Long departureDelay = item.getDepartureTime() != null ? item.getDepartureTime().getDelay() : 0L;
         Long arrivalDelay = item.getArrivalTime() != null ? item.getArrivalTime().getDelay() : 0L;
-        TimestampDelay departureTime = TimestampDelay.of(candidate.getDepartureTime().getExpectedTime(), departureDelay);
-        TimestampDelay arrivalTime = TimestampDelay.of(candidate.getArrivalTime().getExpectedTime(), arrivalDelay);
+        TimeDelay departureTime = TimeDelay.of(candidate.getDepartureTime().getExpectedTime(), departureDelay);
+        TimeDelay arrivalTime = TimeDelay.of(candidate.getArrivalTime().getExpectedTime(), arrivalDelay);
 
         result.departureTime(departureTime) //
                 .arrivalTime(arrivalTime);

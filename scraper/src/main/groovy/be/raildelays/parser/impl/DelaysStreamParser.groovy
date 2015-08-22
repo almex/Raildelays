@@ -35,6 +35,9 @@ import org.ccil.cowan.tagsoup.Parser
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import java.time.LocalDate
+import java.time.LocalDateTime
+
 class DelaysStreamParser implements StreamParser<Direction, DelaysRequest> {
 
 
@@ -80,7 +83,7 @@ class DelaysStreamParser implements StreamParser<Direction, DelaysRequest> {
             log.debug("delay=" + delay)
             log.debug("canceled=" + canceled)
 
-            Step step = new Step(ordinance, station, ParsingUtil.parseTimestamp(ParsingUtil.formatDate(stream.request.day) + hour), parseDelay(delay), canceled)
+            Step step = new Step(ordinance, station, extractDateTime(stream.request.day, hour), parseDelay(delay), canceled)
 
             steps.add(step)
             ordinance++
@@ -88,6 +91,16 @@ class DelaysStreamParser implements StreamParser<Direction, DelaysRequest> {
         direction.steps = steps
 
         return direction;
+    }
+
+    private LocalDateTime extractDateTime(LocalDate day, String hour) {
+        LocalDateTime dateTime
+
+        if (!"".equals(hour)) {
+            dateTime = ParsingUtil.parseTimestamp(ParsingUtil.formatDate(day) + hour)
+        }
+
+        return dateTime
     }
 
     def static Long stringToLong(String value) {

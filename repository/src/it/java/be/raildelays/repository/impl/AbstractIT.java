@@ -2,11 +2,11 @@ package be.raildelays.repository.impl;
 
 import com.excilys.ebi.spring.dbunit.test.RollbackTransactionalDataSetTestExecutionListener;
 import org.junit.runner.RunWith;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,8 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration(locations = {
         "classpath:spring/repository/raildelays-repository-integration-test-context.xml",
         "classpath:spring/test/raildelays-tx-context.xml"})
-@TransactionConfiguration(transactionManager = "raildelaysTransactionManager", defaultRollback = true)
-@Transactional
+@Rollback
+@Transactional(transactionManager = "raildelaysTransactionManager")
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class,
         TransactionalTestExecutionListener.class,
         RollbackTransactionalDataSetTestExecutionListener.class})

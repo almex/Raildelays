@@ -3,7 +3,7 @@ package be.raildelays.delays;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Date;
+import java.time.LocalTime;
 
 import static be.raildelays.delays.DelayMatcher.*;
 
@@ -11,27 +11,27 @@ public class DelayMatcherTest {
 
     @Test
     public void durationBetweenTwoDefaultTimestampDelayIsEqualToZero() {
-        final TimestampDelay timestampDelay = TimestampDelay.now();
+        final TimeDelay timeDelay = TimeDelay.now();
 
-        Assert.assertTrue(duration(between(timestampDelay).and(timestampDelay), is(equalTo(0L))));
-        Assert.assertFalse(duration(between(timestampDelay).and(timestampDelay), is(equalTo(1L))));
+        Assert.assertTrue(duration(between(timeDelay).and(timeDelay), is(equalTo(0L))));
+        Assert.assertFalse(duration(between(timeDelay).and(timeDelay), is(equalTo(1L))));
     }
 
     @Test
     public void durationBetweenTwoDefaultTimestampDelayIsGreaterThanZero() {
-        final TimestampDelay timestampDelay = TimestampDelay.now();
-        final TimestampDelay timestampDelay2 = TimestampDelay.from(timestampDelay, 1L);
+        final TimeDelay timeDelay = TimeDelay.now();
+        final TimeDelay timeDelay2 = timeDelay.withDelay(1L);
 
-        Assert.assertTrue(duration(between(timestampDelay).and(timestampDelay2), is(greaterThan(0L))));
-        Assert.assertFalse(duration(between(timestampDelay).and(timestampDelay2), is(greaterThan(1L))));
+        Assert.assertTrue(duration(between(timeDelay).and(timeDelay2), is(greaterThan(0L))));
+        Assert.assertFalse(duration(between(timeDelay).and(timeDelay2), is(greaterThan(1L))));
     }
 
     @Test
     public void durationBetweenDateAndTimestampDelayIsEqualToZero() {
-        final Date date = new Date();
-        final TimestampDelay timestampDelay = TimestampDelay.of(date);
+        final LocalTime time = LocalTime.now();
+        final TimeDelay timeDelay = TimeDelay.of(time);
 
-        Assert.assertTrue(duration(between(timestampDelay).and(date), is(equalTo(0L))));
-        Assert.assertTrue(duration(between(date).and(timestampDelay), is(equalTo(0L))));
+        Assert.assertTrue(duration(between(timeDelay).and(time), is(equalTo(0L))));
+        Assert.assertTrue(duration(between(time).and(timeDelay), is(equalTo(0L))));
     }
 }

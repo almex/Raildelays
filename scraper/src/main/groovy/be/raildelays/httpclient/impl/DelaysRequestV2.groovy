@@ -27,13 +27,15 @@ package be.raildelays.httpclient.impl
 import be.raildelays.domain.Language
 import be.raildelays.httpclient.AbstractRequest
 
+import java.time.LocalDate
+
 /**
  * @author Almex
  * @since 1.2
  */
 public class DelaysRequestV2 extends AbstractRequest {
 
-    public DelaysRequestV2(String trainId, Date day, Language language) {
+    public DelaysRequestV2(String trainId, LocalDate day, Language language) {
         setTrainId(trainId)
         setDay(day)
         setLanguage(language)
@@ -47,11 +49,11 @@ public class DelaysRequestV2 extends AbstractRequest {
         setValue(trainId, "trainId", String.class);
     }
 
-    public Date getDay() {
+    public LocalDate getDay() {
         return getValue("day");
     }
 
-    private void setDay(Date day) {
+    private void setDay(LocalDate day) {
         setValue(day, "day", Date.class);
     }
 

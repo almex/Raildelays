@@ -1,16 +1,12 @@
 package be.raildelays.delays;
 
-import java.util.Date;
+import java.time.LocalTime;
 
 /**
  * @author Almex
  * @since 2.0
  */
 public class DelayMatcher<T> implements Matcher<T> {
-
-    enum Operator {
-        GREATER, LESS, EQUAL, GREATER_OR_EQUAL, LESS_OR_EQUAL
-    }
 
     public static OperatorMatcher<Long> is(OperatorMatcher<Long> matcher) {
         return matcher;
@@ -87,27 +83,31 @@ public class DelayMatcher<T> implements Matcher<T> {
         return OperatorMatcher.operator(operator, valueMatcher);
     }
 
-    public static OrderingComparison between(TimestampDelay from) {
+    public static OrderingComparison between(TimeDelay from) {
         return new OrderingComparison(from);
     }
 
-    public static OrderingComparison between(Date from) {
-        return new OrderingComparison(TimestampDelay.of(from));
+    public static OrderingComparison between(LocalTime from) {
+        return new OrderingComparison(TimeDelay.of(from));
     }
-
 
     @Override
     public boolean match(T object) {
         return false;
     }
 
+
+    enum Operator {
+        GREATER, LESS, EQUAL, GREATER_OR_EQUAL, LESS_OR_EQUAL
+    }
+
     public static class OrderingComparison implements Matcher<Long> {
 
-        private TimestampDelay from;
-        private TimestampDelay to;
+        private TimeDelay from;
+        private TimeDelay to;
         private Operator operator;
 
-        protected OrderingComparison(TimestampDelay from) {
+        protected OrderingComparison(TimeDelay from) {
             this.from = from;
         }
 
@@ -117,19 +117,19 @@ public class DelayMatcher<T> implements Matcher<T> {
 
             switch (operator) {
                 case EQUAL:
-                    result = UtilsDelay.compareTimeAndDelay(from, to) == value;
+                    result = Delays.compareTimeAndDelay(from, to) == value;
                     break;
                 case GREATER:
-                    result = UtilsDelay.compareTimeAndDelay(from, to) > value;
+                    result = Delays.compareTimeAndDelay(from, to) > value;
                     break;
                 case GREATER_OR_EQUAL:
-                    result = UtilsDelay.compareTimeAndDelay(from, to) >= value;
+                    result = Delays.compareTimeAndDelay(from, to) >= value;
                     break;
                 case LESS:
-                    result = UtilsDelay.compareTimeAndDelay(from, to) < value;
+                    result = Delays.compareTimeAndDelay(from, to) < value;
                     break;
                 case LESS_OR_EQUAL:
-                    result = UtilsDelay.compareTimeAndDelay(from, to) <= value;
+                    result = Delays.compareTimeAndDelay(from, to) <= value;
                     break;
 
             }
@@ -137,19 +137,19 @@ public class DelayMatcher<T> implements Matcher<T> {
             return result;
         }
 
-        protected TimestampDelay getFrom() {
+        protected TimeDelay getFrom() {
             return from;
         }
 
-        protected void setFrom(TimestampDelay from) {
+        protected void setFrom(TimeDelay from) {
             this.from = from;
         }
 
-        protected TimestampDelay getTo() {
+        protected TimeDelay getTo() {
             return to;
         }
 
-        protected void setTo(TimestampDelay to) {
+        protected void setTo(TimeDelay to) {
             this.to = to;
         }
 
@@ -157,14 +157,14 @@ public class DelayMatcher<T> implements Matcher<T> {
             this.operator = operator;
         }
 
-        public OrderingComparison and(TimestampDelay to) {
+        public OrderingComparison and(TimeDelay to) {
             this.setTo(to);
 
             return this;
         }
 
-        public OrderingComparison and(Date to) {
-            this.setTo(TimestampDelay.of(to));
+        public OrderingComparison and(LocalTime to) {
+            this.setTo(TimeDelay.of(to));
 
             return this;
         }
@@ -176,6 +176,10 @@ public class DelayMatcher<T> implements Matcher<T> {
 
         private ValueMatcher(V value) {
             this.value = value;
+        }
+
+        public static <V> ValueMatcher<V> value(V value) {
+            return new ValueMatcher<>(value);
         }
 
         @Override
@@ -193,10 +197,6 @@ public class DelayMatcher<T> implements Matcher<T> {
 
         public V getValue() {
             return value;
-        }
-
-        public static <V> ValueMatcher<V> value(V value) {
-            return new ValueMatcher<>(value);
         }
 
         public void setValue(V value) {

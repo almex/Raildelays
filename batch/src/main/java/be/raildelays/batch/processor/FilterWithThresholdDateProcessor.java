@@ -51,28 +51,12 @@ public class FilterWithThresholdDateProcessor implements ItemProcessor<ExcelRow,
         Assert.notNull(thresholdDate, "The 'thresholdDate' property must be provided");
     }
 
-    public enum Mode {
-        BEFORE {
-            @Override
-            boolean filter(LocalDate itemDate, LocalDate thresholdDate) {
-                return itemDate.isAfter(thresholdDate) || itemDate.isEqual(thresholdDate);
-            }
-        }, AFTER_OR_EQUALS {
-            @Override
-            boolean filter(LocalDate itemDate, LocalDate thresholdDate) {
-                return itemDate.isBefore(thresholdDate);
-            }
-        };
-
-        abstract boolean filter(LocalDate itemDate, LocalDate thresholdDate);
-    }
-
     @Override
     public ExcelRow process(ExcelRow item) throws Exception {
         ExcelRow result = null; // By default we filter the item
 
         if (item.getDate() != null) {
-            LocalDate itemDate = item.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate itemDate = item.getDate();
 
             if (!mode.filter(itemDate, thresholdDate)) {
                 result = item;
@@ -88,5 +72,21 @@ public class FilterWithThresholdDateProcessor implements ItemProcessor<ExcelRow,
 
     public void setMode(Mode mode) {
         this.mode = mode;
+    }
+
+    public enum Mode {
+        BEFORE {
+            @Override
+            boolean filter(LocalDate itemDate, LocalDate thresholdDate) {
+                return itemDate.isAfter(thresholdDate) || itemDate.isEqual(thresholdDate);
+            }
+        }, AFTER_OR_EQUALS {
+            @Override
+            boolean filter(LocalDate itemDate, LocalDate thresholdDate) {
+                return itemDate.isBefore(thresholdDate);
+            }
+        };
+
+        abstract boolean filter(LocalDate itemDate, LocalDate thresholdDate);
     }
 }

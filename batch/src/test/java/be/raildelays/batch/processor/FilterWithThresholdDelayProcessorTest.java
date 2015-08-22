@@ -6,7 +6,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public class FilterWithThresholdDelayProcessorTest {
 
@@ -22,7 +22,7 @@ public class FilterWithThresholdDelayProcessorTest {
     public void testLessThanFiltered() throws Exception {
         processor.setMode(FilterWithThresholdDelayProcessor.Mode.FILTER_LESS_THAN);
 
-        Assert.assertNull(processor.process(new ExcelRow.Builder(new Date(), Sens.DEPARTURE)
+        Assert.assertNull(processor.process(new ExcelRow.Builder(LocalDate.now(), Sens.DEPARTURE)
                 .delay(59L)
                 .build(false)));
     }
@@ -31,7 +31,7 @@ public class FilterWithThresholdDelayProcessorTest {
     public void testLessThanNotFiltered() throws Exception {
         processor.setMode(FilterWithThresholdDelayProcessor.Mode.FILTER_LESS_THAN);
 
-        Assert.assertNotNull(processor.process(new ExcelRow.Builder(new Date(), Sens.DEPARTURE)
+        Assert.assertNotNull(processor.process(new ExcelRow.Builder(LocalDate.now(), Sens.DEPARTURE)
                 .delay(60L)
                 .build(false)));
     }
@@ -40,7 +40,7 @@ public class FilterWithThresholdDelayProcessorTest {
     public void testGreaterThanFiltered() throws Exception {
         processor.setMode(FilterWithThresholdDelayProcessor.Mode.FILTER_GREATER_OR_EQUAL_TO);
 
-        Assert.assertNull(processor.process(new ExcelRow.Builder(new Date(), Sens.DEPARTURE)
+        Assert.assertNull(processor.process(new ExcelRow.Builder(LocalDate.now(), Sens.DEPARTURE)
                 .delay(60L)
                 .build(false)));
     }
@@ -49,7 +49,7 @@ public class FilterWithThresholdDelayProcessorTest {
     public void testGreaterThanNotFiltered() throws Exception {
         processor.setMode(FilterWithThresholdDelayProcessor.Mode.FILTER_GREATER_OR_EQUAL_TO);
 
-        Assert.assertNotNull(processor.process(new ExcelRow.Builder(new Date(), Sens.DEPARTURE)
+        Assert.assertNotNull(processor.process(new ExcelRow.Builder(LocalDate.now(), Sens.DEPARTURE)
                 .delay(59L)
                 .build(false)));
     }

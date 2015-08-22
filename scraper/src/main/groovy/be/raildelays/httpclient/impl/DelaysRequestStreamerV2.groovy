@@ -27,7 +27,7 @@ package be.raildelays.httpclient.impl
 import be.raildelays.httpclient.DefaultStream
 import be.raildelays.httpclient.Stream
 
-import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
 
 /**
  * Request a direction for a train to retrieve delays.
@@ -39,10 +39,8 @@ class DelaysRequestStreamerV2 extends SncbRequestStreamer<DelaysRequestV2> {
 
     @Override
     Stream<DelaysRequestV2> stream(DelaysRequestV2 request) {
-        final SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yy");
-
         return new DefaultStream<DelaysRequestV2>(httpGet('/bin/trainsearch.exe/' + request.language.sncbParameter
-                , [trainname: request.trainId, date : formatter.format(request.day), getTrainFromArchive: 'yes'])
+                , [trainname: request.trainId, date: request.day.format(DateTimeFormatter.ofPattern("dd.MM.yy")), getTrainFromArchive: 'yes'])
                 , request);
     }
 }

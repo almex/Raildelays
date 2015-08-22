@@ -48,7 +48,10 @@ import org.springframework.batch.item.file.RowMappingException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
 
@@ -204,45 +207,37 @@ public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
     }
 
     private void setStringFormat(Row row, int cellIndex, String message) {
-        setFormat(row, cellIndex, message, new CellFormatter<String>() {
-
-            @Override
-            public void setFormat(Cell cell, String message) {
-                switch (cell.getCellType()) {
-                    case Cell.CELL_TYPE_BLANK:
-                    case Cell.CELL_TYPE_STRING:
-                    default:
-                        cell.setCellValue(message);
-                }
+        setFormat(row, cellIndex, message, (cell, message1) -> {
+            switch (cell.getCellType()) {
+                case Cell.CELL_TYPE_BLANK:
+                case Cell.CELL_TYPE_STRING:
+                default:
+                    cell.setCellValue(message1);
             }
         });
     }
 
-    private void setDateFormat(Row row, int cellIndex, Date time) {
-        setFormat(row, cellIndex, time, new CellFormatter<Date>() {
-
-            @Override
-            public void setFormat(Cell cell, Date date) {
-                switch (cell.getCellType()) {
-                    case Cell.CELL_TYPE_BLANK:
-                    case Cell.CELL_TYPE_NUMERIC:
-                        cell.setCellValue(date);
-                        break;
-                    case Cell.CELL_TYPE_STRING:
-                    default:
-                        cell.setCellValue(new SimpleDateFormat().format(date));
-                }
+    private void setDateFormat(Row row, int cellIndex, LocalDate date) {
+        setFormat(row, cellIndex, date, (cell, date1) -> {
+            switch (cell.getCellType()) {
+                case Cell.CELL_TYPE_BLANK:
+                case Cell.CELL_TYPE_NUMERIC:
+                    cell.setCellValue(Date.from(date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+                    break;
+                case Cell.CELL_TYPE_STRING:
+                default:
+                    cell.setCellValue(date.format(DateTimeFormatter.ISO_DATE));
             }
         });
     }
 
-    private void setTimeFormat(Row row, int cellIndex, Date time, final String format) {
-        setFormat(row, cellIndex, time, new CellFormatter<Date>() {
-            SimpleDateFormat hh = new SimpleDateFormat(format);
+    private void setTimeFormat(Row row, int cellIndex, LocalTime time, final String format) {
+        setFormat(row, cellIndex, time, new CellFormatter<LocalTime>() {
+            DateTimeFormatter hh = DateTimeFormatter.ofPattern(format);
             NumberFormat numberFormat = new DecimalFormat("##");
 
             @Override
-            public void setFormat(Cell cell, Date time) {
+            public void setFormat(Cell cell, LocalTime time) {
                 try {
                     switch (cell.getCellType()) {
                         case Cell.CELL_TYPE_NUMERIC:
@@ -260,11 +255,11 @@ public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
         });
     }
 
-    private void setHHFormat(Row row, int cellIndex, Date time) {
+    private void setHHFormat(Row row, int cellIndex, LocalTime time) {
         setTimeFormat(row, cellIndex, time, "HH");
     }
 
-    private void setMMFormat(Row row, int cellIndex, Date time) {
+    private void setMMFormat(Row row, int cellIndex, LocalTime time) {
         setTimeFormat(row, cellIndex, time, "mm");
     }
 

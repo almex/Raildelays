@@ -24,11 +24,10 @@
 
 package be.raildelays.parser.impl
 
-import be.raildelays.delays.TimestampDelay
+import be.raildelays.delays.TimeDelay
 import be.raildelays.domain.Language
 import be.raildelays.domain.entities.LineStop
 import be.raildelays.domain.entities.Station
-
 import be.raildelays.domain.entities.Train
 import be.raildelays.httpclient.Stream
 import be.raildelays.httpclient.impl.DelaysRequestV2
@@ -38,7 +37,7 @@ import groovy.json.JsonSlurper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-import java.text.SimpleDateFormat
+import java.time.LocalTime
 
 /**
  * Stream parser for data coming from HAFAS interface of SNCB/NMBS.
@@ -98,23 +97,21 @@ class DelaysStreamParserV2 implements StreamParser<LineStop, DelaysRequestV2> {
         return result;
     }
 
-    private static TimestampDelay getDepartureTime(Map object) {
-        final SimpleDateFormat parser = new SimpleDateFormat("HH:mm");
-        TimestampDelay result = null;
+    private static TimeDelay getDepartureTime(Map object) {
+        TimeDelay result = null;
 
         if (object.csDt != null) {
-            result = TimestampDelay.of(parser.parse(object.csDt), object.dD != null ? object.dD : 0);
+            result = TimeDelay.of(LocalTime.parse(object.csDt), object.dD != null ? object.dD : 0);
         }
 
         return result;
     }
 
-    private static TimestampDelay getArrivalTime(Map object) {
-        final SimpleDateFormat parser = new SimpleDateFormat("HH:mm");
-        TimestampDelay result = null;
+    private static TimeDelay getArrivalTime(Map object) {
+        TimeDelay result = null;
 
         if (object.csAt != null) {
-            result = TimestampDelay.of(parser.parse(object.csAt), object.dA != null ? object.dA : 0);
+            result = TimeDelay.of(LocalTime.parse(object.csAt), object.dA != null ? object.dA : 0);
         }
 
         return result;

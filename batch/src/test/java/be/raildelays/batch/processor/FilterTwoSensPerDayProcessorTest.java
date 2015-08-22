@@ -19,15 +19,14 @@ import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.core.io.Resource;
 
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 @RunWith(value = BlockJUnit4ClassRunner.class)
 public class FilterTwoSensPerDayProcessorTest {
-    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
-    private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
     private List<BatchExcelRow> list;
     /**
      * S.U.T.
@@ -74,67 +73,67 @@ public class FilterTwoSensPerDayProcessorTest {
 
         list = new ArrayList<>();
 
-        list.add(new Builder(DATE_FORMAT.parse("01/01/2000"), Sens.DEPARTURE) //
+        list.add(new Builder(LocalDate.parse("2000-01-01"), Sens.DEPARTURE) //
                 .departureStation(stationA) //
                 .arrivalStation(stationB) //
                 .expectedTrain1(new Train("466")) //
-                .expectedArrivalTime(TIME_FORMAT.parse("07:00")) //
-                .expectedDepartureTime(TIME_FORMAT.parse("07:05")) //
+                .expectedArrivalTime(LocalTime.parse("07:00")) //
+                .expectedDepartureTime(LocalTime.parse("07:05")) //
                 .effectiveTrain1(new Train("466")) //
-                .effectiveDepartureTime(TIME_FORMAT.parse("07:03")) //
-                .effectiveArrivalTime(TIME_FORMAT.parse("07:10")) //
+                .effectiveDepartureTime(LocalTime.parse("07:03")) //
+                .effectiveArrivalTime(LocalTime.parse("07:10")) //
                 .delay(5L) //
                 .index(0L) //
                 .build());
 
-        list.add(new Builder(DATE_FORMAT.parse("01/01/2000"), Sens.ARRIVAL) //
+        list.add(new Builder(LocalDate.parse("2000-01-01"), Sens.ARRIVAL) //
                 .departureStation(stationB) //
                 .arrivalStation(stationA) //
                 .expectedTrain1(new Train("467")) //
-                .expectedArrivalTime(TIME_FORMAT.parse("15:00")) //
-                .expectedDepartureTime(TIME_FORMAT.parse("15:05")) //
+                .expectedArrivalTime(LocalTime.parse("15:00")) //
+                .expectedDepartureTime(LocalTime.parse("15:05")) //
                 .effectiveTrain1(new Train("466")) //
-                .effectiveDepartureTime(TIME_FORMAT.parse("15:03")) //
-                .effectiveArrivalTime(TIME_FORMAT.parse("15:10")) //
+                .effectiveDepartureTime(LocalTime.parse("15:03")) //
+                .effectiveArrivalTime(LocalTime.parse("15:10")) //
                 .delay(5L) //
                 .index(1L) //
                 .build());
 
-        list.add(new Builder(DATE_FORMAT.parse("02/01/2000"), Sens.DEPARTURE) //
+        list.add(new Builder(LocalDate.parse("2000-01-02"), Sens.DEPARTURE) //
                 .departureStation(stationA) //
                 .arrivalStation(stationB) //
                 .expectedTrain1(new Train("530")) //
-                .expectedArrivalTime(TIME_FORMAT.parse("08:00")) //
-                .expectedDepartureTime(TIME_FORMAT.parse("08:05")) //
+                .expectedArrivalTime(LocalTime.parse("08:00")) //
+                .expectedDepartureTime(LocalTime.parse("08:05")) //
                 .effectiveTrain1(new Train("466")) //
-                .effectiveDepartureTime(TIME_FORMAT.parse("08:03")) //
-                .effectiveArrivalTime(TIME_FORMAT.parse("08:15")) //
+                .effectiveDepartureTime(LocalTime.parse("08:03")) //
+                .effectiveArrivalTime(LocalTime.parse("08:15")) //
                 .delay(10L) //
                 .index(2L) //
                 .build());
 
-        list.add(new Builder(DATE_FORMAT.parse("02/01/2000"), Sens.ARRIVAL) //
+        list.add(new Builder(LocalDate.parse("2000-01-02"), Sens.ARRIVAL) //
                 .departureStation(stationB) //
                 .arrivalStation(stationA) //
                 .expectedTrain1(new Train("477")) //
-                .expectedArrivalTime(TIME_FORMAT.parse("16:00")) //
-                .expectedDepartureTime(TIME_FORMAT.parse("16:05")) //
+                .expectedArrivalTime(LocalTime.parse("16:00")) //
+                .expectedDepartureTime(LocalTime.parse("16:05")) //
                 .effectiveTrain1(new Train("466")) //
-                .effectiveDepartureTime(TIME_FORMAT.parse("16:03")) //
-                .effectiveArrivalTime(TIME_FORMAT.parse("16:10")) //
+                .effectiveDepartureTime(LocalTime.parse("16:03")) //
+                .effectiveArrivalTime(LocalTime.parse("16:10")) //
                 .delay(5L) //
                 .index(3L) //
                 .build());
 
-        list.add(new Builder(DATE_FORMAT.parse("03/01/2000"), Sens.DEPARTURE) //
+        list.add(new Builder(LocalDate.parse("2000-01-03"), Sens.DEPARTURE) //
                 .departureStation(stationA) //
                 .arrivalStation(stationB) //
                 .expectedTrain1(new Train("531")) //
-                .expectedArrivalTime(TIME_FORMAT.parse("12:00")) //
-                .expectedDepartureTime(TIME_FORMAT.parse("12:05")) //
+                .expectedArrivalTime(LocalTime.parse("12:00")) //
+                .expectedDepartureTime(LocalTime.parse("12:05")) //
                 .effectiveTrain1(new Train("466")) //
-                .effectiveDepartureTime(TIME_FORMAT.parse("12:03")) //
-                .effectiveArrivalTime(TIME_FORMAT.parse("12:20")) //
+                .effectiveDepartureTime(LocalTime.parse("12:03")) //
+                .effectiveArrivalTime(LocalTime.parse("12:20")) //
                 .delay(15L) //
                 .index(4L) //
                 .build());
@@ -151,15 +150,15 @@ public class FilterTwoSensPerDayProcessorTest {
 
     @Test
     public void testProcessReturnNew() throws Exception {
-        BatchExcelRow excelRow = processor.process(new Builder(DATE_FORMAT.parse("05/01/2000"), Sens.ARRIVAL) //
+        BatchExcelRow excelRow = processor.process(new Builder(LocalDate.parse("2000-01-05"), Sens.ARRIVAL) //
                 .departureStation(stationB) //
                 .arrivalStation(stationA) //
                 .expectedTrain1(new Train("578")) //
-                .expectedArrivalTime(TIME_FORMAT.parse("22:00")) //
-                .expectedDepartureTime(TIME_FORMAT.parse("22:05")) //
+                .expectedArrivalTime(LocalTime.parse("22:00")) //
+                .expectedDepartureTime(LocalTime.parse("22:05")) //
                 .effectiveTrain1(new Train("578")) //
-                .effectiveDepartureTime(TIME_FORMAT.parse("16:03")) //
-                .effectiveArrivalTime(TIME_FORMAT.parse("16:10")) //
+                .effectiveDepartureTime(LocalTime.parse("16:03")) //
+                .effectiveArrivalTime(LocalTime.parse("16:10")) //
                 .delay(5L) //
                 .build());
 
@@ -169,15 +168,15 @@ public class FilterTwoSensPerDayProcessorTest {
 
     @Test
     public void testProcessReachEof() throws Exception {
-        BatchExcelRow expected = new Builder(DATE_FORMAT.parse("02/01/2000"), Sens.ARRIVAL) //
+        BatchExcelRow expected = new Builder(LocalDate.parse("2000-01-02"), Sens.ARRIVAL) //
                 .departureStation(stationB) //
                 .arrivalStation(stationA) //
                 .expectedTrain1(new Train("578")) //
-                .expectedArrivalTime(TIME_FORMAT.parse("17:00")) //
-                .expectedDepartureTime(TIME_FORMAT.parse("17:05")) //
+                .expectedArrivalTime(LocalTime.parse("17:00")) //
+                .expectedDepartureTime(LocalTime.parse("17:05")) //
                 .effectiveTrain1(new Train("578")) //
-                .effectiveDepartureTime(TIME_FORMAT.parse("16:03")) //
-                .effectiveArrivalTime(TIME_FORMAT.parse("16:10")) //
+                .effectiveDepartureTime(LocalTime.parse("16:03")) //
+                .effectiveArrivalTime(LocalTime.parse("16:10")) //
                 .delay(25L) //
                 .build();
         BatchExcelRow excelRow = processor.process(expected);
@@ -187,15 +186,15 @@ public class FilterTwoSensPerDayProcessorTest {
 
     @Test
     public void testProcessReturnReplace() throws Exception {
-        BatchExcelRow excelRow = processor.process(new Builder(DATE_FORMAT.parse("02/01/2000"), Sens.ARRIVAL) //
+        BatchExcelRow excelRow = processor.process(new Builder(LocalDate.parse("2000-01-02"), Sens.ARRIVAL) //
                 .departureStation(stationB) //
                 .arrivalStation(stationA) //
                 .expectedTrain1(new Train("578")) //
-                .expectedArrivalTime(TIME_FORMAT.parse("17:00")) //
-                .expectedDepartureTime(TIME_FORMAT.parse("17:05")) //
+                .expectedArrivalTime(LocalTime.parse("17:00")) //
+                .expectedDepartureTime(LocalTime.parse("17:05")) //
                 .effectiveTrain1(new Train("578")) //
-                .effectiveDepartureTime(TIME_FORMAT.parse("16:03")) //
-                .effectiveArrivalTime(TIME_FORMAT.parse("16:10")) //
+                .effectiveDepartureTime(LocalTime.parse("16:03")) //
+                .effectiveArrivalTime(LocalTime.parse("16:10")) //
                 .delay(25L) //
                 .build());
 
@@ -205,15 +204,15 @@ public class FilterTwoSensPerDayProcessorTest {
 
     @Test
     public void testProcessReturnSkip() throws Exception {
-        BatchExcelRow excelRow = processor.process(new Builder(DATE_FORMAT.parse("02/01/2000"), Sens.ARRIVAL) //
+        BatchExcelRow excelRow = processor.process(new Builder(LocalDate.parse("2000-01-02"), Sens.ARRIVAL) //
                 .departureStation(stationB) //
                 .arrivalStation(stationA) //
                 .expectedTrain1(new Train("578")) //
-                .expectedArrivalTime(TIME_FORMAT.parse("16:00")) //
-                .expectedDepartureTime(TIME_FORMAT.parse("16:05")) //
+                .expectedArrivalTime(LocalTime.parse("16:00")) //
+                .expectedDepartureTime(LocalTime.parse("16:05")) //
                 .effectiveTrain1(new Train("466")) //
-                .effectiveDepartureTime(TIME_FORMAT.parse("16:03")) //
-                .effectiveArrivalTime(TIME_FORMAT.parse("16:10")) //
+                .effectiveDepartureTime(LocalTime.parse("16:03")) //
+                .effectiveArrivalTime(LocalTime.parse("16:10")) //
                 .delay(0L) //
                 .build());
 

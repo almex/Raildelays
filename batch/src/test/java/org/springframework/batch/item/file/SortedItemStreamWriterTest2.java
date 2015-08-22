@@ -23,8 +23,8 @@ import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,8 +45,6 @@ public class SortedItemStreamWriterTest2 extends AbstractFileTest {
     public void setUp() throws Exception {
         SortedItemStreamWriter<BatchExcelRow> delegate = new SortedItemStreamWriter<>();
         ExcelSheetItemReader<BatchExcelRow> reader = new ExcelSheetItemReader<>();
-        DateFormat timeFormat = new SimpleDateFormat("HH:mm");
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         FileSystemResource resource = new FileSystemResource(CURRENT_PATH + "retard_sncb.xls");
         ExcelSheetItemWriter<BatchExcelRow> writer = new ExcelSheetItemWriter<>();
         SimpleResourceItemSearch resourceItemSearch = new SimpleResourceItemSearch();
@@ -91,36 +89,36 @@ public class SortedItemStreamWriterTest2 extends AbstractFileTest {
 
         items = new ArrayList<>();
 
-        BatchExcelRow from = new BatchExcelRow.Builder(dateFormat.parse("27/05/2014"), Sens.DEPARTURE) //
+        BatchExcelRow from = new BatchExcelRow.Builder(LocalDate.parse("2014-05-27"), Sens.DEPARTURE) //
                 .departureStation(new Station("Liège-Guillemins")) //
                 .arrivalStation(new Station("Bruxelles-central")) //
-                .expectedDepartureTime(timeFormat.parse("08:00")) //
-                .expectedArrivalTime(timeFormat.parse("09:00")) //
+                .expectedDepartureTime(LocalTime.parse("08:00")) //
+                .expectedArrivalTime(LocalTime.parse("09:00")) //
                 .expectedTrain1(new Train("466")) //
-                .effectiveDepartureTime(timeFormat.parse("08:05")) //
-                .effectiveArrivalTime(timeFormat.parse("09:15")) //
+                .effectiveDepartureTime(LocalTime.parse("08:05")) //
+                .effectiveArrivalTime(LocalTime.parse("09:15")) //
                 .effectiveTrain1(new Train("466")) //
                 .delay(15L) //
                 .build();
-        BatchExcelRow to = new BatchExcelRow.Builder(dateFormat.parse("23/05/2014"), Sens.ARRIVAL) //
+        BatchExcelRow to = new BatchExcelRow.Builder(LocalDate.parse("2014-05-23"), Sens.ARRIVAL) //
                 .departureStation(new Station("Bruxelles-central")) //
                 .arrivalStation(new Station("Liège-Guillemins")) //
-                .expectedDepartureTime(timeFormat.parse("14:00")) //
-                .expectedArrivalTime(timeFormat.parse("15:00")) //
+                .expectedDepartureTime(LocalTime.parse("14:00")) //
+                .expectedArrivalTime(LocalTime.parse("15:00")) //
                 .expectedTrain1(new Train("529")) //
-                .effectiveDepartureTime(timeFormat.parse("14:05")) //
-                .effectiveArrivalTime(timeFormat.parse("15:15")) //
+                .effectiveDepartureTime(LocalTime.parse("14:05")) //
+                .effectiveArrivalTime(LocalTime.parse("15:15")) //
                 .effectiveTrain1(new Train("529")) //
                 .delay(15L) //
                 .build();
-        BatchExcelRow replace = new BatchExcelRow.Builder(dateFormat.parse("22/05/2014"), Sens.DEPARTURE) //
+        BatchExcelRow replace = new BatchExcelRow.Builder(LocalDate.parse("2014-05-22"), Sens.DEPARTURE) //
                 .departureStation(new Station("Liège-Guillemins")) //
                 .arrivalStation(new Station("Bruxelles-central")) //
-                .expectedDepartureTime(timeFormat.parse("14:00")) //
-                .expectedArrivalTime(timeFormat.parse("15:00")) //
+                .expectedDepartureTime(LocalTime.parse("14:00")) //
+                .expectedArrivalTime(LocalTime.parse("15:00")) //
                 .expectedTrain1(new Train("516")) //
-                .effectiveDepartureTime(timeFormat.parse("14:05")) //
-                .effectiveArrivalTime(timeFormat.parse("15:25")) //
+                .effectiveDepartureTime(LocalTime.parse("14:05")) //
+                .effectiveArrivalTime(LocalTime.parse("15:25")) //
                 .effectiveTrain1(new Train("516")) //
                 .delay(25L) //
                 .index(1L) //

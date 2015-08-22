@@ -17,16 +17,14 @@ import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.core.io.FileSystemResource;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import java.util.Date;
 
 @RunWith(BlockJUnit4ClassRunner.class)
 public class ExcelFileToRenameOrDeleteDeciderTest extends AbstractFileTest {
 
-    private ExcelFileToRenameOrDeleteDecider decider;
     private static final LocalDate NOW = LocalDate.now();
+    private ExcelFileToRenameOrDeleteDecider decider;
     private JobExecution jobExecution;
     private StepExecution stepExecution;
 
@@ -43,19 +41,14 @@ public class ExcelFileToRenameOrDeleteDeciderTest extends AbstractFileTest {
     @Test
     public void testRename() throws Exception {
         decider.setReader(new ItemStreamItemReaderDelegator<>(new IteratorItemReader<>(Arrays.asList(
-                new ExcelRow.Builder(Date.from(NOW
-                        .minus(1, ChronoUnit.MONTHS)
-                        .atStartOfDay(ZoneId.systemDefault())
-                        .toInstant() // 1 month before Now
-                ), Sens.ARRIVAL)
+                new ExcelRow.Builder(NOW.minus(1, ChronoUnit.MONTHS) // 1 month before Now
+                        , Sens.ARRIVAL)
                         .build(false),
                 new ExcelRow.Builder(null, null) // To test null value
                         .build(false),
-                new ExcelRow.Builder(Date.from(NOW
-                        .plus(1, ChronoUnit.MONTHS)
-                        .atStartOfDay(ZoneId.systemDefault())
-                        .toInstant() // 1 month after Now
-                ), Sens.ARRIVAL)
+                new ExcelRow.Builder(NOW
+                        .plus(1, ChronoUnit.MONTHS) // 1 month after Now
+                        , Sens.ARRIVAL)
                         .build(false)
         ))));
 
@@ -69,17 +62,13 @@ public class ExcelFileToRenameOrDeleteDeciderTest extends AbstractFileTest {
         decider.setReader(new ItemStreamItemReaderDelegator<>(new IteratorItemReader<>(Arrays.asList(
                 new ExcelRow.Builder(null, null) // To test null value
                         .build(false),
-                new ExcelRow.Builder(Date.from(NOW
-                        .minus(1, ChronoUnit.MONTHS)
-                        .atStartOfDay(ZoneId.systemDefault())
-                        .toInstant() // 1 month before Now
-                ), Sens.ARRIVAL)
+                new ExcelRow.Builder(NOW
+                        .minus(1, ChronoUnit.MONTHS) // 1 month before Now
+                        , Sens.ARRIVAL)
                         .build(false),
-                new ExcelRow.Builder(Date.from(NOW
-                        .plus(1, ChronoUnit.MONTHS)
-                        .atStartOfDay(ZoneId.systemDefault())
-                        .toInstant() // 1 month after Now
-                ), Sens.ARRIVAL)
+                new ExcelRow.Builder(NOW
+                        .plus(1, ChronoUnit.MONTHS) // 1 month after Now
+                        , Sens.ARRIVAL)
                         .build(false)
         ))));
 

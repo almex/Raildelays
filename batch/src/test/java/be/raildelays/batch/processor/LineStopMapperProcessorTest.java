@@ -14,12 +14,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Date;
 
 public class LineStopMapperProcessorTest {
 
-    private static final Date TODAY = new Date();
+    private static final LocalDate TODAY = LocalDate.now();
     private static final String LANGUAGE = Language.EN.name();
     private static final String DUMMY = "dummy";
     private static final String DEPARTURE_STATION = "departure";
@@ -55,17 +56,17 @@ public class LineStopMapperProcessorTest {
         departure.setFrom(new be.raildelays.domain.railtime.Station(DEPARTURE_STATION));
         departure.setTo(new be.raildelays.domain.railtime.Station(ARRIVAL_STATION));
         departure.getSteps().addAll(Arrays.asList(
-                new Step(0, DEPARTURE_STATION, new Date(), 0L, false),
-                new Step(1, INTERMEDIATE_STATION, new Date(), 0L, false),
-                new Step(2, ARRIVAL_STATION, new Date(), 0L, false)
+                new Step(0, DEPARTURE_STATION, LocalDateTime.now(), 0L, false),
+                new Step(1, INTERMEDIATE_STATION, LocalDateTime.now(), 0L, false),
+                new Step(2, ARRIVAL_STATION, LocalDateTime.now(), 0L, false)
         ));
 
         arrival.setFrom(new be.raildelays.domain.railtime.Station(DEPARTURE_STATION));
         arrival.setTo(new be.raildelays.domain.railtime.Station(ARRIVAL_STATION));
         arrival.getSteps().addAll(Arrays.asList(
-                new Step(0, DEPARTURE_STATION, new Date(), 0L, false),
-                new Step(1, INTERMEDIATE_STATION, new Date(), 0L, false),
-                new Step(2, ARRIVAL_STATION, new Date(), 0L, false)
+                new Step(0, DEPARTURE_STATION, LocalDateTime.now(), 0L, false),
+                new Step(1, INTERMEDIATE_STATION, LocalDateTime.now(), 0L, false),
+                new Step(2, ARRIVAL_STATION, LocalDateTime.now(), 0L, false)
         ));
 
         input = new TwoDirections(departure, arrival);

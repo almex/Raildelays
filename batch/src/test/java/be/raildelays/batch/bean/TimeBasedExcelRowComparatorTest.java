@@ -6,24 +6,27 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 import static org.hamcrest.Matchers.lessThan;
 
 @RunWith(BlockJUnit4ClassRunner.class)
 public class TimeBasedExcelRowComparatorTest extends AbstractExcelRowComparatorTest {
 
-    private Date now;
+    private LocalTime now;
+    private LocalDate today;
 
     @Override
     public void setUp() {
         comparator = new TimeBasedExcelRowComparator();
-        now = new Date();
+        now = LocalTime.now();
+        today = LocalDate.now();
     }
 
     @Test
     public final void testCompareNullDate() throws Exception {
-        Assert.assertThat(comparator.compare(new ExcelRow.Builder(now, null)
+        Assert.assertThat(comparator.compare(new ExcelRow.Builder(today, null)
                                 .build(false),
                         new BatchExcelRow.Builder(null, null)
                                 .build(false)),
@@ -32,21 +35,21 @@ public class TimeBasedExcelRowComparatorTest extends AbstractExcelRowComparatorT
 
     @Test
     public void testCompareNullExpectedDepartureTime() throws Exception {
-        Assert.assertThat(comparator.compare(new ExcelRow.Builder(now, null)
-                                .expectedDepartureTime(new Date())
+        Assert.assertThat(comparator.compare(new ExcelRow.Builder(today, null)
+                                .expectedDepartureTime(LocalTime.now())
                                 .build(false),
-                        new BatchExcelRow.Builder(now, null)
+                        new BatchExcelRow.Builder(today, null)
                                 .build(false)),
                 lessThan(0));
     }
 
     @Test
     public void testCompareNullExpecteArrivalTime() throws Exception {
-        Assert.assertThat(comparator.compare(new ExcelRow.Builder(now, null)
+        Assert.assertThat(comparator.compare(new ExcelRow.Builder(today, null)
                                 .expectedDepartureTime(now)
                                 .expectedArrivalTime(now)
                                 .build(false),
-                        new BatchExcelRow.Builder(now, null)
+                        new BatchExcelRow.Builder(today, null)
                                 .expectedDepartureTime(now)
                                 .build(false)),
                 lessThan(0));

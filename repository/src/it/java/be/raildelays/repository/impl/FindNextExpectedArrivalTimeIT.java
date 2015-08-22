@@ -12,8 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @DataSet(value = "classpath:FindNextExpectedArrivalTimeIT.xml",
@@ -28,7 +27,7 @@ public class FindNextExpectedArrivalTimeIT extends AbstractIT {
     @Test
     public void testFindNextExpectedArrivalTime() throws ParseException {
         Station station = new Station("Bruxelles-Central");
-        Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2000-01-01 16:27:00");
+        LocalDateTime date = LocalDateTime.parse("2000-01-01T16:27:00");
 
         LOGGER.info("size={}", lineStopDao.findAll().size());
         for (LineStop lineStop : lineStopDao.findAll()) {

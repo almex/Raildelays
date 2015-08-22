@@ -22,57 +22,42 @@
  * IN THE SOFTWARE.
  */
 
-package be.raildelays.httpclient.impl
+package be.raildelays.jpa;
 
-import be.raildelays.domain.Language
-import be.raildelays.domain.Sens
-import be.raildelays.httpclient.AbstractRequest
-
-import java.time.LocalDate
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
+import java.sql.Date;
+import java.time.LocalDate;
 
 /**
+ * {@link AttributeConverter} dedicated to deal conversion between {@link LocalDate} and {@link Date}.
+ * This converter is part of JDK 8/JPA 2.1 compatibility workaround in the waiting of a new version JPA.
+ *
  * @author Almex
- * @since 1.2
+ * @since 2.0
  */
-public class DelaysRequest extends AbstractRequest {
+@Converter(autoApply = true)
+public class LocalDateAttributeConverter implements AttributeConverter<LocalDate, Date> {
 
-    public DelaysRequest(String trainId, LocalDate day, Sens sens, Language language) {
-        setTrainId(trainId)
-        setDay(day)
-        setSens(sens)
-        setLanguage(language)
+    @Override
+    public Date convertToDatabaseColumn(LocalDate entityValue) {
+        Date result = null;
+
+        if (entityValue != null) {
+            result = Date.valueOf(entityValue);
+        }
+
+        return result;
     }
 
-    public String getTrainId() {
-        return getValue("trainId");
-    }
+    @Override
+    public LocalDate convertToEntityAttribute(Date databaseValue) {
+        LocalDate result = null;
 
-    private void setTrainId(String trainId) {
-        setValue(trainId, "trainId", String.class);
-    }
+        if (databaseValue != null) {
+            result = databaseValue.toLocalDate();
+        }
 
-    public LocalDate getDay() {
-        return getValue("day");
+        return result;
     }
-
-    private void setDay(LocalDate day) {
-        setValue(day, "day", Date.class);
-    }
-
-    public Sens getSens() {
-        return getValue("sens");
-    }
-
-    private void setSens(Sens sens) {
-        setValue(sens, "sens", String.class);
-    }
-
-    public Language getLanguage() {
-        return getValue("language");
-    }
-
-    private void setLanguage(Language language) {
-        setValue(language, "language", Language.class);
-    }
-
 }

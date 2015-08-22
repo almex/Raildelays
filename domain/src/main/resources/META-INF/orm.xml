@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <entity-mappings
-        xmlns="http://java.sun.com/xml/ns/persistence/orm"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://java.sun.com/xml/ns/persistence/orm"
         xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd"
         version="2.0">
 
     <description>Expose Value Object from Raildelays API as an entity</description>
     <package>be.raildelays.delays</package>
-    <embeddable class="TimestampDelay">
+    <embeddable class="TimeDelay">
         <attributes>
-            <basic name="expectedTime">
-                <temporal>TIME</temporal>
-            </basic>
+            <basic name="expectedTime"/>
             <basic name="delay" />
         </attributes>
     </embeddable>

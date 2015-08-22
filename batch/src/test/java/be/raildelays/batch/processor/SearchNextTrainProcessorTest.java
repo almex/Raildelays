@@ -1,7 +1,7 @@
 package be.raildelays.batch.processor;
 
 import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.delays.TimestampDelay;
+import be.raildelays.delays.TimeDelay;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
@@ -15,16 +15,16 @@ import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 @RunWith(value = BlockJUnit4ClassRunner.class)
 public class SearchNextTrainProcessorTest {
 
-    private static final SimpleDateFormat F = new SimpleDateFormat("HH:mm");
-    private static final Date TODAY = new Date();
+    private static final LocalDate TODAY = LocalDate.now();
     private static final Station DEPARTURE_STATION = new Station(
             "Liège-Guillemins");
     private static final Station ARRIVAL_STATION = new Station(
@@ -58,37 +58,41 @@ public class SearchNextTrainProcessorTest {
                 .departureStation(DEPARTURE_STATION) //
                 .arrivalStation(ARRIVAL_STATION) //
                 .expectedTrain1(new Train("y")) //
-                .expectedDepartureTime(F.parse("16:30")) //
-                .expectedArrivalTime(F.parse("17:00")) //
+                .expectedDepartureTime(LocalTime.parse("16:30")) //
+                .expectedArrivalTime(LocalTime.parse("17:00")) //
                 .effectiveTrain1(new Train("y")) //
-                .effectiveDepartureTime(F.parse("16:30")) //
-                .effectiveArrivalTime(F.parse("17:00")) //
+                .effectiveDepartureTime(LocalTime.parse("16:30")) //
+                .effectiveArrivalTime(LocalTime.parse("17:00")) //
                 .canceled(false) //
                 .delay(0L) //
                 .build();
 
         stop0 = new LineStop.Builder().date(TODAY)
                 .train(new Train("0")).station(ARRIVAL_STATION)
-                .arrivalTime(TimestampDelay.of(F.parse("18:00"), 0L))
-                .departureTime(TimestampDelay.of(F.parse("18:00"), 0L))
-                .canceled(false)
+                .arrivalTime(TimeDelay.of(LocalTime.parse("18:00"), 0L))
+                .departureTime(TimeDelay.of(LocalTime.parse("18:00"), 0L))
+                .canceledArrival(false)
+                .canceledDeparture(false)
                 .addPrevious(new LineStop.Builder().date(TODAY)
                         .train(new Train("0")).station(DEPARTURE_STATION)
-                        .arrivalTime(TimestampDelay.of(F.parse("17:30"), 0L))
-                        .departureTime(TimestampDelay.of(F.parse("17:30"), 0L))
-                        .canceled(false))
+                        .arrivalTime(TimeDelay.of(LocalTime.parse("17:30"), 0L))
+                        .departureTime(TimeDelay.of(LocalTime.parse("17:30"), 0L))
+                        .canceledArrival(false)
+                        .canceledDeparture(false))
                 .build();
 
         stop1 = new LineStop.Builder().date(TODAY)
                 .train(new Train("1")).station(ARRIVAL_STATION)
-                .arrivalTime(TimestampDelay.of(F.parse("18:30"), 0L))
-                .departureTime(TimestampDelay.of(F.parse("18:30"), 0L))
-                .canceled(false)
+                .arrivalTime(TimeDelay.of(LocalTime.parse("18:30"), 0L))
+                .departureTime(TimeDelay.of(LocalTime.parse("18:30"), 0L))
+                .canceledArrival(false)
+                .canceledDeparture(false)
                 .addPrevious(new LineStop.Builder().date(TODAY)
                         .train(new Train("1")).station(DEPARTURE_STATION)
-                        .arrivalTime(TimestampDelay.of(F.parse("17:00"), 0L))
-                        .departureTime(TimestampDelay.of(F.parse("17:00"), 0L))
-                        .canceled(false))
+                        .arrivalTime(TimeDelay.of(LocalTime.parse("17:00"), 0L))
+                        .departureTime(TimeDelay.of(LocalTime.parse("17:00"), 0L))
+                        .canceledArrival(false)
+                        .canceledDeparture(false))
                 .build();
 
 		/*
@@ -114,8 +118,8 @@ public class SearchNextTrainProcessorTest {
     @Test
     public void testTrainIsCanceledAndArrivalDelays() throws Exception {
         stop0 = new LineStop.Builder(stop0)
-                .arrivalTime(TimestampDelay.of(F.parse("18:00"), 30L))
-                .departureTime(TimestampDelay.of(F.parse("18:00"), 30L))
+                .arrivalTime(TimeDelay.of(LocalTime.parse("18:00"), 30L * 1000 * 60))
+                .departureTime(TimeDelay.of(LocalTime.parse("18:00"), 30L * 1000 * 60))
                 .build();
 
         nextLineStops = Arrays.asList(new LineStop[]{stop0, stop1});
@@ -125,7 +129,7 @@ public class SearchNextTrainProcessorTest {
         EasyMock.expect(
                 raildelaysServiceMock.searchNextTrain(
                         EasyMock.anyObject(Station.class),
-                        EasyMock.anyObject(Date.class))).andReturn(
+                        EasyMock.anyObject(LocalDateTime.class))).andReturn(
                 nextLineStops);
         EasyMock.replay(raildelaysServiceMock);
 
@@ -150,7 +154,8 @@ public class SearchNextTrainProcessorTest {
     @Test
     public void testTrainIsMultipleCanceling() throws Exception {
         stop0 = new LineStop.Builder(stop0)
-                .canceled(true)
+                .canceledArrival(true)
+                .canceledDeparture(true)
                 .build();
 
         nextLineStops = Arrays.asList(new LineStop[]{stop0, stop1});
@@ -160,7 +165,7 @@ public class SearchNextTrainProcessorTest {
         EasyMock.expect(
                 raildelaysServiceMock.searchNextTrain(
                         EasyMock.anyObject(Station.class),
-                        EasyMock.anyObject(Date.class))).andReturn(
+                        EasyMock.anyObject(LocalDateTime.class))).andReturn(
                 nextLineStops);
         EasyMock.replay(raildelaysServiceMock);
 
@@ -174,7 +179,7 @@ public class SearchNextTrainProcessorTest {
     }
 
     /*
-	 *        16:30  17:00  17:30  18:00  18:30  19:00
+     *        16:30  17:00  17:30  18:00  18:30  19:00
 	 *          |------|------|------|------|------|           
 	 *      y   >>>>>>>>>>>>>>>>>>|------>>>>>>>>>>|
 	 *     (0                 |------|)
@@ -185,14 +190,14 @@ public class SearchNextTrainProcessorTest {
     @Test
     public void testTrainIsDelayAndNextAreNot() throws Exception {
 
-        item.setEffectiveDepartureTime(F.parse("17:45"));
-        item.setEffectiveArrivalTime(F.parse("19:00"));
+        item.setEffectiveDepartureTime(LocalTime.parse("17:45"));
+        item.setEffectiveArrivalTime(LocalTime.parse("19:00"));
         item.setDelay(120);
 
         EasyMock.expect(
                 raildelaysServiceMock.searchNextTrain(
                         EasyMock.anyObject(Station.class),
-                        EasyMock.anyObject(Date.class))).andReturn(
+                        EasyMock.anyObject(LocalDateTime.class))).andReturn(
                 nextLineStops);
         EasyMock.replay(raildelaysServiceMock);
 
@@ -220,7 +225,7 @@ public class SearchNextTrainProcessorTest {
         EasyMock.expect(
                 raildelaysServiceMock.searchNextTrain(
                         EasyMock.anyObject(Station.class),
-                        EasyMock.anyObject(Date.class))).andReturn(
+                        EasyMock.anyObject(LocalDateTime.class))).andReturn(
                 nextLineStops);
         EasyMock.replay(raildelaysServiceMock);
 
@@ -245,13 +250,13 @@ public class SearchNextTrainProcessorTest {
     @Test
     public void testTrainWithArrivalDelay() throws Exception {
 
-        item.setEffectiveArrivalTime(F.parse("18:30"));
+        item.setEffectiveArrivalTime(LocalTime.parse("18:30"));
         item.setDelay(90);
 
         EasyMock.expect(
                 raildelaysServiceMock.searchNextTrain(
                         EasyMock.anyObject(Station.class),
-                        EasyMock.anyObject(Date.class))).andReturn(
+                        EasyMock.anyObject(LocalDateTime.class))).andReturn(
                 nextLineStops);
         EasyMock.replay(raildelaysServiceMock);
 

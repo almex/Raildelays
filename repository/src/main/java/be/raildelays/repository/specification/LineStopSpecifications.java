@@ -24,14 +24,15 @@
 
 package be.raildelays.repository.specification;
 
-import be.raildelays.delays.TimestampDelay_;
+import be.raildelays.delays.TimeDelay_;
 import be.raildelays.domain.entities.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Locale;
 
 /**
@@ -102,8 +103,7 @@ public class LineStopSpecifications {
      * @param date for which we should have a match
      * @return a predicate
      */
-    public static Specification<LineStop> dateEquals(final Date date) {
-
+    public static Specification<LineStop> dateEquals(final LocalDate date) {
         return (root, query, builder) -> builder.equal(root.get(LineStop_.date), date);
     }
 
@@ -113,19 +113,17 @@ public class LineStopSpecifications {
      * @return a predicate
      */
     public static Specification<LineStop> arrivalTimeIsNotNull() {
-
-        return (root, query, builder) -> root.get(LineStop_.arrivalTime).get(TimestampDelay_.expectedTime).isNotNull();
+        return (root, query, builder) -> root.get(LineStop_.arrivalTime).get(TimeDelay_.expectedTime).isNotNull();
     }
 
     /**
      * Creates a specification used to find LineStop whose arrival time greater than the expectedTime one.
      *
-     * @param date the expectedTime date
+     * @param time the expectedTime time
      * @return a predicate
      */
-    public static Specification<LineStop> arrivalTimeGreaterThan(final Date date) {
-
-        return (root, query, builder) -> builder.greaterThan(root.get(LineStop_.arrivalTime).get(TimestampDelay_.expectedTime), date);
+    public static Specification<LineStop> arrivalTimeGreaterThan(final LocalTime time) {
+        return (root, query, builder) -> builder.greaterThan(root.get(LineStop_.arrivalTime).get(TimeDelay_.expectedTime), time);
     }
 
     /**
@@ -134,8 +132,7 @@ public class LineStopSpecifications {
      * @return a predicate
      */
     public static Specification<LineStop> arrivalDelayIsNotNull() {
-
-        return (root, query, builder) -> root.get(LineStop_.arrivalTime).get(TimestampDelay_.delay).isNotNull();
+        return (root, query, builder) -> root.get(LineStop_.arrivalTime).get(TimeDelay_.delay).isNotNull();
     }
 
     /**
@@ -145,8 +142,7 @@ public class LineStopSpecifications {
      * @return a predicate
      */
     public static Specification<LineStop> arrivalDelayGreaterThan(final Long delay) {
-
-        return (root, query, builder) -> builder.greaterThan(root.get(LineStop_.arrivalTime).get(TimestampDelay_.delay), delay);
+        return (root, query, builder) -> builder.greaterThan(root.get(LineStop_.arrivalTime).get(TimeDelay_.delay), delay);
     }
 
     /**
@@ -156,8 +152,7 @@ public class LineStopSpecifications {
      * @return a predicate
      */
     public static Specification<LineStop> arrivalDelayGreaterThanOrEqualTo(final Long delay) {
-
-        return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get(LineStop_.arrivalTime).get(TimestampDelay_.delay), delay);
+        return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get(LineStop_.arrivalTime).get(TimeDelay_.delay), delay);
     }
 
     /**
@@ -166,19 +161,17 @@ public class LineStopSpecifications {
      * @return a predicate
      */
     public static Specification<LineStop> departureTimeIsNotNull() {
-
-        return (root, query, builder) -> root.get(LineStop_.departureTime).get(TimestampDelay_.expectedTime).isNotNull();
+        return (root, query, builder) -> root.get(LineStop_.departureTime).get(TimeDelay_.expectedTime).isNotNull();
     }
 
     /**
      * Creates a specification used to find LineStop whose departure time greater than the expectedTime one.
      *
-     * @param date the expectedTime date
+     * @param time the expected time
      * @return a predicate
      */
-    public static Specification<LineStop> departureTimeGreaterThan(final Date date) {
-
-        return (root, query, builder) -> builder.greaterThan(root.get(LineStop_.departureTime).get(TimestampDelay_.expectedTime), date);
+    public static Specification<LineStop> departureTimeGreaterThan(final LocalTime time) {
+        return (root, query, builder) -> builder.greaterThan(root.get(LineStop_.departureTime).get(TimeDelay_.expectedTime), time);
     }
 
     /**
@@ -187,8 +180,7 @@ public class LineStopSpecifications {
      * @return a predicate
      */
     public static Specification<LineStop> departureDelayIsNotNull() {
-
-        return (root, query, builder) -> root.get(LineStop_.departureTime).get(TimestampDelay_.delay).isNotNull();
+        return (root, query, builder) -> root.get(LineStop_.departureTime).get(TimeDelay_.delay).isNotNull();
     }
 
     /**
@@ -198,8 +190,7 @@ public class LineStopSpecifications {
      * @return a predicate
      */
     public static Specification<LineStop> departureDelayGreaterThan(final Long delay) {
-
-        return (root, query, builder) -> builder.greaterThan(root.get(LineStop_.departureTime).get(TimestampDelay_.delay), delay);
+        return (root, query, builder) -> builder.greaterThan(root.get(LineStop_.departureTime).get(TimeDelay_.delay), delay);
     }
 
     /**
@@ -208,7 +199,6 @@ public class LineStopSpecifications {
      * @return a predicate
      */
     public static Specification<LineStop> isCanceledDeparture() {
-
         return (root, query, builder) -> builder.equal(root.get(LineStop_.canceledDeparture), true);
     }
 
@@ -218,7 +208,6 @@ public class LineStopSpecifications {
      * @return a predicate
      */
     public static Specification<LineStop> isCanceledArrival() {
-
         return (root, query, builder) -> builder.equal(root.get(LineStop_.canceledArrival), true);
     }
 
@@ -228,7 +217,6 @@ public class LineStopSpecifications {
      * @return a predicate
      */
     public static Specification<LineStop> isNotCanceled() {
-
         return (root, query, builder) -> builder.and(
                 builder.equal(root.get(LineStop_.canceledDeparture), false),
                 builder.equal(root.get(LineStop_.canceledArrival), false)

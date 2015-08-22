@@ -24,8 +24,9 @@
 
 package be.raildelays.logging;
 
-import be.raildelays.delays.TimestampDelay;
-import be.raildelays.delays.UtilsDelay;
+import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.delays.Delays;
+import be.raildelays.delays.TimeDelay;
 import be.raildelays.domain.dto.RouteLogDTO;
 import be.raildelays.domain.dto.ServedStopDTO;
 import be.raildelays.domain.entities.LineStop;
@@ -35,13 +36,13 @@ import be.raildelays.domain.railtime.Train;
 import be.raildelays.domain.railtime.TwoDirections;
 import be.raildelays.domain.xls.ExcelRow;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Marker;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -108,11 +109,13 @@ public class RaildelaysLogger implements Logger {
     private Delegator<Step> stepDelegator = new Delegator<Step>() {
         @Override
         public String logLine(String message, Step object) {
+            TimeDelay departureTime = TimeDelay.of(object.getDateTime().toLocalTime(), object.getDelay());
+
             return new LogLineBuilder()
                     .message(message)
                     .departureStation(object.getStation() != null ? object.getStation().getName() : null)
-                    .expectedDepartureTime(object.getTimestamp())
-                    .effectiveDepartureTime(computeEffectiveTime(TimestampDelay.of(object.getTimestamp(), object.getDelay())))
+                    .expectedDepartureTime(object.getDateTime().toLocalTime())
+                    .effectiveDepartureTime(departureTime != null ? departureTime.toLocalTime() : null)
                     .canceledDeparture(object.isCanceled())
                     .canceledArrival(object.isCanceled())
                     .build();
@@ -134,8 +137,8 @@ public class RaildelaysLogger implements Logger {
                     .departureStation(getStationName(object.getStation()))
                     .expectedDepartureTime(object.getArrivalTime() != null ? object.getArrivalTime().getExpectedTime() : null)
                     .expectedArrivalTime(object.getDepartureTime() != null ? object.getDepartureTime().getExpectedTime() : null)
-                    .effectiveDepartureTime(computeEffectiveTime(object.getArrivalTime()))
-                    .effectiveArrivalTime(computeEffectiveTime(object.getDepartureTime()))
+                    .effectiveDepartureTime(object.getArrivalTime() != null ? object.getArrivalTime().toLocalTime() : null)
+                    .effectiveArrivalTime(object.getDepartureTime() != null ? object.getDepartureTime().toLocalTime() : null)
                     .canceledDeparture(object.isCanceledArrival())
                     .canceledArrival(object.isCanceledDeparture())
                     .idPrevious(object.getPrevious() != null ? object.getPrevious().getId() : null)
@@ -161,6 +164,26 @@ public class RaildelaysLogger implements Logger {
                     .build();
         }
     };
+    private Delegator<BatchExcelRow> batchExcelRowDelegator = new Delegator<BatchExcelRow>() {
+        @Override
+        public String logLine(String message, BatchExcelRow object) {
+            return new LogLineBuilder()
+                    .message(message)
+                    .id(object.getId())
+                    .date(object.getDate())
+                    .expectedTrain(getTrainId(object.getExpectedTrain1()))
+                    .effectiveTrain(getTrainId(object.getEffectiveTrain1()))
+                    .departureStation(getStationName(object.getDepartureStation()))
+                    .arrivalStation(getStationName(object.getArrivalStation()))
+                    .expectedDepartureTime(object.getExpectedDepartureTime())
+                    .expectedArrivalTime(object.getExpectedArrivalTime())
+                    .effectiveDepartureTime(object.getEffectiveDepartureTime())
+                    .effectiveArrivalTime(object.getEffectiveArrivalTime())
+                    .canceledArrival(object.isCanceled())
+                    .canceledDeparture(object.isCanceled())
+                    .build();
+        }
+    };
     private Delegator<RouteLogDTO> routeLogDTODelegator = new Delegator<RouteLogDTO>() {
         @Override
         public String logLine(String message, RouteLogDTO object) {
@@ -179,13 +202,16 @@ public class RaildelaysLogger implements Logger {
              * - we reach the stop at the arrival time <-> we start our route at departure time
              * - we leave the stop at the departure time <-> we stop our route at arrival time
              */
+            TimeDelay arrivalTime = TimeDelay.of(object.getArrivalTime(), object.getArrivalDelay());
+            TimeDelay departureTime = TimeDelay.of(object.getDepartureTime(), object.getDepartureDelay());
+
             return new LogLineBuilder()
                     .message(message)
                     .departureStation(object.getStationName())
                     .expectedDepartureTime(object.getArrivalTime())
                     .expectedArrivalTime(object.getDepartureTime())
-                    .effectiveDepartureTime(computeEffectiveTime(TimestampDelay.of(object.getArrivalTime(), object.getArrivalDelay())))
-                    .effectiveArrivalTime(computeEffectiveTime(TimestampDelay.of(object.getDepartureTime(), object.getDepartureDelay())))
+                    .effectiveDepartureTime(arrivalTime != null ? arrivalTime.toLocalTime() : null)
+                    .effectiveArrivalTime(departureTime != null ? departureTime.toLocalTime() : null)
                     .canceledDeparture(object.isCanceled())
                     .canceledArrival(object.isCanceled())
                     .build();
@@ -201,17 +227,6 @@ public class RaildelaysLogger implements Logger {
         this.type = type;
         this.delegate = delegate;
         this.marker = marker;
-    }
-
-    private static Date computeEffectiveTime(TimestampDelay timestampDelay) {
-        Date result = null;
-
-        if (timestampDelay != null && timestampDelay.getExpectedTime() != null) {
-            result = DateUtils.addMinutes(timestampDelay.getExpectedTime(),
-                    timestampDelay.getDelay() != null ? timestampDelay.getDelay().intValue() : 0);
-        }
-
-        return result;
     }
 
     private static Long getTrainId(be.raildelays.domain.entities.Train train) {
@@ -306,6 +321,21 @@ public class RaildelaysLogger implements Logger {
 
     @Override
     public void trace(String message, ExcelRow excelRow) {
+        excelRowDelegator.log(message, Level.TRACE, excelRow);
+    }
+
+    @Override
+    public void info(String message, BatchExcelRow excelRow) {
+        excelRowDelegator.log(message, Level.INFO, excelRow);
+    }
+
+    @Override
+    public void debug(String message, BatchExcelRow excelRow) {
+        excelRowDelegator.log(message, Level.DEBUG, excelRow);
+    }
+
+    @Override
+    public void trace(String message, BatchExcelRow excelRow) {
         excelRowDelegator.log(message, Level.TRACE, excelRow);
     }
 
@@ -694,15 +724,15 @@ public class RaildelaysLogger implements Logger {
 
         private String message;
         private Long id;
-        private Date date;
+        private LocalDate date;
         private Long expectedTrain;
         private Long effectiveTrain;
         private String departureStation;
         private String arrivalStation;
-        private Date expectedDepartureTime;
-        private Date expectedArrivalTime;
-        private Date effectiveDepartureTime;
-        private Date effectiveArrivalTime;
+        private LocalTime expectedDepartureTime;
+        private LocalTime expectedArrivalTime;
+        private LocalTime effectiveDepartureTime;
+        private LocalTime effectiveArrivalTime;
         private Long idPrevious;
         private Long idNext;
         private boolean canceledDeparture;
@@ -732,7 +762,7 @@ public class RaildelaysLogger implements Logger {
             return this;
         }
 
-        public LogLineBuilder date(Date date) {
+        public LogLineBuilder date(LocalDate date) {
             this.date = date;
 
             return this;
@@ -762,25 +792,25 @@ public class RaildelaysLogger implements Logger {
             return this;
         }
 
-        public LogLineBuilder expectedDepartureTime(Date expectedDepartureTime) {
+        public LogLineBuilder expectedDepartureTime(LocalTime expectedDepartureTime) {
             this.expectedDepartureTime = expectedDepartureTime;
 
             return this;
         }
 
-        public LogLineBuilder expectedArrivalTime(Date expectedArrivalTime) {
+        public LogLineBuilder expectedArrivalTime(LocalTime expectedArrivalTime) {
             this.expectedArrivalTime = expectedArrivalTime;
 
             return this;
         }
 
-        public LogLineBuilder effectiveDepartureTime(Date effectiveDepartureTime) {
+        public LogLineBuilder effectiveDepartureTime(LocalTime effectiveDepartureTime) {
             this.effectiveDepartureTime = effectiveDepartureTime;
 
             return this;
         }
 
-        public LogLineBuilder effectiveArrivalTime(Date effectiveArrivalTime) {
+        public LogLineBuilder effectiveArrivalTime(LocalTime effectiveArrivalTime) {
             this.effectiveArrivalTime = effectiveArrivalTime;
 
             return this;
@@ -804,8 +834,8 @@ public class RaildelaysLogger implements Logger {
             final NumberFormat idFormat = new DecimalFormat(ID_FORMAT);
             final NumberFormat trainFormat = new DecimalFormat(TRAIN_FORMAT);
             final NumberFormat delayFormat = new DecimalFormat(DELAY_FORMAT);
-            final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-            final SimpleDateFormat timeFormat = new SimpleDateFormat(TIME_FORMAT);
+            final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern(DATE_FORMAT);
+            final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern(TIME_FORMAT);
 
             if (expectedTrain != null ||
                     departureStation != null ||
@@ -831,7 +861,7 @@ public class RaildelaysLogger implements Logger {
                 builder.append(separator);
                 builder.append(formatEffectiveTime(effectiveArrivalTime, canceledArrival));
                 builder.append(separator);
-                builder.append(delayFormat.format(UtilsDelay.computeDelay(expectedArrivalTime, effectiveArrivalTime)));
+                builder.append(delayFormat.format(Delays.computeDelay(expectedArrivalTime, effectiveArrivalTime) / 1000 / 60));
                 builder.append(separator);
                 builder.append(StringUtils.rightPad(idPrevious != null ? idFormat.format(idPrevious) : "", ID_FORMAT.length()));
                 builder.append(separator);
@@ -845,13 +875,13 @@ public class RaildelaysLogger implements Logger {
             return builder.toString();
         }
 
-        public String formatEffectiveTime(Date effectiveTime, boolean canceled) {
-            final SimpleDateFormat timeFormat = new SimpleDateFormat(TIME_FORMAT);
-            final SimpleDateFormat canceledTimeFormat = new SimpleDateFormat("HH'x'mm");
+        public String formatEffectiveTime(LocalTime effectiveTime, boolean canceled) {
+            final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern(TIME_FORMAT);
+            final DateTimeFormatter canceledTimeFormat = DateTimeFormatter.ofPattern("HH'x'mm");
             final String result;
 
             if (effectiveTime != null) {
-                result = StringUtils.rightPad((canceled ? canceledTimeFormat : timeFormat).format(effectiveTime), TIME_FORMAT.length());
+                result = StringUtils.rightPad(effectiveTime.format(canceled ? canceledTimeFormat : timeFormat), TIME_FORMAT.length());
             } else {
                 result = StringUtils.center(canceled ? "x" : "", TIME_FORMAT.length());
             }

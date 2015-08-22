@@ -53,6 +53,10 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
     private ExecutionContext executionContext;
     private String language = Language.EN.name();
 
+    private static boolean isEmpty(Object object) {
+        return object == null;
+    }
+
     @Override
     public void afterPropertiesSet() throws Exception {
         Validate.notNull(outputReader, "outputReader is mandatory");
@@ -114,7 +118,7 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
                             LOGGER.debug("stop_searching", result);
 
                             break;
-                        } else if (item.getDate().before(matchingExcelRow.getDate())) {
+                        } else if (item.getDate().isBefore(matchingExcelRow.getDate())) {
                             result = null;
 
                             /*
@@ -163,10 +167,6 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
         }
 
         return result;
-    }
-
-    private static boolean isEmpty(Object object) {
-        return object == null;
     }
 
     public void setLanguage(String language) {
