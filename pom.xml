@@ -1194,27 +1194,31 @@
                                     <append>true</append>
                                 </configuration>
                             </execution>
-                            <execution>
-                                <id>report-unit-tests</id>
-                                <goals>
-                                    <goal>report</goal>
-                                </goals>
-                                <configuration>
-                                    <dataFile>${jacoco.test.destFile}</dataFile>
-                                    <outputDirectory>${coveralls.report.path}</outputDirectory>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>report-integration-tests</id>
-                                <goals>
-                                    <goal>report-integration</goal>
-                                </goals>
-                                <configuration>
-                                    <dataFile>${jacoco.it.destFile}</dataFile>
-                                    <outputDirectory>${coveralls.report.path}</outputDirectory>
-                                </configuration>
-                            </execution>
+                            <!--<execution>-->
+                            <!--<id>report-unit-tests</id>-->
+                            <!--<goals>-->
+                            <!--<goal>report</goal>-->
+                            <!--</goals>-->
+                            <!--<configuration>-->
+                            <!--<dataFile>${jacoco.test.destFile}</dataFile>-->
+                            <!--<outputDirectory>${coveralls.report.path}</outputDirectory>-->
+                            <!--</configuration>-->
+                            <!--</execution>-->
+                            <!--<execution>-->
+                            <!--<id>report-integration-tests</id>-->
+                            <!--<goals>-->
+                            <!--<goal>report-integration</goal>-->
+                            <!--</goals>-->
+                            <!--<configuration>-->
+                            <!--<dataFile>${jacoco.it.destFile}</dataFile>-->
+                            <!--<outputDirectory>${coveralls.report.path}</outputDirectory>-->
+                            <!--</configuration>-->
+                            <!--</execution>-->
                         </executions>
+                        <configuration>
+                            <dataFile>${jacoco.it.destFile}</dataFile>
+                            <outputDirectory>${coveralls.report.path}</outputDirectory>
+                        </configuration>
                     </plugin>
                     <!-- To publish code-coverage on Coveralls via Travis-ci -->
                     <plugin>
@@ -1230,10 +1234,46 @@
                         <!--</execution>-->
                         <!--</executions>-->
                         <configuration>
+
                             <repoToken>g9PRdWtGBudopOiM4Mzb8KMF7DMLV9BLb</repoToken>
                             <jacocoReports>
                                 <jacocoReport>${coveralls.report.path}/jacoco.xml</jacocoReport>
                             </jacocoReports>
+                        </configuration>
+                    </plugin>
+
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>coveralls</id>
+
+            <build>
+                <plugins>
+                    <!-- To compute Code Coverage for integration tests and unit tests -->
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>prepare-agent</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <exclude>target/generated-sources/**/*.java</exclude>
+                            <exclude>target/generated-test-sources/**/*.java</exclude>
+                        </configuration>
+                    </plugin>
+                    <!-- To publish code-coverage on Coveralls via Travis-ci -->
+                    <plugin>
+                        <groupId>org.eluder.coveralls</groupId>
+                        <artifactId>coveralls-maven-plugin</artifactId>
+                        <configuration>
+                            <repoToken>g9PRdWtGBudopOiM4Mzb8KMF7DMLV9BLb</repoToken>
                         </configuration>
                     </plugin>
 
