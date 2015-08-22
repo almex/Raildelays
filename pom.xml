@@ -1273,7 +1273,7 @@
                         <groupId>org.eluder.coveralls</groupId>
                         <artifactId>coveralls-maven-plugin</artifactId>
                         <configuration>
-                            <repoToken>${coveralls-key}</repoToken>
+                            <repoToken>${env.coveralls.token}</repoToken>
                         </configuration>
                     </plugin>
 
