@@ -7,6 +7,7 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,7 +114,17 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
                 }
             }
 
-            this.outputStream = new FileOutputStream(outputFile);
+            try {
+                this.outputStream = new FileOutputStream(outputFile);
+            } catch (FileNotFoundException e) {
+                /**
+                 * FIXME this is a workaround! I don't know the real source of the problem.
+                 * We try here a second time because, in test scenario, it happens that the file is handled by another
+                 * process during some milliseconds.
+                 */
+                Thread.sleep(500);
+                this.outputStream = new FileOutputStream(outputFile);
+            }
 
         } catch (IOException | InvalidFormatException e) {
             throw new ItemStreamException("I/O when opening Excel template", e);
@@ -148,15 +159,10 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
         } catch (IOException e) {
             throw new ItemStreamException("I/O error when writing Excel outputDirectory file", e);
         } finally {
-            try {
-                if (outputStream != null) {
-                    outputStream.close();
-                    outputStream = null;
-                    workbook = null;
-                }
-            } catch (IOException e) {
-                LOGGER.error("I/O error when closing Excel outputDirectory file", e);
-            }
+            IOUtils.closeQuietly(workbook);
+            IOUtils.closeQuietly(outputStream);
+            outputStream = null;
+            workbook = null;
         }
 
 
@@ -186,21 +192,21 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
         this.sheetIndex = sheetIndex;
     }
 
+    public Resource getResource() {
+        return resource;
+    }
+
     @Override
     public void setResource(Resource resource) {
         this.resource = resource;
     }
 
-    public void setTemplate(Resource template) {
-        this.template = template;
-    }
-
-    public Resource getResource() {
-        return resource;
-    }
-
     public Resource getTemplate() {
         return template;
+    }
+
+    public void setTemplate(Resource template) {
+        this.template = template;
     }
 
     public void setShouldDeleteIfExists(boolean shouldDeleteIfExists) {

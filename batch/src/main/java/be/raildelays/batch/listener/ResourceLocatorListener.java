@@ -57,7 +57,7 @@ public class ResourceLocatorListener {
 
             // We could have an empty row (i.e.: date can be null)
             if (item.getDate() != null) {
-                String suffix = item.getDate().format(DateTimeFormatter.ISO_DATE);
+                String suffix = item.getDate().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
                 context.putString(FILENAME_SUFFIX_KEY, suffix);
             }

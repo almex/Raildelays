@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import static org.springframework.batch.item.file.ExcelSheetItemWriter.Format;
 
@@ -19,8 +20,8 @@ public class  AbstractFileTest {
     protected static final String CURRENT_PATH = "." + File.separator + "target" + File.separator;
     protected static final String EXCEL_FILE_PREFIX = "retard_sncb";
     protected static final String EXCEL_FILE_NAME = EXCEL_FILE_PREFIX + " 20140522" + Format.OLE2.getFileExtension();
-    protected static final String DATE_TO_STRING = "2014-01-21";
-    protected static LocalDate DATE = LocalDate.parse(DATE_TO_STRING);
+    protected static final String DATE_TO_STRING = "20140121";
+    protected static LocalDate DATE = LocalDate.parse(DATE_TO_STRING, DateTimeFormatter.ofPattern("yyyyMMdd"));
 
     protected void copyFile() throws IOException {
         Path source = new ClassPathResource(EXCEL_FILE_NAME).getFile().toPath();
