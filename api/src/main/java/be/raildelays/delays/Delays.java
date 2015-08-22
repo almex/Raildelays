@@ -46,17 +46,11 @@ public final class Delays {
         long result = 0;
 
         if (timeDelayA != null && timeDelayB != null) {
-            if (timeDelayA.getExpectedTime() != null && timeDelayB.getExpectedTime() != null) {
-                LocalTime start = timeDelayA.toLocalTime();
-                LocalTime end = timeDelayB.toLocalTime();
-                Duration duration = Duration.between(start, end);
+            LocalTime start = timeDelayA.getEffectiveTime();
+            LocalTime end = timeDelayB.getEffectiveTime();
+            Duration duration = Duration.between(start, end);
 
-                result = -duration.toMillis(); // The difference is the opposite of a duration
-            } else if (timeDelayA.getExpectedTime() != null) {
-                result = 1;
-            } else if (timeDelayB.getExpectedTime() != null) {
-                result = -1;
-            }
+            result = -duration.toMillis(); // The difference is the opposite of a duration
         } else if (timeDelayA != null) {
             result = 1;
         } else if (timeDelayB != null) {
@@ -147,8 +141,8 @@ public final class Delays {
      * @return the number of milliseconds between the {@code expectedTime} and the {@code effectiveTime},
      * 0 if the {@code expectedTime} or the {@code expectedTime} is {@code null}.
      */
-    public static Long computeDelay(LocalTime expectedTime, LocalTime effectiveTime) {
-        Long result = 0L;
+    public static long computeDelay(LocalTime expectedTime, LocalTime effectiveTime) {
+        long result = 0;
 
         if (expectedTime != null && effectiveTime != null) {
             Duration duration = Duration.between(expectedTime, effectiveTime);
@@ -165,7 +159,7 @@ public final class Delays {
         if (expectedTime instanceof java.sql.Time) {
             result = ((java.sql.Time) expectedTime).toLocalTime();
         } else if (expectedTime instanceof java.sql.Date) {
-            throw new UnsupportedOperationException("Cannot handle java.sql.Date because we expect a time");
+            throw new UnsupportedOperationException("Cannot handle java.sql.Date because we expect only a time");
         } else if (expectedTime instanceof java.sql.Timestamp) {
             result = ((java.sql.Timestamp) expectedTime)
                     .toLocalDateTime()

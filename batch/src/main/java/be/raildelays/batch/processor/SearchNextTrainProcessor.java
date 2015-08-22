@@ -190,7 +190,7 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
             /*
              * Do not take into account candidate which leaves after the item.
              */
-            if (candidateDeparture.getDepartureTime().after(TimeDelay.of(item.getEffectiveDepartureTime()))
+            if (candidateDeparture.getDepartureTime().isAfter(TimeDelay.of(item.getEffectiveDepartureTime()))
             /*duration(between(candidateDeparture.getDepartureTime())
                     .and(item.getEffectiveDepartureTime()), is(greaterThan(0L)))*/
                     /*compareTimeAndDelay(candidateDeparture.getDepartureTime(), item.getEffectiveDepartureTime()) > 0*/) {

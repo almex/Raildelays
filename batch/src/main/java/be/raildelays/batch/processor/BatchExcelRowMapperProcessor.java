@@ -149,8 +149,8 @@ public class BatchExcelRowMapperProcessor implements ItemProcessor<LineStop, Bat
      * @return a {@link BatchExcelRow} containing the combination of {@code lineStopFrom} and {@code lineStopTo}
      */
     protected BatchExcelRow map(LineStop lineStopFrom, LineStop lineStopTo, Sens sens) {
-        LocalTime effectiveDepartureTime = lineStopFrom.getDepartureTime() != null ? lineStopFrom.getDepartureTime().toLocalTime() : null;
-        LocalTime effectiveArrivalTime = lineStopTo.getArrivalTime() != null ? lineStopTo.getArrivalTime().toLocalTime() : null;
+        LocalTime effectiveDepartureTime = lineStopFrom.getDepartureTime() != null ? lineStopFrom.getDepartureTime().getEffectiveTime() : null;
+        LocalTime effectiveArrivalTime = lineStopTo.getArrivalTime() != null ? lineStopTo.getArrivalTime().getEffectiveTime() : null;
 
         return new Builder(lineStopFrom.getDate(), sens) //
                 .departureStation(lineStopFrom.getStation()) //

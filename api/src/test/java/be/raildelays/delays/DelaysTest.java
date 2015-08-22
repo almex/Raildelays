@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
@@ -22,7 +23,7 @@ public class DelaysTest {
     @Test
     public void testCompareTimeAndDelayEquals() throws Exception {
         LocalTime departureA = LocalTime.parse("15:05");
-        TimeDelay departureB = TimeDelay.of(LocalTime.parse("15:00"), 5L * 60 * 1000);
+        TimeDelay departureB = TimeDelay.of(LocalTime.parse("15:00"), 5L, ChronoUnit.MINUTES);
 
         Assert.assertThat(Delays.compareTimeAndDelay(departureA, departureB), is(equalTo(0L)));
     }
@@ -30,7 +31,7 @@ public class DelaysTest {
     @Test
     public void testRevertedCompareTimeAndDelayEquals() throws Exception {
         LocalTime departureA = LocalTime.parse("15:05");
-        TimeDelay departureB = TimeDelay.of(LocalTime.parse("15:00"), 5L * 60 * 1000);
+        TimeDelay departureB = TimeDelay.of(LocalTime.parse("15:00"), 5L, ChronoUnit.MINUTES);
 
         Assert.assertThat(Delays.compareTimeAndDelay(departureB, departureA), is(equalTo(0L)));
     }
@@ -142,7 +143,7 @@ public class DelaysTest {
     @Test
     public void testComputeNonZeroDelay() throws Exception {
         LocalTime departureA = LocalTime.now();
-        LocalTime departureB = TimeDelay.of(departureA, 15L).toLocalTime();
+        LocalTime departureB = TimeDelay.of(departureA, 15L).getEffectiveTime();
 
         Assert.assertThat(Delays.computeDelay(departureA, departureB), is(equalTo(15L)));
     }

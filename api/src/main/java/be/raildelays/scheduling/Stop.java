@@ -5,6 +5,7 @@ import be.raildelays.location.Location;
 
 /**
  * @author Almex
+ * @since 2.0
  */
 public interface Stop {
 

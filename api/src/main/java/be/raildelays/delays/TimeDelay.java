@@ -3,15 +3,18 @@ package be.raildelays.delays;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * {@code TimeDelay} is an immutable object that represent a time plus its delay.
+ * Out of it you can retrieve the {@code expectedTime} or the {@code effectiveTime},
+ * where the {@code effectiveTime} is the {@code expectedTime} plus a {@code delay}.
  * This is a {@code Value Object} class.
  *
  * @author Almex
@@ -22,6 +25,7 @@ public final class TimeDelay implements Serializable, Comparable<TimeDelay> {
 
     private static final long DEFAULT_DELAY = 0L;
     private static final long serialVersionUID = -1026179811764044178L;
+    private static final ChronoUnit DELAY_UNIT = ChronoUnit.MILLIS;
     private final LocalTime expectedTime;
     private final Long delay; // in number of milliseconds
 
@@ -92,7 +96,7 @@ public final class TimeDelay implements Serializable, Comparable<TimeDelay> {
         TimeDelay result = null;
 
         if (expectedTime != null) {
-            Duration duration = Duration.of(DEFAULT_DELAY, ChronoUnit.MILLIS);
+            Duration duration = Duration.of(DEFAULT_DELAY, DELAY_UNIT);
 
             if (delay != null && unit != null) {
                 if (!unit.isSupportedBy(expectedTime) ||
@@ -171,7 +175,7 @@ public final class TimeDelay implements Serializable, Comparable<TimeDelay> {
      * @param target the {@link TimeDelay}  to compare with
      * @return {@code true} if {@code this} is after the{@code target}, {@code false} otherwise
      */
-    public boolean after(TimeDelay target) {
+    public boolean isAfter(TimeDelay target) {
         return compareTo(target) > 0;
     }
 
@@ -181,52 +185,30 @@ public final class TimeDelay implements Serializable, Comparable<TimeDelay> {
      * @param target the {@link TimeDelay}  to compare with
      * @return {@code true} if {@code this} is before the{@code target}, {@code false} otherwise
      */
-    public boolean before(TimeDelay target) {
+    public boolean isBefore(TimeDelay target) {
         return compareTo(target) < 0;
     }
 
     /**
-     * Compare if {@code this} {@link TimeDelay} is after or equal to the {@code target} {@link TimeDelay}.
-     *
-     * @param target the {@link TimeDelay} to compare with
-     * @return {@code true} if {@code this} is after or equal to the{@code target}, {@code false} otherwise
-     */
-    public boolean afterOrEqual(TimeDelay target) {
-        return compareTo(target) >= 0;
-    }
-
-    /**
-     * Compare if {@code this} {@link TimeDelay} is before or equal to the {@code target} {@link TimeDelay}.
-     *
-     * @param target the {@link TimeDelay} to compare with
-     * @return {@code true} if {@code this} is before or equal to the{@code target}, {@code false} otherwise
-     */
-    public boolean beforeOrEqual(TimeDelay target) {
-        return compareTo(target) <= 0;
-    }
-
-    /**
-     * Translate a {@link TimeDelay} into a {@link LocalTime}.
+     * Translate a {@link TimeDelay} into a {@link LocalTime} in order to get the effective time of this
+     * {@link TimeDelay}.
      *
      * @return a non-null {@link LocalTime} which is a combination of {@code expectedTime}
      * plus its {@code delay}.
      */
-    public LocalTime toLocalTime() {
-        return expectedTime.plus(delay, ChronoUnit.MILLIS);
+    public LocalTime getEffectiveTime() {
+        return expectedTime.plus(delay, DELAY_UNIT);
     }
 
     /**
-     * Translate a {@link TimeDelay} into a {@link Date}.
+     * Translate a {@link TimeDelay} into a {@link LocalDateTime}.
      *
-     * @return a non-null {@link Date} with {@link ZoneId#systemDefault()} which is a combination of {@code expectedTime}
-     * plus its {@code delay}.
+     * @param date the date to combien with, not null
+     * @return a non-null {@link LocalDateTime} which is a combination of {@code expectedTime}
+     * plus its {@code delay} and the {@code date}.
      */
-    public Date toDate() {
-        return Date.from(toLocalTime()
-                        .atDate(LocalDate.now())
-                        .atZone(ZoneId.systemDefault())
-                        .toInstant()
-        );
+    public LocalDateTime atDate(LocalDate date) {
+        return getEffectiveTime().atDate(date);
     }
 
     @Override
@@ -261,15 +243,9 @@ public final class TimeDelay implements Serializable, Comparable<TimeDelay> {
 
     @Override
     public int compareTo(TimeDelay target) {
-        int result;
+        Objects.requireNonNull(target);
 
-        if (target == null) {
-            result = -1;
-        } else {
-            result = this.toLocalTime().compareTo(target.toLocalTime());
-        }
-
-        return result;
+        return this.getEffectiveTime().compareTo(target.getEffectiveTime());
     }
 
     public final LocalTime getExpectedTime() {

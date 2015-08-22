@@ -77,7 +77,7 @@ public class Step extends Stop implements Serializable, Comparable<Step> {
         if (this.isCanceled()) {
             builder.append("canceled=true");
         } else {
-            LocalTime effectiveTime = TimeDelay.of(getDateTime().toLocalTime(), delay).toLocalTime();
+            LocalTime effectiveTime = TimeDelay.of(getDateTime().toLocalTime(), delay).getEffectiveTime();
 
             builder.append("scheduledTime=");
             builder.append(getDateTime().toLocalTime().format(DateTimeFormatter.ISO_TIME));
