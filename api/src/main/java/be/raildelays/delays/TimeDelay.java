@@ -1,10 +1,13 @@
 package be.raildelays.delays;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
+import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.Date;
 
 /**
@@ -72,6 +75,39 @@ public final class TimeDelay implements Serializable, Comparable<TimeDelay> {
      */
     public static TimeDelay of(LocalTime expectedTime, Long delay) {
         return expectedTime != null ? new TimeDelay(expectedTime, delay) : null;
+    }
+
+    /**
+     * Create an an instance of {@link TimeDelay} with the {@code expectedTime} and the {@code delay}
+     * of a certain {@code unit}.
+     *
+     * @param expectedTime the expected time such as : 1st January 2000 at 12:00
+     * @param delay        delay in the {@code unit} counting from the {@code expectedTime}
+     * @param unit         unit of the delay (unsupported units are {@code ChronoUnit.MICROS}, {@code ChronoUnit.NANOS}
+     *                     and all not supported by {@link LocalTime#isSupported(TemporalUnit)})
+     * @return a {@link TimeDelay} with the {@code expectedTime} and the {@code delay},
+     * {@code null} if the {@code expectedTime} is {@code null}.
+     */
+    public static TimeDelay of(LocalTime expectedTime, Long delay, TemporalUnit unit) {
+        TimeDelay result = null;
+
+        if (expectedTime != null) {
+            Duration duration = Duration.of(DEFAULT_DELAY, ChronoUnit.MILLIS);
+
+            if (delay != null && unit != null) {
+                if (!unit.isSupportedBy(expectedTime) ||
+                        ChronoUnit.NANOS.equals(unit) ||
+                        ChronoUnit.MICROS.equals(unit)) {
+                    throw new UnsupportedTemporalTypeException("This unit is not supported by a TimeDelay");
+                }
+
+                duration = Duration.of(delay, unit);
+            }
+
+            result = new TimeDelay(expectedTime, duration.toMillis());
+        }
+
+        return result;
     }
 
     /**
@@ -207,7 +243,6 @@ public final class TimeDelay implements Serializable, Comparable<TimeDelay> {
         } else if (obj instanceof TimeDelay) {
             TimeDelay target = (TimeDelay) obj;
 
-            //FIXME should use Date#equals(Date) instead
             result = this.expectedTime.equals(target.expectedTime) && this.delay.equals(target.delay);
         }
 
@@ -231,12 +266,7 @@ public final class TimeDelay implements Serializable, Comparable<TimeDelay> {
         if (target == null) {
             result = -1;
         } else {
-            //FIXME should use Date#compareTo(Date) instead
-            result = this.expectedTime.compareTo(target.expectedTime);
-
-            if (result == 0) {
-                result = this.delay.compareTo(target.delay);
-            }
+            result = this.toLocalTime().compareTo(target.toLocalTime());
         }
 
         return result;

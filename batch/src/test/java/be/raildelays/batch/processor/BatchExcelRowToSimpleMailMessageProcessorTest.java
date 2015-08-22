@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @RunWith(BlockJUnit4ClassRunner.class)
 public class BatchExcelRowToSimpleMailMessageProcessorTest {
@@ -24,7 +24,7 @@ public class BatchExcelRowToSimpleMailMessageProcessorTest {
     public void testProcess() throws Exception {
 
         Assert.assertNotNull(processor.process(new BatchExcelRow
-                .Builder(new Date(), Sens.ARRIVAL)
-                .build(false )));
+                .Builder(LocalDate.now(), Sens.ARRIVAL)
+                .build(false)));
     }
 }

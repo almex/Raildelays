@@ -30,7 +30,7 @@ import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.annotation.BeforeWrite;
 import org.springframework.batch.item.ExecutionContext;
 
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -54,11 +54,10 @@ public class ResourceLocatorListener {
         if (!items.isEmpty()) {
             // Retrieve first element of what would be written
             BatchExcelRow item = items.get(0);
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
 
             // We could have an empty row (i.e.: date can be null)
             if (item.getDate() != null) {
-                String suffix = formatter.format(item.getDate());
+                String suffix = item.getDate().format(DateTimeFormatter.ISO_DATE);
 
                 context.putString(FILENAME_SUFFIX_KEY, suffix);
             }

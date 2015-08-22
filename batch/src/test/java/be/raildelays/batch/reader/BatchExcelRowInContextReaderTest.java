@@ -9,10 +9,9 @@ import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Collections;
-import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 
@@ -20,27 +19,25 @@ public class BatchExcelRowInContextReaderTest {
 
     private static String KEY_NAME = "foo";
     private BatchExcelRowInContextReader reader;
-    private Date now;
+    private LocalDate now;
     private ExecutionContext context;
     private BatchExcelRow expected;
 
     @Before
     public void setUp() throws Exception {
-        final DateFormat timeFormat = new SimpleDateFormat("HH:mm");
-
-        now = new Date();
+        now = LocalDate.now();
         context = MetaDataInstanceFactory.createStepExecution()
                 .getExecutionContext();
         reader = new BatchExcelRowInContextReader();
         expected = new BatchExcelRow.Builder(now, Sens.DEPARTURE)
                 .departureStation(new Station("BRUXELLES-CENTRAL")) //
                 .arrivalStation(new Station("LIEGE-GUILLEMINS")) //
-                .expectedDepartureTime(timeFormat.parse("14:00")) //
-                .expectedArrivalTime(timeFormat.parse("15:00")) //
+                .expectedDepartureTime(LocalTime.parse("14:00")) //
+                .expectedArrivalTime(LocalTime.parse("15:00")) //
                 .expectedTrain1(new Train("529")) //
                 .expectedTrain2(new Train("516")) //
-                .effectiveDepartureTime(timeFormat.parse("14:05")) //
-                .effectiveArrivalTime(timeFormat.parse("15:15")) //
+                .effectiveDepartureTime(LocalTime.parse("14:05")) //
+                .effectiveArrivalTime(LocalTime.parse("15:15")) //
                 .effectiveTrain1(new Train("529")) //
                 .effectiveTrain2(new Train("516")) //
                 .delay(10L) //

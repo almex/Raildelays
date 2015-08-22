@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Map;
 
 public class StoreDelayGreaterThanThresholdInContextProcessorTest {
@@ -37,7 +37,7 @@ public class StoreDelayGreaterThanThresholdInContextProcessorTest {
         processor.setThreshold(60L);
         processor.beforeStep(stepbExecution);
 
-        input = new BatchExcelRow.Builder(new Date(), Sens.DEPARTURE)
+        input = new BatchExcelRow.Builder(LocalDate.now(), Sens.DEPARTURE)
                 .expectedTrain1(RaildelaysTestUtils.generateTrain("dummy", Language.EN))
                 .build(false);
     }

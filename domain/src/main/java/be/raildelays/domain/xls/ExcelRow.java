@@ -40,11 +40,10 @@ import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
 
 /**
@@ -64,7 +63,7 @@ public class ExcelRow implements Comparable<ExcelRow>, Serializable {
 
     @Column(name = "DATE")
     @NotNull
-    @Past
+    //FIXME @Past cannot use JSR-310 (java.time.* API) in conjunction with JSR-349 (Bean Validation 1.1)
     private LocalDate date;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -83,11 +82,12 @@ public class ExcelRow implements Comparable<ExcelRow>, Serializable {
 
     @Column(name = "EXPECTED_DEPARTURE_TIME")
     @NotNull
+    //FIXME @Past cannot use JSR-310 (java.time.* API) in conjunction with JSR-349 (Bean Validation 1.1)
     private LocalTime expectedDepartureTime;
 
     @Column(name = "EXPECTED_ARRIVAL_TIME")
     @NotNull
-    @Past
+    //FIXME @Past cannot use JSR-310 (java.time.* API) in conjunction with JSR-349 (Bean Validation 1.1)
     private LocalTime expectedArrivalTime;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -101,12 +101,12 @@ public class ExcelRow implements Comparable<ExcelRow>, Serializable {
 
     @Column(name = "EFFECTIVE_DEPARTURE_TIME")
     @NotNull
-    @Past
+    //FIXME @Past cannot use JSR-310 (java.time.* API) in conjunction with JSR-349 (Bean Validation 1.1)
     private LocalTime effectiveDepartureTime;
 
     @Column(name = "EFFECTIVE_ARRIVAL_TIME")
     @NotNull
-    @Past
+    //FIXME @Past cannot use JSR-310 (java.time.* API) in conjunction with JSR-349 (Bean Validation 1.1)
     private LocalTime effectiveArrivalTime;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -341,10 +341,8 @@ public class ExcelRow implements Comparable<ExcelRow>, Serializable {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-        SimpleDateFormat tf = new SimpleDateFormat("HH:mm");
 
-        builder.append(date != null ? df.format(date) : "N/A");
+        builder.append(date != null ? date.format(DateTimeFormatter.ISO_DATE) : "N/A");
         builder.append(" ");
         builder.append(notNullToString(departureStation));
         builder.append(" ");
@@ -352,17 +350,17 @@ public class ExcelRow implements Comparable<ExcelRow>, Serializable {
         builder.append(" ");
         builder.append(notNullToString(linkStation));
         builder.append(" ");
-        builder.append(expectedDepartureTime != null ? tf.format(expectedDepartureTime) : "N/A");
+        builder.append(expectedDepartureTime != null ? expectedDepartureTime.format(DateTimeFormatter.ISO_TIME) : "N/A");
         builder.append(" ");
-        builder.append(expectedArrivalTime != null ? tf.format(expectedArrivalTime) : "N/A");
+        builder.append(expectedArrivalTime != null ? expectedArrivalTime.format(DateTimeFormatter.ISO_TIME) : "N/A");
         builder.append(" ");
         builder.append(notNullToString(expectedTrain1));
         builder.append(" ");
         builder.append(notNullToString(expectedTrain2));
         builder.append(" ");
-        builder.append(effectiveDepartureTime != null ? tf.format(effectiveDepartureTime) : "N/A");
+        builder.append(effectiveDepartureTime != null ? effectiveDepartureTime.format(DateTimeFormatter.ISO_TIME) : "N/A");
         builder.append(" ");
-        builder.append(effectiveArrivalTime != null ? tf.format(effectiveArrivalTime) : "N/A");
+        builder.append(effectiveArrivalTime != null ? effectiveArrivalTime.format(DateTimeFormatter.ISO_TIME) : "N/A");
         builder.append(" ");
         builder.append(notNullToString(effectiveTrain1));
         builder.append(" ");

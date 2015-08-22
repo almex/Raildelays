@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Date;
 
 @RunWith(BlockJUnit4ClassRunner.class)
@@ -29,7 +30,7 @@ public class FilterWithThresholdDateProcessorTest {
         processor.setMode(FilterWithThresholdDateProcessor.Mode.BEFORE);
 
         BatchExcelRow item = new BatchExcelRow
-                .Builder(Date.from(Instant.parse("2014-12-31T00:00:00.00Z")), Sens.DEPARTURE)
+                .Builder(LocalDate.parse("2014-12-31"), Sens.DEPARTURE)
                 .build(false);
         ExcelRow result = processor.process(item);
 
@@ -41,7 +42,7 @@ public class FilterWithThresholdDateProcessorTest {
         processor.setMode(FilterWithThresholdDateProcessor.Mode.BEFORE);
 
         BatchExcelRow item = new BatchExcelRow
-                .Builder(Date.from(Instant.parse("2014-01-01T00:00:00.00Z")), Sens.DEPARTURE)
+                .Builder(LocalDate.parse("2014-01-01"), Sens.DEPARTURE)
                 .build(false);
         ExcelRow result = processor.process(item);
 
@@ -53,7 +54,7 @@ public class FilterWithThresholdDateProcessorTest {
         processor.setMode(FilterWithThresholdDateProcessor.Mode.BEFORE);
 
         BatchExcelRow item = new BatchExcelRow
-                .Builder(Date.from(Instant.parse("2014-01-18T00:00:00.00Z")), Sens.DEPARTURE)
+                .Builder(LocalDate.parse("2014-01-18"), Sens.DEPARTURE)
                 .build(false);
         ExcelRow result = processor.process(item);
 
@@ -65,7 +66,7 @@ public class FilterWithThresholdDateProcessorTest {
         processor.setMode(FilterWithThresholdDateProcessor.Mode.AFTER_OR_EQUALS);
 
         BatchExcelRow item = new BatchExcelRow
-                .Builder(Date.from(Instant.parse("2014-01-18T00:00:00.00Z")), Sens.DEPARTURE)
+                .Builder(LocalDate.parse("2014-01-18"), Sens.DEPARTURE)
                 .build(false);
         ExcelRow result = processor.process(item);
 
@@ -77,7 +78,7 @@ public class FilterWithThresholdDateProcessorTest {
         processor.setMode(FilterWithThresholdDateProcessor.Mode.AFTER_OR_EQUALS);
 
         BatchExcelRow item = new BatchExcelRow
-                .Builder(Date.from(Instant.parse("2014-01-01T00:00:00.00Z")), Sens.DEPARTURE)
+                .Builder(LocalDate.parse("2014-01-01"), Sens.DEPARTURE)
                 .build(false);
         ExcelRow result = processor.process(item);
 
@@ -89,7 +90,7 @@ public class FilterWithThresholdDateProcessorTest {
         processor.setMode(FilterWithThresholdDateProcessor.Mode.AFTER_OR_EQUALS);
 
         BatchExcelRow item = new BatchExcelRow
-                .Builder(Date.from(Instant.parse("2014-12-31T00:00:00.00Z")), Sens.DEPARTURE)
+                .Builder(LocalDate.parse("2014-12-31"), Sens.DEPARTURE)
                 .build(false);
         ExcelRow result = processor.process(item);
 

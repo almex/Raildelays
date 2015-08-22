@@ -24,6 +24,7 @@
 
 package be.raildelays.logging;
 
+import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.delays.Delays;
 import be.raildelays.delays.TimeDelay;
 import be.raildelays.domain.dto.RouteLogDTO;
@@ -39,7 +40,6 @@ import org.slf4j.Marker;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -161,6 +161,26 @@ public class RaildelaysLogger implements Logger {
                     .expectedArrivalTime(object.getExpectedArrivalTime())
                     .effectiveDepartureTime(object.getEffectiveDepartureTime())
                     .effectiveArrivalTime(object.getEffectiveArrivalTime())
+                    .build();
+        }
+    };
+    private Delegator<BatchExcelRow> batchExcelRowDelegator = new Delegator<BatchExcelRow>() {
+        @Override
+        public String logLine(String message, BatchExcelRow object) {
+            return new LogLineBuilder()
+                    .message(message)
+                    .id(object.getId())
+                    .date(object.getDate())
+                    .expectedTrain(getTrainId(object.getExpectedTrain1()))
+                    .effectiveTrain(getTrainId(object.getEffectiveTrain1()))
+                    .departureStation(getStationName(object.getDepartureStation()))
+                    .arrivalStation(getStationName(object.getArrivalStation()))
+                    .expectedDepartureTime(object.getExpectedDepartureTime())
+                    .expectedArrivalTime(object.getExpectedArrivalTime())
+                    .effectiveDepartureTime(object.getEffectiveDepartureTime())
+                    .effectiveArrivalTime(object.getEffectiveArrivalTime())
+                    .canceledArrival(object.isCanceled())
+                    .canceledDeparture(object.isCanceled())
                     .build();
         }
     };
@@ -301,6 +321,21 @@ public class RaildelaysLogger implements Logger {
 
     @Override
     public void trace(String message, ExcelRow excelRow) {
+        excelRowDelegator.log(message, Level.TRACE, excelRow);
+    }
+
+    @Override
+    public void info(String message, BatchExcelRow excelRow) {
+        excelRowDelegator.log(message, Level.INFO, excelRow);
+    }
+
+    @Override
+    public void debug(String message, BatchExcelRow excelRow) {
+        excelRowDelegator.log(message, Level.DEBUG, excelRow);
+    }
+
+    @Override
+    public void trace(String message, BatchExcelRow excelRow) {
         excelRowDelegator.log(message, Level.TRACE, excelRow);
     }
 
@@ -799,8 +834,8 @@ public class RaildelaysLogger implements Logger {
             final NumberFormat idFormat = new DecimalFormat(ID_FORMAT);
             final NumberFormat trainFormat = new DecimalFormat(TRAIN_FORMAT);
             final NumberFormat delayFormat = new DecimalFormat(DELAY_FORMAT);
-            final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-            final SimpleDateFormat timeFormat = new SimpleDateFormat(TIME_FORMAT);
+            final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern(DATE_FORMAT);
+            final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern(TIME_FORMAT);
 
             if (expectedTrain != null ||
                     departureStation != null ||
@@ -826,7 +861,7 @@ public class RaildelaysLogger implements Logger {
                 builder.append(separator);
                 builder.append(formatEffectiveTime(effectiveArrivalTime, canceledArrival));
                 builder.append(separator);
-                builder.append(delayFormat.format(Delays.computeDelay(expectedArrivalTime, effectiveArrivalTime)));
+                builder.append(delayFormat.format(Delays.computeDelay(expectedArrivalTime, effectiveArrivalTime) / 1000 / 60));
                 builder.append(separator);
                 builder.append(StringUtils.rightPad(idPrevious != null ? idFormat.format(idPrevious) : "", ID_FORMAT.length()));
                 builder.append(separator);

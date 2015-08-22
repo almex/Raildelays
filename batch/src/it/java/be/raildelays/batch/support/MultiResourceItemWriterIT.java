@@ -32,7 +32,6 @@ import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
 import com.excilys.ebi.spring.dbunit.config.DBOperation;
 import com.excilys.ebi.spring.dbunit.test.DataSet;
-import org.apache.commons.lang.time.DateUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -50,10 +49,15 @@ import org.springframework.test.context.ContextConfiguration;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @ContextConfiguration(locations = {
         "/jobs/main-job-context.xml"})
@@ -84,29 +88,31 @@ public class MultiResourceItemWriterIT extends AbstractContextIT {
         }
 
         items = new ArrayList<>();
-        DateFormat formatter = new SimpleDateFormat("HH:mm");
-        Iterator<Calendar> it = DateUtils.iterator(new SimpleDateFormat("dd/MM/yyyy").parse("01/01/2000"), DateUtils.RANGE_MONTH_MONDAY);
+        List<LocalDate> dates = new ArrayList<>(80);
 
-        for (int i = 0; i < 80 && it.hasNext(); i++) {
-            Date date = it.next().getTime();
+        for (int i = 0; i < 80; i++) {
+            dates.add(LocalDate.now().minus(1, ChronoUnit.DAYS));
+        }
+
+        for (LocalDate date : dates) {
             BatchExcelRow from = new BatchExcelRow.Builder(date, Sens.DEPARTURE) //
                     .departureStation(new Station("Liège-Guillemins")) //
                     .arrivalStation(new Station("Bruxelles-central")) //
-                    .expectedDepartureTime(formatter.parse("08:00")) //
-                    .expectedArrivalTime(formatter.parse("09:00")) //
+                    .expectedDepartureTime(LocalTime.parse("08:00")) //
+                    .expectedArrivalTime(LocalTime.parse("09:00")) //
                     .expectedTrain1(new Train("466")) //
-                    .effectiveDepartureTime(formatter.parse("08:05")) //
-                    .effectiveArrivalTime(formatter.parse("09:15")) //
+                    .effectiveDepartureTime(LocalTime.parse("08:05")) //
+                    .effectiveArrivalTime(LocalTime.parse("09:15")) //
                     .effectiveTrain1(new Train("466")) //
                     .build();
             BatchExcelRow to = new BatchExcelRow.Builder(date, Sens.ARRIVAL) //
                     .departureStation(new Station("Bruxelles-central")) //
                     .arrivalStation(new Station("Liège-Guillemins")) //
-                    .expectedDepartureTime(formatter.parse("14:00")) //
-                    .expectedArrivalTime(formatter.parse("15:00")) //
+                    .expectedDepartureTime(LocalTime.parse("14:00")) //
+                    .expectedArrivalTime(LocalTime.parse("15:00")) //
                     .expectedTrain1(new Train("529")) //
-                    .effectiveDepartureTime(formatter.parse("14:05")) //
-                    .effectiveArrivalTime(formatter.parse("15:15")) //
+                    .effectiveDepartureTime(LocalTime.parse("14:05")) //
+                    .effectiveArrivalTime(LocalTime.parse("15:15")) //
                     .effectiveTrain1(new Train("529")) //
                     .build();
 

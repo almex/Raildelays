@@ -24,6 +24,7 @@
 
 package be.raildelays.logging;
 
+import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.domain.dto.RouteLogDTO;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.railtime.TwoDirections;
@@ -55,6 +56,12 @@ public interface Logger extends org.slf4j.Logger {
     void debug(String message, ExcelRow excelRow);
 
     void trace(String message, ExcelRow excelRow);
+
+    void info(String message, BatchExcelRow excelRow);
+
+    void debug(String message, BatchExcelRow excelRow);
+
+    void trace(String message, BatchExcelRow excelRow);
 
     void info(String message, RouteLogDTO routeLog);
 

@@ -8,9 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
 
 import static org.springframework.batch.item.file.ExcelSheetItemWriter.Format;
 
@@ -21,16 +19,8 @@ public class  AbstractFileTest {
     protected static final String CURRENT_PATH = "." + File.separator + "target" + File.separator;
     protected static final String EXCEL_FILE_PREFIX = "retard_sncb";
     protected static final String EXCEL_FILE_NAME = EXCEL_FILE_PREFIX + " 20140522" + Format.OLE2.getFileExtension();
-    protected static final String DATE_TO_STRING = "20140121";
-    protected static Date DATE;
-
-    static {
-        try {
-            DATE = new SimpleDateFormat("yyyyMMdd").parse(DATE_TO_STRING);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-    }
+    protected static final String DATE_TO_STRING = "2014-01-21";
+    protected static LocalDate DATE = LocalDate.parse(DATE_TO_STRING);
 
     protected void copyFile() throws IOException {
         Path source = new ClassPathResource(EXCEL_FILE_NAME).getFile().toPath();

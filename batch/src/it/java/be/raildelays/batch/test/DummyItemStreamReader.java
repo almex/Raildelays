@@ -8,8 +8,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-import java.time.Instant;
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  * Created by xbmc on 28-06-15.
@@ -28,7 +27,7 @@ public class DummyItemStreamReader extends AbstractItemStreamItemReader implemen
         ExcelRow result = null;
 
         if (open) {
-            result = new ExcelRow.Builder(Date.from(Instant.now()), Sens.ARRIVAL).delay(65L).build(false);
+            result = new ExcelRow.Builder(LocalDate.now(), Sens.ARRIVAL).delay(65L).build(false);
             open = false;
         }
 

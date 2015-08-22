@@ -91,7 +91,7 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
                 result = rowMapper.mapRow(row, getCurrentIndex());
             } catch (Exception ex) {
                 throw new ParseException("Parsing error at line: " + getCurrentIndex() + " in resource=["
-                        + resource.getDescription() + "], input=[" + row + "]", ex);
+                        + resource.getDescription() + "]", ex);
             }
         } else {
             noInput = true;
@@ -199,13 +199,13 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
         return noInput;
     }
 
+    public Resource getResource() {
+        return resource;
+    }
+
     @Override
     public void setResource(Resource resource) {
         this.resource = resource;
-    }
-
-    public Resource getResource() {
-        return resource;
     }
 
     /**

@@ -38,28 +38,28 @@ public final class Delays {
      * Compare two {@link TimeDelay} and compute duration between those two
      * (taking into account delays of both parameters).
      *
-     * @param timestampA first {@link TimeDelay}
-     * @param timestampB second {@link TimeDelay}
-     * @return number of milliseconds between <code>timestampA</code> and <code>timestampB</code>
+     * @param timeDelayA first {@link TimeDelay}
+     * @param timeDelayB second {@link TimeDelay}
+     * @return number of milliseconds between <code>timeDelayA</code> and <code>timeDelayB</code>
      */
-    public static long compareTimeAndDelay(TimeDelay timestampA, TimeDelay timestampB) {
+    public static long compareTimeAndDelay(TimeDelay timeDelayA, TimeDelay timeDelayB) {
         long result = 0;
 
-        if (timestampA != null && timestampB != null) {
-            if (timestampA.getExpectedTime() != null && timestampB.getExpectedTime() != null) {
-                LocalTime start = timestampA.toLocalTime();
-                LocalTime end = timestampB.toLocalTime();
+        if (timeDelayA != null && timeDelayB != null) {
+            if (timeDelayA.getExpectedTime() != null && timeDelayB.getExpectedTime() != null) {
+                LocalTime start = timeDelayA.toLocalTime();
+                LocalTime end = timeDelayB.toLocalTime();
                 Duration duration = Duration.between(start, end);
 
                 result = -duration.toMillis(); // The difference is the opposite of a duration
-            } else if (timestampA.getExpectedTime() != null) {
+            } else if (timeDelayA.getExpectedTime() != null) {
                 result = 1;
-            } else if (timestampB.getExpectedTime() != null) {
+            } else if (timeDelayB.getExpectedTime() != null) {
                 result = -1;
             }
-        } else if (timestampA != null) {
+        } else if (timeDelayA != null) {
             result = 1;
-        } else if (timestampB != null) {
+        } else if (timeDelayB != null) {
             result = -1;
         }
 
@@ -80,14 +80,14 @@ public final class Delays {
 
     /**
      * Compare two {@link TimeDelay} and compute duration between those two
-     * (taking into account delay only from the <code>timestamp</code>).
+     * (taking into account delay only from the <code>timeDelay</code>).
      *
-     * @param timestamp a {@link TimeDelay}
+     * @param timeDelay a {@link TimeDelay}
      * @param time      a {@link LocalTime}
-     * @return number of milliseconds between <code>timestamp</code> and <code>time</code>
+     * @return number of milliseconds between <code>timeDelay</code> and <code>time</code>
      */
-    public static long compareTimeAndDelay(TimeDelay timestamp, LocalTime time) {
-        return compareTimeAndDelay(timestamp, TimeDelay.of(time));
+    public static long compareTimeAndDelay(TimeDelay timeDelay, LocalTime time) {
+        return compareTimeAndDelay(timeDelay, TimeDelay.of(time));
     }
 
     /**

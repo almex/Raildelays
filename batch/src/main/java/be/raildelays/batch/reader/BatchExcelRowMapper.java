@@ -50,6 +50,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 /**
  * Simple {@link org.springframework.batch.item.file.RowMapper} matching our use case to deal with our
@@ -162,15 +163,19 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
         return getValue(row, cellIndex, cell -> {
             LocalDate result = null;
 
-            switch (cell.getCellType()) {
-                case Cell.CELL_TYPE_NUMERIC:
-                    result = LocalDateTime.ofInstant(cell.getDateCellValue().toInstant(), ZoneId.systemDefault()).toLocalDate();
-                    break;
-                case Cell.CELL_TYPE_STRING:
-                    result = LocalDate.parse(cell.getStringCellValue(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                    break;
-                default:
-                    LOGGER.error("Cannot convert rowIndex={} cellIndex={} of type={} into Date", cell.getRowIndex(), cell.getColumnIndex(), cell.getCellType());
+            try {
+                switch (cell.getCellType()) {
+                    case Cell.CELL_TYPE_NUMERIC:
+                        result = LocalDateTime.ofInstant(cell.getDateCellValue().toInstant(), ZoneId.systemDefault()).toLocalDate();
+                        break;
+                    case Cell.CELL_TYPE_STRING:
+                        result = LocalDate.parse(cell.getStringCellValue(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                        break;
+                    default:
+                        LOGGER.error("Cannot convert rowIndex={} cellIndex={} of type={} into Date", cell.getRowIndex(), cell.getColumnIndex(), cell.getCellType());
+                }
+            } catch (DateTimeParseException e) {
+                LOGGER.error("Parsing exception: cannot convert into date rowIndex={} cellIndex={}, exception={}", cell.getRowIndex(), cellIndex, e.getMessage());
             }
 
             return result;
@@ -184,10 +189,7 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
         Integer minutes = getTime(row, mmCellIndex);
 
         if (hours != null && minutes != null && hours >= 0 && minutes >= 0) {
-            String hh = numberFormat.format(hours);
-            String mm = numberFormat.format(minutes);
-
-            result = LocalTime.parse(hh + ":" + mm);
+            result = LocalTime.parse(String.format("%02d:%02d", hours, minutes));
         }
 
         return result;

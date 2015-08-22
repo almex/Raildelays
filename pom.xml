@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.almex</groupId>
@@ -85,10 +86,10 @@
         <version.spring.boot>1.2.5.RELEASE</version.spring.boot>
         <version.spring.dbunit>1.4.0</version.spring.dbunit>
         <version.xbean.spring>3.16</version.xbean.spring>
+        <version.hibernate.validator>5.2.1.Final</version.hibernate.validator>
         <version.hibernate>4.3.11.Final</version.hibernate>
         <version.eclipselink>2.5.1</version.eclipselink>
         <version.openjpa>2.2.2</version.openjpa>
-        <version.hibernate.validator>5.2.1.Final</version.hibernate.validator>
         <version.querydsl>3.4.2</version.querydsl>
         <version.validation.api>1.1.0.Final</version.validation.api>
         <version.javax.el-api>2.2.4</version.javax.el-api>

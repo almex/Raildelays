@@ -6,18 +6,18 @@ import be.raildelays.domain.xls.ExcelRow;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import static org.hamcrest.Matchers.greaterThan;
 
 public class StationBasedExcelRowComparatorTest extends AbstractExcelRowComparatorTest {
 
-    private Date now;
+    private LocalDate now;
 
     @Override
     public void setUp() {
         comparator = new StationBasedExcelRowComparator(Language.EN);
-        now = new Date();
+        now = LocalDate.now();
     }
 
 

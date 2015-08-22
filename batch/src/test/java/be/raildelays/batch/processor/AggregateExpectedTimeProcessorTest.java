@@ -11,9 +11,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -22,8 +22,7 @@ import java.util.List;
 
 public class AggregateExpectedTimeProcessorTest {
     public static final Train TRAIN = new Train("0");
-    private static final SimpleDateFormat F = new SimpleDateFormat("HH:mm");
-    private static final Date TODAY = new Date();
+    private static final LocalDate TODAY = LocalDate.now();
     private static final Station DEPARTURE_STATION = new Station(
             "Liège-Guillemins");
     private static final Station INTERMEDIATE_STATION = new Station(
@@ -46,8 +45,8 @@ public class AggregateExpectedTimeProcessorTest {
 
         item = new LineStop.Builder().date(TODAY)
                 .train(TRAIN).station(INTERMEDIATE_STATION)
-                .arrivalTime(TimeDelay.of(F.parse("18:20"), 0L))
-                .departureTime(TimeDelay.of(F.parse("18:20"), 0L))
+                .arrivalTime(TimeDelay.of(LocalTime.parse("18:20"), 0L))
+                .departureTime(TimeDelay.of(LocalTime.parse("18:20"), 0L))
                 .canceledDeparture(true)
                 .canceledArrival(true)
                 .addNext(new LineStop.Builder().date(TODAY)
@@ -65,20 +64,20 @@ public class AggregateExpectedTimeProcessorTest {
 
         expected = new LineStop.Builder().date(TODAY)
                 .train(TRAIN).station(INTERMEDIATE_STATION)
-                .arrivalTime(TimeDelay.of(F.parse("18:20"), 0L))
-                .departureTime(TimeDelay.of(F.parse("18:21"), 0L))
+                .arrivalTime(TimeDelay.of(LocalTime.parse("18:20"), 0L))
+                .departureTime(TimeDelay.of(LocalTime.parse("18:21"), 0L))
                 .canceledDeparture(true)
                 .canceledArrival(true)
                 .addNext(new LineStop.Builder().date(TODAY)
                         .train(new Train("1")).station(ARRIVAL_STATION)
-                        .arrivalTime(TimeDelay.of(F.parse("18:30"), 0L))
-                        .departureTime(TimeDelay.of(F.parse("18:31"), 0L))
+                        .arrivalTime(TimeDelay.of(LocalTime.parse("18:30"), 0L))
+                        .departureTime(TimeDelay.of(LocalTime.parse("18:31"), 0L))
                         .canceledDeparture(true)
                         .canceledArrival(true))
                 .addPrevious(new LineStop.Builder().date(TODAY)
                         .train(new Train("1")).station(DEPARTURE_STATION)
-                        .arrivalTime(TimeDelay.of(F.parse("17:00"), 0L))
-                        .departureTime(TimeDelay.of(F.parse("17:01"), 0L))
+                        .arrivalTime(TimeDelay.of(LocalTime.parse("17:00"), 0L))
+                        .departureTime(TimeDelay.of(LocalTime.parse("17:01"), 0L))
                         .canceledDeparture(true))
                 .build();
 
@@ -113,12 +112,12 @@ public class AggregateExpectedTimeProcessorTest {
 
         Assert.assertNotNull(result);
 
-        Assert.assertEquals(F.parse("17:00"), result.getPrevious().getArrivalTime().getExpectedTime());
-        Assert.assertEquals(F.parse("17:01"), result.getPrevious().getDepartureTime().getExpectedTime());
-        Assert.assertEquals(F.parse("18:20"), result.getArrivalTime().getExpectedTime());
-        Assert.assertEquals(F.parse("18:21"), result.getDepartureTime().getExpectedTime());
-        Assert.assertEquals(F.parse("18:30"), result.getNext().getArrivalTime().getExpectedTime());
-        Assert.assertEquals(F.parse("18:31"), result.getNext().getDepartureTime().getExpectedTime());
+        Assert.assertEquals(LocalTime.parse("17:00"), result.getPrevious().getArrivalTime().getExpectedTime());
+        Assert.assertEquals(LocalTime.parse("17:01"), result.getPrevious().getDepartureTime().getExpectedTime());
+        Assert.assertEquals(LocalTime.parse("18:20"), result.getArrivalTime().getExpectedTime());
+        Assert.assertEquals(LocalTime.parse("18:21"), result.getDepartureTime().getExpectedTime());
+        Assert.assertEquals(LocalTime.parse("18:30"), result.getNext().getArrivalTime().getExpectedTime());
+        Assert.assertEquals(LocalTime.parse("18:31"), result.getNext().getDepartureTime().getExpectedTime());
 
         EasyMock.verify(raildelaysServiceMock);
     }
