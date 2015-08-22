@@ -1230,7 +1230,7 @@
                         <groupId>org.eluder.coveralls</groupId>
                         <artifactId>coveralls-maven-plugin</artifactId>
                         <configuration>
-                            <repoToken>${env.coveralls.token}</repoToken>
+                            <repoToken>${repoToken}</repoToken>
                         </configuration>
                     </plugin>
 
