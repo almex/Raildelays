@@ -10,5 +10,5 @@ jdk:
   - oraclejdk8
   
 after_success:
-  - mvn clean verify -Pcode-coverage
+  - mvn clean verify -Pcode-coverage coveralls:report
 

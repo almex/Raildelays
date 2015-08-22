@@ -118,7 +118,7 @@
         <version.dbunit>2.4.9</version.dbunit>
         <version.jodatime>2.3</version.jodatime>
         <version.animal.snifer>1.14</version.animal.snifer>
-        <version.jacoco>0.7.4.201502262128</version.jacoco>
+        <version.jacoco>0.7.5.201505241946</version.jacoco>
 
         <!-- Surefire/Failsafe settings -->
         <forkCount>1</forkCount>
@@ -137,8 +137,9 @@
         <sonar.language>java</sonar.language>
         <!-- groupId allow concurrent analyze -->
         <!--jacoco.test.destFile>${java.io.tmpdir}/${project.groupId}/jacoco-test.exec</jacoco.test.destFile -->
-        <jacoco.test.destFile>${java.io.tmpdir}/JaCoCo${version.jacoco}/jacoco-test.exec</jacoco.test.destFile>
-        <jacoco.it.destFile>${java.io.tmpdir}/JaCoCo${version.jacoco}/jacoco-it.exec</jacoco.it.destFile>
+        <coveralls.report.path>${java.io.tmpdir}/JaCoCo${version.jacoco}/</coveralls.report.path>
+        <jacoco.test.destFile>${coveralls.report.path}/jacoco-test.exec</jacoco.test.destFile>
+        <jacoco.it.destFile>${coveralls.report.path}/jacoco-it.exec</jacoco.it.destFile>
         <it.source.path>src/it/java</it.source.path>
         <it.resources.path>src/it/resources</it.resources.path>
     </properties>
@@ -1193,28 +1194,47 @@
                                     <append>true</append>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>report-unit-tests</id>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                                <configuration>
+                                    <dataFile>${jacoco.test.destFile}</dataFile>
+                                    <outputDirectory>${coveralls.report.path}</outputDirectory>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>report-integration-tests</id>
+                                <goals>
+                                    <goal>report-integration</goal>
+                                </goals>
+                                <configuration>
+                                    <dataFile>${jacoco.it.destFile}</dataFile>
+                                    <outputDirectory>${coveralls.report.path}</outputDirectory>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                     <!-- To publish code-coverage on Coveralls via Travis-ci -->
                     <plugin>
                         <groupId>org.eluder.coveralls</groupId>
                         <artifactId>coveralls-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>coveralls</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>report</goal>
-                                </goals>
-                                <configuration>
-                                    <repoToken>g9PRdWtGBudopOiM4Mzb8KMF7DMLV9BLb</repoToken>
-                                    <jacocoReports>
-                                        <jacocoReport>${jacoco.test.destFile}</jacocoReport>
-                                        <jacocoReport>${jacoco.it.destFile}</jacocoReport>
-                                    </jacocoReports>
-                                </configuration>
-                            </execution>
-                        </executions>
+                        <!--<executions>-->
+                        <!--<execution>-->
+                        <!--<id>coveralls</id>-->
+                        <!--<phase>verify</phase>-->
+                        <!--<goals>-->
+                        <!--<goal>report</goal>-->
+                        <!--</goals>-->
+                        <!--</execution>-->
+                        <!--</executions>-->
+                        <configuration>
+                            <repoToken>g9PRdWtGBudopOiM4Mzb8KMF7DMLV9BLb</repoToken>
+                            <jacocoReports>
+                                <jacocoReport>${coveralls.report.path}/jacoco.xml</jacocoReport>
+                            </jacocoReports>
+                        </configuration>
                     </plugin>
 
                 </plugins>
