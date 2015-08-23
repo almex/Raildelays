@@ -25,10 +25,11 @@
 
     <developers>
         <developer>
-            <email>soumagne_alexis@hotmail.com</email>
+            <id>Almex</id>
+            <email>alexis underscore soumagne at hotmail dot com</email>
             <name>Alexis SOUMAGNE</name>
             <url>https://github.com/almex</url>
-            <id>almex</id>
+            <timezone>Europe/Berlin</timezone>
         </developer>
     </developers>
 

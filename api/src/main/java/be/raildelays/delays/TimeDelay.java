@@ -1,14 +1,10 @@
 package be.raildelays.delays;
 
 import java.io.Serializable;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 import java.time.temporal.UnsupportedTemporalTypeException;
-import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -50,9 +46,9 @@ public final class TimeDelay implements Serializable, Comparable<TimeDelay> {
     }
 
     /**
-     * Create an an instance of {@link TimeDelay} with the current {@link Date} for the expectedTime time and 0 delay.
+     * Create an an instance of {@link TimeDelay} with the current {@link LocalTime} for the expectedTime time and 0 delay.
      *
-     * @return a non-null {@link TimeDelay} with the current {@link Date} and 0 delay.
+     * @return a non-null {@link TimeDelay} with the current {@link LocalTime} and 0 delay.
      */
     public static TimeDelay now() {
         return new TimeDelay();
@@ -91,18 +87,21 @@ public final class TimeDelay implements Serializable, Comparable<TimeDelay> {
      *                     and all not supported by {@link LocalTime#isSupported(TemporalUnit)})
      * @return a {@link TimeDelay} with the {@code expectedTime} and the {@code delay},
      * {@code null} if the {@code expectedTime} is {@code null}.
+     * @throws UnsupportedTemporalTypeException if the unit is not supported
      */
     public static TimeDelay of(LocalTime expectedTime, Long delay, TemporalUnit unit) {
         TimeDelay result = null;
 
+        Objects.requireNonNull(unit);
+
         if (expectedTime != null) {
             Duration duration = Duration.of(DEFAULT_DELAY, DELAY_UNIT);
 
-            if (delay != null && unit != null) {
+            if (delay != null) {
                 if (!unit.isSupportedBy(expectedTime) ||
                         ChronoUnit.NANOS.equals(unit) ||
                         ChronoUnit.MICROS.equals(unit)) {
-                    throw new UnsupportedTemporalTypeException("This unit is not supported by a TimeDelay");
+                    throw new UnsupportedTemporalTypeException("Unsupported unit: " + unit);
                 }
 
                 duration = Duration.of(delay, unit);
@@ -115,17 +114,6 @@ public final class TimeDelay implements Serializable, Comparable<TimeDelay> {
     }
 
     /**
-     * Create an an instance of {@link TimeDelay} with the {@code expectedTime} given in parameter and 0 {@code delay}.
-     *
-     * @param expectedTime we take into account only the {@link #expectedTime} from this {@link TimeDelay}
-     * @return a {@link TimeDelay} with the {@code expectedTime} and 0 {@code delay},
-     * {@code null} if the {@code expectedTime} is {@code null}.
-     */
-    public static TimeDelay of(TimeDelay expectedTime) {
-        return expectedTime != null ? new TimeDelay(expectedTime.getExpectedTime(), DEFAULT_DELAY) : null;
-    }
-
-    /**
      * Create an an instance of {@link TimeDelay} from two {@link LocalTime} :
      * <ul>
      * <li>the expected time</li>
@@ -134,7 +122,8 @@ public final class TimeDelay implements Serializable, Comparable<TimeDelay> {
      *
      * @param expectedTime  the expected time of this instance of {@link TimeDelay}
      * @param effectiveTime the effective time used to compute delay
-     * @return a {@link TimeDelay} with the computed delay between those two {@link Date},
+     * @return a {@link TimeDelay} with as delay the duration between those two {@code expectedTime}
+     * and {@code effectiveTime},
      * {@code null} if the {@code expectedTime} is {@code null}.
      */
     public static TimeDelay computeFrom(LocalTime expectedTime, LocalTime effectiveTime) {
@@ -157,6 +146,17 @@ public final class TimeDelay implements Serializable, Comparable<TimeDelay> {
      */
     public static TimeDelay from(TimeDelay timeDelay) {
         return new TimeDelay(timeDelay.getExpectedTime(), timeDelay.getDelay());
+    }
+
+    /**
+     * Create an an instance of {@link TimeDelay} with the {@code expectedTime} given in parameter and 0 {@code delay}.
+     *
+     * @param expectedTime we take into account only the {@link #expectedTime} from this {@link TimeDelay}
+     * @return a {@link TimeDelay} with the {@code expectedTime} and 0 {@code delay},
+     * {@code null} if the {@code expectedTime} is {@code null}.
+     */
+    public static TimeDelay fromWithoutDelay(TimeDelay expectedTime) {
+        return expectedTime != null ? new TimeDelay(expectedTime.getExpectedTime(), DEFAULT_DELAY) : null;
     }
 
     /**
@@ -195,6 +195,9 @@ public final class TimeDelay implements Serializable, Comparable<TimeDelay> {
      *
      * @return a non-null {@link LocalTime} which is a combination of {@code expectedTime}
      * plus its {@code delay}.
+     * @throws DateTimeException if the addition cannot be made
+     * @throws UnsupportedTemporalTypeException - if the unit is not supported
+     * @throws ArithmeticException if numeric overflow occurs
      */
     public LocalTime getEffectiveTime() {
         return expectedTime.plus(delay, DELAY_UNIT);
