@@ -14,4 +14,11 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
+    <dependencies>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>pojo-unit</artifactId>
+        </dependency>
+    </dependencies>
+
 </project>
