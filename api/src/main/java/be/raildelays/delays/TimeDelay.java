@@ -16,6 +16,12 @@ import java.util.Objects;
  * @author Almex
  * @implSpec This class is immutable and thread-safe.
  * @since 2.0
+ * @implNote This class has a natural ordering that is inconsistent with equals.
+ * Because {@code x.equals(y)} does not mean that {@code x.compareTo(y) == 0}.
+ * <p>
+ * Example: considering x=18:00+30" and y=18:30+00" {@link #equals(Object)} return {@code false} but
+ * {@link #compareTo(TimeDelay)} return {@code true}.
+ * </p>
  */
 public final class TimeDelay implements Serializable, Comparable<TimeDelay> {
 
@@ -196,7 +202,6 @@ public final class TimeDelay implements Serializable, Comparable<TimeDelay> {
      * @return a non-null {@link LocalTime} which is a combination of {@code expectedTime}
      * plus its {@code delay}.
      * @throws DateTimeException if the addition cannot be made
-     * @throws UnsupportedTemporalTypeException - if the unit is not supported
      * @throws ArithmeticException if numeric overflow occurs
      */
     public LocalTime getEffectiveTime() {

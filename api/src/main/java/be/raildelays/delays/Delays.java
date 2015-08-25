@@ -35,25 +35,31 @@ public final class Delays {
     }
 
     /**
-     * Compare two {@link TimeDelay} and compute duration between those two
-     * (taking into account delays of both parameters).
+     * This method is based on {@link Comparable#compareTo(Object)} contract except that it can handle {@code null}
+     * reference on left parameter and that it computes the opposite of a {@link Duration} between those two
+     * {@link TimeDelay} parameters (taking into account the {@linkplain TimeDelay#getEffectiveTime() effectiveTime}).
      *
-     * @param timeDelayA first {@link TimeDelay}
-     * @param timeDelayB second {@link TimeDelay}
-     * @return number of milliseconds between <code>timeDelayA</code> and <code>timeDelayB</code>
+     * @param startInclusive start {@link TimeDelay}, inclusive and can be null
+     * @param endExclusive end {@link TimeDelay}, exclusive and can be null
+     * @return number of milliseconds between {@code endExclusive} and {@code startInclusive}, 0 if either
+     * {@code endExclusive} or {@code startInclusive} is null
+     * @throws DateTimeException if the seconds between the temporals cannot be obtained
+     * @throws ArithmeticException if the calculation exceeds the capacity of {@code Duration}
      */
-    public static long compareTimeAndDelay(TimeDelay timeDelayA, TimeDelay timeDelayB) {
+    public static long compareTimeAndDelay(TimeDelay startInclusive, TimeDelay endExclusive) {
         long result = 0;
 
-        if (timeDelayA != null && timeDelayB != null) {
-            LocalTime start = timeDelayA.getEffectiveTime();
-            LocalTime end = timeDelayB.getEffectiveTime();
+        if (startInclusive == endExclusive) {
+            result = 0;
+        } else if (startInclusive != null && endExclusive != null) {
+            LocalTime start = startInclusive.getEffectiveTime();
+            LocalTime end = endExclusive.getEffectiveTime();
             Duration duration = Duration.between(start, end);
 
             result = -duration.toMillis(); // The difference is the opposite of a duration
-        } else if (timeDelayA != null) {
+        } else if (startInclusive != null) {
             result = 1;
-        } else if (timeDelayB != null) {
+        } else if (endExclusive != null) {
             result = -1;
         }
 
@@ -153,20 +159,34 @@ public final class Delays {
         return result;
     }
 
-    public static LocalTime toLocalTime(Date expectedTime) {
+    /**
+     * Assumes translation of {@link Date} into {@link LocalTime}.
+     * This implementation takes into account 4 possible types :
+     * <ul>
+     * <li><code>java.sql.Time</code></li>
+     * <li><code>java.sql.Date</code></li>
+     * <li><code>java.sql.Timestamp</code></li>
+     * <li><code>java.util.Date</code></li>
+     * </ul>
+     *
+     * @param date the date to translate
+     * @return the time part of this date-time, not null
+     * @throws UnsupportedOperationException if the {@code date} is an instance of {@link java.sql.Date}
+     */
+    public static LocalTime toLocalTime(Date date) {
         LocalTime result;
 
-        if (expectedTime instanceof java.sql.Time) {
-            result = ((java.sql.Time) expectedTime).toLocalTime();
-        } else if (expectedTime instanceof java.sql.Date) {
+        if (date instanceof java.sql.Time) {
+            result = ((java.sql.Time) date).toLocalTime();
+        } else if (date instanceof java.sql.Date) {
             throw new UnsupportedOperationException("Cannot handle java.sql.Date because we expect only a time");
-        } else if (expectedTime instanceof java.sql.Timestamp) {
-            result = ((java.sql.Timestamp) expectedTime)
+        } else if (date instanceof java.sql.Timestamp) {
+            result = ((java.sql.Timestamp) date)
                     .toLocalDateTime()
                     .toLocalTime();
         } else {
             result = LocalDateTime
-                    .ofInstant(expectedTime.toInstant(), ZoneId.systemDefault())
+                    .ofInstant(date.toInstant(), ZoneId.systemDefault())
                     .toLocalTime();
         }
 

@@ -3,6 +3,11 @@ package be.raildelays.delays;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 
@@ -18,6 +23,22 @@ public class DelaysTest {
         TimeDelay departureB = TimeDelay.of(departureA, 0L);
 
         Assert.assertThat(Delays.compareTimeAndDelay(departureA, departureB), is(equalTo(0L)));
+    }
+
+    @Test
+    public void testCompareTimeAndDelayWithLeftIsNull() throws Exception {
+        TimeDelay departureA = null;
+        TimeDelay departureB = TimeDelay.now();
+
+        Assert.assertThat(Delays.compareTimeAndDelay(departureA, departureB), is(lessThan(0L)));
+    }
+
+    @Test
+    public void testCompareTimeAndDelayWithRightIsNull() throws Exception {
+        TimeDelay departureA = TimeDelay.now();
+        TimeDelay departureB = null;
+
+        Assert.assertThat(Delays.compareTimeAndDelay(departureA, departureB), is(greaterThan(0L)));
     }
 
     @Test
@@ -79,7 +100,7 @@ public class DelaysTest {
     @Test
     public void testCompareTime() throws Exception {
         LocalTime departureA = LocalTime.now();
-        TimeDelay departureB = TimeDelay.of(departureA, 0L);
+        TimeDelay departureB = TimeDelay.of(departureA, 15L);
 
         Assert.assertThat(Delays.compareTime(departureA, departureB), is(equalTo(0L)));
     }
@@ -87,9 +108,9 @@ public class DelaysTest {
     @Test
     public void testRevertedCompareTimeGreater() throws Exception {
         LocalTime departureA = LocalTime.parse("14:00");
-        TimeDelay departureB = TimeDelay.of(LocalTime.parse("15:00"), 0L);
+        TimeDelay departureB = TimeDelay.of(LocalTime.parse("15:00"), 15L);
 
-        Assert.assertThat(Delays.compareTime(departureB, departureA), is(greaterThan(0L)));
+        Assert.assertThat(Delays.compareTime(departureB, departureA), is(equalTo(3600L * 1000)));
     }
 
     @Test
@@ -113,7 +134,7 @@ public class DelaysTest {
         LocalTime departureA = LocalTime.parse("15:00");
         TimeDelay departureB = TimeDelay.of(LocalTime.parse("14:00"), 0L);
 
-        Assert.assertThat(Delays.compareTime(departureA, departureB), is(greaterThan(0L)));
+        Assert.assertThat(Delays.compareTime(departureA, departureB), is(equalTo(3600L * 1000)));
     }
 
     @Test
@@ -121,15 +142,14 @@ public class DelaysTest {
         LocalTime departureA = LocalTime.parse("14:00");
         TimeDelay departureB = TimeDelay.of(LocalTime.parse("15:00"), 0L);
 
-        Assert.assertThat(Delays.compareTime(departureA, departureB), is(lessThan(0L)));
+        Assert.assertThat(Delays.compareTime(departureA, departureB), is(equalTo(-3600L * 1000)));
     }
 
     @Test
     public void testCompareTimeWithTwoEqualsDates() throws Exception {
         LocalTime departureA = LocalTime.now();
-        LocalTime departureB = departureA;
 
-        Assert.assertThat(Delays.compareTime(departureA, departureB), is(equalTo(0L)));
+        Assert.assertThat(Delays.compareTime(departureA, departureA), is(equalTo(0L)));
     }
 
     @Test
@@ -146,5 +166,28 @@ public class DelaysTest {
         LocalTime departureB = TimeDelay.of(departureA, 15L).getEffectiveTime();
 
         Assert.assertThat(Delays.computeDelay(departureA, departureB), is(equalTo(15L)));
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void testToLocalTimeWithSqlDate() {
+        Delays.toLocalTime(Date.valueOf("2000-01-01"));
+    }
+
+    @Test
+    public void testToLocalTimeWithSqlTime() {
+        Assert.assertEquals(LocalTime.of(12, 0, 0),
+                Delays.toLocalTime(Time.valueOf("12:00:00")));
+    }
+
+    @Test
+    public void testToLocalTimeWithSqlTimestamp() {
+        Assert.assertEquals(LocalTime.of(12, 0, 0),
+                Delays.toLocalTime(Timestamp.valueOf("2000-01-01 12:00:00")));
+    }
+
+    @Test
+    public void testToLocalTimeWithUtilDate() throws ParseException {
+        Assert.assertEquals(LocalTime.of(12, 0, 0),
+                Delays.toLocalTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2000-01-01 12:00:00")));
     }
 }
