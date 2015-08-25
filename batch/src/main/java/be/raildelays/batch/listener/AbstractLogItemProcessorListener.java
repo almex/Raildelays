@@ -30,7 +30,11 @@ import org.springframework.batch.core.annotation.AfterProcess;
 import org.springframework.batch.core.annotation.BeforeProcess;
 
 /**
+ * Base abstract class to log items before and after process.
+ *
  * @author Almex
+ * @since 1.1
+ * @see org.springframework.batch.core.ItemProcessListener
  */
 public abstract class AbstractLogItemProcessorListener<I, O> {
 

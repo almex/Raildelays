@@ -28,9 +28,13 @@ import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.xls.ExcelRow;
 
 /**
+ *
+ *
  * @author Almex
+ * @since 1.1
  */
 public class LogStep2ItemProcessorListener extends AbstractLogItemProcessorListener<Object, Object> {
+
     @Override
     public void infoInput(String message, Object input) {
         if (input instanceof LineStop) {

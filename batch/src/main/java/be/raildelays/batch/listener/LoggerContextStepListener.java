@@ -34,6 +34,7 @@ import org.springframework.batch.core.StepExecutionListener;
  * log direction based on that fields.
  *
  * @author Almex
+ * @since 1.1
  */
 public class LoggerContextStepListener implements StepExecutionListener {
 

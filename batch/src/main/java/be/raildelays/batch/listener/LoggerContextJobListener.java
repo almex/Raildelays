@@ -36,9 +36,9 @@ import java.util.Date;
  * log directory based on that number.
  *
  * @author Almex
+ * @since 1.1
  */
 public class LoggerContextJobListener implements JobExecutionListener {
-
 
     public static final String JOB_EXECUTION_ID = "jobExecutionId";
     public static final String JOB_INSTANCE_ID = "jobInstanceId";
@@ -47,6 +47,7 @@ public class LoggerContextJobListener implements JobExecutionListener {
     @Override
     public void beforeJob(JobExecution jobExecution) {
         Date date = jobExecution.getJobParameters().getDate("date");
+
         MDC.put(JOB_EXECUTION_ID, jobExecution.getId().toString());
         MDC.put(JOB_INSTANCE_ID, jobExecution.getJobId().toString());
         MDC.put(DATE_PARAMETER, new SimpleDateFormat("yyyy-MM-dd").format(date));
