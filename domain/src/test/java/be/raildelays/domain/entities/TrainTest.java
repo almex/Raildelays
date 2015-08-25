@@ -1,7 +1,7 @@
 package be.raildelays.domain.entities;
 
 import be.raildelays.domain.Language;
-import be.raildelays.test.AbstractObjectTest;
+import com.github.almex.pojounit.AbstractObjectTest;
 import org.junit.experimental.theories.DataPoint;
 
 public class TrainTest extends AbstractObjectTest {
