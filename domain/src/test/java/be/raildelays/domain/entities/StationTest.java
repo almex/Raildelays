@@ -1,6 +1,6 @@
 package be.raildelays.domain.entities;
 
-import be.raildelays.test.AbstractObjectTest;
+import com.github.almex.pojounit.AbstractObjectTest;
 import org.junit.Before;
 import org.junit.experimental.theories.DataPoint;
 
