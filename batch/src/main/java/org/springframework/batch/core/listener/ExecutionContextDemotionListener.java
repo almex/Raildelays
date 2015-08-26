@@ -1,5 +1,6 @@
 package org.springframework.batch.core.listener;
 
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.InitializingBean;
@@ -17,6 +18,7 @@ import org.springframework.util.Assert;
  * @since 1.2
  */
 public class ExecutionContextDemotionListener extends StepExecutionListenerSupport implements InitializingBean {
+
     private String[] keys = null;
 
     private boolean strict = false;
@@ -45,7 +47,7 @@ public class ExecutionContextDemotionListener extends StepExecutionListenerSuppo
     }
 
     /**
-     * @param keys A list of keys corresponding to items in the {@link org.springframework.batch.core.Step}
+     * @param keys A list of keys corresponding to items in the {@link Step}
      * {@link ExecutionContext} that must be promoted.
      */
     public void setKeys(String[] keys) {
