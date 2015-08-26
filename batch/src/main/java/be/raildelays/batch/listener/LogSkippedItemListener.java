@@ -36,6 +36,7 @@ import org.springframework.batch.core.SkipListener;
  * This class logs skipped item via Slf4j.
  *
  * @author Almex
+ * @since 1.1
  */
 public class LogSkippedItemListener implements SkipListener<Object, BatchExcelRow>, ItemProcessListener<Object, Object> {
 
@@ -70,6 +71,7 @@ public class LogSkippedItemListener implements SkipListener<Object, BatchExcelRo
 
     @Override
     public void beforeProcess(Object item) {
+        // No action here
     }
 
     @Override
@@ -87,5 +89,6 @@ public class LogSkippedItemListener implements SkipListener<Object, BatchExcelRo
 
     @Override
     public void onProcessError(Object item, Exception e) {
+        // No action here
     }
 }

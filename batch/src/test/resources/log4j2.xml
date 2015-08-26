@@ -4,13 +4,16 @@
         <Console name="console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{DATE} %-5p %-15c{1}: %m%n"/>
         </Console>
-
+        <List name="List"/>
     </appenders>
     <loggers>
 
         <logger name="be.raildelays" level="trace" additivity="false">
             <appender-ref ref="console"/>
         </logger>
+        <Logger name="be.raildelays.batch.listener.LogSkippedItemListener" level="debug">
+            <AppenderRef ref="List"/>
+        </Logger>
 
         <root level="info">
             <appender-ref ref="console"/>

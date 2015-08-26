@@ -103,8 +103,8 @@
         <version.jersey>2.19</version.jersey>
 
         <version.atomikos>3.9.2</version.atomikos>
-        <version.log4j>2.2</version.log4j>
-        <version.slf4j>1.7.5</version.slf4j>
+        <version.log4j>2.3</version.log4j>
+        <version.slf4j>1.7.12</version.slf4j>
         <version.log4jdbc>1.16</version.log4jdbc>
         <version.disruptor>3.3.0</version.disruptor>
         <version.groovy>2.3.9</version.groovy>
