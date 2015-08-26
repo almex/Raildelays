@@ -176,14 +176,14 @@ public class LogSkippedItemListenerTest {
     @Test
     public void testAfterProcessExcelRow() throws Exception {
 
-        listener.onSkipInProcess(new ExcelRow
+        listener.afterProcess(new ExcelRow
                         .Builder(LocalDate.now(), Sens.DEPARTURE)
                         .departureStation(new Station("foo"))
                         .arrivalStation(new Station("bar"))
                         .expectedDepartureTime(LocalTime.parse("15:00"))
                         .expectedArrivalTime(LocalTime.parse("16:00"))
                         .build(false),
-                new Exception("error")
+                null
         );
 
         Assert.assertTrue(appender.getEvents()
@@ -204,7 +204,7 @@ public class LogSkippedItemListenerTest {
     @Test
     public void testAfterProcessLineStop() throws Exception {
 
-        listener.onSkipInProcess(new LineStop
+        listener.afterProcess(new LineStop
                         .Builder()
                         .date(LocalDate.now())
                         .station(new Station("foo"))
@@ -212,7 +212,7 @@ public class LogSkippedItemListenerTest {
                         .departureTime(TimeDelay.of(LocalTime.parse("15:00")))
                         .arrivalTime(TimeDelay.of(LocalTime.parse("16:00")))
                         .build(),
-                new Exception("error")
+                null
         );
 
         Assert.assertTrue(appender.getEvents()
@@ -232,9 +232,7 @@ public class LogSkippedItemListenerTest {
     @Test
     public void testAfterProcessUnknownType() throws Exception {
 
-        listener.afterProcess(new Object(),
-                new Exception("error")
-        );
+        listener.afterProcess(new Object(), null);
 
         Assert.assertTrue(appender.getEvents()
                 .stream()
