@@ -27,15 +27,14 @@ package be.raildelays.batch.listener;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.BlockJUnit4ClassRunner;
 import org.slf4j.MDC;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 
-/**
- * @author Almex
- * @since 1.2
- */
+@RunWith(BlockJUnit4ClassRunner.class)
 public class LoggerContextStepListenerTest {
 
     public static final String STEP_NAME = "myStep";

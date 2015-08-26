@@ -27,6 +27,8 @@ package be.raildelays.batch.listener;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.BlockJUnit4ClassRunner;
 import org.slf4j.MDC;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameter;
@@ -36,6 +38,7 @@ import org.springframework.batch.test.MetaDataInstanceFactory;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+@RunWith(BlockJUnit4ClassRunner.class)
 public class LoggerContextJobListenerTest {
 
     public static final Date DATE = new Date();
