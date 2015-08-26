@@ -2,9 +2,9 @@ language: java
 jdk:
 - oraclejdk8
 script:
-- mvn verify -B
+- mvn verify -Pit -B
 after_success:
-- mvn clean test -Pcoveralls jacoco:report coveralls:report
+- mvn clean verify -Pcoveralls jacoco:report coveralls:report
 env:
   global:
     secure: L9mXSTP7v+Rtr+FLLvvK7vgTgqezlufDHlM7iDMpZxd8JzEJywd2aQr+/oVXVsSviClb2puCbfKe/ttcZatqIRFn969sDCo7dupiOSOwC7visG+Cpq/Gr/EnJMLNpofJpU59xG/LTWeFaGOm8xMNtMlw230qQSrZtlABxKUmrlNdc2FjsKTH8IgZfsp0ap6FJFLbmNibkOvBDlpiWytFPxnmn5Bb7LiY/DjqSVIXKBlFh9vWMw6DeYntaFuYat6H83hzM23spSphZMLh+Lo/xwAzQ9hvBOMutjlZI0SM5Mh4ZDhwd3ZSrjXf2HeJ7ilzQ6u75IvblqwKrHaz5nNpy7+SCcRQKYuMmgDDGH6JIIDOHbmTBYvA9YFLD7qbHRgtvvHmXjuGsONnA5Ime27N0IeuhAg5/dOBwkVbiIsK7SZMBA3BPgC2mPlOw0qDKa2/AkTS7sE/SXlTG70ML+Pt/b6vMJ2RS4WFAXM9Us2MbV7GFMGKnGZy1Zf/UOCke3MV3gh9MOMVAFIrRev6xlwE99Smi8C172DOgMu1ivOIb+HAzH5mQU1+C1BvIGkDMtrO/rgJZnu2vAWXLcLYxd6Jy9VUI/e0Rc3gZE7MjjrDW9mRdPjQ7rwAK38TMXh7JMUrTJhqUgpRDJ2bzjBeTC7rpxnJY4rUXzL7LUDLMJlaFrc=
