@@ -4,4 +4,4 @@ jdk:
 script:
 - mvn verify -Pit -B
 after_success:
-- mvn clean test jacoco:report coveralls:report -Pcoveralls  -B
+- mvn clean verify jacoco:report coveralls:report -Pcoveralls  -B
