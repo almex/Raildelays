@@ -1214,7 +1214,7 @@
                 </plugins>
             </build>
         </profile>
-
+        
         <profile>
             <id>coveralls</id>
 
@@ -1222,78 +1222,41 @@
                 <plugins>
                     <!-- To compute Code Coverage for integration tests and unit tests -->
                     <plugin>
-                        <artifactId>maven-surefire-plugin</artifactId>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>default-test</id>
-                                <!-- We disable surefire since it seems buggy -->
-                                <phase>none</phase>
+                                <id>prepare-agent</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
                             </execution>
                         </executions>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
+                            <excludes>
+                                <!-- Exclude generated sources like JPA model gen -->
+                                <exclude>**/*_*</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                    <!-- We want unit-tests and integration-tests in the report -->
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>false</skip>
+                            <!-- fork mode must be enable with JaCoCo (1 thread per CPU Core) -->
+                            <forkCount>1</forkCount>
+                            <!-- Must be set to false to solve issue with JUnit ClassRule -->
+                            <reuseForks>false</reuseForks>
+                            <!-- If you want code coverage you must run tests -->
                             <skipTests>false</skipTests>
-                            <reportFormat>xml</reportFormat>
-                            <!-- required format for Sonar -->
+                            <!-- We want to count the number of failed tests -->
                             <testFailureIgnore>true</testFailureIgnore>
                             <includes>
                                 <include>**/*Test.java</include>
                                 <include>**/*IT.java</include>
                             </includes>
                         </configuration>
-                        <executions>
-                            <execution>
-                                <id>integration-tests</id>
-                                <phase>integration-test</phase>
-                                <goals>
-                                    <goal>integration-test</goal>
-                                </goals>
-                                <configuration>
-                                    <skip>false</skip>
-                                    <forkCount>1</forkCount>
-                                    <!-- fork mode must be enable with JaCoCo (1 thread per CPU Core) -->
-                                    <reuseForks>false</reuseForks>
-                                    <!-- coverage.test.argLine is the link with JaCoCo plug-in -->
-                                    <argLine>
-                                        ${coverage.test.argLine} -Xmx512m -Xms128m -XX:MaxMetaspaceSize=128m -XX:MetaspaceSize=64m
-                                    </argLine>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>integration-tests-verify</id>
-                                <phase>post-integration-test</phase>
-                                <goals>
-                                    <goal>verify</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.jacoco</groupId>
-                        <artifactId>jacoco-maven-plugin</artifactId>
-                        <configuration>
-                            <dataFile>${jacoco.test.destFile}</dataFile>
-                            <excludes>
-                                <!-- Exclude generated sources like JPA model gen -->
-                                <exclude>**/*_*</exclude>
-                            </excludes>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>prepare-failsafe-argLine</id>
-                                <phase>pre-integration-test</phase>
-                                <goals>
-                                    <goal>prepare-agent</goal>
-                                </goals>
-                                <configuration>
-                                    <propertyName>coverage.test.argLine</propertyName>
-                                    <destFile>${jacoco.test.destFile}</destFile>
-                                    <append>true</append>
-                                </configuration>
-                            </execution>
-                        </executions>
                     </plugin>
                     <!-- To publish code-coverage on Coveralls via Travis-ci -->
                     <plugin>
