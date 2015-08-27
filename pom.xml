@@ -1223,6 +1223,16 @@
                     <!-- To compute Code Coverage for integration tests and unit tests -->
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>default-test</id>
+                                <!-- We disable surefire since it seems buggy -->
+                                <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
                             <skipTests>false</skipTests>
                             <reportFormat>xml</reportFormat>
@@ -1235,10 +1245,10 @@
                         </configuration>
                         <executions>
                             <execution>
-                                <id>default-test</id>
-                                <phase>test</phase>
+                                <id>integration-tests</id>
+                                <phase>integration-test</phase>
                                 <goals>
-                                    <goal>test</goal>
+                                    <goal>integration-test</goal>
                                 </goals>
                                 <configuration>
                                     <skip>false</skip>
@@ -1250,6 +1260,13 @@
                                         ${coverage.test.argLine} -Xmx512m -Xms128m -XX:MaxMetaspaceSize=128m -XX:MetaspaceSize=64m
                                     </argLine>
                                 </configuration>
+                            </execution>
+                            <execution>
+                                <id>integration-tests-verify</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>verify</goal>
+                                </goals>
                             </execution>
                         </executions>
                     </plugin>
@@ -1265,8 +1282,8 @@
                         </configuration>
                         <executions>
                             <execution>
-                                <id>prepare-surefire-argLine</id>
-                                <phase>generate-test-resources</phase>
+                                <id>prepare-failsafe-argLine</id>
+                                <phase>pre-integration-test</phase>
                                 <goals>
                                     <goal>prepare-agent</goal>
                                 </goals>
