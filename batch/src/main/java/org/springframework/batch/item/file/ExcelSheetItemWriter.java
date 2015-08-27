@@ -122,7 +122,7 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
                  * We try here a second time because, in test scenario, it happens that the file is handled by another
                  * process during some milliseconds.
                  */
-                Thread.sleep(500);
+                Thread.sleep(1000);
                 this.outputStream = new FileOutputStream(outputFile);
             }
 
