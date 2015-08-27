@@ -1254,7 +1254,7 @@
                                     <skip>false</skip>
                                     <forkCount>1</forkCount>
                                     <!-- fork mode must be enable with JaCoCo (1 thread per CPU Core) -->
-                                    <reuseForks>true</reuseForks>
+                                    <reuseForks>false</reuseForks>
                                     <!-- coverage.test.argLine is the link with JaCoCo plug-in -->
                                     <argLine>
                                         ${coverage.test.argLine} -Xmx512m -Xms128m -XX:MaxMetaspaceSize=128m -XX:MetaspaceSize=64m
