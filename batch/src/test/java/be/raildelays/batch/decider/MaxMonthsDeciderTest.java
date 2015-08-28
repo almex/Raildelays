@@ -31,7 +31,7 @@ public class MaxMonthsDeciderTest {
     private StepExecution stepExecution;
 
     @Before
-    public void setUp() throws ParseException {
+    public void setUp() throws Exception {
         jobExecution = MetaDataInstanceFactory.createJobExecution();
         stepExecution = MetaDataInstanceFactory.createStepExecution();
         decider = new MaxMonthsDecider();
@@ -39,7 +39,7 @@ public class MaxMonthsDeciderTest {
     }
 
     @Test
-    public void testCompleted() throws ParseException {
+    public void testCompleted() throws Exception {
         decider.setReader(new ItemStreamItemReaderDelegator<>(new IteratorItemReader<>(Arrays.asList(
                 new ExcelRow.Builder(NOW.minus(1, ChronoUnit.MONTHS) // 1 month before Now
                         , Sens.ARRIVAL)
@@ -50,6 +50,7 @@ public class MaxMonthsDeciderTest {
                         , Sens.ARRIVAL)
                         .build(false)
         ))));
+        decider.afterPropertiesSet();
 
         FlowExecutionStatus status = decider.decide(jobExecution, stepExecution);
 
@@ -58,7 +59,7 @@ public class MaxMonthsDeciderTest {
 
 
     @Test
-    public void testCompletedWithMaxMonths() throws ParseException {
+    public void testCompletedWithMaxMonths() throws Exception {
         decider.setReader(new ItemStreamItemReaderDelegator<>(new IteratorItemReader<>(Arrays.asList(
                 new ExcelRow.Builder(NOW.minus(6, ChronoUnit.MONTHS) // 6 month before Now
                         , Sens.ARRIVAL)
@@ -69,6 +70,7 @@ public class MaxMonthsDeciderTest {
                         , Sens.ARRIVAL)
                         .build(false)
         ))));
+        decider.afterPropertiesSet();
 
         FlowExecutionStatus status = decider.decide(jobExecution, stepExecution);
 
