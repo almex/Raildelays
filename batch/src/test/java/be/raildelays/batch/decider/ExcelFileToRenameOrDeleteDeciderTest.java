@@ -51,6 +51,7 @@ public class ExcelFileToRenameOrDeleteDeciderTest extends AbstractFileTest {
                         , Sens.ARRIVAL)
                         .build(false)
         ))));
+        decider.afterPropertiesSet();
 
         FlowExecutionStatus status = decider.decide(jobExecution, stepExecution);
 
@@ -71,6 +72,7 @@ public class ExcelFileToRenameOrDeleteDeciderTest extends AbstractFileTest {
                         , Sens.ARRIVAL)
                         .build(false)
         ))));
+        decider.afterPropertiesSet();
 
         FlowExecutionStatus status = decider.decide(jobExecution, stepExecution);
 
