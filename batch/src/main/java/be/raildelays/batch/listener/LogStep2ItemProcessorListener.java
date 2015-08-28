@@ -28,7 +28,7 @@ import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.xls.ExcelRow;
 
 /**
- *
+ * Logging of items before and after process in generateExcelFilesSubStep
  *
  * @author Almex
  * @since 1.1
