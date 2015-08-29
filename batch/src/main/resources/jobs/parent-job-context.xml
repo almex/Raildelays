@@ -11,7 +11,8 @@
 
     <context:property-placeholder location="classpath:application.properties" order="1" ignore-unresolvable="true"/>
 
-    <job id="parentJob" incrementer="batchJobParametersIncrementer" abstract="true" xmlns="http://www.springframework.org/schema/batch">
+    <job id="parentJob" incrementer="batchJobParametersIncrementer" abstract="true"
+         xmlns="http://www.springframework.org/schema/batch">
     </job>
 
     <step id="parentStep" abstract="true" xmlns="http://www.springframework.org/schema/batch">
@@ -29,6 +30,26 @@
     </bean>
 
     <bean id="jobParameterExtractor" class="be.raildelays.batch.job.ExecutionContextJobParametersExtractor"/>
+
+    <bean id="localDateEditor" class="org.springframework.beans.propertyeditor.CustomLocalDateEditor">
+        <constructor-arg>
+            <bean class="java.time.format.DateTimeFormatter" factory-method="ofPattern">
+                <constructor-arg value="yyyy-MM-dd"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg value="true"/>
+    </bean>
+
+    <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+        <property name="customEditors">
+            <map>
+                <entry key="java.time.LocalDate">
+                    <ref bean="localDateEditor"/>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
 
     <!-- ================================================================================================== -->
     <!-- =====================================        LISTENERS       ===================================== -->

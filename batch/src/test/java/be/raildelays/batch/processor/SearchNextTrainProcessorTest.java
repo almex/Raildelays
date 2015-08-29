@@ -436,4 +436,21 @@ public class SearchNextTrainProcessorTest {
 
         EasyMock.verify(raildelaysServiceMock);
     }
+
+    @Test
+    public void testWithNoResult() throws Exception {
+        EasyMock.expect(
+                raildelaysServiceMock.searchNextTrain(
+                        EasyMock.anyObject(Station.class),
+                        EasyMock.anyObject(LocalDateTime.class))).andReturn(
+                Collections.EMPTY_LIST);
+        EasyMock.replay(raildelaysServiceMock);
+
+        BatchExcelRow result = processor.process(item);
+
+        Assert.assertNotNull(result);
+        Assert.assertEquals(new Train(Y), result.getEffectiveTrain1());
+
+        EasyMock.verify(raildelaysServiceMock);
+    }
 }

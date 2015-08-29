@@ -39,6 +39,7 @@ import be.raildelays.repository.TrainDao;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
@@ -70,6 +71,7 @@ public class LineStopMapperProcessor implements ItemProcessor<TwoDirections, Lin
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        Assert.notNull(date, "The 'date' property should not be null");
     }
 
     @Override
@@ -140,23 +142,19 @@ public class LineStopMapperProcessor implements ItemProcessor<TwoDirections, Lin
 
         if (StringUtils.isNotBlank(train.getEnglishName())) {
             result = trainDao.findByEnglishName(train.getEnglishName());
-        }
-
-        if (result == null && StringUtils.isNotBlank(train.getFrenchName())) {
+        } else if (StringUtils.isNotBlank(train.getFrenchName())) {
             result = trainDao.findByFrenchName(train.getFrenchName());
-        }
-
-        if (result == null && StringUtils.isNotBlank(train.getDutchName())) {
+        } else if (StringUtils.isNotBlank(train.getDutchName())) {
             result = trainDao.findByDutchName(train.getDutchName());
         }
 
         if (result == null) {
             result = train;
 
-            LOGGER.debug("create_train={}.", train);
+            LOGGER.debug("create_train={}", train);
         }
 
-        LOGGER.trace("train={}.", result);
+        LOGGER.trace("train={}", result);
 
         return result;
     }
@@ -166,23 +164,19 @@ public class LineStopMapperProcessor implements ItemProcessor<TwoDirections, Lin
 
         if (StringUtils.isNotBlank(station.getEnglishName())) {
             result = stationDao.findByEnglishName(station.getEnglishName());
-        }
-
-        if (result == null && StringUtils.isNotBlank(station.getFrenchName())) {
+        } else if (StringUtils.isNotBlank(station.getFrenchName())) {
             result = stationDao.findByFrenchName(station.getFrenchName());
-        }
-
-        if (result == null && StringUtils.isNotBlank(station.getDutchName())) {
+        } else if (StringUtils.isNotBlank(station.getDutchName())) {
             result = stationDao.findByDutchName(station.getDutchName());
         }
 
         if (result == null) {
             result = station;
 
-            LOGGER.debug("create_station={}.", station);
+            LOGGER.debug("create_station={}", station);
         }
 
-        LOGGER.trace("station={}.", result);
+        LOGGER.trace("station={}", result);
 
         return result;
     }

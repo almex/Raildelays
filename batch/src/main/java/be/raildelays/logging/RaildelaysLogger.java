@@ -490,52 +490,52 @@ public class RaildelaysLogger implements Logger {
 
     @Override
     public void debug(String format, Object arg) {
-
+        delegate.debug(format, arg);
     }
 
     @Override
     public void debug(String format, Object arg1, Object arg2) {
-
+        delegate.debug(format, arg1, arg2);
     }
 
     @Override
     public void debug(String format, Object... arguments) {
-
+        delegate.debug(format, arguments);
     }
 
     @Override
     public void debug(String msg, Throwable t) {
-
+        delegate.debug(msg, t);
     }
 
     @Override
     public boolean isDebugEnabled(Marker marker) {
-        return false;
+        return delegate.isDebugEnabled(marker);
     }
 
     @Override
     public void debug(Marker marker, String msg) {
-
+        delegate.debug(marker, msg);
     }
 
     @Override
     public void debug(Marker marker, String format, Object arg) {
-
+        delegate.debug(marker, format, arg);
     }
 
     @Override
     public void debug(Marker marker, String format, Object arg1, Object arg2) {
-
+        delegate.debug(marker, format, arg1, arg2);
     }
 
     @Override
     public void debug(Marker marker, String format, Object... arguments) {
-
+        delegate.debug(marker, format, arguments);
     }
 
     @Override
     public void debug(Marker marker, String msg, Throwable t) {
-
+        delegate.debug(marker, msg, t);
     }
 
     @Override
