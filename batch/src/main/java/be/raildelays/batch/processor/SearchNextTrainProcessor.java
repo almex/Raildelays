@@ -34,7 +34,6 @@ import be.raildelays.logging.Logger;
 import be.raildelays.logging.LoggerFactory;
 import be.raildelays.service.RaildelaysService;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.beans.factory.InitializingBean;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -49,7 +48,7 @@ import java.util.Locale;
  *
  * @author Almex
  */
-public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, BatchExcelRow>, InitializingBean {
+public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, BatchExcelRow> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("Nxt", SearchNextTrainProcessor.class);
 
@@ -57,11 +56,6 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
     private RaildelaysService service;
 
     private String language = Language.EN.name();
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-
-    }
 
     public List<BatchExcelRow> process(List<BatchExcelRow> items) throws Exception {
         List<BatchExcelRow> result = new ArrayList<>();
@@ -156,11 +150,6 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
             // We don't process null values
             if (candidateDeparture == null) {
                 LOGGER.trace("filter_null_departure", candidateDeparture);
-                continue;
-            }
-
-            if (candidateArrival == null) {
-                LOGGER.trace("filter_null_arrival", candidateArrival);
                 continue;
             }
 

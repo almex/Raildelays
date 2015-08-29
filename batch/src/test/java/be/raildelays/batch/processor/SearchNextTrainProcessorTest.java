@@ -2,6 +2,7 @@ package be.raildelays.batch.processor;
 
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.delays.TimeDelay;
+import be.raildelays.domain.Language;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
@@ -19,16 +20,20 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @RunWith(value = BlockJUnit4ClassRunner.class)
 public class SearchNextTrainProcessorTest {
 
+    public static final String LIEGE_GUILLEMINS = "Liège-Guillemins";
+    public static final String BRUXELLES_CENTRAL = "Bruxelles-Central";
+    public static final String Y = "416";
+    public static final String N0 = "410";
+    public static final String N1 = "411";
     private static final LocalDate TODAY = LocalDate.now();
-    private static final Station DEPARTURE_STATION = new Station(
-            "Liège-Guillemins");
-    private static final Station ARRIVAL_STATION = new Station(
-            "Bruxelles-Central");
+    private static final Station DEPARTURE_STATION = new Station(LIEGE_GUILLEMINS);
+    private static final Station ARRIVAL_STATION = new Station(BRUXELLES_CENTRAL);
     /**
      * S.U.T.
      */
@@ -57,10 +62,10 @@ public class SearchNextTrainProcessorTest {
         item = new BatchExcelRow.Builder(TODAY, Sens.DEPARTURE) //
                 .departureStation(DEPARTURE_STATION) //
                 .arrivalStation(ARRIVAL_STATION) //
-                .expectedTrain1(new Train("y")) //
+                .expectedTrain1(new Train(Y)) //
                 .expectedDepartureTime(LocalTime.parse("16:30")) //
                 .expectedArrivalTime(LocalTime.parse("17:00")) //
-                .effectiveTrain1(new Train("y")) //
+                .effectiveTrain1(new Train(Y)) //
                 .effectiveDepartureTime(LocalTime.parse("16:30")) //
                 .effectiveArrivalTime(LocalTime.parse("17:00")) //
                 .canceled(false) //
@@ -68,13 +73,13 @@ public class SearchNextTrainProcessorTest {
                 .build();
 
         stop0 = new LineStop.Builder().date(TODAY)
-                .train(new Train("0")).station(ARRIVAL_STATION)
+                .train(new Train(N0)).station(ARRIVAL_STATION)
                 .arrivalTime(TimeDelay.of(LocalTime.parse("18:00"), 0L))
                 .departureTime(TimeDelay.of(LocalTime.parse("18:00"), 0L))
                 .canceledArrival(false)
                 .canceledDeparture(false)
                 .addPrevious(new LineStop.Builder().date(TODAY)
-                        .train(new Train("0")).station(DEPARTURE_STATION)
+                        .train(new Train(N0)).station(DEPARTURE_STATION)
                         .arrivalTime(TimeDelay.of(LocalTime.parse("17:30"), 0L))
                         .departureTime(TimeDelay.of(LocalTime.parse("17:30"), 0L))
                         .canceledArrival(false)
@@ -82,13 +87,13 @@ public class SearchNextTrainProcessorTest {
                 .build();
 
         stop1 = new LineStop.Builder().date(TODAY)
-                .train(new Train("1")).station(ARRIVAL_STATION)
+                .train(new Train(N1)).station(ARRIVAL_STATION)
                 .arrivalTime(TimeDelay.of(LocalTime.parse("18:30"), 0L))
                 .departureTime(TimeDelay.of(LocalTime.parse("18:30"), 0L))
                 .canceledArrival(false)
                 .canceledDeparture(false)
                 .addPrevious(new LineStop.Builder().date(TODAY)
-                        .train(new Train("1")).station(DEPARTURE_STATION)
+                        .train(new Train(N1)).station(DEPARTURE_STATION)
                         .arrivalTime(TimeDelay.of(LocalTime.parse("17:00"), 0L))
                         .departureTime(TimeDelay.of(LocalTime.parse("17:00"), 0L))
                         .canceledArrival(false)
@@ -121,6 +126,7 @@ public class SearchNextTrainProcessorTest {
                 .arrivalTime(TimeDelay.of(LocalTime.parse("18:00"), 30L * 1000 * 60))
                 .departureTime(TimeDelay.of(LocalTime.parse("18:00"), 30L * 1000 * 60))
                 .build();
+        processor.setLanguage(Language.EN.name());
 
         nextLineStops = Arrays.asList(new LineStop[]{stop0, stop1});
 
@@ -136,7 +142,7 @@ public class SearchNextTrainProcessorTest {
         BatchExcelRow result = processor.process(item);
 
         Assert.assertNotNull(result);
-        Assert.assertEquals(new Train("0"), result.getEffectiveTrain1());
+        Assert.assertEquals(new Train(N0), result.getEffectiveTrain1());
         Assert.assertEquals(90, result.getDelay().longValue());
 
         EasyMock.verify(raildelaysServiceMock);
@@ -153,10 +159,33 @@ public class SearchNextTrainProcessorTest {
 	 */
     @Test
     public void testTrainIsMultipleCanceling() throws Exception {
-        stop0 = new LineStop.Builder(stop0)
+        final Language lang = Language.FR;
+
+        stop0 = new LineStop.Builder(stop0, false, false)
+                .train(new Train(N0, lang))
+                .station(new Station(BRUXELLES_CENTRAL, lang))
+                .addPrevious(new LineStop
+                                .Builder(stop0.getPrevious(), false, false)
+                                .train(new Train(N0, lang))
+                                .station(new Station(LIEGE_GUILLEMINS, lang))
+                )
                 .canceledArrival(true)
                 .canceledDeparture(true)
                 .build();
+        stop1 = new LineStop.Builder(stop1, false, false)
+                .train(new Train(N1, lang))
+                .station(new Station(BRUXELLES_CENTRAL, lang))
+                .addPrevious(new LineStop
+                                .Builder(stop1.getPrevious(), false, false)
+                                .train(new Train(N1, lang))
+                                .station(new Station(LIEGE_GUILLEMINS, lang))
+                )
+                .build();
+        item.setExpectedTrain1(new Train(Y, lang));
+        item.setEffectiveTrain1(new Train(Y, lang));
+        item.setDepartureStation(new Station(LIEGE_GUILLEMINS, lang));
+        item.setArrivalStation(new Station(BRUXELLES_CENTRAL, lang));
+        processor.setLanguage(lang.name());
 
         nextLineStops = Arrays.asList(new LineStop[]{stop0, stop1});
 
@@ -172,7 +201,7 @@ public class SearchNextTrainProcessorTest {
         BatchExcelRow result = processor.process(item);
 
         Assert.assertNotNull(result);
-        Assert.assertEquals(new Train("1"), result.getEffectiveTrain1());
+        Assert.assertEquals(new Train(N1, lang), result.getEffectiveTrain1());
         Assert.assertEquals(90, result.getDelay().longValue());
 
         EasyMock.verify(raildelaysServiceMock);
@@ -189,10 +218,37 @@ public class SearchNextTrainProcessorTest {
 	 */
     @Test
     public void testTrainIsDelayAndNextAreNot() throws Exception {
+        final Language lang = Language.NL;
+
+        stop0 = new LineStop.Builder(stop0, false, false)
+                .train(new Train(N0, lang))
+                .station(new Station(BRUXELLES_CENTRAL, lang))
+                .addPrevious(new LineStop
+                                .Builder(stop0.getPrevious(), false, false)
+                                .train(new Train(N0, lang))
+                                .station(new Station(LIEGE_GUILLEMINS, lang))
+                )
+                .build();
+        stop1 = new LineStop.Builder(stop1, false, false)
+                .train(new Train(N1, lang))
+                .station(new Station(BRUXELLES_CENTRAL, lang))
+                .addPrevious(new LineStop
+                                .Builder(stop1.getPrevious(), false, false)
+                                .train(new Train(N1, lang))
+                                .station(new Station(LIEGE_GUILLEMINS, lang))
+                )
+                .build();
+
+        nextLineStops = Arrays.asList(new LineStop[]{stop0, stop1});
 
         item.setEffectiveDepartureTime(LocalTime.parse("17:45"));
         item.setEffectiveArrivalTime(LocalTime.parse("19:00"));
         item.setDelay(120);
+        item.setExpectedTrain1(new Train(Y, lang));
+        item.setEffectiveTrain1(new Train(Y, lang));
+        item.setDepartureStation(new Station(LIEGE_GUILLEMINS, lang));
+        item.setArrivalStation(new Station(BRUXELLES_CENTRAL, lang));
+        processor.setLanguage(lang.name());
 
         EasyMock.expect(
                 raildelaysServiceMock.searchNextTrain(
@@ -204,7 +260,7 @@ public class SearchNextTrainProcessorTest {
         BatchExcelRow result = processor.process(item);
 
         Assert.assertNotNull(result);
-        Assert.assertEquals(new Train("0"), result.getEffectiveTrain1());
+        Assert.assertEquals(new Train(N0, lang), result.getEffectiveTrain1());
         Assert.assertEquals(60, result.getDelay().longValue());
 
         EasyMock.verify(raildelaysServiceMock);
@@ -232,7 +288,7 @@ public class SearchNextTrainProcessorTest {
         BatchExcelRow result = processor.process(item);
 
         Assert.assertNotNull(result);
-        Assert.assertEquals(new Train("y"), result.getEffectiveTrain1());
+        Assert.assertEquals(new Train(Y), result.getEffectiveTrain1());
         Assert.assertEquals(0, result.getDelay().longValue());
 
         EasyMock.verify(raildelaysServiceMock);
@@ -263,8 +319,120 @@ public class SearchNextTrainProcessorTest {
         BatchExcelRow result = processor.process(item);
 
         Assert.assertNotNull(result);
-        Assert.assertEquals(new Train("y"), result.getEffectiveTrain1());
+        Assert.assertEquals(new Train(Y), result.getEffectiveTrain1());
         Assert.assertEquals(90, result.getDelay().longValue());
+
+        EasyMock.verify(raildelaysServiceMock);
+    }
+
+    @Test
+    public void testProcessCollection() throws Exception {
+        item.setEffectiveArrivalTime(LocalTime.parse("18:30"));
+        item.setDelay(90);
+
+        EasyMock.expect(
+                raildelaysServiceMock.searchNextTrain(
+                        EasyMock.anyObject(Station.class),
+                        EasyMock.anyObject(LocalDateTime.class))).andReturn(
+                nextLineStops);
+        EasyMock.replay(raildelaysServiceMock);
+
+        List<BatchExcelRow> result = processor.process(Collections.singletonList(item));
+
+        Assert.assertNotNull(result);
+        Assert.assertEquals(new Train(Y), result.get(0).getEffectiveTrain1());
+        Assert.assertEquals(90, result.get(0).getDelay().longValue());
+
+        EasyMock.verify(raildelaysServiceMock);
+    }
+
+    @Test
+    public void testNoCorrespondingDepartureStation() throws Exception {
+
+        stop0 = new LineStop.Builder(stop0, false, false)
+                .station(new Station(BRUXELLES_CENTRAL))
+                .addPrevious(new LineStop
+                                .Builder(stop0.getPrevious(), false, false)
+                                .station(new Station("foo"))
+                ).build();
+        stop1 = new LineStop.Builder(stop1, false, false)
+                .station(new Station(BRUXELLES_CENTRAL))
+                .addPrevious(new LineStop
+                                .Builder(stop1.getPrevious(), false, false)
+                                .station(new Station("foo"))
+                ).build();
+
+        nextLineStops = Arrays.asList(new LineStop[]{stop0, stop1});
+
+        EasyMock.expect(
+                raildelaysServiceMock.searchNextTrain(
+                        EasyMock.anyObject(Station.class),
+                        EasyMock.anyObject(LocalDateTime.class))).andReturn(
+                nextLineStops);
+        EasyMock.replay(raildelaysServiceMock);
+
+        BatchExcelRow result = processor.process(item);
+
+        Assert.assertNotNull(result);
+        Assert.assertEquals(new Train(Y), result.getEffectiveTrain1());
+
+        EasyMock.verify(raildelaysServiceMock);
+    }
+
+    @Test
+    public void testCanceledDeparture() throws Exception {
+
+        stop0 = new LineStop.Builder(stop0, false, false)
+                .addPrevious(new LineStop
+                                .Builder(stop0.getPrevious(), false, false)
+                                .canceledDeparture(true)
+                ).build();
+        stop1 = new LineStop.Builder(stop1, false, false)
+                .addPrevious(new LineStop
+                                .Builder(stop1.getPrevious(), false, false)
+                                .canceledDeparture(true)
+                ).build();
+
+        nextLineStops = Arrays.asList(new LineStop[]{stop0, stop1});
+
+        EasyMock.expect(
+                raildelaysServiceMock.searchNextTrain(
+                        EasyMock.anyObject(Station.class),
+                        EasyMock.anyObject(LocalDateTime.class))).andReturn(
+                nextLineStops);
+        EasyMock.replay(raildelaysServiceMock);
+
+        BatchExcelRow result = processor.process(item);
+
+        Assert.assertNotNull(result);
+        Assert.assertEquals(new Train(Y), result.getEffectiveTrain1());
+
+        EasyMock.verify(raildelaysServiceMock);
+    }
+
+    @Test
+    public void testCanceledArrival() throws Exception {
+
+        stop0 = new LineStop.Builder(stop0)
+                .canceledArrival(true)
+                .build();
+        stop1 = new LineStop.Builder(stop1)
+                .canceledArrival(true)
+                .build();
+
+        nextLineStops = Arrays.asList(new LineStop[]{stop0, stop1});
+
+        EasyMock.expect(
+                raildelaysServiceMock.searchNextTrain(
+                        EasyMock.anyObject(Station.class),
+                        EasyMock.anyObject(LocalDateTime.class))).andReturn(
+                nextLineStops);
+        EasyMock.replay(raildelaysServiceMock);
+
+        BatchExcelRow result = processor.process(item);
+
+        Assert.assertNotNull(result);
+        Assert.assertEquals(new Train(Y), result.getEffectiveTrain1());
 
         EasyMock.verify(raildelaysServiceMock);
     }
