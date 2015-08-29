@@ -2,6 +2,7 @@ package be.raildelays.batch.processor;
 
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.bean.BatchExcelRow.Builder;
+import be.raildelays.domain.Language;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
@@ -11,11 +12,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.NonTransientResourceException;
-import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.batch.item.*;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
+import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.core.io.Resource;
 
@@ -145,6 +144,7 @@ public class FilterTwoSensPerDayProcessorTest {
         processor = new FilterTwoSensPerDayProcessor();
         stepExecution.getExecutionContext().putString("foo", "");
         processor.setOutputReader(fakeReader);
+        processor.setLanguage(Language.EN.name());
         processor.afterPropertiesSet();
     }
 
@@ -214,6 +214,65 @@ public class FilterTwoSensPerDayProcessorTest {
                 .effectiveDepartureTime(LocalTime.parse("16:03")) //
                 .effectiveArrivalTime(LocalTime.parse("16:10")) //
                 .delay(0L) //
+                .build());
+
+        Assert.assertNull(excelRow);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testProcessNoIndex() throws Exception {
+        list.forEach(row -> row.setIndex(null));
+
+        processor.process(new Builder(LocalDate.parse("2000-01-02"), Sens.ARRIVAL) //
+                .departureStation(stationB) //
+                .arrivalStation(stationA) //
+                .expectedTrain1(new Train("578")) //
+                .expectedArrivalTime(LocalTime.parse("17:00")) //
+                .expectedDepartureTime(LocalTime.parse("17:05")) //
+                .effectiveTrain1(new Train("578")) //
+                .effectiveDepartureTime(LocalTime.parse("16:03")) //
+                .effectiveArrivalTime(LocalTime.parse("16:10")) //
+                .delay(25L) //
+                .build());
+    }
+
+    @Test
+    public void testProcessItemStreamException() throws Exception {
+        processor.setOutputReader(new AbstractItemStreamItemReader<BatchExcelRow>() {
+            @Override
+            public BatchExcelRow read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+                throw new ItemStreamException("Cannot open the file");
+            }
+        });
+
+        BatchExcelRow input = new Builder(LocalDate.parse("2000-01-02"), Sens.ARRIVAL) //
+                .departureStation(stationB) //
+                .arrivalStation(stationA) //
+                .expectedTrain1(new Train("578")) //
+                .expectedArrivalTime(LocalTime.parse("17:00")) //
+                .expectedDepartureTime(LocalTime.parse("17:05")) //
+                .effectiveTrain1(new Train("578")) //
+                .effectiveDepartureTime(LocalTime.parse("16:03")) //
+                .effectiveArrivalTime(LocalTime.parse("16:10")) //
+                .delay(25L) //
+                .build();
+        BatchExcelRow output = processor.process(input);
+
+        Assert.assertEquals(input, output);
+    }
+
+    @Test
+    public void testProcessBefore() throws Exception {
+        BatchExcelRow excelRow = processor.process(new Builder(LocalDate.parse("1999-12-31"), Sens.ARRIVAL) //
+                .departureStation(stationB) //
+                .arrivalStation(stationA) //
+                .expectedTrain1(new Train("578")) //
+                .expectedArrivalTime(LocalTime.parse("22:00")) //
+                .expectedDepartureTime(LocalTime.parse("22:05")) //
+                .effectiveTrain1(new Train("578")) //
+                .effectiveDepartureTime(LocalTime.parse("16:03")) //
+                .effectiveArrivalTime(LocalTime.parse("16:10")) //
+                .delay(5L) //
                 .build());
 
         Assert.assertNull(excelRow);

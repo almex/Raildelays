@@ -30,11 +30,14 @@ import org.springframework.beans.PropertyEditorRegistry;
 import java.time.LocalDate;
 
 /**
+ * Register {@link CustomLocalDateEditor} as an editor for a {@link LocalDate}
+ *
  * @author Almex
  * @since 2.0
  */
 public class CustomLocalDateEditorRegistrar implements PropertyEditorRegistrar {
 
+    @Override
     public void registerCustomEditors(PropertyEditorRegistry registry) {
         registry.registerCustomEditor(
                 LocalDate.class,
