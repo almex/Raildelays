@@ -40,8 +40,6 @@
                 <!-- Because this reader need access to the StepExecutionContext -->
                 <listener ref="delaysItemReader"/>
                 <!-- Because this processor need access to the StepExecutionContext -->
-                <listener ref="filterTwoSensPerDayXlsProcessor"/>
-                <!-- Because this processor need access to the StepExecutionContext -->
                 <listener ref="storeInContextMoreThanOneHourDelayProcessor"/>
                 <!-- Feed Logger MDC with some properties from StepContext -->
                 <listener ref="loggerContextStepListener"/>

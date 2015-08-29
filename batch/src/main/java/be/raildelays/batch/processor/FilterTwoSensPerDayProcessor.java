@@ -30,8 +30,6 @@ import be.raildelays.domain.Language;
 import be.raildelays.logging.Logger;
 import be.raildelays.logging.LoggerFactory;
 import org.apache.commons.lang.Validate;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemStreamException;
@@ -45,6 +43,7 @@ import java.util.Locale;
  * The only remaining items are those which have the maximum delay for a given sens.
  *
  * @author Almex
+ * @since 1.0
  */
 public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow, BatchExcelRow>, InitializingBean {
 
@@ -60,11 +59,7 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
     @Override
     public void afterPropertiesSet() throws Exception {
         Validate.notNull(outputReader, "outputReader is mandatory");
-    }
-
-    @BeforeStep
-    public void beforeStep(StepExecution stepExecution) {
-        this.executionContext = stepExecution.getExecutionContext();
+        this.executionContext = new ExecutionContext();
     }
 
     @Override
