@@ -18,7 +18,7 @@ import java.util.Date;
  * @author Almex
  * @since 2.0
  */
-public final class Delays {
+public abstract class Delays {
 
     /**
      * We keep an arbitrary reference to an instance of {@link LocalDate} in case of conversion from
@@ -26,13 +26,6 @@ public final class Delays {
      * call to {@link #toLocalTime(Date)}.
      */
     public static final LocalDate DATE = LocalDate.now();
-
-    /**
-     * Default constructor.
-     */
-    private Delays() {
-        // No instantiation is possible.
-    }
 
     /**
      * This method is based on {@link Comparable#compareTo(Object)} contract except that it can handle {@code null}
@@ -47,7 +40,7 @@ public final class Delays {
      * @throws ArithmeticException if the calculation exceeds the capacity of {@code Duration}
      */
     public static long compareTimeAndDelay(TimeDelay startInclusive, TimeDelay endExclusive) {
-        long result = 0;
+        long result;
 
         if (startInclusive == endExclusive) {
             result = 0;
@@ -59,7 +52,7 @@ public final class Delays {
             result = -duration.toMillis(); // The difference is the opposite of a duration
         } else if (startInclusive != null) {
             result = 1;
-        } else if (endExclusive != null) {
+        } else {
             result = -1;
         }
 
