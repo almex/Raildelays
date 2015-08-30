@@ -185,4 +185,25 @@ public abstract class Delays {
 
         return result;
     }
+
+    /**
+     * Convert a delay in milliseconds into minutes.
+     *
+     * @param delay in number of milliseconds
+     * @return the same delay in number of minutes
+     */
+    public static Long toMinutes(Long delay) {
+        return delay != null ? Duration.ofMillis(delay).toMinutes() : null;
+    }
+
+
+    /**
+     * Convert a delay in minutes into milliseconds.
+     *
+     * @param delay in number of minutes
+     * @return the same delay in number of milliseconds
+     */
+    public static Long toMillis(Long delay) {
+        return delay != null ? Duration.ofMinutes(delay).toMillis() : null;
+    }
 }

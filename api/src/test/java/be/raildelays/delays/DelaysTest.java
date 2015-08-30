@@ -190,4 +190,14 @@ public class DelaysTest {
         Assert.assertEquals(LocalTime.of(12, 0, 0),
                 Delays.toLocalTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2000-01-01 12:00:00")));
     }
+
+    @Test
+    public void testToMinutes() {
+        Assert.assertEquals(15, (long) Delays.toMinutes(15L * 1000 * 60));
+    }
+
+    @Test
+    public void testToMillis() {
+        Assert.assertEquals(15 * 1000 * 60, (long) Delays.toMillis(15L));
+    }
 }
