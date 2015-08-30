@@ -485,7 +485,7 @@ public class RaildelaysLogger implements Logger {
 
     @Override
     public void debug(String msg) {
-
+        delegate.debug(msg);
     }
 
     @Override

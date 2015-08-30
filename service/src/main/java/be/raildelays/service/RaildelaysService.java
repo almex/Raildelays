@@ -55,13 +55,12 @@ public interface RaildelaysService {
      * date. This search is done no matter the direction of your ride (e.g.:
      * from A to B/from B to a).
      *
-     * @param delayThreshold minimum delay (in minutes)
+     * @param delayThreshold minimum delay (in milliseconds)
      * @param date           for which delays are recorded
      * @param stationA       a certain station which could be your departure or arrival
      *                       station depending moment within the day
      * @param stationB       a certain station which could be your departure or arrival
      *                       station depending moment within the day
-     * @param delayThreshold
      * @return a list of {@link LineStop} linked each other following a
      * direction
      */

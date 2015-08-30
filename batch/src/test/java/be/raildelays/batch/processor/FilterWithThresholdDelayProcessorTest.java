@@ -1,5 +1,6 @@
 package be.raildelays.batch.processor;
 
+import be.raildelays.delays.Delays;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.xls.ExcelRow;
 import org.junit.Assert;
@@ -22,8 +23,9 @@ public class FilterWithThresholdDelayProcessorTest {
     public void testLessThanFiltered() throws Exception {
         processor.setMode(FilterWithThresholdDelayProcessor.Mode.FILTER_LESS_THAN);
 
-        Assert.assertNull(processor.process(new ExcelRow.Builder(LocalDate.now(), Sens.DEPARTURE)
-                .delay(59L)
+        Assert.assertNull(processor.process(new ExcelRow
+                .Builder(LocalDate.now(), Sens.DEPARTURE)
+                .delay(Delays.toMillis(59L))
                 .build(false)));
     }
 
@@ -31,8 +33,9 @@ public class FilterWithThresholdDelayProcessorTest {
     public void testLessThanNotFiltered() throws Exception {
         processor.setMode(FilterWithThresholdDelayProcessor.Mode.FILTER_LESS_THAN);
 
-        Assert.assertNotNull(processor.process(new ExcelRow.Builder(LocalDate.now(), Sens.DEPARTURE)
-                .delay(60L)
+        Assert.assertNotNull(processor.process(new ExcelRow
+                .Builder(LocalDate.now(), Sens.DEPARTURE)
+                .delay(Delays.toMillis(60L))
                 .build(false)));
     }
 
@@ -40,8 +43,9 @@ public class FilterWithThresholdDelayProcessorTest {
     public void testGreaterThanFiltered() throws Exception {
         processor.setMode(FilterWithThresholdDelayProcessor.Mode.FILTER_GREATER_OR_EQUAL_TO);
 
-        Assert.assertNull(processor.process(new ExcelRow.Builder(LocalDate.now(), Sens.DEPARTURE)
-                .delay(60L)
+        Assert.assertNull(processor.process(new ExcelRow
+                .Builder(LocalDate.now(), Sens.DEPARTURE)
+                .delay(Delays.toMillis(60L))
                 .build(false)));
     }
 
@@ -49,8 +53,9 @@ public class FilterWithThresholdDelayProcessorTest {
     public void testGreaterThanNotFiltered() throws Exception {
         processor.setMode(FilterWithThresholdDelayProcessor.Mode.FILTER_GREATER_OR_EQUAL_TO);
 
-        Assert.assertNotNull(processor.process(new ExcelRow.Builder(LocalDate.now(), Sens.DEPARTURE)
-                .delay(59L)
+        Assert.assertNotNull(processor.process(new ExcelRow
+                .Builder(LocalDate.now(), Sens.DEPARTURE)
+                .delay(Delays.toMillis(59L))
                 .build(false)));
     }
 }

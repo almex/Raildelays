@@ -24,6 +24,7 @@
 
 package be.raildelays.batch.processor;
 
+import be.raildelays.delays.Delays;
 import be.raildelays.domain.xls.ExcelRow;
 import be.raildelays.logging.Logger;
 import be.raildelays.logging.LoggerFactory;
@@ -45,24 +46,6 @@ public class FilterWithThresholdDelayProcessor implements ItemProcessor<ExcelRow
     private Long threshold;
     private Mode mode;
 
-
-    public enum Mode {
-        FILTER_LESS_THAN {
-            @Override
-            boolean filter(ExcelRow item, Long threshold) {
-                return item.getDelay() < threshold;
-            }
-        },
-        FILTER_GREATER_OR_EQUAL_TO {
-            @Override
-            boolean filter(ExcelRow item, Long threshold) {
-                return item.getDelay() >= threshold;
-            }
-        };
-
-        abstract boolean filter(ExcelRow item, Long threshold);
-    }
-
     @Override
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(threshold, "The 'threshold' property must be provided");
@@ -83,11 +66,31 @@ public class FilterWithThresholdDelayProcessor implements ItemProcessor<ExcelRow
         return result;
     }
 
+    /**
+     * @param threshold in number of minutes
+     */
     public void setThreshold(Long threshold) {
         this.threshold = threshold;
     }
 
     public void setMode(Mode mode) {
         this.mode = mode;
+    }
+
+    public enum Mode {
+        FILTER_LESS_THAN {
+            @Override
+            boolean filter(ExcelRow item, Long threshold) {
+                return item.getDelay() < Delays.toMillis(threshold);
+            }
+        },
+        FILTER_GREATER_OR_EQUAL_TO {
+            @Override
+            boolean filter(ExcelRow item, Long threshold) {
+                return item.getDelay() >= Delays.toMillis(threshold);
+            }
+        };
+
+        abstract boolean filter(ExcelRow item, Long threshold);
     }
 }

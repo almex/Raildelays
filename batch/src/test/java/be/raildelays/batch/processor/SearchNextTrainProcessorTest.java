@@ -1,6 +1,7 @@
 package be.raildelays.batch.processor;
 
 import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.delays.Delays;
 import be.raildelays.delays.TimeDelay;
 import be.raildelays.domain.Language;
 import be.raildelays.domain.Sens;
@@ -123,8 +124,8 @@ public class SearchNextTrainProcessorTest {
     @Test
     public void testTrainIsCanceledAndArrivalDelays() throws Exception {
         stop0 = new LineStop.Builder(stop0)
-                .arrivalTime(TimeDelay.of(LocalTime.parse("18:00"), 30L * 1000 * 60))
-                .departureTime(TimeDelay.of(LocalTime.parse("18:00"), 30L * 1000 * 60))
+                .arrivalTime(TimeDelay.of(LocalTime.parse("18:00"), Delays.toMillis(30L)))
+                .departureTime(TimeDelay.of(LocalTime.parse("18:00"), Delays.toMillis(30L)))
                 .build();
         processor.setLanguage(Language.EN.name());
 

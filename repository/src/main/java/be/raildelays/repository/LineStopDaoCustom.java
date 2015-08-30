@@ -40,11 +40,10 @@ public interface LineStopDaoCustom {
      *
      * @param date           date for which you do the search
      * @param station        departure station
-     * @param delayThreshold minimum delay (in minutes)
+     * @param delayThreshold minimum delay (in milliseconds)
      * @return a collection of {@link LineStop} belonging to departure
      */
-    List<LineStop> findDepartureDelays(LocalDate date, Station station,
-                                       long delayThreshold);
+    List<LineStop> findDepartureDelays(LocalDate date, Station station, long delayThreshold);
 
     /**
      * Search a list of delayed or canceled departure {@link LineStop} which belong to departure or
@@ -52,11 +51,10 @@ public interface LineStopDaoCustom {
      *
      * @param date           date for which you do the search
      * @param station        arrival station
-     * @param delayThreshold minimum delay (in minutes)
+     * @param delayThreshold minimum delay (in milliseconds)
      * @return a collection of {@link LineStop} belonging to arrival
      */
-    List<LineStop> findArrivalDelays(LocalDate date, Station station,
-                                     long delayThreshold);
+    List<LineStop> findArrivalDelays(LocalDate date, Station station, long delayThreshold);
 
     /**
      * Search a the next trains which is expectedTime to arrive after a certain

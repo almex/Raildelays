@@ -55,8 +55,7 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
     private EntityManager entityManager;
 
     @Override
-    public List<LineStop> findDepartureDelays(LocalDate date, Station station,
-                                              long delayThreshold) {
+    public List<LineStop> findDepartureDelays(LocalDate date, Station station, long delayThreshold) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
         Root<LineStop> root = query.from(LineStop.class);
@@ -88,8 +87,7 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<LineStop> findArrivalDelays(LocalDate date, Station station,
-                                            long delayThreshold) {
+    public List<LineStop> findArrivalDelays(LocalDate date, Station station, long delayThreshold) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
         Root<LineStop> root = query.from(LineStop.class);

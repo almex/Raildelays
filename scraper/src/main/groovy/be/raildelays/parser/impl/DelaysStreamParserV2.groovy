@@ -24,6 +24,7 @@
 
 package be.raildelays.parser.impl
 
+import be.raildelays.delays.Delays
 import be.raildelays.delays.TimeDelay
 import be.raildelays.domain.Language
 import be.raildelays.domain.entities.LineStop
@@ -101,7 +102,7 @@ class DelaysStreamParserV2 implements StreamParser<LineStop, DelaysRequestV2> {
         TimeDelay result = null;
 
         if (object.csDt != null) {
-            result = TimeDelay.of(LocalTime.parse(object.csDt), object.dD != null ? object.dD : 0);
+            result = TimeDelay.of(LocalTime.parse(object.csDt), object.dD != null ? Delays.toMillis(object.dD) : 0);
         }
 
         return result;
@@ -111,7 +112,7 @@ class DelaysStreamParserV2 implements StreamParser<LineStop, DelaysRequestV2> {
         TimeDelay result = null;
 
         if (object.csAt != null) {
-            result = TimeDelay.of(LocalTime.parse(object.csAt), object.dA != null ? object.dA : 0);
+            result = TimeDelay.of(LocalTime.parse(object.csAt), object.dA != null ? Delays.toMillis(object.dA) : 0);
         }
 
         return result;

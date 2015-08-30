@@ -1,6 +1,7 @@
 package be.raildelays.batch.processor;
 
 import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.delays.Delays;
 import be.raildelays.domain.Language;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Train;
@@ -44,14 +45,14 @@ public class StoreDelayGreaterThanThresholdInContextProcessorTest {
 
     @Test
     public void testThatItemIsNotFiltered() throws Exception {
-        input.setDelay(59L);
+        input.setDelay(Delays.toMillis(59L));
 
         Assert.assertNotNull(processor.process(input));
     }
 
     @Test
     public void testThatTrainIdIsInTheContext() throws Exception {
-        input.setDelay(61L);
+        input.setDelay(Delays.toMillis(61L));
         processor.process(input);
 
         Assert.assertEquals(input, ((Map) stepbExecution.getExecutionContext().get(KEY_NAME)).get(Sens.DEPARTURE));

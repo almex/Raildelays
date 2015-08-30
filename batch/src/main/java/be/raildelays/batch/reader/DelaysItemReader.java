@@ -24,6 +24,7 @@
 
 package be.raildelays.batch.reader;
 
+import be.raildelays.delays.Delays;
 import be.raildelays.domain.Language;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
@@ -65,7 +66,7 @@ public class DelaysItemReader implements ItemReader<LineStop>, InitializingBean 
 
     private LocalDate date;
 
-    private Integer threshold;
+    private Long threshold;
 
     private String language = Language.EN.name();
 
@@ -84,7 +85,12 @@ public class DelaysItemReader implements ItemReader<LineStop>, InitializingBean 
         LOGGER.debug("Searching delays for date={}", date);
 
         if (date != null) {
-            result = service.searchDelaysBetween(date, new Station(stationA, lang), new Station(stationB, lang), threshold);
+            result = service.searchDelaysBetween(
+                    date,
+                    new Station(stationA, lang),
+                    new Station(stationB, lang),
+                    Delays.toMillis(threshold)
+            );
         }
 
         Collections.sort(result);
@@ -109,7 +115,7 @@ public class DelaysItemReader implements ItemReader<LineStop>, InitializingBean 
         this.date = date;
     }
 
-    public void setThreshold(Integer threshold) {
+    public void setThreshold(Long threshold) {
         this.threshold = threshold;
     }
 

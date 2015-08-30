@@ -25,6 +25,7 @@
 package be.raildelays.batch.processor;
 
 import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.delays.Delays;
 import be.raildelays.logging.Logger;
 import be.raildelays.logging.LoggerFactory;
 import org.apache.commons.lang.Validate;
@@ -53,7 +54,7 @@ public class FilterSmallDelaysProcessor implements ItemProcessor<BatchExcelRow, 
 
         LOGGER.trace("item", item);
 
-        if (item.getDelay() >= threshold) {
+        if (item.getDelay() >= Delays.toMillis(threshold)) {
             LOGGER.debug("keep_delay>=" + threshold, item);
             result = item;
         }
@@ -63,6 +64,9 @@ public class FilterSmallDelaysProcessor implements ItemProcessor<BatchExcelRow, 
         return result; // To apply the ItemReader contract
     }
 
+    /**
+     * @param threshold in number of minutes
+     */
     public void setThreshold(Long threshold) {
         this.threshold = threshold;
     }

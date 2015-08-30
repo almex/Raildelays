@@ -22,7 +22,7 @@ public class TimeDelayTest {
 
     @Test
     public void testOf2() throws Exception {
-        TimeDelay timeDelay = TimeDelay.of(LocalTime.parse("18:00"), 30L * 1000 * 60);
+        TimeDelay timeDelay = TimeDelay.of(LocalTime.parse("18:00"), Delays.toMillis(30L));
 
         Assert.assertEquals(LocalTime.parse("18:30"), timeDelay.getEffectiveTime());
     }

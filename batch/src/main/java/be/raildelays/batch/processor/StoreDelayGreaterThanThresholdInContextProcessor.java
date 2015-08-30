@@ -25,6 +25,7 @@
 package be.raildelays.batch.processor;
 
 import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.delays.Delays;
 import be.raildelays.domain.Sens;
 import be.raildelays.logging.Logger;
 import be.raildelays.logging.LoggerFactory;
@@ -79,7 +80,7 @@ public class StoreDelayGreaterThanThresholdInContextProcessor implements ItemPro
     @Override
     public BatchExcelRow process(final BatchExcelRow item) throws Exception {
 
-        if (item.getDelay() < threshold) {
+        if (item.getDelay() < Delays.toMillis(threshold)) {
             LOGGER.debug("delay<" + threshold, item);
         } else {
             storeInContext(item);
@@ -107,6 +108,9 @@ public class StoreDelayGreaterThanThresholdInContextProcessor implements ItemPro
         LOGGER.debug("store_in_context", item);
     }
 
+    /**
+     * @param threshold in number of minutes
+     */
     public void setThreshold(Long threshold) {
         this.threshold = threshold;
     }
