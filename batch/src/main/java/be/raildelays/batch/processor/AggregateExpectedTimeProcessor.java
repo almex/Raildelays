@@ -32,8 +32,6 @@ import be.raildelays.service.RaildelaysService;
 import org.springframework.batch.item.ItemProcessor;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * If one stop is not deserved (canceled) then we have no expectedTime time. We must
@@ -48,21 +46,6 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, L
 
     @Resource
     private RaildelaysService service;
-
-
-    public List<LineStop> process(List<LineStop> items) throws Exception {
-        List<LineStop> result = null;
-
-        for (LineStop item : items) {
-            if (result == null) {
-                result = new ArrayList<>();
-            }
-
-            result.add(process(item));
-        }
-
-        return result;
-    }
 
 
     @Override
