@@ -108,9 +108,9 @@ public class BatchExcelRowMapperProcessor implements ItemProcessor<LineStop, Bat
         LineStop result = null;
 
         if (lineStop != null) {
-            if (lineStop.getStation().equals(stationA)) {
-                result = lineStop;
-            } else if (lineStop.getStation().equals(stationB)) {
+            Station station = lineStop.getStation();
+
+            if (station.equals(stationA) || station.equals(stationB)) {
                 result = lineStop;
             } else if (lineStop.getPrevious() != null) {
                 result = readPrevious(lineStop.getPrevious(), stationA, stationB);
@@ -126,9 +126,9 @@ public class BatchExcelRowMapperProcessor implements ItemProcessor<LineStop, Bat
         LineStop result = null;
 
         if (lineStop != null) {
-            if (lineStop.getStation().equals(stationA)) {
-                result = lineStop;
-            } else if (lineStop.getStation().equals(stationB)) {
+            Station station = lineStop.getStation();
+
+            if (station.equals(stationA) || station.equals(stationB)) {
                 result = lineStop;
             } else if (lineStop.getNext() != null) {
                 result = readNext(lineStop.getNext(), stationA, stationB);

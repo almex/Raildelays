@@ -1,6 +1,7 @@
 package be.raildelays.batch.processor;
 
 import be.raildelays.batch.bean.BatchExcelRow;
+import be.raildelays.batch.exception.ArrivalDepartureEqualsException;
 import be.raildelays.delays.TimeDelay;
 import be.raildelays.domain.Language;
 import be.raildelays.domain.entities.LineStop;
@@ -12,7 +13,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -29,7 +29,7 @@ public class BatchExcelRowMapperProcessorTest {
     private BatchExcelRowMapperProcessor processor;
 
     @Before
-    public void setUp() throws ParseException {
+    public void setUp() throws Exception {
         LocalDate today = LocalDate.now();
 
         // 1 -> A -> 2 -> B -> 3
@@ -84,6 +84,7 @@ public class BatchExcelRowMapperProcessorTest {
         processor.setStationA("stationA");
         processor.setStationB("stationB");
         processor.setLanguage(Language.EN.name());
+        processor.afterPropertiesSet();
     }
 
     @Test
@@ -116,6 +117,16 @@ public class BatchExcelRowMapperProcessorTest {
         Assert.assertEquals(new Station("stationB"),
                 excelRow.getArrivalStation());
         Assert.assertEquals(20 * 60 * 1000, excelRow.getDelay().longValue());
+    }
+
+    @Test(expected = ArrivalDepartureEqualsException.class)
+    public void testArrivalDepartureEquals() throws Exception {
+        LineStop actual = new LineStop
+                .Builder(fromA, false, false)
+                .station(new Station("foo"))
+                .build();
+
+        processor.process(actual);
     }
 
 }
