@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/spring/batch/raildelays-batch-integration-test-context.xml"})
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, StepScopeTestExecutionListener.class})
-@Transactional
+@Transactional(transactionManager = "raildelaysTransactionManager")
 @Rollback(false)
 public abstract class AbstractContextIT extends AbstractJUnit4SpringContextTests {
 

@@ -31,11 +31,10 @@
 
     <bean id="jobParameterExtractor" class="be.raildelays.batch.job.ExecutionContextJobParametersExtractor"/>
 
-    <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
-        <property name="propertyEditorRegistrars">
-            <list>
-                <bean class="org.springframework.beans.propertyeditor.CustomLocalDateEditorRegistrar"/>
-            </list>
+    <bean id="conversionService"
+          class="org.springframework.context.support.ConversionServiceFactoryBean">
+        <property name="converters">
+            <bean class="org.springframework.data.convert.Jsr310Converters" factory-method="getConvertersToRegister"/>
         </property>
     </bean>
 

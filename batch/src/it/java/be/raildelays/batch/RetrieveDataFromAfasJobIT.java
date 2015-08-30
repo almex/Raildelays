@@ -24,6 +24,7 @@
 
 package be.raildelays.batch;
 
+import be.raildelays.domain.Language;
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -40,8 +41,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-@ContextConfiguration(locations = {
-        "/jobs/steps/retrieve-data-from-afas-job-context.xml"})
+@ContextConfiguration(locations = {"/jobs/steps/retrieve-data-from-afas-job-context.xml"})
 public class RetrieveDataFromAfasJobIT extends AbstractContextIT {
 
     /**
@@ -67,8 +67,9 @@ public class RetrieveDataFromAfasJobIT extends AbstractContextIT {
                 date = today.getTime();
             }
 
-            parameters.put("input.file.path", new JobParameter("train-list.properties"));
+            parameters.put("trainId", new JobParameter("416"));
             parameters.put("date", new JobParameter(date));
+            parameters.put("language", new JobParameter(Language.EN.name()));
             parameters.put("station.a.name", new JobParameter("Liège-Guillemins"));
             parameters.put("station.b.name", new JobParameter("Brussels (Bruxelles)-Central"));
             parameters.put("output.file.path", new JobParameter("file:./target/output.dat"));

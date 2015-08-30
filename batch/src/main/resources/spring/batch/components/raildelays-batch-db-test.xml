@@ -47,12 +47,12 @@
     </bean> -->
     
     <batch:job-repository id="jobRepository"
-                          data-source="batchDataSource" transaction-manager="batchTransactionManager"
-                          isolation-level-for-create="DEFAULT" table-prefix="BATCH_"
+                          data-source="batchDataSource"
+                          transaction-manager="batchTransactionManager"
+                          isolation-level-for-create="DEFAULT"
+                          table-prefix="BATCH_"
                           max-varchar-length="1000"/>
 
-    <bean id="batchTransactionManager"
-          class="org.springframework.batch.support.transaction.ResourcelessTransactionManager">
-    </bean>
+    <alias name="raildelaysTransactionManager" alias="batchTransactionManager"/>
 
 </beans>
