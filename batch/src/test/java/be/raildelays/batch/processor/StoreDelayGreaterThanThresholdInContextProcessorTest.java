@@ -37,8 +37,10 @@ public class StoreDelayGreaterThanThresholdInContextProcessorTest {
         processor.setKeyName(KEY_NAME);
         processor.setThreshold(60L);
         processor.beforeStep(stepbExecution);
+        processor.afterPropertiesSet();
 
-        input = new BatchExcelRow.Builder(LocalDate.now(), Sens.DEPARTURE)
+        input = new BatchExcelRow
+                .Builder(LocalDate.now(), Sens.DEPARTURE)
                 .expectedTrain1(RaildelaysTestUtils.generateTrain("dummy", Language.EN))
                 .build(false);
     }
@@ -56,5 +58,22 @@ public class StoreDelayGreaterThanThresholdInContextProcessorTest {
         processor.process(input);
 
         Assert.assertEquals(input, ((Map) stepbExecution.getExecutionContext().get(KEY_NAME)).get(Sens.DEPARTURE));
+    }
+
+    @Test
+    public void testThat2TrainIdsAreInTheContext() throws Exception {
+        processor.process(new BatchExcelRow
+                .Builder(LocalDate.now(), Sens.DEPARTURE)
+                .expectedTrain1(RaildelaysTestUtils.generateTrain("dummy", Language.EN))
+                .delay(Delays.toMillis(75L))
+                .build(false));
+        processor.process(new BatchExcelRow
+                .Builder(LocalDate.now(), Sens.ARRIVAL)
+                .expectedTrain1(RaildelaysTestUtils.generateTrain("dummy", Language.EN))
+                .delay(Delays.toMillis(66L))
+                .build(false));
+
+        Assert.assertNotNull(((Map) stepbExecution.getExecutionContext().get(KEY_NAME)).get(Sens.DEPARTURE));
+        Assert.assertNotNull(((Map) stepbExecution.getExecutionContext().get(KEY_NAME)).get(Sens.ARRIVAL));
     }
 }

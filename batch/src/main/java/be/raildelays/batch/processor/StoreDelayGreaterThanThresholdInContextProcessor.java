@@ -83,29 +83,30 @@ public class StoreDelayGreaterThanThresholdInContextProcessor implements ItemPro
         if (item.getDelay() < Delays.toMillis(threshold)) {
             LOGGER.debug("delay<" + threshold, item);
         } else {
-            storeInContext(item);
             LOGGER.debug("delay>=" + threshold, item);
+
+            storeInContext(item);
         }
 
         return item;
     }
 
     private void storeInContext(final BatchExcelRow item) {
-        Map<Sens, BatchExcelRow> list = null;
+        Map<Sens, BatchExcelRow> map = null;
 
         /*
          * We can only have two trains  the same day having more than one hour of delay (one per sens).
          */
         if (context.containsKey(keyName)) {
-            list = (Map) context.get(keyName);
+            map = (Map) context.get(keyName);
         } else {
-            list = new HashMap<>(2);
-            context.put(keyName, list);
+            map = new HashMap<>(2);
+            context.put(keyName, map);
         }
 
-        list.put(item.getSens(), item);
+        map.put(item.getSens(), item);
 
-        LOGGER.debug("store_in_context", item);
+        LOGGER.trace("store_in_context", item);
     }
 
     /**
