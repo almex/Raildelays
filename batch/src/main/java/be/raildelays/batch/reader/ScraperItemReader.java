@@ -31,15 +31,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.retry.RetryCallback;
-import org.springframework.retry.RetryContext;
 import org.springframework.retry.RetryPolicy;
 import org.springframework.retry.backoff.BackOffPolicy;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.util.Assert;
 
 /**
- * {@link org.springframework.batch.item.ItemReader} capable of retrieving data from <i>www.railtime.be</i> website.
+ * {@link org.springframework.batch.item.ItemReader} capable of retrieving data from a website.
  * This implementation use a {@link org.springframework.retry.RetryPolicy} to allow to configure upon which
  * {@link java.lang.Exception} you want to try multiple attempt to read. For instance, {@code IOException} would be a
  * good choice as it denote a problem during the HTTP connection (maybe Wi-Fi is off, you network is not fully
@@ -47,8 +45,7 @@ import org.springframework.util.Assert;
  * {@link org.springframework.retry.backoff.BackOffPolicy} in order to define what to do between two attempts (e.g.:
  * wait 5 seconds).
  * <p>
- * To retrieve data from Railtime, this reader need to know the {@code trainId}, the {@code date},
- * the {@code sens} and the {@code language}.
+ * To retrieve data from a website, this reader need to have a {@code request}, a {@code streamer} and a {@code parser}.
  * </p>
  * <p>
  * To be respectful of the website we attempt to read, this reader also wait between 1 and 5 seconds between two
@@ -86,25 +83,21 @@ public class ScraperItemReader<T, R extends Request> implements ItemReader<T>, I
 
     public T read() throws Exception {
 
-        return retryTemplate.execute(new RetryCallback<T, Exception>() {
-            @Override
-            public T doWithRetry(RetryContext context) throws Exception {
-                T result = null;
+        return retryTemplate.execute(context -> {
+            T result = null;
 
-                if (request != null) {
-                    LOGGER.debug("Requesting Railtime for {}", request);
+            if (request != null) {
+                LOGGER.debug("Requesting Railtime for {}", request);
 
-                    waitRandomly();
+                waitRandomly();
 
-                    result = parser.parse(streamer.stream(request));
+                result = parser.parse(streamer.stream(request));
 
-                    request = null; // We consume read, then next time we will return null if no new request is provided
-                }
-
-                return result;
+                request = null; // We consume read, then next time we will return null if no new request is provided
             }
-        });
 
+            return result;
+        });
     }
 
     /**
