@@ -18,6 +18,9 @@ public class BatchExcelRowToSimpleMailMessageProcessorTest {
     @Before
     public void setUp() {
         processor = new BatchExcelRowToSimpleMailMessageProcessor();
+        processor.setFrom("foo");
+        processor.setSubject("blabla");
+        processor.setTo("bar");
     }
 
     @Test
@@ -25,6 +28,7 @@ public class BatchExcelRowToSimpleMailMessageProcessorTest {
 
         Assert.assertNotNull(processor.process(new BatchExcelRow
                 .Builder(LocalDate.now(), Sens.ARRIVAL)
-                .build(false)));
+                        .build(false))
+        );
     }
 }
