@@ -2,8 +2,10 @@ package be.raildelays.batch.processor;
 
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.exception.ArrivalDepartureEqualsException;
+import be.raildelays.delays.Delays;
 import be.raildelays.delays.TimeDelay;
 import be.raildelays.domain.Language;
+import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
@@ -38,38 +40,58 @@ public class BatchExcelRowMapperProcessorTest {
         TimeDelay arrivalTime;
         TimeDelay departureTime;
 
-        arrivalTime = TimeDelay.of(LocalTime.parse("12:00"), 5L * 60 * 1000);
-        departureTime = TimeDelay.of(LocalTime.parse("12:05"), 5L * 60 * 1000);
-        LineStop.Builder builder = new LineStop.Builder().date(today)
-                .train(new Train("466")).station(new Station("station1"))
-                .arrivalTime(arrivalTime).departureTime(departureTime)
+        arrivalTime = TimeDelay.of(LocalTime.parse("12:00"), Delays.toMillis(5L));
+        departureTime = TimeDelay.of(LocalTime.parse("12:05"), Delays.toMillis(5L));
+        LineStop.Builder builder = new LineStop
+                .Builder()
+                .date(today)
+                .train(new Train("466"))
+                .station(new Station("station1"))
+                .arrivalTime(arrivalTime)
+                .departureTime(departureTime)
                 .canceledDeparture(false)
                 .canceledArrival(false);
-        arrivalTime = TimeDelay.of(LocalTime.parse("12:20"), 10L * 60 * 1000);
-        departureTime = TimeDelay.of(LocalTime.parse("12:25"), 10L * 60 * 1000);
-        builder.addNext(new LineStop.Builder().date(today)
-                .train(new Train("466")).station(new Station("stationA"))
-                .arrivalTime(arrivalTime).departureTime(departureTime)
+        arrivalTime = TimeDelay.of(LocalTime.parse("12:20"), Delays.toMillis(10L));
+        departureTime = TimeDelay.of(LocalTime.parse("12:25"), Delays.toMillis(10L));
+        builder.addNext(new LineStop
+                .Builder()
+                .date(today)
+                .train(new Train("466"))
+                .station(new Station("stationA"))
+                .arrivalTime(arrivalTime)
+                .departureTime(departureTime)
                 .canceledDeparture(false)
                 .canceledArrival(false));
-        arrivalTime = TimeDelay.of(LocalTime.parse("12:45"), 15L * 60 * 1000);
-        departureTime = TimeDelay.of(LocalTime.parse("12:50"), 15L * 60 * 1000);
-        builder.addNext(new LineStop.Builder().date(today)
-                .train(new Train("466")).station(new Station("station2"))
-                .arrivalTime(arrivalTime).departureTime(departureTime)
+        arrivalTime = TimeDelay.of(LocalTime.parse("12:45"), Delays.toMillis(15L));
+        departureTime = TimeDelay.of(LocalTime.parse("12:50"), Delays.toMillis(15L));
+        builder.addNext(new LineStop
+                .Builder()
+                .date(today)
+                .train(new Train("466"))
+                .station(new Station("station2"))
+                .arrivalTime(arrivalTime)
+                .departureTime(departureTime)
                 .canceledDeparture(false)
                 .canceledArrival(false));
-        arrivalTime = TimeDelay.of(LocalTime.parse("12:55"), 20L * 60 * 1000);
-        departureTime = TimeDelay.of(LocalTime.parse("13:00"), 20L * 60 * 1000);
-        builder.addNext(new LineStop.Builder().date(today)
-                .train(new Train("466")).station(new Station("stationB"))
-                .arrivalTime(arrivalTime).departureTime(departureTime)
+        arrivalTime = TimeDelay.of(LocalTime.parse("12:55"), Delays.toMillis(20L));
+        departureTime = TimeDelay.of(LocalTime.parse("13:00"), Delays.toMillis(20L));
+        builder.addNext(new LineStop
+                .Builder()
+                .date(today)
+                .train(new Train("466"))
+                .station(new Station("stationB"))
+                .arrivalTime(arrivalTime)
+                .departureTime(departureTime)
                 .canceledDeparture(false)
                 .canceledArrival(false));
-        arrivalTime = TimeDelay.of(LocalTime.parse("13:45"), 25L * 60 * 1000);
+        arrivalTime = TimeDelay.of(LocalTime.parse("13:45"), Delays.toMillis(25L));
         departureTime = null;
-        builder.addNext(new LineStop.Builder().date(today).train(new Train("466"))
-                .station(new Station("station3")).arrivalTime(arrivalTime)
+        builder.addNext(new LineStop
+                .Builder()
+                .date(today)
+                .train(new Train("466"))
+                .station(new Station("station3"))
+                .arrivalTime(arrivalTime)
                 .departureTime(departureTime)
                 .canceledDeparture(false)
                 .canceledArrival(false));
@@ -91,20 +113,14 @@ public class BatchExcelRowMapperProcessorTest {
     public void testProcessFromA() throws Exception {
         BatchExcelRow excelRow = processor.process(fromA);
 
-        Assert.assertEquals(new Station("stationA"),
-                excelRow.getDepartureStation());
-        Assert.assertEquals(new Station("stationB"),
-                excelRow.getArrivalStation());
+        Assert.assertEquals(new Station("stationA"), excelRow.getDepartureStation());
+        Assert.assertEquals(new Station("stationB"), excelRow.getArrivalStation());
         Assert.assertEquals(new Train("466"), excelRow.getExpectedTrain1());
         Assert.assertEquals(new Train("466"), excelRow.getEffectiveTrain1());
-        Assert.assertEquals(LocalTime.parse("12:25"),
-                excelRow.getExpectedDepartureTime());
-        Assert.assertEquals(LocalTime.parse("12:55"),
-                excelRow.getExpectedArrivalTime());
-        Assert.assertEquals(LocalTime.parse("12:35"),
-                excelRow.getEffectiveDepartureTime());
-        Assert.assertEquals(LocalTime.parse("13:15"),
-                excelRow.getEffectiveArrivalTime());
+        Assert.assertEquals(LocalTime.parse("12:25"), excelRow.getExpectedDepartureTime());
+        Assert.assertEquals(LocalTime.parse("12:55"), excelRow.getExpectedArrivalTime());
+        Assert.assertEquals(LocalTime.parse("12:35"), excelRow.getEffectiveDepartureTime());
+        Assert.assertEquals(LocalTime.parse("13:15"), excelRow.getEffectiveArrivalTime());
         Assert.assertEquals(20 * 60 * 1000, excelRow.getDelay().longValue());
     }
 
@@ -112,15 +128,31 @@ public class BatchExcelRowMapperProcessorTest {
     public void testProcessFromB() throws Exception {
         BatchExcelRow excelRow = processor.process(fromB);
 
-        Assert.assertEquals(new Station("stationA"),
-                excelRow.getDepartureStation());
-        Assert.assertEquals(new Station("stationB"),
-                excelRow.getArrivalStation());
-        Assert.assertEquals(20 * 60 * 1000, excelRow.getDelay().longValue());
+        Assert.assertEquals(new Station("stationA"), excelRow.getDepartureStation());
+        Assert.assertEquals(new Station("stationB"), excelRow.getArrivalStation());
+        Assert.assertEquals(Delays.toMillis(20L), excelRow.getDelay());
+    }
+
+    @Test
+    public void testProcessSensDeparture() throws Exception {
+        BatchExcelRow excelRow = processor.process(fromB);
+
+        Assert.assertEquals(Sens.DEPARTURE, excelRow.getSens());
+    }
+
+    @Test
+    public void testProcessSensArrival() throws Exception {
+        processor.setStationA("stationB");
+        processor.setStationB("stationA");
+
+        BatchExcelRow excelRow = processor.process(fromB);
+
+        Assert.assertEquals(Sens.ARRIVAL, excelRow.getSens());
     }
 
     @Test(expected = ArrivalDepartureEqualsException.class)
     public void testArrivalDepartureEquals() throws Exception {
+        // We create a LineStop with no departure/arrival station
         LineStop actual = new LineStop
                 .Builder(fromA, false, false)
                 .station(new Station("foo"))
