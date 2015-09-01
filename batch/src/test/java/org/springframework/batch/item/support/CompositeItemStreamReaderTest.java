@@ -5,8 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStreamReader;
+import org.springframework.batch.item.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,7 +59,7 @@ public class CompositeItemStreamReaderTest {
     }
 
     /**
-     * We expect with that null delegates we get an empty list.
+     * We expect that with null delegates we get an empty list.
      */
     @Test
     public void testReadNullDelegates() throws Exception {
@@ -81,6 +80,21 @@ public class CompositeItemStreamReaderTest {
         Assert.assertTrue(readAll().isEmpty());
     }
 
+    /**
+     * We expect to get an ItemStreamException if any exception come from a delegate.read().
+     */
+    @Test(expected = ItemStreamException.class)
+    public void testReadThrowException() throws Exception {
+        reader.setDelegates(Collections.singletonList(new AbstractItemStreamItemReader<String>() {
+            @Override
+            public String read() throws Exception {
+                throw new Exception();
+            }
+        }));
+
+        readAll();
+    }
+
     private List<String> readAll() throws Exception {
         List<String> result = new ArrayList<>();
         ExecutionContext context = new ExecutionContext();
@@ -92,6 +106,7 @@ public class CompositeItemStreamReaderTest {
         }
 
         reader.update(context);
+        reader.close();
 
         return result;
     }
