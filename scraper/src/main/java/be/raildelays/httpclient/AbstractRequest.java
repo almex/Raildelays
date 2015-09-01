@@ -29,10 +29,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Abstract implementation of a {@link Request} containing generic methods that any sub-class can use
+ * to make it be like a normal JavaBean.
+ *
  * @author Almex
  * @since 2.0
  */
-public class AbstractRequest implements Request {
+public abstract class AbstractRequest implements Request {
 
     private Map<String, Object> parameters = new HashMap<>();
 

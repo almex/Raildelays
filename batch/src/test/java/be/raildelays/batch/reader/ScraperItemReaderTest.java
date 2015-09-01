@@ -57,7 +57,8 @@ public class ScraperItemReaderTest {
                 return request;
             }
         });
-        reader.setRequest(new AbstractRequest());
+        reader.setRequest(new AbstractRequest() {
+        });
         reader.setRetryPolicy(new NeverRetryPolicy());
         reader.setBackOffPolicy(new NoBackOffPolicy());
         reader.afterPropertiesSet();

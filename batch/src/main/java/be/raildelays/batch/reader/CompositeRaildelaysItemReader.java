@@ -29,9 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.step.item.Chunk;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.NonTransientResourceException;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.support.CompositeItemStream;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -49,8 +46,7 @@ import java.util.List;
  */
 public class CompositeRaildelaysItemReader extends CompositeItemStream implements ItemReader<List<LineStop>>, InitializingBean {
 
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(CompositeRaildelaysItemReader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CompositeRaildelaysItemReader.class);
 
     private DelaysItemReader delaysItemReader;
 
@@ -63,8 +59,7 @@ public class CompositeRaildelaysItemReader extends CompositeItemStream implement
         register(datesItemReader);
     }
 
-    public List<LineStop> read() throws Exception, UnexpectedInputException,
-            ParseException, NonTransientResourceException {
+    public List<LineStop> read() throws Exception {
         List<LineStop> result = null; // The end of this reader is when we have no more date
         LocalDate date = datesItemReader.read();
 
@@ -79,7 +74,6 @@ public class CompositeRaildelaysItemReader extends CompositeItemStream implement
                     result.add(lineStop);
                 }
             }
-
 
             LOGGER.debug("Found {} delays for {}", result.size(), date);
         }

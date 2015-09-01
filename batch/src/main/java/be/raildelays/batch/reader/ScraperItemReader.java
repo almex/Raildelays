@@ -132,10 +132,6 @@ public class ScraperItemReader<T, R extends Request> implements ItemReader<T>, I
         this.parser = parser;
     }
 
-    public R getRequest() {
-        return request;
-    }
-
     public void setRequest(R request) {
         this.request = request;
     }

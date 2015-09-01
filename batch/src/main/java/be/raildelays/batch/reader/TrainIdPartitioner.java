@@ -29,12 +29,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamReader;
-import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
-import org.springframework.batch.repeat.RepeatCallback;
-import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.support.RepeatTemplate;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,52 +41,57 @@ import java.util.Map;
 /**
  * This {@link org.springframework.batch.core.partition.support.Partitioner} is used to create one partition per train.
  * Meaning that we will have dynamically one step per train. And depending on the
- * {@link org.springframework.core.task.TaskExecutor} those steps can be executed concurrently.
+ * {@code TaskExecutor} those steps can be executed concurrently.
+ * <p>
+ *     The {@link ExecutionContext} of each train contains the key {@code trainId} with a value of {@link Integer} type.
+ *     The name of the partition is 'partitionX' where 'X' is the zero-based index in order of creation.
+ * </p>
  *
  * @author Almex
  * @since 1.0
+ * @see org.springframework.core.task.TaskExecutor
  */
-public class TrainIdPartitioner implements Partitioner {
+public class TrainIdPartitioner implements Partitioner, InitializingBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrainIdPartitioner.class);
 
     private ItemStreamReader<String> trainListReader;
 
     @Override
+    public void afterPropertiesSet() throws Exception {
+        Assert.notNull(trainListReader, "The property 'trainListReader' must be provided");
+    }
+
+    @Override
     public Map<String, ExecutionContext> partition(final int gridSize) {
-        final Map<String, ExecutionContext> partitions = new HashMap<>();
+        Map<String, ExecutionContext> partitions = new HashMap<>();
+
+        trainListReader.open(new ExecutionContext());
 
         try {
-            trainListReader.open(new ExecutionContext());
-            RepeatTemplate template = new RepeatTemplate();
-            template.iterate(new RepeatCallback() {
+            new RepeatTemplate().iterate(context -> {
+                RepeatStatus result = RepeatStatus.CONTINUABLE;
 
-                @Override
-                public RepeatStatus doInIteration(RepeatContext context) throws UnexpectedInputException, ParseException {
-                    RepeatStatus result = RepeatStatus.CONTINUABLE;
+                try {
+                    String trainId = trainListReader.read();
 
-                    try {
-                        String trainId = trainListReader.read();
+                    if (trainId != null) {
+                        ExecutionContext executionContext = new ExecutionContext();
+                        int partitionId = partitions.size();
 
-                        if (trainId != null) {
-                            ExecutionContext executionContext = new ExecutionContext();
-                            int partitionId = partitions.size();
+                        executionContext.putInt("trainId", Integer.parseInt(trainId));
+                        partitions.put("partition" + partitionId, executionContext);
 
-                            executionContext.putInt("trainId", Integer.parseInt(trainId));
-                            partitions.put("partition" + partitionId, executionContext);
-                        } else {
-                            result = RepeatStatus.FINISHED;
-                        }
-                    } catch (Exception e) {
-                        throw new UnexpectedInputException("Error during reading list of train", e);
+                        LOGGER.debug("Partition created with id={} and trainId={}", partitionId, trainId);
+                    } else {
+                        result = RepeatStatus.FINISHED;
                     }
-
-                    return result;
+                } catch (Exception e) {
+                    throw new UnexpectedInputException("Error during reading list of train", e);
                 }
 
+                return result;
             });
-        } catch (Exception e) {
-            LOGGER.error("Error during start of retrieveDataFromRailtimeJob we will attempt to restart all failed jobs: {}", e);
         } finally {
             trainListReader.close();
         }
@@ -98,4 +102,5 @@ public class TrainIdPartitioner implements Partitioner {
     public void setTrainListReader(ItemStreamReader<String> trainListReader) {
         this.trainListReader = trainListReader;
     }
+
 }
