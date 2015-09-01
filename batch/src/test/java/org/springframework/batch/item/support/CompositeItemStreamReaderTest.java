@@ -7,7 +7,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamReader;
-import org.springframework.batch.test.ItemStreamItemReaderDelegator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
