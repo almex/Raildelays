@@ -10,22 +10,23 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
+import org.springframework.batch.item.support.ItemStreamItemReaderDelegator;
 import org.springframework.batch.item.support.IteratorItemReader;
-import org.springframework.batch.test.ItemStreamItemReaderDelegator;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 
+/**
+ * @author Almex
+ */
 @RunWith(BlockJUnit4ClassRunner.class)
 public class MaxMonthsDeciderTest {
 
-    private static final SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
     private static final LocalDate NOW = LocalDate.now();
-    // The S.U.T.
+    private static final FlowExecutionStatus COMPLETED_WITH_MAX_MONTHS =
+            new FlowExecutionStatus(MaxMonthsDecider.COMPLETED_WITH_MAX_MONTHS.getExitCode());
     private MaxMonthsDecider decider;
     private JobExecution jobExecution;
     private StepExecution stepExecution;
@@ -38,16 +39,20 @@ public class MaxMonthsDeciderTest {
         decider.setMaxNumberOfMonth(6);
     }
 
+    /**
+     * We only expect that it decide COMPLETED.
+     */
     @Test
     public void testCompleted() throws Exception {
         decider.setReader(new ItemStreamItemReaderDelegator<>(new IteratorItemReader<>(Arrays.asList(
-                new ExcelRow.Builder(NOW.minus(1, ChronoUnit.MONTHS) // 1 month before Now
-                        , Sens.ARRIVAL)
+                new ExcelRow
+                        .Builder(NOW.minus(1, ChronoUnit.MONTHS), Sens.ARRIVAL) // 1 month before Now
                         .build(false),
-                new ExcelRow.Builder(null, Sens.ARRIVAL) // To test null value
+                new ExcelRow
+                        .Builder(null, Sens.ARRIVAL) // To test null value
                         .build(false),
-                new ExcelRow.Builder(NOW.plus(1, ChronoUnit.MONTHS) // 1 month after Now
-                        , Sens.ARRIVAL)
+                new ExcelRow
+                        .Builder(NOW.plus(1, ChronoUnit.MONTHS), Sens.ARRIVAL) // 1 month after Now
                         .build(false)
         ))));
         decider.afterPropertiesSet();
@@ -58,23 +63,30 @@ public class MaxMonthsDeciderTest {
     }
 
 
+    /**
+     * We expect to get COMPLETED_WITH_MAX_MONTHS and 'threshold.date' in the stepExecutionContext.
+     */
     @Test
     public void testCompletedWithMaxMonths() throws Exception {
         decider.setReader(new ItemStreamItemReaderDelegator<>(new IteratorItemReader<>(Arrays.asList(
-                new ExcelRow.Builder(NOW.minus(6, ChronoUnit.MONTHS) // 6 month before Now
-                        , Sens.ARRIVAL)
+                new ExcelRow
+                        .Builder(NOW.minus(6, ChronoUnit.MONTHS), Sens.ARRIVAL) // 6 month before Now
                         .build(false),
-                new ExcelRow.Builder(null, Sens.ARRIVAL) // To test null value
+                new ExcelRow
+                        .Builder(null, Sens.ARRIVAL) // To test null value
                         .build(false),
-                new ExcelRow.Builder(NOW.plus(2, ChronoUnit.MONTHS) // 2 month after Now
-                        , Sens.ARRIVAL)
+                new ExcelRow
+                        .Builder(NOW.plus(2, ChronoUnit.MONTHS), Sens.ARRIVAL) // 2 month after Now
                         .build(false)
         ))));
         decider.afterPropertiesSet();
 
         FlowExecutionStatus status = decider.decide(jobExecution, stepExecution);
 
-        Assert.assertTrue(stepExecution.getExecutionContext().entrySet().stream().anyMatch(stringObjectEntry -> stringObjectEntry.getKey().equals("threshold.date")));
-        Assert.assertEquals(new FlowExecutionStatus(MaxMonthsDecider.COMPLETED_WITH_MAX_MONTHS.getExitCode()), status);
+        Assert.assertTrue(stepExecution.getExecutionContext()
+                .entrySet()
+                .stream()
+                .anyMatch(entry -> entry.getKey().equals("threshold.date")));
+        Assert.assertEquals(COMPLETED_WITH_MAX_MONTHS, status);
     }
 }
