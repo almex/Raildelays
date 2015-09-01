@@ -29,6 +29,10 @@ import be.raildelays.domain.entities.LineStop_;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
 import be.raildelays.repository.LineStopDaoCustom;
+import org.hibernate.jpa.criteria.OrderImpl;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.data.jpa.repository.query.QueryUtils;
@@ -36,6 +40,7 @@ import org.springframework.data.jpa.repository.query.QueryUtils;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -87,7 +92,7 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<LineStop> findArrivalDelays(LocalDate date, Station station, long delayThreshold) {
+    public Page<LineStop> findArrivalDelays(LocalDate date, Station station, long delayThreshold, Pageable request) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
         Root<LineStop> root = query.from(LineStop.class);
@@ -114,7 +119,22 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
                 builder.in(root.get(LineStop_.id)).value(notCanceled)
         ));
 
-        return entityManager.createQuery(query).getResultList();
+        /// We apply sorting
+        if (request != null && request.getSort() != null) {
+            request.getSort().spliterator()
+                    .forEachRemaining(order ->
+                                    query.orderBy(new OrderImpl(root.get(order.getProperty()), order.isAscending()))
+                    );
+        }
+
+        TypedQuery<LineStop> typedQuery = entityManager.createQuery(query);
+
+        // Activating pagination
+        if (request != null) {
+            typedQuery.setFirstResult(request.getOffset()).setMaxResults(request.getPageSize());
+        }
+
+        return new PageImpl<>(typedQuery.getResultList());
     }
 
     @Override

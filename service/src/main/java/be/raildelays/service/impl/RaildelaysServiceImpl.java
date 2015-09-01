@@ -240,12 +240,12 @@ public class RaildelaysServiceImpl implements RaildelaysService {
                 new Object[]{date, stationA, stationB, delayThreshold});
 
         result.addAll(lineStopDao.findArrivalDelays(date, stationA,
-                delayThreshold));
+                delayThreshold, null).getContent());
 
         LOGGER.debug("Retrieved {} line stops from station A", result.size());
 
         result.addAll(lineStopDao.findArrivalDelays(date, stationB,
-                delayThreshold));
+                delayThreshold, null).getContent());
 
         LOGGER.debug("Retrieved {} line stops from station A and station B",
                 result.size());

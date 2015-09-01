@@ -27,6 +27,8 @@ package be.raildelays.repository;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -54,7 +56,7 @@ public interface LineStopDaoCustom {
      * @param delayThreshold minimum delay (in milliseconds)
      * @return a collection of {@link LineStop} belonging to arrival
      */
-    List<LineStop> findArrivalDelays(LocalDate date, Station station, long delayThreshold);
+    Page<LineStop> findArrivalDelays(LocalDate date, Station station, long delayThreshold, Pageable request);
 
     /**
      * Search a the next trains which is expectedTime to arrive after a certain
