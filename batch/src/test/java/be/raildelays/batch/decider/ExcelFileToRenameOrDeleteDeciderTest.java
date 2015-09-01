@@ -1,6 +1,5 @@
 package be.raildelays.batch.decider;
 
-import be.raildelays.batch.AbstractFileTest;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.xls.ExcelRow;
 import org.junit.Assert;
@@ -11,20 +10,24 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
+import org.springframework.batch.item.support.ItemStreamItemReaderDelegator;
 import org.springframework.batch.item.support.IteratorItemReader;
-import org.springframework.batch.test.ItemStreamItemReaderDelegator;
 import org.springframework.batch.test.MetaDataInstanceFactory;
-import org.springframework.core.io.FileSystemResource;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 
+/**
+ * @author Almex
+ */
 @RunWith(BlockJUnit4ClassRunner.class)
-public class ExcelFileToRenameOrDeleteDeciderTest extends AbstractFileTest {
+public class MaxMonthsDeciderTest {
 
     private static final LocalDate NOW = LocalDate.now();
-    private ExcelFileToRenameOrDeleteDecider decider;
+    private static final FlowExecutionStatus COMPLETED_WITH_MAX_MONTHS =
+            new FlowExecutionStatus(MaxMonthsDecider.COMPLETED_WITH_MAX_MONTHS.getExitCode());
+    private MaxMonthsDecider decider;
     private JobExecution jobExecution;
     private StepExecution stepExecution;
 
@@ -32,51 +35,58 @@ public class ExcelFileToRenameOrDeleteDeciderTest extends AbstractFileTest {
     public void setUp() throws Exception {
         jobExecution = MetaDataInstanceFactory.createJobExecution();
         stepExecution = MetaDataInstanceFactory.createStepExecution();
-        decider = new ExcelFileToRenameOrDeleteDecider();
-        decider.setContextKey("foo");
-        decider.setFileNamePrefix("bar");
-        decider.setDirectory(new FileSystemResource(CURRENT_PATH + EXCEL_FILE_NAME));
+        decider = new MaxMonthsDecider();
+        decider.setMaxNumberOfMonth(6);
     }
 
+    /**
+     * We only expect that it decide COMPLETED.
+     */
     @Test
-    public void testRename() throws Exception {
+    public void testCompleted() throws Exception {
         decider.setReader(new ItemStreamItemReaderDelegator<>(new IteratorItemReader<>(Arrays.asList(
-                new ExcelRow.Builder(NOW.minus(1, ChronoUnit.MONTHS) // 1 month before Now
-                        , Sens.ARRIVAL)
+                new ExcelRow
+                        .Builder(NOW.minus(1, ChronoUnit.MONTHS), Sens.ARRIVAL) // 1 month before Now
                         .build(false),
-                new ExcelRow.Builder(null, null) // To test null value
+                new ExcelRow
+                        .Builder(null, Sens.ARRIVAL) // To test null value
                         .build(false),
-                new ExcelRow.Builder(NOW
-                        .plus(1, ChronoUnit.MONTHS) // 1 month after Now
-                        , Sens.ARRIVAL)
+                new ExcelRow
+                        .Builder(NOW.plus(1, ChronoUnit.MONTHS), Sens.ARRIVAL) // 1 month after Now
                         .build(false)
         ))));
         decider.afterPropertiesSet();
 
         FlowExecutionStatus status = decider.decide(jobExecution, stepExecution);
 
-        Assert.assertEquals(new FlowExecutionStatus(ExcelFileToRenameOrDeleteDecider.RENAME.getExitCode()), status);
+        Assert.assertEquals(FlowExecutionStatus.COMPLETED, status);
     }
 
+
+    /**
+     * We expect to get COMPLETED_WITH_MAX_MONTHS and 'threshold.date' in the stepExecutionContext.
+     */
     @Test
-    public void testDelete() throws Exception {
+    public void testCompletedWithMaxMonths() throws Exception {
         decider.setReader(new ItemStreamItemReaderDelegator<>(new IteratorItemReader<>(Arrays.asList(
-                new ExcelRow.Builder(null, null) // To test null value
+                new ExcelRow
+                        .Builder(NOW.minus(6, ChronoUnit.MONTHS), Sens.ARRIVAL) // 6 month before Now
                         .build(false),
-                new ExcelRow.Builder(NOW
-                        .minus(1, ChronoUnit.MONTHS) // 1 month before Now
-                        , Sens.ARRIVAL)
+                new ExcelRow
+                        .Builder(null, Sens.ARRIVAL) // To test null value
                         .build(false),
-                new ExcelRow.Builder(NOW
-                        .plus(1, ChronoUnit.MONTHS) // 1 month after Now
-                        , Sens.ARRIVAL)
+                new ExcelRow
+                        .Builder(NOW.plus(2, ChronoUnit.MONTHS), Sens.ARRIVAL) // 2 month after Now
                         .build(false)
         ))));
         decider.afterPropertiesSet();
 
         FlowExecutionStatus status = decider.decide(jobExecution, stepExecution);
 
-        Assert.assertEquals(new FlowExecutionStatus(ExcelFileToRenameOrDeleteDecider.DELETE.getExitCode()), status);
-
+        Assert.assertTrue(stepExecution.getExecutionContext()
+                .entrySet()
+                .stream()
+                .anyMatch(entry -> entry.getKey().equals("threshold.date")));
+        Assert.assertEquals(COMPLETED_WITH_MAX_MONTHS, status);
     }
 }
