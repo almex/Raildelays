@@ -31,8 +31,10 @@ import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.support.ResourceAwareItemStream;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
 import java.nio.file.Paths;
@@ -63,16 +65,23 @@ public class MoreThanOneHourDelayDecider extends AbstractReadAndDecideTasklet<Ex
         ExitStatus result = ExitStatus.EXECUTING;
 
         if (item.getDelay() >= thresholdDelay) {
-            if (reader instanceof ResourceAwareItemStream) {
-                // We store the file path in the context
-                context.put(keyName, Paths.get(((ResourceAwareItemStream) reader).getResource().getURI()));
+            Resource resource;
 
-                // We keep trace that we've stored something
-                contribution.incrementWriteCount(1);
-                result = COMPLETED_WITH_60_M_DELAY;
+            if (reader instanceof ResourceAwareItemStream) {
+                resource = ((ResourceAwareItemStream) reader).getResource();
+            }
+            if (reader instanceof MultiResourceItemReader) {
+                resource = ((MultiResourceItemReader) reader).getCurrentResource();
             } else {
                 throw new UnexpectedInputException("The 'reader' should be an instance of ResourceAwareItemStream");
             }
+            
+            // We store the file path in the context
+            context.put(keyName, Paths.get(resource.getURI()));
+
+            // We keep trace that we've stored something
+            contribution.incrementWriteCount(1);
+            result = COMPLETED_WITH_60_M_DELAY;
         }
 
         return result;
