@@ -30,6 +30,7 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.support.ResourceAwareItemStream;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -69,6 +70,8 @@ public class MoreThanOneHourDelayDecider extends AbstractReadAndDecideTasklet<Ex
                 // We keep trace that we've stored something
                 contribution.incrementWriteCount(1);
                 result = COMPLETED_WITH_60_M_DELAY;
+            } else {
+                throw new UnexpectedInputException("The 'reader' should be an instance of ResourceAwareItemStream");
             }
         }
 
