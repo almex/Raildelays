@@ -43,10 +43,10 @@ import java.nio.file.Paths;
  * This {@link JobExecutionDecider} is responsible to return a custom {@link FlowExecutionStatus}
  * when we get an item with a delay greater than the max threshold in the {@link ExecutionContext}.
  * Then we return <code>COMPLETED_WITH_60M_DELAY</code> in order to go to extra steps to handle this particular item.
+ * The reader must be an instance of {@link ResourceAwareItemStream}.
  *
  * @since 1.2
  * @author Almex
- * @see be.raildelays.batch.processor.StoreDelayGreaterThanThresholdInContextProcessor
  */
 public class MoreThanOneHourDelayDecider extends AbstractReadAndDecideTasklet<ExcelRow> implements InitializingBean {
 
@@ -60,6 +60,12 @@ public class MoreThanOneHourDelayDecider extends AbstractReadAndDecideTasklet<Ex
         Assert.notNull(this.thresholdDelay, "The 'thresholdDelay' property must be provided");
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @throws UnexpectedInputException if the reader is neither an instance of {@link ResourceAwareItemStream} nor an
+     *                                  instance of {@link MultiResourceItemReader}.
+     */
     @Override
     protected ExitStatus doRead(StepContribution contribution, ExecutionContext context, ExcelRow item) throws Exception {
         ExitStatus result = ExitStatus.EXECUTING;
@@ -69,15 +75,12 @@ public class MoreThanOneHourDelayDecider extends AbstractReadAndDecideTasklet<Ex
 
             if (reader instanceof ResourceAwareItemStream) {
                 resource = ((ResourceAwareItemStream) reader).getResource();
-            }
-            if (reader instanceof MultiResourceItemReader) {
-                resource = ((MultiResourceItemReader) reader).getCurrentResource();
             } else {
                 throw new UnexpectedInputException("The 'reader' should be an instance of ResourceAwareItemStream");
             }
-            
+
             // We store the file path in the context
-            context.put(keyName, Paths.get(resource.getURI()));
+            context.put(keyName, Paths.get(resource.getURI()).toAbsolutePath().toString());
 
             // We keep trace that we've stored something
             contribution.incrementWriteCount(1);
