@@ -4,14 +4,18 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 import org.springframework.batch.item.support.ResourceLocator;
+import org.springframework.batch.support.ResourceAwareItemStream;
 import org.springframework.core.io.Resource;
+
+import java.io.IOException;
 
 /**
  * This implementation make the job not restartable
  *
  * @author Almex
  */
-public class MultiResourceAwareItemReader<T> extends AbstractItemStreamItemReader<T> implements ResourceAwareItemReaderItemStream<T> {
+public class MultiResourceAwareItemReader<T> extends AbstractItemStreamItemReader<T> implements
+        ResourceAwareItemReaderItemStream<T>, ResourceAwareItemStream {
 
     private ResourceLocator resourceLocator;
 
@@ -54,6 +58,15 @@ public class MultiResourceAwareItemReader<T> extends AbstractItemStreamItemReade
 
     public void setDelegate(ResourceAwareItemReaderItemStream<? extends T> delegate) {
         this.delegate = delegate;
+    }
+
+    @Override
+    public Resource getResource() {
+        try {
+            return resourceLocator.getResource(executionContext);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Cannot retrieve resource from resource locator", e);
+        }
     }
 
     @Override
