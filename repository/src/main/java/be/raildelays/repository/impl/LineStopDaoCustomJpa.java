@@ -29,24 +29,25 @@ import be.raildelays.domain.entities.LineStop_;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
 import be.raildelays.repository.LineStopDaoCustom;
-import org.hibernate.jpa.criteria.OrderImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.data.jpa.repository.query.QueryUtils;
+import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
+import javax.persistence.criteria.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 import static be.raildelays.repository.specification.LineStopSpecifications.*;
@@ -55,9 +56,23 @@ import static org.springframework.data.jpa.domain.Specifications.where;
 @SuppressWarnings("unused") // Injected via Spring Data JPA
 public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(LineStopDaoCustomJpa.class);
     @PersistenceContext
     @SuppressWarnings("unused") // Injected via CDI
     private EntityManager entityManager;
+
+    private static Long executeCountQuery(TypedQuery<Long> query) {
+        Assert.notNull(query);
+
+        List<Long> totals = query.getResultList();
+        Long total = 0L;
+
+        for (Long element : totals) {
+            total += element == null ? 0 : element;
+        }
+
+        return total;
+    }
 
     @Override
     public List<LineStop> findDepartureDelays(LocalDate date, Station station, long delayThreshold) {
@@ -82,17 +97,13 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
                         .and(arrivalDelayGreaterThanOrEqualTo(delayThreshold))
                         .toPredicate(root, query, builder));
 
-        query.where(builder.or(
-                builder.in(root.get(LineStop_.id)).value(canceled),
-                builder.in(root.get(LineStop_.id)).value(notCanceled)
-        ));
 
-        return entityManager.createQuery(query).getResultList();
+        return findAll(where(idsIn(canceled)).or(idsIn(notCanceled)), (Pageable) null).getContent();
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public Page<LineStop> findArrivalDelays(LocalDate date, Station station, long delayThreshold, Pageable request) {
+    public Page<LineStop> findArrivalDelays(LocalDate date, Station station, long delayThreshold, Pageable pageable) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
         Root<LineStop> root = query.from(LineStop.class);
@@ -100,6 +111,16 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
         Subquery<Long> notCanceled = query.subquery(Long.class);
         Root<LineStop> canceledRoot = canceled.from(LineStop.class);
         Root<LineStop> notCanceledRoot = notCanceled.from(LineStop.class);
+
+        if (LOGGER.isDebugEnabled()) {
+            if (pageable != null) {
+                LOGGER.debug("Searching delays for : date={} station={} threshold={} firstResult={} maxResult={}",
+                        date, station, delayThreshold, pageable.getOffset(), pageable.getPageSize());
+            } else {
+                LOGGER.debug("Searching delays for : date={} station={} threshold={}",
+                        date, station, delayThreshold);
+            }
+        }
 
         canceled.select(canceledRoot.get(LineStop_.id))
                 .where(where(dateEquals(date))
@@ -114,35 +135,24 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
                         .and(arrivalDelayGreaterThanOrEqualTo(delayThreshold))
                         .toPredicate(notCanceledRoot, query, builder));
 
-        query.where(builder.or(
-                builder.in(root.get(LineStop_.id)).value(canceled),
-                builder.in(root.get(LineStop_.id)).value(notCanceled)
-        ));
+        Page<LineStop> all = findAll(where(idsIn(canceled)).or(idsIn(notCanceled)), pageable);
 
-        /// We apply sorting
-        if (request != null && request.getSort() != null) {
-            request.getSort().spliterator()
-                    .forEachRemaining(order ->
-                                    query.orderBy(new OrderImpl(root.get(order.getProperty()), order.isAscending()))
-                    );
-        }
+        LOGGER.debug("Retrieved delays : size={}/{} elements={}/{} pages={}/{}",
+                all.getContent().size(), all.getSize(),
+                all.getNumberOfElements(), all.getTotalElements(),
+                all.getNumber(), all.getTotalPages());
 
-        TypedQuery<LineStop> typedQuery = entityManager.createQuery(query);
-
-        // Activating pagination
-        if (request != null) {
-            typedQuery.setFirstResult(request.getOffset()).setMaxResults(request.getPageSize());
-        }
-
-        return new PageImpl<>(typedQuery.getResultList());
+        return all;
     }
 
     @Override
     public List<LineStop> findNextExpectedArrivalTime(Station station, LocalDateTime dateTime) {
         return findAll(where(dateEquals(dateTime.toLocalDate()))
-                .and(arrivalTimeIsNotNull())
-                .and(arrivalTimeGreaterThan(dateTime.toLocalTime()))
-                .and(stationEquals(station)), new Sort(Sort.Direction.ASC, "arrivalTime.expectedTime"));
+                        .and(arrivalTimeIsNotNull())
+                        .and(arrivalTimeGreaterThan(dateTime.toLocalTime()))
+                        .and(stationEquals(station)),
+                new Sort(Sort.Direction.ASC, "arrivalTime.expectedTime")
+        );
 
     }
 
@@ -165,6 +175,30 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
                 .getResultList();
     }
 
+    private Page<LineStop> findAll(Specifications<LineStop> specifications, Pageable pageable) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
+        Root<LineStop> root = query.from(LineStop.class);
+
+        TypedQuery<LineStop> typedQuery = entityManager.createQuery(query
+                        .where(specifications.toPredicate(root, query, builder))
+                        .orderBy(QueryUtils.toOrders(pageable.getSort(), root, builder))
+        );
+
+        return pageable == null ? new PageImpl<>(typedQuery.getResultList()) : readPage(typedQuery, pageable, specifications);
+    }
+
+    protected Page<LineStop> readPage(TypedQuery<LineStop> query, Pageable pageable, Specification<LineStop> specifications) {
+
+        query.setFirstResult(pageable.getOffset());
+        query.setMaxResults(pageable.getPageSize());
+
+        Long total = executeCountQuery(getCountQuery(specifications));
+        List<LineStop> content = total > pageable.getOffset() ? query.getResultList() : Collections.<LineStop>emptyList();
+
+        return new PageImpl<LineStop>(content, pageable, total);
+    }
+
     private List<LineStop> findAll(Specifications<LineStop> specifications, Sort sort) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
@@ -172,9 +206,42 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 
         return entityManager
                 .createQuery(query
-                        .where(specifications.toPredicate(root, query, builder))
-                        .orderBy(QueryUtils.toOrders(sort, root, builder)))
-                .getResultList();
+                                .where(specifications.toPredicate(root, query, builder))
+                                .orderBy(QueryUtils.toOrders(sort, root, builder))
+                ).getResultList();
+    }
+
+    protected TypedQuery<Long> getCountQuery(Specification<LineStop> specification) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> query = builder.createQuery(Long.class);
+
+        Root<LineStop> root = applySpecificationToCriteria(specification, query);
+
+        if (query.isDistinct()) {
+            query.select(builder.countDistinct(root));
+        } else {
+            query.select(builder.count(root));
+        }
+
+        return entityManager.createQuery(query);
+    }
+
+    private <S> Root<LineStop> applySpecificationToCriteria(Specification<LineStop> specification, CriteriaQuery<S> query) {
+        Assert.notNull(query);
+        Root<LineStop> root = query.from(LineStop.class);
+
+        if (specification == null) {
+            return root;
+        }
+
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        Predicate predicate = specification.toPredicate(root, query, builder);
+
+        if (predicate != null) {
+            query.where(predicate);
+        }
+
+        return root;
     }
 
     private LineStop findFirstOne(Specifications<LineStop> specification) {

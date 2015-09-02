@@ -116,7 +116,7 @@
     <bean id="delaysFromArrivalItemReader"
           class="org.springframework.batch.item.data.RepositoryItemReader"
           scope="step">
-        <property name="pageSize" value="2"/>
+        <property name="pageSize" value="${generate.excel.files.commit.interval}"/>
         <property name="methodName" value="findArrivalDelays"/>
         <property name="repository" ref="lineStopDao"/>
         <property name="saveState" value="false"/>

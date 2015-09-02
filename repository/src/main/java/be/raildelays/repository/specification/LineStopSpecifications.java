@@ -31,6 +31,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Subquery;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Locale;
@@ -221,6 +222,16 @@ public class LineStopSpecifications {
                 builder.equal(root.get(LineStop_.canceledDeparture), false),
                 builder.equal(root.get(LineStop_.canceledArrival), false)
         );
+    }
+
+    /**
+     * Creates a specification where {@link LineStop#id} must be in a list provided by a sub-query.
+     *
+     * @param subQuery returning a list of Id's
+     * @return a predicate
+     */
+    public static Specification<LineStop> idsIn(Subquery<Long> subQuery) {
+        return (root, query, builder) -> builder.in(root.get(LineStop_.id)).value(subQuery);
     }
 
 }
