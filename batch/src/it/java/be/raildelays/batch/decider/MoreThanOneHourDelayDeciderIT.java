@@ -25,7 +25,9 @@ public class MoreThanOneHourDelayDeciderIT extends AbstractContextIT {
     public void testCompleted() throws Exception {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(
                 new JobParameters(
-                        Collections.singletonMap("thresholdDelay", new JobParameter(100L))));
+                        Collections.singletonMap("thresholdDelay", new JobParameter(100L))
+                )
+        );
 
         Assert.assertFalse(jobExecution.getStatus().isUnsuccessful());
         Assert.assertEquals(2, jobExecution.getStepExecutions().size());
@@ -35,7 +37,9 @@ public class MoreThanOneHourDelayDeciderIT extends AbstractContextIT {
     public void testCompletedWith60mDelay() throws Exception {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(
                 new JobParameters(
-                        Collections.singletonMap("thresholdDelay", new JobParameter(60L))));
+                        Collections.singletonMap("thresholdDelay", new JobParameter(60L))
+                )
+        );
 
         Assert.assertFalse(jobExecution.getStatus().isUnsuccessful());
         Assert.assertEquals(3, jobExecution.getStepExecutions().size());
@@ -46,7 +50,9 @@ public class MoreThanOneHourDelayDeciderIT extends AbstractContextIT {
     public void testFailed() throws Exception {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(
                 new JobParameters(
-                        Collections.singletonMap("thresholdDelay", new JobParameter(-1L))));
+                        Collections.singletonMap("thresholdDelay", new JobParameter(-1L))
+                )
+        );
 
         Assert.assertTrue(jobExecution.getStatus().isUnsuccessful());
         Assert.assertEquals(1, jobExecution.getStepExecutions().size());

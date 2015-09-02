@@ -1,7 +1,6 @@
 package be.raildelays.batch.processor;
 
 import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.delays.Delays;
 import be.raildelays.domain.Sens;
 import org.junit.Assert;
 import org.junit.Before;
@@ -24,7 +23,7 @@ public class FilterSmallDelaysProcessorTest {
     public void testFilter() throws Exception {
         Assert.assertNull(processor.process(new BatchExcelRow
                 .Builder(LocalDate.now(), Sens.ARRIVAL)
-                .delay(Delays.toMillis(14L))
+                .delay(14L)
                 .build(false)));
     }
 
@@ -32,7 +31,7 @@ public class FilterSmallDelaysProcessorTest {
     public void testNotFilter() throws Exception {
         Assert.assertNotNull(processor.process(new BatchExcelRow
                 .Builder(LocalDate.now(), Sens.ARRIVAL)
-                .delay(Delays.toMillis(15L))
+                .delay(15L)
                 .build(false)));
     }
 }

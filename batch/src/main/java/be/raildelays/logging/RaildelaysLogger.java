@@ -861,7 +861,7 @@ public class RaildelaysLogger implements Logger {
                 builder.append(separator);
                 builder.append(formatEffectiveTime(effectiveArrivalTime, canceledArrival));
                 builder.append(separator);
-                builder.append(delayFormat.format(Delays.computeDelay(expectedArrivalTime, effectiveArrivalTime) / 1000 / 60));
+                builder.append(delayFormat.format(Delays.toMinutes(Delays.computeDelay(expectedArrivalTime, effectiveArrivalTime))));
                 builder.append(separator);
                 builder.append(StringUtils.rightPad(idPrevious != null ? idFormat.format(idPrevious) : "", ID_FORMAT.length()));
                 builder.append(separator);

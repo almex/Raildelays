@@ -27,6 +27,7 @@ package be.raildelays.batch.processor;
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.bean.BatchExcelRow.Builder;
 import be.raildelays.batch.exception.ArrivalDepartureEqualsException;
+import be.raildelays.delays.Delays;
 import be.raildelays.domain.Language;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.LineStop;
@@ -161,7 +162,7 @@ public class BatchExcelRowMapperProcessor implements ItemProcessor<LineStop, Bat
                 .effectiveDepartureTime(effectiveDepartureTime) //
                 .effectiveArrivalTime(effectiveArrivalTime) //
                 .effectiveTrain1(lineStopTo.getTrain()) //
-                .delay(lineStopTo.getArrivalTime().getDelay()) //
+                .delay(Delays.toMinutes(lineStopTo.getArrivalTime().getDelay())) //
                 .canceled(lineStopFrom.isCanceled())
                 .build(false);
     }

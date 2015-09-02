@@ -121,7 +121,7 @@ public class BatchExcelRowMapperProcessorTest {
         Assert.assertEquals(LocalTime.parse("12:55"), excelRow.getExpectedArrivalTime());
         Assert.assertEquals(LocalTime.parse("12:35"), excelRow.getEffectiveDepartureTime());
         Assert.assertEquals(LocalTime.parse("13:15"), excelRow.getEffectiveArrivalTime());
-        Assert.assertEquals(20 * 60 * 1000, excelRow.getDelay().longValue());
+        Assert.assertEquals(20, excelRow.getDelay().longValue());
     }
 
     @Test
@@ -130,7 +130,7 @@ public class BatchExcelRowMapperProcessorTest {
 
         Assert.assertEquals(new Station("stationA"), excelRow.getDepartureStation());
         Assert.assertEquals(new Station("stationB"), excelRow.getArrivalStation());
-        Assert.assertEquals(Delays.toMillis(20L), excelRow.getDelay());
+        Assert.assertEquals(20, excelRow.getDelay().longValue());
     }
 
     @Test

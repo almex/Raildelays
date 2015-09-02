@@ -24,7 +24,6 @@
 
 package be.raildelays.batch.processor;
 
-import be.raildelays.delays.Delays;
 import be.raildelays.domain.xls.ExcelRow;
 import be.raildelays.logging.Logger;
 import be.raildelays.logging.LoggerFactory;
@@ -81,13 +80,13 @@ public class FilterWithThresholdDelayProcessor implements ItemProcessor<ExcelRow
         FILTER_LESS_THAN {
             @Override
             boolean filter(ExcelRow item, Long threshold) {
-                return item.getDelay() < Delays.toMillis(threshold);
+                return item.getDelay() < threshold;
             }
         },
         FILTER_GREATER_OR_EQUAL_TO {
             @Override
             boolean filter(ExcelRow item, Long threshold) {
-                return item.getDelay() >= Delays.toMillis(threshold);
+                return item.getDelay() >= threshold;
             }
         };
 
