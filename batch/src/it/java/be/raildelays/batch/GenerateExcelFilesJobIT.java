@@ -42,7 +42,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @ContextConfiguration(locations = {"/jobs/steps/generate-excel-files-job-context.xml"})
-@DataSet(value = "classpath:GenerateExcelFilesJobIT.xml", tearDownOperation = DBOperation.DELETE_ALL)
+@DataSet(value = "classpath:GenerateExcelFilesIT.xml",
+        tearDownOperation = DBOperation.DELETE_ALL,
+        dataSourceSpringName = "dataSource")
 public class GenerateExcelFilesJobIT extends AbstractContextIT {
 
     /**
@@ -58,15 +60,16 @@ public class GenerateExcelFilesJobIT extends AbstractContextIT {
 
         parameters.put("input.file.path", new JobParameter("train-list.properties"));
         parameters.put("date", new JobParameter(new SimpleDateFormat("dd/MM/yyyy").parse("01/01/2000")));
-        parameters.put("language", new JobParameter(Language.FR.name()));
+        parameters.put("language", new JobParameter(Language.EN.name()));
         parameters.put("station.departure", new JobParameter("Liège-Guillemins"));
-        parameters.put("station.arrival", new JobParameter("Brussels (Bruxelles)-Central"));
+        parameters.put("station.arrival", new JobParameter("Bruxelles-Central"));
         parameters.put("excel.output.path", new JobParameter("./"));
         parameters.put("excel.file.name", new JobParameter("sncb_"));
         parameters.put("excel.file.extension", new JobParameter("xls"));
         parameters.put("excel.archive.path", new JobParameter("./"));
         parameters.put("text.output.path", new JobParameter("./output.txt"));
-        parameters.put("excel.template.path", new JobParameter(new ClassPathResource("template.xls").getFile().getAbsolutePath()));
+        parameters.put("excel.template.path",
+                new JobParameter(new ClassPathResource("template.xls").getFile().getAbsolutePath()));
 
         batchStatus = jobLauncherTestUtils.launchJob(new JobParameters(parameters)).getStatus();
 

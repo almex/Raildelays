@@ -1,4 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ The MIT License (MIT)
+  ~
+  ~ Copyright (c) 2015 Almex
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a
+  ~ copy of this software and associated documentation files (the "Software"),
+  ~ to deal in the Software without restriction, including without limitation
+  ~ the rights to use, copy, modify, merge, publish, distribute, sublicense,
+  ~ and/or sell copies of the Software, and to permit persons to whom the
+  ~ Software is furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in
+  ~ all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+  ~ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+  ~ IN THE SOFTWARE.
+  -->
+
 <dataset>
     <STATION ID="1" ENGLISH_NAME="Bruxelles-Midi" DTYPE="Station"/>
     <STATION ID="2" ENGLISH_NAME="Bruxelles-Central" DTYPE="Station"/>
@@ -8,7 +32,7 @@
     <!-- 466 -->
     <TRAIN ID="466" ENGLISH_NAME="466" DTYPE="RailtimeTrain" RAILTIME_ID="466"/>
 
-    <LINE_STOP ID="4661" TRAIN_ID="466" STATION_ID="1" CANCELED_DEPARTURE="false" CANCELED_ARRIVAL="false" 
+    <LINE_STOP ID="4661" TRAIN_ID="466" STATION_ID="1" CANCELED_DEPARTURE="false" CANCELED_ARRIVAL="false"
                DATE="2000-01-01" ARRIVAL_TIME_EXPECTED="16:24:00" ARRIVAL_TIME_DELAY="0"
                DEPARTURE_TIME_EXPECTED="16:24:00" DEPARTURE_TIME_DELAY="3600000"
             />
@@ -29,7 +53,7 @@
     <!-- 477 -->
     <TRAIN ID="477" ENGLISH_NAME="477" DTYPE="RailtimeTrain" RAILTIME_ID="477"/>
 
-    <LINE_STOP ID="4771" TRAIN_ID="477" STATION_ID="1" CANCELED_DEPARTURE="false" CANCELED_ARRIVAL="false" 
+    <LINE_STOP ID="4771" TRAIN_ID="477" STATION_ID="1" CANCELED_DEPARTURE="false" CANCELED_ARRIVAL="false"
                DATE="2000-01-01" ARRIVAL_TIME_EXPECTED="17:24:00" ARRIVAL_TIME_DELAY="0"
                DEPARTURE_TIME_EXPECTED="17:24:00" DEPARTURE_TIME_DELAY="3600000"
             />
@@ -37,7 +61,7 @@
                DATE="2000-01-01" ARRIVAL_TIME_EXPECTED="17:27:00" ARRIVAL_TIME_DELAY="4500000"
                DEPARTURE_TIME_EXPECTED="17:28:00" DEPARTURE_TIME_DELAY="4600000" PREVIOUS_ID="4771"
             />
-    <LINE_STOP ID="4773" TRAIN_ID="477" STATION_ID="3" CANCELED_DEPARTURE="false" CANCELED_ARRIVAL="true" 
+    <LINE_STOP ID="4773" TRAIN_ID="477" STATION_ID="3" CANCELED_DEPARTURE="false" CANCELED_ARRIVAL="true"
                DATE="2000-01-01" ARRIVAL_TIME_EXPECTED="17:31:00" ARRIVAL_TIME_DELAY="0"
                DEPARTURE_TIME_EXPECTED="17:33:00" DEPARTURE_TIME_DELAY="0" PREVIOUS_ID="4772"
             />
@@ -69,7 +93,7 @@
     <!-- 515 -->
     <TRAIN ID="515" ENGLISH_NAME="515" DTYPE="RailtimeTrain" RAILTIME_ID="515"/>
 
-    <LINE_STOP ID="5151" TRAIN_ID="515" STATION_ID="1" CANCELED_DEPARTURE="false" CANCELED_ARRIVAL="false" 
+    <LINE_STOP ID="5151" TRAIN_ID="515" STATION_ID="1" CANCELED_DEPARTURE="false" CANCELED_ARRIVAL="false"
                DATE="2000-01-01" ARRIVAL_TIME_EXPECTED="16:55:00" ARRIVAL_TIME_DELAY="5"
                DEPARTURE_TIME_EXPECTED="16:57:00" DEPARTURE_TIME_DELAY="300000"
             />
@@ -77,11 +101,11 @@
                DATE="2000-01-01" ARRIVAL_TIME_EXPECTED="17:00:00" ARRIVAL_TIME_DELAY="900000"
                DEPARTURE_TIME_EXPECTED="17:01:00" DEPARTURE_TIME_DELAY="300000" PREVIOUS_ID="5151"
             />
-    <LINE_STOP ID="5153" TRAIN_ID="515" STATION_ID="3" CANCELED_DEPARTURE="false" CANCELED_ARRIVAL="false" 
+    <LINE_STOP ID="5153" TRAIN_ID="515" STATION_ID="3" CANCELED_DEPARTURE="false" CANCELED_ARRIVAL="false"
                DATE="2000-01-01" ARRIVAL_TIME_EXPECTED="17:04:00" ARRIVAL_TIME_DELAY="5"
                DEPARTURE_TIME_EXPECTED="17:06:00" DEPARTURE_TIME_DELAY="300000" PREVIOUS_ID="5152"
             />
-    <LINE_STOP ID="5154" TRAIN_ID="515" STATION_ID="4" CANCELED_DEPARTURE="false" CANCELED_ARRIVAL="false" 
+    <LINE_STOP ID="5154" TRAIN_ID="515" STATION_ID="4" CANCELED_DEPARTURE="false" CANCELED_ARRIVAL="false"
                DATE="2000-01-01" ARRIVAL_TIME_EXPECTED="18:00:00" ARRIVAL_TIME_DELAY="5"
                DEPARTURE_TIME_EXPECTED="18:05:00" DEPARTURE_TIME_DELAY="300000" PREVIOUS_ID="5153"
             />

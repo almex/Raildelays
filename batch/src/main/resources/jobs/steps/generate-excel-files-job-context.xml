@@ -102,8 +102,17 @@
                 <value type="java.time.LocalDate">#{jobParameters['date']}</value>
                 <bean class="be.raildelays.domain.entities.Station">
                     <constructor-arg value="#{jobParameters['station.departure']}"/>
+                    <constructor-arg>
+                        <bean class="be.raildelays.domain.Language" factory-method="valueOf">
+                            <constructor-arg>
+                                <value>#{jobParameters['language']?.toUpperCase()}</value>
+                            </constructor-arg>
+                        </bean>
+                    </constructor-arg>
                 </bean>
-                <value type="java.lang.Long">${excel.item.delay.min.threshold}</value>
+                <bean class="be.raildelays.delays.Delays" factory-method="toMillis">
+                    <constructor-arg value="${excel.item.delay.min.threshold}"/>
+                </bean>
             </list>
         </property>
         <property name="sort">
@@ -125,13 +134,22 @@
                 <value type="java.time.LocalDate">#{jobParameters['date']}</value>
                 <bean class="be.raildelays.domain.entities.Station">
                     <constructor-arg value="#{jobParameters['station.arrival']}"/>
+                    <constructor-arg>
+                        <bean class="be.raildelays.domain.Language" factory-method="valueOf">
+                            <constructor-arg>
+                                <value>#{jobParameters['language']?.toUpperCase()}</value>
+                            </constructor-arg>
+                        </bean>
+                    </constructor-arg>
                 </bean>
-                <value type="java.lang.Long">${excel.item.delay.min.threshold}</value>
+                <bean class="be.raildelays.delays.Delays" factory-method="toMillis">
+                    <constructor-arg value="${excel.item.delay.min.threshold}"/>
+                </bean>
             </list>
         </property>
         <property name="sort">
             <map>
-                <entry key="date" value="ASC"/>
+                <entry key="arrivalTime" value="ASC"/>
             </map>
         </property>
     </bean>
