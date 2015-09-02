@@ -1,6 +1,5 @@
 package be.raildelays.batch.processor;
 
-import be.raildelays.delays.Delays;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.xls.ExcelRow;
 import org.junit.Assert;
@@ -25,7 +24,7 @@ public class FilterWithThresholdDelayProcessorTest {
 
         Assert.assertNull(processor.process(new ExcelRow
                 .Builder(LocalDate.now(), Sens.DEPARTURE)
-                .delay(Delays.toMillis(59L))
+                .delay(59L)
                 .build(false)));
     }
 
@@ -35,7 +34,7 @@ public class FilterWithThresholdDelayProcessorTest {
 
         Assert.assertNotNull(processor.process(new ExcelRow
                 .Builder(LocalDate.now(), Sens.DEPARTURE)
-                .delay(Delays.toMillis(60L))
+                .delay(60L)
                 .build(false)));
     }
 
@@ -45,7 +44,7 @@ public class FilterWithThresholdDelayProcessorTest {
 
         Assert.assertNull(processor.process(new ExcelRow
                 .Builder(LocalDate.now(), Sens.DEPARTURE)
-                .delay(Delays.toMillis(60L))
+                .delay(60L)
                 .build(false)));
     }
 
@@ -55,7 +54,7 @@ public class FilterWithThresholdDelayProcessorTest {
 
         Assert.assertNotNull(processor.process(new ExcelRow
                 .Builder(LocalDate.now(), Sens.DEPARTURE)
-                .delay(Delays.toMillis(59L))
+                .delay(59L)
                 .build(false)));
     }
 }
