@@ -180,10 +180,13 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
         CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
         Root<LineStop> root = query.from(LineStop.class);
 
-        TypedQuery<LineStop> typedQuery = entityManager.createQuery(query
-                        .where(specifications.toPredicate(root, query, builder))
-                        .orderBy(QueryUtils.toOrders(pageable.getSort(), root, builder))
-        );
+        query = query.where(specifications.toPredicate(root, query, builder));
+
+        if (pageable != null && pageable.getSort() != null) {
+            query = query.orderBy(QueryUtils.toOrders(pageable.getSort(), root, builder));
+        }
+
+        TypedQuery<LineStop> typedQuery = entityManager.createQuery(query);
 
         return pageable == null ? new PageImpl<>(typedQuery.getResultList()) : readPage(typedQuery, pageable, specifications);
     }
@@ -194,9 +197,9 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
         query.setMaxResults(pageable.getPageSize());
 
         Long total = executeCountQuery(getCountQuery(specifications));
-        List<LineStop> content = total > pageable.getOffset() ? query.getResultList() : Collections.<LineStop>emptyList();
+        List<LineStop> content = total > pageable.getOffset() ? query.getResultList() : Collections.emptyList();
 
-        return new PageImpl<LineStop>(content, pageable, total);
+        return new PageImpl<>(content, pageable, total);
     }
 
     private List<LineStop> findAll(Specifications<LineStop> specifications, Sort sort) {
