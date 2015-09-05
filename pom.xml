@@ -3,7 +3,7 @@
 
     <groupId>com.github.almex</groupId>
     <artifactId>raildelays-parent</artifactId>
-    <version>1.2.2</version>
+    <version>1.2.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Raildelays</name>
@@ -35,7 +35,7 @@
         <url>https://github.com/almex/Raildelays.git</url>
         <connection>scm:git:https://github.com/almex/Raildelays.git</connection>
         <developerConnection>scm:git:git@github.com:almex/Raildelays.git</developerConnection>
-        <tag>v1.2.2</tag>
+        <tag>raildelays-parent-1.2.1</tag>
     </scm>
 
     <distributionManagement>
