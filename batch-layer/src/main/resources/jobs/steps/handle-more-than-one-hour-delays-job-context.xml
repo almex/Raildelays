@@ -34,7 +34,7 @@
             <tasklet transaction-manager="batchTransactionManager">
                 <chunk reader="oneHourDelayItemReader"
                        processor="chainedProcessorsForLessThanOneHourDelay"
-                       writer="oneHourMultiResourceItemWriter"
+                       writer="oneHourDelayItemWriter"
                        commit-interval="1">
                     <listeners merge="true">
                         <!-- To compute file name of the Excel file after filtering -->
@@ -181,15 +181,24 @@
     <!-- =====================================         WRITERS        ===================================== -->
     <!-- ================================================================================================== -->
 
-    <bean id="oneHourMultiResourceItemWriter"
-          class="org.springframework.batch.item.support.MultiResourceMaxItemCountItemWriter"
+    <bean id="oneHourDelayItemWriter"
+          class="be.raildelays.batch.writer.ResourceLocatorExcelRowItemStreamWriterAdaptor"
           scope="step">
-        <property name="delegate" ref="oneHourSortedItemWriter"/>
-        <property name="name" value="oneHourMultiResourceItemWriter"/>
-        <property name="resourceLocator" ref="oneHourItemWriterResourceLocator"/>
+        <property name="fileName" value="#{jobParameters['excel.file.name']}"/>
+        <property name="fileExtension" value=".#{jobParameters['excel.file.extension']}"/>
+        <property name="directoryPath" value="#{jobParameters['excel.output.path']}"/>
+        <property name="delegate" ref="excelSheetWithOneHourDelayItemWriter"/>
     </bean>
 
-    <bean id="oneHourSortedItemWriter"
+    <!--<bean id="oneHourMultiResourceItemWriter"
+          class="org.springframework.batch.item.support.MultiResourceMaxItemCountItemWriter"
+          scope="step">
+        <property name="delegate" ref="excelSheetWithOneHourDelayItemWriter"/>
+        <property name="name" value="oneHourMultiResourceItemWriter"/>
+        <property name="resourceLocator" ref="oneHourItemWriterResourceLocator"/>
+    </bean>-->
+
+    <!--<bean id="oneHourSortedItemWriter"
           class="org.springframework.batch.item.support.SortedItemStreamWriter"
           scope="step">
         <property name="reader">
@@ -208,7 +217,7 @@
             <bean class="be.raildelays.batch.bean.TimeBasedExcelRowComparator"/>
         </property>
         <property name="writer" ref="excelSheetWithOneHourDelayItemWriter"/>
-    </bean>
+    </bean>-->
 
     <bean id="excelSheetWithOneHourDelayItemWriter"
           class="org.springframework.batch.item.file.ExcelSheetItemWriter"

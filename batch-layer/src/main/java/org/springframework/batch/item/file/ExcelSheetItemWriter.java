@@ -24,7 +24,8 @@ import java.io.*;
 /**
  * @param <T> parameter type of the method {@link #write(java.util.List)}
  */
-public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemWriter<T> implements ResourceAwareItemWriterItemStream<T>, InitializingBean, ResourceAwareItemStream {
+public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemWriter<T>
+        implements ResourceAwareItemWriterItemStream<T>, InitializingBean, ResourceAwareItemStream {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExcelSheetItemWriter.class);
     private static final String ROW_TO_SKIP_KEY = "row.to.skip.key";
@@ -186,21 +187,21 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
         this.sheetIndex = sheetIndex;
     }
 
+    public Resource getResource() {
+        return resource;
+    }
+
     @Override
     public void setResource(Resource resource) {
         this.resource = resource;
     }
 
-    public void setTemplate(Resource template) {
-        this.template = template;
-    }
-
-    public Resource getResource() {
-        return resource;
-    }
-
     public Resource getTemplate() {
         return template;
+    }
+
+    public void setTemplate(Resource template) {
+        this.template = template;
     }
 
     public void setShouldDeleteIfExists(boolean shouldDeleteIfExists) {
