@@ -24,9 +24,6 @@
 
 package org.springframework.batch.item.file;
 
-import be.raildelays.batch.ExcelFileUtils;
-import be.raildelays.domain.Sens;
-import be.raildelays.domain.xls.ExcelRow;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,53 +32,47 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-import java.io.File;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * @author Almex
- * @since 1.2
  */
 public class ResourceLocatorItemWriterItemStreamTest {
 
-    public static final String RETARD_SNCB_20000101_XLS = "." + File.separator + "retard_sncb 20000101.xls";
-    private ResourceLocatorItemWriterItemStream writer;
-    private ExcelRowResourceAwareItemWriterItemStream delegate;
+    public static final String KEY = "key";
+    private ResourceLocatorItemWriterItemStream<String> writer;
+    private SimpleResourceAwareItemWriterItemStream delegate;
 
 
     @Before
     public void setUp() throws Exception {
         writer = new ResourceLocatorItemWriterItemStream();
-        delegate = new ExcelRowResourceAwareItemWriterItemStream();
+        delegate = new SimpleResourceAwareItemWriterItemStream();
         writer.setDelegate(delegate);
-        writer.setResourceLocator(new SimpleResourceLocator<ExcelRow>() {
-
-            @Override
-            public void onWrite(List<? extends ExcelRow> items, ResourceContext context) {
-                String suffix = items.get(0).getDate().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-                File file = ExcelFileUtils.getFile(new File("./"), "retard_sncb", suffix, ".xls");
-
-                context.changeResource(new FileSystemResource(file));
-            }
-        });
     }
 
+    /**
+     * We expect that the onWrite() method build a path by appending items into one String.
+     */
     @Test
     public void testWrite() throws Exception {
         ExecutionContext executionContext = new ExecutionContext();
 
+        writer.setResourceLocator(new SimpleResourceLocator<String>() {
+            @Override
+            public void onWrite(List<? extends String> items, ResourceContext context) throws ItemStreamException {
+                context.changeResource(new FileSystemResource(Arrays.toString(items.toArray())));
+            }
+        });
+
         writer.open(executionContext);
-        writer.write(Collections.singletonList(new ExcelRow
-                .Builder(LocalDate.parse("2000-01-01"), Sens.ARRIVAL)
-                .build(false)));
+        writer.write(Arrays.asList("a", "b", "c"));
         writer.update(executionContext);
 
         try {
-            Assert.assertEquals(RETARD_SNCB_20000101_XLS, delegate.getResource().getFile().getPath());
+            Assert.assertEquals("[a, b, c]", delegate.getResource().getFile().getPath());
         } catch (IOException e) {
             Assert.fail(e.getMessage());
         }
@@ -89,7 +80,63 @@ public class ResourceLocatorItemWriterItemStreamTest {
         writer.close();
     }
 
-    private static class ExcelRowResourceAwareItemWriterItemStream implements ResourceAwareItemWriterItemStream<ExcelRow> {
+    /**
+     * We expect that the onOpen() method build a path by by retrieving a property from the execution context.
+     */
+    @Test
+    public void testOpen() throws Exception {
+        ExecutionContext executionContext = new ExecutionContext();
+
+        executionContext.put(KEY, "foo");
+        writer.setResourceLocator(new SimpleResourceLocator<String>() {
+            @Override
+            public void onOpen(ResourceContext context) throws ItemStreamException {
+                context.changeResource(new FileSystemResource(executionContext.getString(KEY)));
+            }
+        });
+
+        writer.open(executionContext);
+        writer.write(Arrays.asList("a", "b", "c"));
+        writer.update(executionContext);
+
+        try {
+            Assert.assertEquals("foo", delegate.getResource().getFile().getPath());
+        } catch (IOException e) {
+            Assert.fail(e.getMessage());
+        }
+
+        writer.close();
+    }
+
+    /**
+     * We expect that the onUpdate() method build a path by by retrieving a property from the execution context.
+     */
+    @Test
+    public void testClose() throws Exception {
+        ExecutionContext executionContext = new ExecutionContext();
+
+        executionContext.put(KEY, "foo");
+        writer.setResourceLocator(new SimpleResourceLocator<String>() {
+            @Override
+            public void onUpdate(ResourceContext context) throws ItemStreamException {
+                context.changeResource(new FileSystemResource(executionContext.getString(KEY)));
+            }
+        });
+
+        writer.open(executionContext);
+        writer.write(Arrays.asList("a", "b", "c"));
+        writer.update(executionContext);
+
+        try {
+            Assert.assertEquals("foo", delegate.getResource().getFile().getPath());
+        } catch (IOException e) {
+            Assert.fail(e.getMessage());
+        }
+
+        writer.close();
+    }
+
+    private static class SimpleResourceAwareItemWriterItemStream implements ResourceAwareItemWriterItemStream<String> {
 
         private Resource resource;
 
@@ -118,7 +165,7 @@ public class ResourceLocatorItemWriterItemStreamTest {
         }
 
         @Override
-        public void write(List<? extends ExcelRow> items) throws Exception {
+        public void write(List<? extends String> items) throws Exception {
 
         }
     }
