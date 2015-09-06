@@ -190,9 +190,6 @@
         <logger name="be.raildelays.batch.Bootstrap" level="trace" additivity="false">
             <appender-ref ref="console"/>
         </logger>
-        <logger name="be.raildelays.batch.reader.CompositeRailtimeItemReader" level="trace" additivity="false">
-            <appender-ref ref="step1Reader"/>
-        </logger>
         <logger name="be.raildelays.batch.reader.TrainIdPartitioner" level="trace" additivity="false">
             <appender-ref ref="step1Reader"/>
         </logger>
@@ -216,9 +213,6 @@
             <appender-ref ref="step2Reader"/>
         </logger>
         <logger name="be.raildelays.service" level="trace" additivity="false">
-            <appender-ref ref="step2Reader"/>
-        </logger>
-        <logger name="be.raildelays.batch.reader.CompositeRaildelaysItemReader" level="trace" additivity="false">
             <appender-ref ref="step2Reader"/>
         </logger>
         <logger name="be.raildelays.batch.listener.LogStep2ItemProcessorListener" level="trace" additivity="false">

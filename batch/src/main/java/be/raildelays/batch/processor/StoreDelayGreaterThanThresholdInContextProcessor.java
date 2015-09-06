@@ -53,7 +53,6 @@ import java.util.Map;
  * </p>
  *
  * @author Almex
- * @see be.raildelays.batch.reader.BatchExcelRowInContextReader
  * @since 1.2
  */
 public class StoreDelayGreaterThanThresholdInContextProcessor implements ItemProcessor<BatchExcelRow, BatchExcelRow>, InitializingBean {
