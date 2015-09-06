@@ -29,10 +29,12 @@ import org.springframework.batch.item.ItemStreamException;
 import java.util.List;
 
 /**
+ * Default implementation doing nothing on each event.
+ *
  * @author Almex
  * @since 2.0
  */
-public abstract class AbstractResourceLocator<T> implements ResourceLocator<T> {
+public class SimpleResourceLocator<T> implements ResourceLocator<T> {
 
     @Override
     public void onOpen(ResourceContext context) throws ItemStreamException {

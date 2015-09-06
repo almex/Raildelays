@@ -28,8 +28,13 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.io.Resource;
 
 /**
+ * Context used by a {@code ResourceLocator} to determine if the resource reference {@linkplain #hasChanged} or not.
+ * You can also determine if this resource {@link #hasAlreadyBeenInitialized()} or not.
+ * The {@link Resource} is stored in the {@link ExecutionContext} that has been used to instantiate this context.
+ *
  * @author Almex
  * @since 2.0
+ * @see ResourceLocator
  */
 public class ResourceContext {
 
@@ -39,13 +44,19 @@ public class ResourceContext {
     private boolean hasChanged = false;
     private boolean initialized = false;
 
-
     public ResourceContext(ExecutionContext executionContext) {
         this.executionContext = executionContext;
     }
 
+    /**
+     * Change the resource contained within this context and set the context as initialized if it has not been set yet.
+     *
+     * @param resource the resource you want to store in this context.
+     */
     public void changeResource(Resource resource) {
-        Resource previousResource = consumeResource();
+        Resource previousResource = (Resource) executionContext.get(RESOURCE_KEY);
+
+        initialized = true;
 
         if (previousResource != resource) {
             hasChanged = true;
@@ -53,21 +64,59 @@ public class ResourceContext {
         }
     }
 
+    /**
+     * Consume the resource if it has previously been set via {@link #changeResource(Resource)}.
+     *
+     * @return the {@link Resource} if it contains one, {@code null} otherwise.
+     */
     public Resource consumeResource() {
-        hasChanged = false;
-        initialized = true;
-        return (Resource) executionContext.get(RESOURCE_KEY);
+        Resource result = null;
+
+        if (containsResource()) {
+            hasChanged = false;
+            result = (Resource) executionContext.remove(RESOURCE_KEY);
+        }
+
+        return result;
     }
 
+    /**
+     * Determine if the resource has changed since the last time we consumed it.
+     *
+     * @return {@code true} if a call to {@link #changeResource(Resource)} has been done since the last time we called
+     * {@link #consumeResource()}, {@code false} otherwise.
+     */
     public boolean hasChanged() {
         return hasChanged;
     }
 
-    public ExecutionContext getExecutionContext() {
-        return executionContext;
+    /**
+     * Check if the context contains a resource to consume.
+     *
+     * @return {@code true} if a call to {@link #changeResource(Resource)} has been done and not already consumed,
+     * {@code false} otherwise.
+     */
+    public boolean containsResource() {
+        return executionContext.containsKey(RESOURCE_KEY);
     }
 
-    public boolean isInitialized() {
+    /**
+     * Determine if the resource has already been initialized or not.
+     * This method return the same result as {@link #consumeResource()} if the context is used for the first time.
+     *
+     * @return {@code true} if any call to {@link #changeResource(Resource)} has already been made,
+     * {@code false} otherwise
+     */
+    public boolean hasAlreadyBeenInitialized() {
         return initialized;
+    }
+
+    /**
+     * You can interact with the {@link ExecutionContext}
+     *
+     * @return the {@link ExecutionContext} used to build this {@link ResourceContext}.
+     */
+    public ExecutionContext getExecutionContext() {
+        return executionContext;
     }
 }

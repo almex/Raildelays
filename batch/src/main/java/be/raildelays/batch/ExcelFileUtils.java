@@ -48,7 +48,7 @@ public class ExcelFileUtils extends FileUtils {
     }
 
 
-    public static File getFile(File directory, String prefix, String suffix, String extension) throws IOException {
+    public static File getFile(File directory, String prefix, String suffix, String extension) {
         StringBuilder builder = new StringBuilder();
 
         builder.append(prefix);

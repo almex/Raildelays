@@ -31,6 +31,9 @@ import org.springframework.batch.item.ItemStreamWriter;
 import java.util.List;
 
 /**
+ * This {@link ItemStreamWriter} make the link between a {@link ResourceContext} and a {@link ResourceLocator} to
+ * determine when to set the {@code Resource} of our delegate.
+ *
  * @author Almex
  * @since 2.0
  */
@@ -40,6 +43,14 @@ public class ResourceLocatorItemWriterItemStream<T> implements ItemStreamWriter<
     private ResourceContext resourceContext;
     private ResourceLocator resourceLocator;
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The {@link ResourceContext} is initialized within this method based on the {@link ExecutionContext} provided.
+     * Check if the  {@link ResourceLocator#onOpen(ResourceContext)} event has changed our
+     * {@link ResourceContext}.
+     * </p>
+     */
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
         resourceContext = new ResourceContext(executionContext);
@@ -52,6 +63,13 @@ public class ResourceLocatorItemWriterItemStream<T> implements ItemStreamWriter<
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     *     Check if the  {@link ResourceLocator#onUpdate(ResourceContext)} event has changed our
+     *     {@link ResourceContext}.
+     * </p>
+     */
     @Override
     public void update(ExecutionContext executionContext) throws ItemStreamException {
         resourceLocator.onUpdate(resourceContext);
@@ -70,6 +88,14 @@ public class ResourceLocatorItemWriterItemStream<T> implements ItemStreamWriter<
         delegate.close();
     }
 
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     *     Check if the {@link ResourceLocator#onWrite(List, ResourceContext)} event has changed our
+     *     {@link ResourceContext}.
+     * </p>
+     */
     @Override
     public void write(List<? extends T> items) throws Exception {
         resourceLocator.onWrite(items, resourceContext);

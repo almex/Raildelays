@@ -58,18 +58,12 @@ public class ResourceLocatorItemWriterItemStreamTest {
         writer = new ResourceLocatorItemWriterItemStream();
         delegate = new ExcelRowResourceAwareItemWriterItemStream();
         writer.setDelegate(delegate);
-        writer.setResourceLocator(new AbstractResourceLocator<ExcelRow>() {
+        writer.setResourceLocator(new SimpleResourceLocator<ExcelRow>() {
 
             @Override
             public void onWrite(List<? extends ExcelRow> items, ResourceContext context) {
                 String suffix = items.get(0).getDate().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-                File file;
-
-                try {
-                    file = ExcelFileUtils.getFile(new File("./"), "retard_sncb", suffix, ".xls");
-                } catch (IOException e) {
-                    throw new ItemStreamException(e);
-                }
+                File file = ExcelFileUtils.getFile(new File("./"), "retard_sncb", suffix, ".xls");
 
                 context.changeResource(new FileSystemResource(file));
             }

@@ -24,21 +24,47 @@
 
 package org.springframework.batch.item.file;
 
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 
 import java.util.List;
 
 /**
- * @param <T>
+ * A resource locator is way to define a resource on 3 of {@code ItemStream} operations.
+ * Then you can dynamically create a path based on something in the {@link ResourceContext} or
+ * based on items in case of the {@link #onWrite(List, ResourceContext)} method.
+ *
+ * @param <T> type of the data to write
  * @author Almex
  * @since 2.0
+ * @see org.springframework.batch.item.ItemStream
+ * @see ResourceLocatorItemWriterItemStream
  */
 public interface ResourceLocator<T> {
 
+    /**
+     * Event triggered on {@link ResourceLocatorItemWriterItemStream#open(ExecutionContext)} method.
+     *
+     * @param context to communicate changes on the resource you attempt to build
+     * @throws ItemStreamException in case of any exception
+     */
     void onOpen(ResourceContext context) throws ItemStreamException;
 
+    /**
+     * Event triggered on {@link ResourceLocatorItemWriterItemStream#update(ExecutionContext)} method.
+     *
+     * @param context to communicate changes on the resource you attempt to build
+     * @throws ItemStreamException in case of any exception
+     */
     void onUpdate(ResourceContext context) throws ItemStreamException;
 
+    /**
+     * Event triggered on {@link ResourceLocatorItemWriterItemStream#write(List)} method.
+     *
+     * @param items   data to write
+     * @param context to communicate changes on the resource you attempt to build
+     * @throws ItemStreamException in case of any exception
+     */
     void onWrite(List<? extends T> items, ResourceContext context) throws ItemStreamException;
 
 }

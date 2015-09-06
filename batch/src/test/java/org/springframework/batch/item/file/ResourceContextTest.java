@@ -24,37 +24,61 @@
 
 package org.springframework.batch.item.file;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 
 /**
  * @author Almex
- * @since 1.2
  */
 public class ResourceContextTest {
 
+    private ResourceContext context;
+    private ExecutionContext executionContext;
+
     @Before
     public void setUp() throws Exception {
-
+        executionContext = new ExecutionContext();
+        context = new ResourceContext(executionContext);
     }
 
+    /**
+     * We expect that when changing the resource the context has changed and it's initialized.
+     */
     @Test
     public void testChangeResource() throws Exception {
+        context.changeResource(new FileSystemResource("./"));
 
+        Assert.assertTrue(context.hasChanged());
+        Assert.assertTrue(context.hasAlreadyBeenInitialized());
     }
 
+    /**
+     * We expect that by consuming the resource the context has not changed but it's still initialized.
+     */
     @Test
     public void testConsumeResource() throws Exception {
+        Resource expected = new FileSystemResource("./");
+        Resource actual;
 
+        context.changeResource(expected);
+        actual = context.consumeResource();
+
+        Assert.assertEquals(expected, actual);
+        Assert.assertTrue(context.hasAlreadyBeenInitialized());
+        Assert.assertFalse(context.hasChanged());
     }
 
-    @Test
-    public void testHasChanged() throws Exception {
-
-    }
-
+    /**
+     * We expect that the reference to the ExecutionContext has not changed.
+     */
     @Test
     public void testGetExecutionContext() throws Exception {
+        ExecutionContext actual = context.getExecutionContext();
 
+        Assert.assertEquals(executionContext, actual);
     }
 }

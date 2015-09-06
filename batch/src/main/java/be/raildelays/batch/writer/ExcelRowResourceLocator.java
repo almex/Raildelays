@@ -27,36 +27,40 @@ package be.raildelays.batch.writer;
 import be.raildelays.batch.ExcelFileUtils;
 import be.raildelays.domain.xls.ExcelRow;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.file.AbstractResourceLocator;
 import org.springframework.batch.item.file.ResourceContext;
+import org.springframework.batch.item.file.SimpleResourceLocator;
 import org.springframework.core.io.FileSystemResource;
 
 import java.io.File;
-import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
+ * We generate the Excel file name based of the first item to write.
+ * The {@link ExcelRow#date} is appended to file name prefix, file extension and directory path
+ * to obtain the full path of our output file.
+ *
  * @author Almex
  * @since 2.0
  */
-public class ExcelRowResourceLocator extends AbstractResourceLocator<ExcelRow> {
+public class ExcelRowResourceLocator extends SimpleResourceLocator<ExcelRow> {
 
     private String fileName;
     private String fileExtension;
     private String directoryPath;
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * We only modify the {@link ResourceContext} when the list of item is not empty and that the
+     * {@link ResourceContext} has not been initialized yet.
+     * </p>
+     */
     @Override
     public void onWrite(List<? extends ExcelRow> items, ResourceContext context) throws ItemStreamException {
-        if (items.size() > 0 && !context.isInitialized()) {
+        if (items.size() > 0 && !context.hasAlreadyBeenInitialized()) {
             String suffix = items.get(0).getDate().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-            File file;
-
-            try {
-                file = ExcelFileUtils.getFile(new File(directoryPath), fileName, suffix, fileExtension);
-            } catch (IOException e) {
-                throw new ItemStreamException(e);
-            }
+            File file = ExcelFileUtils.getFile(new File(directoryPath), fileName, suffix, fileExtension);
 
             context.changeResource(new FileSystemResource(file));
         }
