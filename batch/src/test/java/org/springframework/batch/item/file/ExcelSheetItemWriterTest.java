@@ -18,6 +18,10 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 
 import java.io.File;
+import java.io.OutputStream;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
@@ -39,7 +43,7 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
         File directory = new File(CURRENT_PATH);
 
         if (!directory.exists()) {
-            directory.mkdir();
+            Assert.assertTrue("Cannot create a directory for the test", directory.mkdir());
         } else {
             cleanUp();
         }
@@ -54,12 +58,9 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
         writer.setRowsToSkip(21);
         writer.setMaxItemCount(40);
         writer.afterPropertiesSet();
-        writer.open(executionContext);
 
 
         items = new ArrayList<>();
-//        Period.between(LocalDate.parse("01/01/2000"), LocalDate.parse("01/01/2001")).getChronology().
-//        Iterator<LocalDate> it = DateUtils.<LocalDate>iterator(, DateUtils.RANGE_MONTH_MONDAY);
 
         List<LocalDate> dates = new ArrayList<>(80);
 
@@ -97,6 +98,7 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
 
     @Test
     public void testTemplate() throws Exception {
+        writer.open(executionContext);
         writer.write(items.subList(0, 2));
         writer.update(executionContext);
         writer.close();
@@ -106,7 +108,36 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
     }
 
     @Test
+    public void testShouldDeleteIfExists() throws Exception {
+        Path path = Paths.get(CURRENT_PATH);
+        Path file = Files.createTempFile(path, "output", ".xls");
+
+        Instant original = Files
+                .readAttributes(file, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS)
+                .creationTime()
+                .toInstant();
+
+        Thread.sleep(1000);
+
+        writer.setResource(new FileSystemResource(file.toFile()));
+        writer.setShouldDeleteIfExists(true);
+        writer.open(executionContext);
+        writer.close();
+
+        Instant actual = Files
+                .readAttributes(file, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS)
+                .creationTime()
+                .toInstant();
+
+        // Apply best effort pattern to delete the file at the end of the process
+        try (OutputStream ignored = Files.newOutputStream(file, StandardOpenOption.DELETE_ON_CLOSE)) {
+            Assert.assertNotEquals(original, actual);
+        }
+    }
+
+    @Test
     public void testFileLimits() throws Exception {
+        writer.open(executionContext);
         writer.write(items.subList(0, 10));
         writer.update(executionContext);
         writer.write(items.subList(10, 20));
@@ -125,6 +156,7 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
 
     @Test
     public void testRestart() throws Exception {
+        writer.open(executionContext);
         writer.write(items.subList(0, 10));
         writer.update(executionContext);
         writer.close();
@@ -139,7 +171,8 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
 
     @Test
     public void testEmptyList() throws Exception {
-        writer.write(Collections.<BatchExcelRow>emptyList());
+        writer.open(executionContext);
+        writer.write(Collections.emptyList());
         writer.update(executionContext);
         writer.close();
 

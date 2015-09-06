@@ -15,12 +15,16 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.WriteFailedException;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemWriter;
-import org.springframework.batch.item.util.FileUtils;
 import org.springframework.batch.support.ResourceAwareItemStream;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
+import java.time.Instant;
 
 /**
  * @param <T> parameter type of the method {@link #write(java.util.List)}
@@ -73,21 +77,27 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
     @Override
     public void doOpen() throws Exception {
         try {
-            File outputFile = resource.getFile();
+            Path outputFile = resource.getFile().toPath();
 
-            if (outputFile.exists() && (shouldDeleteIfExists || !isValidExcelFile(outputFile))) {
-                boolean deleted = outputFile.delete();
 
-                LOGGER.debug("Output file '{}' deleted:{}", outputFile.getAbsolutePath(), deleted);
+            if (Files.exists(outputFile) && (shouldDeleteIfExists || !isValidExcelFile(outputFile.toFile()))) {
+                boolean deleted = Files.deleteIfExists(outputFile);
+
+                LOGGER.debug("Output file '{}' deleted:{}", outputFile.toAbsolutePath(), deleted);
             }
 
             boolean created = false;
-            if (!outputFile.exists()) {
-                FileUtils.setUpOutputFile(outputFile, false, true, shouldDeleteIfExists);
-                created = outputFile.exists();
+            if (!Files.exists(outputFile)) {
+                Files.createFile(outputFile);
+                /**
+                 * To avoid an odd behaviour on Windows where the system can cache the creation time,
+                 * making difficult to test if if we've already deleted the file or not.
+                 */
+                Files.setAttribute(outputFile, "basic:creationTime", FileTime.from(Instant.now()), LinkOption.NOFOLLOW_LINKS);
+                created = Files.exists(outputFile);
                 jumpToItem(0);
 
-                LOGGER.debug("Output file '{}' created:{}", outputFile.getAbsolutePath(), created);
+                LOGGER.debug("Output file '{}' created:{}", outputFile.toAbsolutePath(), created);
             }
 
             if (template != null && created) {
@@ -96,9 +106,9 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
                 }
             } else {
                 if (created) {
-                    if (outputFile.getName().endsWith(Format.OLE2.getFileExtension())) {
+                    if (outputFile.getFileName().endsWith(Format.OLE2.getFileExtension())) {
                         this.workbook = new HSSFWorkbook();
-                    } else if (outputFile.getName().endsWith(Format.OOXML.getFileExtension())) {
+                    } else if (outputFile.getFileName().endsWith(Format.OOXML.getFileExtension())) {
                         this.workbook = new XSSFWorkbook();
                     } else {
                         throw new InvalidFormatException("Your template is neither an OLE2 format, nor an OOXML format");
@@ -115,7 +125,7 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
             }
 
             try {
-                this.outputStream = new FileOutputStream(outputFile);
+                this.outputStream = Files.newOutputStream(outputFile);
             } catch (FileNotFoundException e) {
                 /**
                  * FIXME this is a workaround! I don't know the real source of the problem.
@@ -123,7 +133,7 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
                  * process during some milliseconds.
                  */
                 Thread.sleep(1000);
-                this.outputStream = new FileOutputStream(outputFile);
+                this.outputStream = Files.newOutputStream(outputFile);
             }
 
         } catch (IOException | InvalidFormatException e) {
