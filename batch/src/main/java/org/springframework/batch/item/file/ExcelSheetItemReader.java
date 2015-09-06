@@ -7,17 +7,15 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.ReaderNotOpenException;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
-import org.springframework.batch.support.ResourceAwareItemStream;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
 import java.io.*;
+
 
 /**
  * <p>
@@ -42,7 +40,7 @@ import java.io.*;
  * @since 1.1
  */
 public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
-        implements IndexedResourceAwareItemStreamReader<T>, InitializingBean, ResourceAwareItemStream {
+        implements IndexedResourceAwareItemStreamReader<T>, InitializingBean, ResourceAwareItemReaderItemStream<T> {
 
     private static Logger LOGGER = LoggerFactory.getLogger(ExcelSheetItemReader.class);
     private RowMapper<T> rowMapper;
@@ -68,8 +66,8 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
     /**
      * Checking that the returned row is not null should validate if we have not reached the End Of File.
      *
-     * @param row
-     * @return
+     * @param row the {@link Row} from which we check the reference
+     * @return {@code true} if the reference to the {@code row} is {@code null}, {@code false} otherwise.
      */
     private static boolean isEof(final Row row) {
         return row == null;
@@ -122,11 +120,6 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
     }
 
     @Override
-    public void open(ExecutionContext executionContext) throws ItemStreamException {
-        super.open(executionContext);
-    }
-
-    @Override
     protected void doOpen() throws Exception {
         Assert.notNull(resource, "Input resource must be set");
 
@@ -138,11 +131,6 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
 
         if (!isValidExcelFile(resource.getFile())) {
             LOGGER.warn("Input resource is neither an OLE2 file, nor an OOXML file {}", resource.getDescription());
-            return;
-        }
-
-        if (!resource.isReadable()) {
-            LOGGER.warn("Input resource is not readable {}", resource.getDescription());
             return;
         }
 
@@ -197,10 +185,6 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
      */
     public boolean isEof() {
         return noInput;
-    }
-
-    public Resource getResource() {
-        return resource;
     }
 
     @Override
