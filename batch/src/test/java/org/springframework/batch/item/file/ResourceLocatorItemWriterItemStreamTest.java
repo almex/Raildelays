@@ -63,7 +63,7 @@ public class ResourceLocatorItemWriterItemStreamTest {
             @Override
             public void onWrite(List<? extends ExcelRow> items, ResourceContext context) {
                 String suffix = items.get(0).getDate().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-                File file = ExcelFileUtils.getFile(new File("./"), "retard_sncb", suffix, ".xls");
+                File file = ExcelFileUtils.getFile(new File("." + File.separator), "retard_sncb", suffix, ".xls");
 
                 context.changeResource(new FileSystemResource(file));
             }
