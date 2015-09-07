@@ -37,14 +37,12 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
     protected RowAggregator<T> rowAggregator;
     protected Resource resource;
     protected Resource template;
-    protected OutputStream outputStream;
     protected Workbook workbook;
     protected int rowsToSkip = 0;
     protected int sheetIndex = 0;
     private boolean shouldDeleteIfExists = false;
 
     private static boolean isValidExcelFile(File file) throws IOException {
-
         try (InputStream inputStream = new PushbackInputStream(new FileInputStream(file), 8)) {
             return POIFSFileSystem.hasPOIFSHeader(inputStream) || POIXMLDocument.hasOOXMLHeader(inputStream);
         }
@@ -57,7 +55,7 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
     }
 
     @Override
-    protected void jumpToItem(int itemIndex) throws Exception {
+    protected void jumpToItem(int itemIndex) throws ItemStreamException {
         super.jumpToItem(rowsToSkip + itemIndex);
     }
 
@@ -75,7 +73,7 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
     }
 
     @Override
-    public void doOpen() throws Exception {
+    public void doOpen() throws ItemStreamException {
         try {
             Path outputFile = resource.getFile().toPath();
 
@@ -109,16 +107,18 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
 
             if (template != null && created) {
                 try (InputStream inputStream = template.getInputStream()) {
-                    this.workbook = WorkbookFactory.create(inputStream);
+                    workbook = WorkbookFactory.create(inputStream);
                 }
             } else {
                 if (created) {
-                    if (outputFile.getFileName().endsWith(Format.OLE2.getFileExtension())) {
-                        this.workbook = new HSSFWorkbook();
-                    } else if (outputFile.getFileName().endsWith(Format.OOXML.getFileExtension())) {
-                        this.workbook = new XSSFWorkbook();
+                    String fileName = outputFile.getFileName().toString();
+
+                    if (fileName.endsWith(Format.OLE2.getFileExtension())) {
+                        workbook = new HSSFWorkbook();
+                    } else if (fileName.endsWith(Format.OOXML.getFileExtension())) {
+                        workbook = new XSSFWorkbook();
                     } else {
-                        throw new InvalidFormatException("Your template is neither an OLE2 format, nor an OOXML format");
+                        throw new InvalidFormatException("Your output is neither an OLE2 format, nor an OOXML format");
                     }
                 } else {
                     /**
@@ -131,30 +131,31 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
                 }
             }
 
-            try {
-                this.outputStream = Files.newOutputStream(outputFile);
-            } catch (FileNotFoundException e) {
-                /**
-                 * FIXME this is a workaround! I don't know the real source of the problem.
-                 * We try here a second time because, in test scenario, it happens that the file is handled by another
-                 * process during some milliseconds.
-                 */
-                Thread.sleep(1000);
-                this.outputStream = Files.newOutputStream(outputFile);
-            }
+            /**
+             * We write our first bytes after reading the template or creating the new Workbook.
+             */
 
-        } catch (IOException | InvalidFormatException e) {
-            throw new ItemStreamException("I/O when opening Excel template", e);
+            try (OutputStream output = Files.newOutputStream(outputFile)) {
+                workbook.write(output);
+            }
+        } catch (IOException e) {
+            throw new ItemStreamException("I/O exception when opening the Excel file", e);
+        } catch (InvalidFormatException e) {
+            throw new ItemStreamException("Invalid format exception when opening the Excel file", e);
         }
     }
 
     @Override
-    public boolean doWrite(T item) throws Exception {
+    public boolean doWrite(T item) throws ItemStreamException {
         T previousRow = null;
 
         if (item != null) {
             try {
                 previousRow = rowAggregator.aggregate(item, workbook, sheetIndex, getCurrentItemIndex());
+
+                try (OutputStream output = Files.newOutputStream(resource.getFile().toPath())) {
+                    workbook.write(output);
+                }
 
                 LOGGER.trace("Previous row={}", previousRow);
             } catch (Exception e) {
@@ -169,16 +170,15 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
     public void doClose() throws ItemStreamException {
 
         try {
-            if (outputStream != null && workbook != null) {
-                workbook.write(outputStream);
-                outputStream.flush();
+            if (workbook != null) {
+                try (OutputStream output = Files.newOutputStream(resource.getFile().toPath())) {
+                    workbook.write(output);
+                }
             }
         } catch (IOException e) {
             throw new ItemStreamException("I/O error when writing Excel outputDirectory file", e);
         } finally {
             IOUtils.closeQuietly(workbook);
-            IOUtils.closeQuietly(outputStream);
-            outputStream = null;
             workbook = null;
         }
 

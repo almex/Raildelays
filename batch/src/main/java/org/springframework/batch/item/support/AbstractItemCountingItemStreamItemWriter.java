@@ -34,17 +34,17 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
     /**
      * Open resources necessary to start writing output.
      */
-    protected abstract void doOpen() throws Exception;
+    protected abstract void doOpen() throws ItemStreamException;
 
     /**
      * Close the resources opened in {@link #doOpen()}.
      */
-    protected abstract void doClose() throws Exception;
+    protected abstract void doClose() throws ItemStreamException;
 
     /**
      * Move to the given item index.
      */
-    protected void jumpToItem(int itemIndex) throws Exception {
+    protected void jumpToItem(int itemIndex) throws ItemStreamException {
         this.currentItemIndex = itemIndex;
     }
 
@@ -76,21 +76,15 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
         super.close();
         currentItemCount = 0;
         currentItemIndex = 0;
-        try {
-            doClose();
-        } catch (Exception e) {
-            throw new ItemStreamException("Error while closing item writer", e);
-        }
+        doClose();
     }
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
         super.open(executionContext);
-        try {
-            doOpen();
-        } catch (Exception e) {
-            throw new ItemStreamException("Failed to initialize the writer", e);
-        }
+
+        doOpen();
+
         if (!isSaveState()) {
             return;
         }

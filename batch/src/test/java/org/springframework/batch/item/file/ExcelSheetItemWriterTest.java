@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
@@ -108,6 +109,48 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
     }
 
     @Test
+    public void testNoTemplateOLE2() throws Exception {
+        writer.setTemplate(null);
+        writer.setResource(new FileSystemResource(CURRENT_PATH + "output.xls"));
+        writer.open(executionContext);
+        writer.update(executionContext);
+        writer.close();
+
+        Assert.assertEquals(1, getExcelFiles().length);
+    }
+
+    @Test
+    public void testNoTemplateOOXML() throws Exception {
+        writer.setTemplate(null);
+        writer.setResource(new FileSystemResource(CURRENT_PATH + "output.xlsx"));
+        writer.open(executionContext);
+        writer.update(executionContext);
+        writer.close();
+
+        Assert.assertEquals(1, getExcelFiles().length);
+    }
+
+    @Test(expected = ItemStreamException.class)
+    public void testInvalidFormatException() throws Exception {
+        Path path = Paths.get(CURRENT_PATH, "output.txt");
+
+        try (OutputStream outputStream = Files.newOutputStream(path,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.WRITE,
+                StandardOpenOption.DELETE_ON_CLOSE)) {
+            outputStream.write(new byte[]{1, 2, 3});
+        }
+
+        try {
+            writer.setTemplate(null);
+            writer.setResource(new FileSystemResource(path.toFile()));
+            writer.open(executionContext);
+        } finally {
+            Files.deleteIfExists(path);
+        }
+    }
+
+    @Test
     public void testShouldDeleteIfExists() throws Exception {
         Path path = Paths.get(CURRENT_PATH);
         Path file = Files.createTempFile(path, "output", ".xls");
@@ -117,7 +160,7 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
                 .creationTime()
                 .toInstant();
 
-        Thread.sleep(1000);
+        Thread.sleep(100);
 
         writer.setResource(new FileSystemResource(file.toFile()));
         writer.setShouldDeleteIfExists(true);
@@ -182,6 +225,7 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
 
     @After
     public void tearDown() throws InterruptedException {
+        writer.close();
         cleanUp();
     }
 }

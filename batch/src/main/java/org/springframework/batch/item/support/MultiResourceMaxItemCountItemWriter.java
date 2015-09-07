@@ -115,7 +115,7 @@ public class MultiResourceMaxItemCountItemWriter<T> extends AbstractItemCounting
     }
 
     @Override
-    protected void doOpen() throws Exception {
+    protected void doOpen() throws ItemStreamException {
         if (executionContext.containsKey(getExecutionContextKey(RESOURCE_KEY))) {
             resource = new FileSystemResource(executionContext.getString(getExecutionContextKey(RESOURCE_KEY), ""));
             // It's a restart
@@ -134,7 +134,7 @@ public class MultiResourceMaxItemCountItemWriter<T> extends AbstractItemCounting
     }
 
     @Override
-    protected void doClose() throws Exception {
+    protected void doClose() throws ItemStreamException {
         resource = null;
         setCurrentItemIndex(0);
         if (opened) {
