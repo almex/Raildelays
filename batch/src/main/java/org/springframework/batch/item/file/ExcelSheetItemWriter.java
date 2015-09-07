@@ -87,8 +87,15 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
             }
 
             boolean created = false;
-            if (!Files.exists(outputFile)) {
+            if (Files.notExists(outputFile)) {
+                Path directory = outputFile.toAbsolutePath().getParent();
+
+                if (Files.notExists(directory)) {
+                    Files.createDirectories(directory);
+                }
+
                 Files.createFile(outputFile);
+
                 /**
                  * To avoid an odd behaviour on Windows where the system can cache the creation time,
                  * making difficult to test if if we've already deleted the file or not.
