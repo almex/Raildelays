@@ -15,7 +15,6 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.WriteFailedException;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemWriter;
-import org.springframework.batch.support.ResourceAwareItemStream;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 
@@ -29,7 +28,8 @@ import java.time.Instant;
 /**
  * @param <T> parameter type of the method {@link #write(java.util.List)}
  */
-public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemWriter<T> implements ResourceAwareItemWriterItemStream<T>, InitializingBean, ResourceAwareItemStream {
+public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemWriter<T>
+        implements ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExcelSheetItemWriter.class);
     private static final String ROW_TO_SKIP_KEY = "row.to.skip.key";
@@ -229,17 +229,9 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
         this.sheetIndex = sheetIndex;
     }
 
-    public Resource getResource() {
-        return resource;
-    }
-
     @Override
     public void setResource(Resource resource) {
         this.resource = resource;
-    }
-
-    public Resource getTemplate() {
-        return template;
     }
 
     public void setTemplate(Resource template) {
