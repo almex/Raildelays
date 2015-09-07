@@ -134,10 +134,7 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
             /**
              * We write our first bytes after reading the template or creating the new Workbook.
              */
-
-            try (OutputStream output = Files.newOutputStream(outputFile)) {
-                workbook.write(output);
-            }
+            writeToFile();
         } catch (IOException e) {
             throw new ItemStreamException("I/O exception when opening the Excel file", e);
         } catch (InvalidFormatException e) {
@@ -153,9 +150,7 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
             try {
                 previousRow = rowAggregator.aggregate(item, workbook, sheetIndex, getCurrentItemIndex());
 
-                try (OutputStream output = Files.newOutputStream(resource.getFile().toPath())) {
-                    workbook.write(output);
-                }
+                writeToFile();
 
                 LOGGER.trace("Previous row={}", previousRow);
             } catch (Exception e) {
@@ -171,9 +166,7 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
 
         try {
             if (workbook != null) {
-                try (OutputStream output = Files.newOutputStream(resource.getFile().toPath())) {
-                    workbook.write(output);
-                }
+                writeToFile();
             }
         } catch (IOException e) {
             throw new ItemStreamException("I/O error when writing Excel outputDirectory file", e);
@@ -183,6 +176,33 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
         }
 
 
+    }
+
+    private void writeToFile() throws IOException {
+        try {
+            writeToFile(true);
+        } catch (InterruptedException e) {
+            throw new IOException("The attempt to wait for a second try to write to the Excel file failed", e);
+        }
+    }
+
+    private void writeToFile(boolean firstTime) throws IOException, InterruptedException {
+        try (OutputStream output = Files.newOutputStream(resource.getFile().toPath())) {
+            workbook.write(output);
+        } catch (IOException e) {
+            /**
+             * FIXME
+             * This part of the code is a workaround to some test failure where file get apparently locked by another
+             * process. Don't how and when it does happen. It seems only happening on Windows OS.
+             */
+            Thread.sleep(1000);
+
+            if (firstTime) {
+                writeToFile(false);
+            } else {
+                throw e;
+            }
+        }
     }
 
     @Override

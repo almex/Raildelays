@@ -30,6 +30,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * @author Almex
+ */
 @RunWith(BlockJUnit4ClassRunner.class)
 public class ExcelSheetItemWriterTest extends AbstractFileTest {
 
@@ -134,6 +137,7 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
     public void testInvalidFormatException() throws Exception {
         Path path = Paths.get(CURRENT_PATH, "output.txt");
 
+        // We create a non-empty file of 3 bytes
         try (OutputStream outputStream = Files.newOutputStream(path,
                 StandardOpenOption.CREATE,
                 StandardOpenOption.WRITE,
