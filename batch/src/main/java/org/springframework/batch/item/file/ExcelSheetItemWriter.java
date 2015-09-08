@@ -149,7 +149,6 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
 
     @Override
     public void doClose() throws ItemStreamException {
-
         try {
             if (workbook != null) {
                 flush();
@@ -160,8 +159,6 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
             IOUtils.closeQuietly(workbook);
             workbook = null;
         }
-
-
     }
 
     private Workbook openWorkbook(Path path) throws IOException, InvalidFormatException {
@@ -188,34 +185,10 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
         return Files.exists(outputPath);
     }
 
-    /**
-     * @throws IOException
-     */
     private void flush() throws IOException {
-        try {
-            flush(true);
-        } catch (InterruptedException e) {
-            throw new IOException("The attempt to wait for a second try to write to the Excel file failed", e);
-        }
-    }
-
-    private void flush(boolean firstTime) throws IOException, InterruptedException {
         try (OutputStream output = Files.newOutputStream(resource.getFile().toPath())) {
             workbook.write(output);
             output.flush();
-        } catch (IOException e) {
-            /**
-             * FIXME
-             * This part of the code is a workaround to some test failure where file get apparently locked by another
-             * process. Don't know nor how or when it does happen but it seems only happening on Windows OS.
-             */
-            Thread.sleep(500);
-
-            if (firstTime) {
-                flush(false);
-            } else {
-                throw e;
-            }
         }
     }
 

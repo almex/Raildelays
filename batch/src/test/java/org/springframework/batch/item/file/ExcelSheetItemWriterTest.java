@@ -100,6 +100,9 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
         }
     }
 
+    /**
+     * We expect a normal execution with a template.
+     */
     @Test
     public void testTemplate() throws Exception {
         writer.open(executionContext);
@@ -111,6 +114,9 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
         Assert.assertEquals(117248, getExcelFiles()[0].length());
     }
 
+    /**
+     * We expect a normal execution with no template and in '.xls' format.
+     */
     @Test
     public void testNoTemplateOLE2() throws Exception {
         writer.setTemplate(null);
@@ -122,6 +128,9 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
         Assert.assertEquals(1, getExcelFiles().length);
     }
 
+    /**
+     * We expect a normal execution with no template and in '.xlsx' format.
+     */
     @Test
     public void testNoTemplateOOXML() throws Exception {
         writer.setTemplate(null);
@@ -133,6 +142,10 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
         Assert.assertEquals(1, getExcelFiles().length);
     }
 
+    /**
+     * We expect to read a file in the wrong format and get an InvalidFormatException embedded into an
+     * ItemStreamException.
+     */
     @Test(expected = ItemStreamException.class)
     public void testInvalidFormatException() throws Exception {
         Path path = Paths.get(CURRENT_PATH, "output.dat");
@@ -154,6 +167,9 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
         }
     }
 
+    /**
+     * We expect to generate an IOException when calling open() which should embedded into an ItemStreamException.
+     */
     @Test(expected = ItemStreamException.class)
     public void testIOException() throws Exception {
         Path path = Paths.get(CURRENT_PATH, "output.dat");
@@ -167,6 +183,9 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
         }
     }
 
+    /**
+     * We expect to test the path where we delete an existing file on open().
+     */
     @Test
     public void testShouldDeleteIfExists() throws Exception {
         Path path = Paths.get(CURRENT_PATH);
@@ -195,6 +214,10 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
         }
     }
 
+    /**
+     * We expect to write one file of 40 rows despite the fact that there are enough items to write two files.
+     * As the maxItemCount=40 it should stop writing after 40 items.
+     */
     @Test
     public void testFileLimits() throws Exception {
         writer.open(executionContext);
@@ -214,6 +237,9 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
         Assert.assertEquals(124416, getExcelFiles()[0].length());
     }
 
+    /**
+     * We expect that upon a restart, the writer start from where it left.
+     */
     @Test
     public void testRestart() throws Exception {
         writer.open(executionContext);
@@ -229,6 +255,9 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
         Assert.assertEquals(124416, getExcelFiles()[0].length());
     }
 
+    /**
+     * We expect that an empty list fo items will not raise any error.
+     */
     @Test
     public void testEmptyList() throws Exception {
         writer.open(executionContext);

@@ -46,11 +46,6 @@ public class HandleMoreThanOneHourDelaysIT extends AbstractContextIT {
         copyFiles();
     }
 
-    @AfterClass
-    public static void tearDown() {
-        cleanUp();
-    }
-
     protected static void copyFiles() throws IOException {
         Files.copy(SOURCE_PATH, TARGET_PATH.resolve(SOURCE_PATH.getFileName()), REPLACE_EXISTING);
     }
@@ -74,6 +69,11 @@ public class HandleMoreThanOneHourDelaysIT extends AbstractContextIT {
                 }
             });
         }
+    }
+
+    @AfterClass
+    public static void tearDown() {
+        cleanUp();
     }
 
     @Test
