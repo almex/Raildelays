@@ -135,7 +135,7 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
 
     @Test(expected = ItemStreamException.class)
     public void testInvalidFormatException() throws Exception {
-        Path path = Paths.get(CURRENT_PATH, "output.txt");
+        Path path = Paths.get(CURRENT_PATH, "output.dat");
 
         // We create a non-empty file of 3 bytes
         try (OutputStream outputStream = Files.newOutputStream(path,
@@ -147,6 +147,19 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
 
         try {
             writer.setTemplate(null);
+            writer.setResource(new FileSystemResource(path.toFile()));
+            writer.open(executionContext);
+        } finally {
+            Files.deleteIfExists(path);
+        }
+    }
+
+    @Test(expected = ItemStreamException.class)
+    public void testIOException() throws Exception {
+        Path path = Paths.get(CURRENT_PATH, "output.dat");
+
+        try {
+            writer.setTemplate(new FileSystemResource("test.dat"));
             writer.setResource(new FileSystemResource(path.toFile()));
             writer.open(executionContext);
         } finally {
@@ -229,6 +242,7 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
 
     @After
     public void tearDown() throws InterruptedException {
+        // We must be sure that we close everything at the end of the test
         writer.close();
         cleanUp();
     }

@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.WriteFailedException;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
@@ -94,64 +93,36 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
     @Override
     public void doOpen() throws ItemStreamException {
         try {
-            Path outputFile = resource.getFile().toPath();
+            Path outputPath = resource.getFile().toPath();
+            boolean created = false;
 
+            if (Files.exists(outputPath) && (shouldDeleteIfExists || !isValidExcelFile(outputPath.toFile()))) {
+                boolean deleted = Files.deleteIfExists(outputPath);
 
-            if (Files.exists(outputFile) && (shouldDeleteIfExists || !isValidExcelFile(outputFile.toFile()))) {
-                boolean deleted = Files.deleteIfExists(outputFile);
-
-                LOGGER.debug("Output file '{}' deleted:{}", outputFile.toAbsolutePath(), deleted);
+                LOGGER.debug("Output file '{}' deleted={}", outputPath.toAbsolutePath(), deleted);
             }
 
-            boolean created = false;
-            if (Files.notExists(outputFile)) {
-                Path directory = outputFile.toAbsolutePath().getParent();
-
-                if (Files.notExists(directory)) {
-                    Files.createDirectories(directory);
-                }
-
-                Files.createFile(outputFile);
-
-                /**
-                 * To avoid an odd behaviour on Windows where the system can cache the creation time,
-                 * making difficult to test if if we've already deleted the file or not.
-                 */
-                Files.setAttribute(outputFile, "basic:creationTime", FileTime.from(Instant.now()), LinkOption.NOFOLLOW_LINKS);
-                created = Files.exists(outputFile);
+            if (Files.notExists(outputPath)) {
+                created = createFile(outputPath);
                 jumpToItem(0);
 
-                LOGGER.debug("Output file '{}' created:{}", outputFile.toAbsolutePath(), created);
+                LOGGER.debug("Output file '{}' created={}", outputPath.toAbsolutePath(), created);
             }
 
             if (template != null && created) {
-                try (InputStream inputStream = Files.newInputStream(template.getFile().toPath())) {
-                    workbook = WorkbookFactory.create(inputStream);
-                }
+                workbook = openWorkbook(template.getFile().toPath());
             } else {
                 if (created) {
-                    String fileName = outputFile.getFileName().toString();
+                    String fileName = outputPath.getFileName().toString();
 
-                    if (fileName.endsWith(Format.OLE2.getFileExtension())) {
-                        workbook = new HSSFWorkbook();
-                    } else if (fileName.endsWith(Format.OOXML.getFileExtension())) {
-                        workbook = new XSSFWorkbook();
-                    } else {
-                        throw new InvalidFormatException("Your output is neither an OLE2 format, nor an OOXML format");
-                    }
+                    workbook = Format.fromFileExtension(fileName).newWorkbook();
                 } else {
-                    /**
-                     * ATTENTION: if we use the resource.getFileInputStream() the stream is never released!
-                     * So, we create our own InputStream instead. Don't know why. Seems like a bug in Apache POI
-                     */
-                    try (InputStream inputStream = Files.newInputStream(resource.getFile().toPath())) {
-                        this.workbook = WorkbookFactory.create(inputStream);
-                    }
+                    workbook = openWorkbook(resource.getFile().toPath());
                 }
             }
 
             /**
-             * We write our first bytes after reading the template or creating the new Workbook.
+             * We write our first bytes after read the template or created the new Workbook.
              */
             flush();
         } catch (IOException e) {
@@ -162,19 +133,15 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
     }
 
     @Override
-    public boolean doWrite(T item) throws ItemStreamException {
+    public boolean doWrite(T item) throws Exception {
         T previousRow = null;
 
         if (item != null) {
-            try {
-                previousRow = rowAggregator.aggregate(item, workbook, sheetIndex, getCurrentItemIndex());
+            previousRow = rowAggregator.aggregate(item, workbook, sheetIndex, getCurrentItemIndex());
 
-                flush();
+            flush();
 
-                LOGGER.trace("Previous row={}", previousRow);
-            } catch (Exception e) {
-                throw new WriteFailedException("We were not able to write in the Excel file", e);
-            }
+            LOGGER.trace("Previous row={}", previousRow);
         }
 
         return previousRow == null;
@@ -195,6 +162,30 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
         }
 
 
+    }
+
+    private Workbook openWorkbook(Path path) throws IOException, InvalidFormatException {
+        try (InputStream inputStream = Files.newInputStream(path)) {
+            return WorkbookFactory.create(inputStream);
+        }
+    }
+
+    private boolean createFile(Path outputPath) throws IOException {
+        Path directory = outputPath.toAbsolutePath().getParent();
+
+        if (Files.notExists(directory)) {
+            Files.createDirectories(directory);
+        }
+
+        Files.createFile(outputPath);
+
+        /**
+         * To avoid an odd behaviour on Windows where the system can cache the creation time,
+         * making difficult to test if if we've already deleted the file or not.
+         */
+        Files.setAttribute(outputPath, "basic:creationTime", FileTime.from(Instant.now()), LinkOption.NOFOLLOW_LINKS);
+
+        return Files.exists(outputPath);
     }
 
     /**
@@ -266,7 +257,19 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
     }
 
     public enum Format {
-        OLE2(".xls"), OOXML(".xlsx");
+        OLE2(".xls") {
+            @Override
+            public Workbook newWorkbook() {
+                return new HSSFWorkbook();
+            }
+        },
+
+        OOXML(".xlsx") {
+            @Override
+            public Workbook newWorkbook() {
+                return new XSSFWorkbook();
+            }
+        };
 
         private String fileExtension;
 
@@ -274,9 +277,30 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
             this.fileExtension = fileExtension;
         }
 
+        public static Format fromFileExtension(String path) throws InvalidFormatException {
+            Format result;
+
+            if (Format.OLE2.match(path)) {
+                result = Format.OLE2;
+            } else if (Format.OOXML.match(path)) {
+                result = Format.OOXML;
+            } else {
+                throw new InvalidFormatException("Your output is neither an OLE2 format, nor an OOXML format");
+            }
+
+            return result;
+        }
+
+        public abstract Workbook newWorkbook();
+
         public String getFileExtension() {
             return fileExtension;
         }
+
+        public boolean match(String path) {
+            return path.endsWith(fileExtension);
+        }
+
     }
 
 }
