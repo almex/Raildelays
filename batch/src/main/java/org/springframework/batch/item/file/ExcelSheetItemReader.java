@@ -19,7 +19,7 @@ import java.io.*;
 
 /**
  * <p>
- * This {@link org.springframework.batch.item.ItemStreamReader} is capable of reading one sheet of one Excel file,
+ * This {@link AbstractItemCountingItemStreamItemReader} is capable of reading one sheet of one Excel file,
  * row per row, and mapping each row to a Java bean via a {@link RowMapper}.
  * This implementation make usage of Apache POI core framework to read either OLE2 or OOXML format (detection is
  * based on file content and not on file extension).
@@ -29,14 +29,14 @@ import java.io.*;
  * {@link org.springframework.core.io.Resource} and a {@link RowMapper}.</p>
  * <p>
  * Note that the restartability of this reader is only based on
- * {@link org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader}.
+ * {@link AbstractItemCountingItemStreamItemReader}.
  * </p>
  *
  * @param <T> return type of a {@link #read()}
  * @author Almex
  * @see #setRowsToSkip(int)
  * @see #setSheetIndex(int)
- * @see
+ * @implSpec This implementation is not thread-safe
  * @since 1.1
  */
 public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>

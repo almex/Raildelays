@@ -26,7 +26,26 @@ import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 
 /**
+ * <p>
+ * This {@link AbstractItemCountingItemStreamItemWriter} is capable of writing one sheet of one Excel file,
+ * row per row, and aggregating each row to a Java bean via a {@link RowAggregator}.
+ * This implementation make usage of Apache POI core framework to write either OLE2 or OOXML format (detection is
+ * based on file extension).
+ * </p>
+ * <p>
+ * If you keep default settings, you only need to specify a
+ * {@link org.springframework.core.io.Resource} and a {@link RowAggregator}.</p>
+ * <p>
+ * Note that the restartability of this writer is only based on
+ * {@link AbstractItemCountingItemStreamItemWriter}.
+ * </p>
+ *
  * @param <T> parameter type of the method {@link #write(java.util.List)}
+ * @author Almex
+ * @see #setRowsToSkip(int)
+ * @see #setSheetIndex(int)
+ * @implSpec This implementation is not thread-safe
+ * @since 1.1
  */
 public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemWriter<T>
         implements ResourceAwareItemWriterItemStream<T>, InitializingBean {
@@ -106,7 +125,7 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
             }
 
             if (template != null && created) {
-                try (InputStream inputStream = template.getInputStream()) {
+                try (InputStream inputStream = Files.newInputStream(template.getFile().toPath())) {
                     workbook = WorkbookFactory.create(inputStream);
                 }
             } else {
@@ -123,9 +142,9 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
                 } else {
                     /**
                      * ATTENTION: if we use the resource.getFileInputStream() the stream is never released!
-                     * So, we create our own FileInputStream instead. Don't know why. Seems like a bug in Apache POI
+                     * So, we create our own InputStream instead. Don't know why. Seems like a bug in Apache POI
                      */
-                    try (InputStream inputStream = new FileInputStream(resource.getFile())) {
+                    try (InputStream inputStream = Files.newInputStream(resource.getFile().toPath())) {
                         this.workbook = WorkbookFactory.create(inputStream);
                     }
                 }
@@ -134,7 +153,7 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
             /**
              * We write our first bytes after reading the template or creating the new Workbook.
              */
-            writeToFile();
+            flush();
         } catch (IOException e) {
             throw new ItemStreamException("I/O exception when opening the Excel file", e);
         } catch (InvalidFormatException e) {
@@ -150,7 +169,7 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
             try {
                 previousRow = rowAggregator.aggregate(item, workbook, sheetIndex, getCurrentItemIndex());
 
-                writeToFile();
+                flush();
 
                 LOGGER.trace("Previous row={}", previousRow);
             } catch (Exception e) {
@@ -166,7 +185,7 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
 
         try {
             if (workbook != null) {
-                writeToFile();
+                flush();
             }
         } catch (IOException e) {
             throw new ItemStreamException("I/O error when writing Excel outputDirectory file", e);
@@ -178,17 +197,21 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
 
     }
 
-    private void writeToFile() throws IOException {
+    /**
+     * @throws IOException
+     */
+    private void flush() throws IOException {
         try {
-            writeToFile(true);
+            flush(true);
         } catch (InterruptedException e) {
             throw new IOException("The attempt to wait for a second try to write to the Excel file failed", e);
         }
     }
 
-    private void writeToFile(boolean firstTime) throws IOException, InterruptedException {
+    private void flush(boolean firstTime) throws IOException, InterruptedException {
         try (OutputStream output = Files.newOutputStream(resource.getFile().toPath())) {
             workbook.write(output);
+            output.flush();
         } catch (IOException e) {
             /**
              * FIXME
@@ -198,7 +221,7 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
             Thread.sleep(500);
 
             if (firstTime) {
-                writeToFile(false);
+                flush(false);
             } else {
                 throw e;
             }
