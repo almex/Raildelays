@@ -193,9 +193,9 @@ public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemW
             /**
              * FIXME
              * This part of the code is a workaround to some test failure where file get apparently locked by another
-             * process. Don't how and when it does happen. It seems only happening on Windows OS.
+             * process. Don't know nor how or when it does happen but it seems only happening on Windows OS.
              */
-            Thread.sleep(1000);
+            Thread.sleep(500);
 
             if (firstTime) {
                 writeToFile(false);

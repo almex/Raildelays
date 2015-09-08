@@ -164,7 +164,7 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
                 .creationTime()
                 .toInstant();
 
-        Thread.sleep(100);
+        Thread.sleep(1000);
 
         writer.setResource(new FileSystemResource(file.toFile()));
         writer.setShouldDeleteIfExists(true);
