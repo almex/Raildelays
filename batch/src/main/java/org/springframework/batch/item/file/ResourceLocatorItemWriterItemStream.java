@@ -36,8 +36,8 @@ import java.util.List;
  * @author Almex
  * @since 2.0
  */
-public class ResourceLocatorItemWriterItemStream<T>
-        extends AbstractResourceLocatorItemStream<ResourceAwareItemWriterItemStream<T>, T>
+public class ResourceLocatorItemWriterItemStream<S extends ResourceAwareItemWriterItemStream<T>, T>
+        extends AbstractResourceLocatorItemStream<S, T>
         implements ItemStreamWriter<T> {
 
     /**
@@ -63,6 +63,11 @@ public class ResourceLocatorItemWriterItemStream<T>
 
     @Override
     public void setResourceToDelegate(Resource resource) {
-        delegate.setResource(resource);
+        if (resourceContext != null) {
+            resourceContext.changeResource(resource);
+            delegate.setResource(resource);
+        } else {
+            throw new IllegalStateException("You must open the stream before calling setResourceToDelegate()");
+        }
     }
 }

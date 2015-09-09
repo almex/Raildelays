@@ -52,7 +52,7 @@ public abstract class AbstractResourceLocatorItemStream<S extends ItemStream, T>
     public void open(ExecutionContext executionContext) throws ItemStreamException {
         resourceContext = new ResourceContext(
                 executionContext,
-                getExecutionContextKey(ResourceContext.class.getSimpleName())
+                getExecutionContextKey(this.getClass().getSimpleName())
         );
 
         resourceLocator.onOpen(resourceContext);

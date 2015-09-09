@@ -154,6 +154,27 @@
         </property>
     </bean>
 
+
+    <bean id="readAllExcelFiles"
+          class="org.springframework.batch.item.file.MultiResourceItemReader"
+          scope="step"
+          lazy-init="true">
+        <property name="delegate">
+            <bean class="org.springframework.batch.item.file.ExcelSheetItemReader">
+                <property name="name" value="excelSheetItemReader1"/>
+                <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
+                <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
+                <property name="rowMapper">
+                    <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
+                        <property name="language" value="#{jobParameters['language']}"/>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+        <property name="resources"
+                  value="file:#{jobParameters['excel.output.path']}/*.#{jobParameters['excel.file.extension']}"/>
+    </bean>
+
     <!-- ================================================================================================== -->
     <!-- =====================================       PROCESSORS       ===================================== -->
     <!-- ================================================================================================== -->
@@ -204,23 +225,7 @@
           class="be.raildelays.batch.processor.FilterTwoSensPerDayProcessor"
           scope="step">
         <property name="language" value="#{jobParameters['language']}"/>
-        <property name="outputReader">
-            <bean class="org.springframework.batch.item.file.MultiResourceAwareItemReader">
-                <property name="delegate">
-                    <bean class="org.springframework.batch.item.file.ExcelSheetItemReader">
-                        <property name="name" value="excelSheetItemReader1"/>
-                        <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
-                        <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
-                        <property name="rowMapper">
-                            <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
-                                <property name="language" value="#{jobParameters['language']}"/>
-                            </bean>
-                        </property>
-                    </bean>
-                </property>
-                <property name="resourceLocator" ref="itemReaderResourceLocator"/>
-            </bean>
-        </property>
+        <property name="outputReader" ref="readAllExcelFiles"/>
     </bean>
 
     <bean id="filterSmallDelaysProcessor"
@@ -338,15 +343,6 @@
         <property name="comparator">
             <bean class="be.raildelays.batch.bean.ExcelRowComparator"/>
         </property>
-    </bean>
-
-    <bean id="itemReaderResourceLocator"
-          class="be.raildelays.batch.support.BySearchExcelResourceLocator"
-          scope="step">
-        <property name="resource"
-                  value="file:#{jobParameters['excel.output.path']}/#{jobParameters['excel.file.name']}.#{jobParameters['excel.file.extension']}"/>
-        <property name="resourceItemSearch" ref="resourceItemSearch"/>
-        <property name="keyName" value="${excel.resource.key}"/>
     </bean>
 
 </beans>

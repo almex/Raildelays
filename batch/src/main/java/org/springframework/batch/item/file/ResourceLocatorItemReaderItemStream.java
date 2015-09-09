@@ -34,13 +34,18 @@ import org.springframework.core.io.Resource;
  * @author Almex
  * @since 2.0
  */
-public class ResourceLocatorItemReaderItemStream<T>
-        extends AbstractResourceLocatorItemStream<ResourceAwareItemReaderItemStream<T>, T>
+public class ResourceLocatorItemReaderItemStream<S extends ResourceAwareItemReaderItemStream<T>, T>
+        extends AbstractResourceLocatorItemStream<S, T>
         implements ItemStreamReader<T> {
 
     @Override
     public void setResourceToDelegate(Resource resource) {
-        delegate.setResource(resource);
+        if (resourceContext != null) {
+            resourceContext.changeResource(resource);
+            delegate.setResource(resource);
+        } else {
+            throw new IllegalStateException("You must open the stream before calling setResourceToDelegate()");
+        }
     }
 
 
@@ -65,12 +70,16 @@ public class ResourceLocatorItemReaderItemStream<T>
             item = resourceLocator.onRead(delegate.read(), resourceContext);
         }
 
-        if (item == null && resourceContext.hasChanged()) {
+        // We have finished to read the last resource we check if we don't have another one
+        if (resourceContext.hasChanged()) {
             delegate.update(resourceContext.getExecutionContext());
             delegate.close();
             delegate.setResource(resourceContext.consumeResource());
             delegate.open(resourceContext.getExecutionContext());
-            item = delegate.read();
+
+            if (item == null) {
+                item = delegate.read();
+            }
         }
 
         return item;
