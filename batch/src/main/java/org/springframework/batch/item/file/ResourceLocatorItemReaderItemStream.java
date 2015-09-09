@@ -24,45 +24,55 @@
 
 package org.springframework.batch.item.file;
 
-import org.springframework.batch.item.ItemStreamWriter;
+import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.core.io.Resource;
 
-import java.util.List;
-
 /**
- * This {@link ItemStreamWriter} make the link between a {@link ResourceContext} and a {@link ResourceLocator} to
+ * This {@link ItemStreamReader} make the link between a {@link ResourceContext} and a {@link ResourceLocator} to
  * determine when to set the {@code Resource} of our delegate.
  *
  * @author Almex
  * @since 2.0
  */
-public class ResourceLocatorItemWriterItemStream<T>
-        extends AbstractResourceLocatorItemStream<ResourceAwareItemWriterItemStream<T>, T>
-        implements ItemStreamWriter<T> {
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     *     Check if the {@link ResourceLocator#onWrite(List, ResourceContext)} event has changed our
-     *     {@link ResourceContext}.
-     * </p>
-     */
-    @Override
-    public void write(List<? extends T> items) throws Exception {
-        resourceLocator.onWrite(items, resourceContext);
-
-        if (resourceContext.hasChanged()) {
-            delegate.update(resourceContext.getExecutionContext());
-            delegate.close();
-            delegate.setResource(resourceContext.consumeResource());
-            delegate.open(resourceContext.getExecutionContext());
-        }
-
-        delegate.write(items);
-    }
+public class ResourceLocatorItemReaderItemStream<T>
+        extends AbstractResourceLocatorItemStream<ResourceAwareItemReaderItemStream<T>, T>
+        implements ItemStreamReader<T> {
 
     @Override
     public void setResourceToDelegate(Resource resource) {
         delegate.setResource(resource);
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Check if the {@link ResourceLocator#onRead(Object, ResourceContext)} event has changed our
+     * {@link ResourceContext}.
+     * </p>
+     */
+    @Override
+    public T read() throws Exception {
+        T item = null;
+
+        if (resourceContext.containsResource()) {
+            if (!resourceContext.hasChanged()) {
+                // That means we don't have set yet the resource (we are initializing the delegate)
+                delegate.setResource(resourceContext.getResource());
+                delegate.open(resourceContext.getExecutionContext());
+            }
+
+            item = resourceLocator.onRead(delegate.read(), resourceContext);
+        }
+
+        if (item == null && resourceContext.hasChanged()) {
+            delegate.update(resourceContext.getExecutionContext());
+            delegate.close();
+            delegate.setResource(resourceContext.consumeResource());
+            delegate.open(resourceContext.getExecutionContext());
+            item = delegate.read();
+        }
+
+        return item;
     }
 }

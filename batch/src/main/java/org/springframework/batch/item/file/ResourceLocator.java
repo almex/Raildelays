@@ -36,9 +36,9 @@ import java.util.List;
  *
  * @param <T> type of the data to write
  * @author Almex
- * @since 2.0
  * @see org.springframework.batch.item.ItemStream
  * @see ResourceLocatorItemWriterItemStream
+ * @since 2.0
  */
 public interface ResourceLocator<T> {
 
@@ -65,6 +65,15 @@ public interface ResourceLocator<T> {
      * @param context to communicate changes on the resource you attempt to build
      * @throws ItemStreamException in case of any exception
      */
-    void onWrite(List<? extends T> items, ResourceContext context) throws ItemStreamException;
+    void onWrite(List<? extends T> items, ResourceContext context) throws Exception;
+
+    /**
+     * Event triggered on {@link ResourceLocatorItemWriterItemStream#write(List)} method.
+     *
+     * @param item    read data
+     * @param context to communicate changes on the resource you attempt to build
+     * @throws ItemStreamException in case of any exception
+     */
+    T onRead(T item, ResourceContext context) throws Exception;
 
 }

@@ -181,12 +181,13 @@
           class="org.springframework.batch.item.file.ResourceLocatorItemWriterItemStream"
           scope="step">
         <property name="resourceLocator">
-            <bean class="be.raildelays.batch.writer.ExcelRowResourceLocator">
+            <bean class="be.raildelays.batch.writer.ExcelRowToWriteResourceLocator">
                 <property name="fileName" value="#{jobParameters['excel.file.name']}"/>
                 <property name="fileExtension" value=".#{jobParameters['excel.file.extension']}"/>
                 <property name="directoryPath" value="#{jobParameters['excel.output.path']}"/>
             </bean>
         </property>
+        <property name="name" value="oneHourDelayItemWriter"/>
         <property name="delegate" ref="excelSheetWithOneHourDelayItemWriter"/>
     </bean>
 

@@ -26,7 +26,6 @@ package be.raildelays.batch.writer;
 
 import be.raildelays.batch.ExcelFileUtils;
 import be.raildelays.domain.xls.ExcelRow;
-import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.ResourceContext;
 import org.springframework.batch.item.file.SimpleResourceLocator;
 import org.springframework.core.io.FileSystemResource;
@@ -43,7 +42,7 @@ import java.util.List;
  * @author Almex
  * @since 2.0
  */
-public class ExcelRowResourceLocator extends SimpleResourceLocator<ExcelRow> {
+public class ExcelRowToWriteResourceLocator extends SimpleResourceLocator<ExcelRow> {
 
     private String fileName;
     private String fileExtension;
@@ -57,8 +56,8 @@ public class ExcelRowResourceLocator extends SimpleResourceLocator<ExcelRow> {
      * </p>
      */
     @Override
-    public void onWrite(List<? extends ExcelRow> items, ResourceContext context) throws ItemStreamException {
-        if (items.size() > 0 && !context.hasAlreadyBeenInitialized()) {
+    public void onWrite(List<? extends ExcelRow> items, ResourceContext context) throws Exception {
+        if (items.size() > 0 && !context.containsResource()) {
             String suffix = items.get(0).getDate().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
             File file = ExcelFileUtils.getFile(new File(directoryPath), fileName, suffix, fileExtension);
 

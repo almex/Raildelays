@@ -42,7 +42,7 @@ public class ResourceContextTest {
     @Before
     public void setUp() throws Exception {
         executionContext = new ExecutionContext();
-        context = new ResourceContext(executionContext);
+        context = new ResourceContext(executionContext, "foo");
     }
 
     /**
@@ -53,7 +53,7 @@ public class ResourceContextTest {
         context.changeResource(new FileSystemResource("./"));
 
         Assert.assertTrue(context.hasChanged());
-        Assert.assertTrue(context.hasAlreadyBeenInitialized());
+        Assert.assertTrue(context.containsResource());
     }
 
     /**
@@ -68,7 +68,7 @@ public class ResourceContextTest {
         actual = context.consumeResource();
 
         Assert.assertEquals(expected, actual);
-        Assert.assertTrue(context.hasAlreadyBeenInitialized());
+        Assert.assertTrue(context.containsResource());
         Assert.assertFalse(context.hasChanged());
     }
 

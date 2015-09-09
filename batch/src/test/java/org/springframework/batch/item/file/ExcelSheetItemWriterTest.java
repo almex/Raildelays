@@ -19,7 +19,9 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.nio.channels.FileLock;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
@@ -171,7 +173,7 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
      * We expect to generate an IOException when calling open() which should embedded into an ItemStreamException.
      */
     @Test(expected = ItemStreamException.class)
-    public void testIOException() throws Exception {
+    public void testIOExceptionOnOpen() throws Exception {
         Path path = Paths.get(CURRENT_PATH, "output.dat");
 
         try {
@@ -267,6 +269,20 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
 
         Assert.assertEquals(1, getExcelFiles().length);
         Assert.assertEquals(117248, getExcelFiles()[0].length());
+    }
+
+    /**
+     * We expect if we lock the file before calling close() we get an IOException embedded into an ItemStreamException
+     */
+    @Test(expected = ItemStreamException.class)
+    public void testIOExceptionOnClose() throws Exception {
+        writer.open(executionContext);
+
+        try (FileOutputStream outputStream = new FileOutputStream(Paths.get(CURRENT_PATH, "output.xls").toFile())) {
+            try (FileLock ignored = outputStream.getChannel().lock()) {
+                writer.close();
+            }
+        }
     }
 
     @After

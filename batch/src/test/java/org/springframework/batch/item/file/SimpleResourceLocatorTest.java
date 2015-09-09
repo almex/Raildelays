@@ -48,7 +48,7 @@ public class SimpleResourceLocatorTest {
      */
     @Test
     public void testOnOpen() throws Exception {
-        resourceLocator.onOpen(new ResourceContext(new ExecutionContext()));
+        resourceLocator.onOpen(new ResourceContext(new ExecutionContext(), "foo"));
     }
 
     /**
@@ -56,7 +56,7 @@ public class SimpleResourceLocatorTest {
      */
     @Test
     public void testOnUpdate() throws Exception {
-        resourceLocator.onUpdate(new ResourceContext(new ExecutionContext()));
+        resourceLocator.onUpdate(new ResourceContext(new ExecutionContext(), "foo"));
     }
 
     /**
@@ -64,6 +64,6 @@ public class SimpleResourceLocatorTest {
      */
     @Test
     public void testOnWrite() throws Exception {
-        resourceLocator.onWrite(Collections.emptyList(), new ResourceContext(new ExecutionContext()));
+        resourceLocator.onWrite(Collections.emptyList(), new ResourceContext(new ExecutionContext(), "foo"));
     }
 }

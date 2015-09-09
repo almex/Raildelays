@@ -41,15 +41,15 @@ import java.util.List;
 /**
  * @author Almex
  */
-public class ExcelRowResourceLocatorTest {
+public class ExcelRowToWriteResourceLocatorTest {
 
-    private ExcelRowResourceLocator resourceLocator;
+    private ExcelRowToWriteResourceLocator resourceLocator;
     private ResourceContext context;
 
     @Before
     public void setUp() throws Exception {
-        context = new ResourceContext(new ExecutionContext());
-        resourceLocator = new ExcelRowResourceLocator();
+        context = new ResourceContext(new ExecutionContext(), "foo");
+        resourceLocator = new ExcelRowToWriteResourceLocator();
         resourceLocator.setFileName("retard_sncb");
         resourceLocator.setFileExtension(".xls");
         resourceLocator.setDirectoryPath("./");

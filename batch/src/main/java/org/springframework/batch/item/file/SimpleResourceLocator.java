@@ -47,7 +47,12 @@ public class SimpleResourceLocator<T> implements ResourceLocator<T> {
     }
 
     @Override
-    public void onWrite(List<? extends T> items, ResourceContext context) throws ItemStreamException {
+    public void onWrite(List<? extends T> items, ResourceContext context) throws Exception {
 
+    }
+
+    @Override
+    public T onRead(T item, ResourceContext context) throws Exception {
+        return item;
     }
 }

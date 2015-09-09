@@ -51,6 +51,7 @@ public class ResourceLocatorItemWriterItemStreamTest {
         writer = new ResourceLocatorItemWriterItemStream();
         delegate = new SimpleResourceAwareItemWriterItemStream();
         writer.setDelegate(delegate);
+        writer.setName("foo");
     }
 
     /**

@@ -22,47 +22,33 @@
  * IN THE SOFTWARE.
  */
 
-package org.springframework.batch.item.file;
+package be.raildelays.batch.reader;
 
-import org.springframework.batch.item.ItemStreamWriter;
+import be.raildelays.domain.xls.ExcelRow;
+import org.springframework.batch.item.file.ResourceContext;
+import org.springframework.batch.item.file.SimpleResourceLocator;
 import org.springframework.core.io.Resource;
 
-import java.util.List;
-
 /**
- * This {@link ItemStreamWriter} make the link between a {@link ResourceContext} and a {@link ResourceLocator} to
- * determine when to set the {@code Resource} of our delegate.
- *
  * @author Almex
- * @since 2.0
+ * @since 1.2
  */
-public class ResourceLocatorItemWriterItemStream<T>
-        extends AbstractResourceLocatorItemStream<ResourceAwareItemWriterItemStream<T>, T>
-        implements ItemStreamWriter<T> {
+public class ExcelRowToReadResourceLocator extends SimpleResourceLocator<ExcelRow> {
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     *     Check if the {@link ResourceLocator#onWrite(List, ResourceContext)} event has changed our
-     *     {@link ResourceContext}.
-     * </p>
-     */
+    private Resource[] resources;
+    private int index = 0;
+
     @Override
-    public void write(List<? extends T> items) throws Exception {
-        resourceLocator.onWrite(items, resourceContext);
+    public ExcelRow onRead(ExcelRow item, ResourceContext context) throws Exception {
 
-        if (resourceContext.hasChanged()) {
-            delegate.update(resourceContext.getExecutionContext());
-            delegate.close();
-            delegate.setResource(resourceContext.consumeResource());
-            delegate.open(resourceContext.getExecutionContext());
+        if (item == null || !context.containsResource()) {
+            context.changeResource(resources[index++]);
         }
 
-        delegate.write(items);
+        return super.onRead(item, context);
     }
 
-    @Override
-    public void setResourceToDelegate(Resource resource) {
-        delegate.setResource(resource);
+    public void setResources(Resource[] resources) {
+        this.resources = resources;
     }
 }
