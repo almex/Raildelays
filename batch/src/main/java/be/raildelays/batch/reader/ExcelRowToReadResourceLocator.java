@@ -25,9 +25,16 @@
 package be.raildelays.batch.reader;
 
 import be.raildelays.domain.xls.ExcelRow;
+import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.ResourceContext;
 import org.springframework.batch.item.file.SimpleResourceLocator;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Almex
@@ -36,7 +43,22 @@ import org.springframework.core.io.Resource;
 public class ExcelRowToReadResourceLocator extends SimpleResourceLocator<ExcelRow> {
 
     private Resource[] resources;
+    private Resource directory;
     private int index = 0;
+
+    @Override
+    public void onOpen(ResourceContext context) throws ItemStreamException {
+        try {
+            List<Resource> result = new ArrayList<>();
+
+            Files.list(directory.getFile().toPath())
+                    .forEach(path -> result.add(new FileSystemResource(path.toFile())));
+
+            resources = result.toArray(new Resource[result.size()]);
+        } catch (IOException e) {
+            throw new ItemStreamException("I/O error when reading directory", e);
+        }
+    }
 
     @Override
     public ExcelRow onRead(ExcelRow item, ResourceContext context) throws Exception {
@@ -46,6 +68,10 @@ public class ExcelRowToReadResourceLocator extends SimpleResourceLocator<ExcelRo
         }
 
         return super.onRead(item, context);
+    }
+
+    public void setDirectory(Resource directory) {
+        this.directory = directory;
     }
 
     public void setResources(Resource[] resources) {
