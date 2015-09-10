@@ -6,10 +6,7 @@ import be.raildelays.batch.writer.BatchExcelRowAggregator;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.batch.item.ExecutionContext;
@@ -275,6 +272,7 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
      * We expect if we lock the file before calling close() we get an IOException embedded into an ItemStreamException
      */
     @Test(expected = ItemStreamException.class)
+    @Ignore // Not portable on Linux
     public void testIOExceptionOnClose() throws Exception {
         writer.open(executionContext);
 

@@ -32,7 +32,9 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +44,7 @@ import java.util.List;
  */
 public class ExcelRowToReadResourceLocator extends SimpleResourceLocator<ExcelRow> {
 
+    private static final String FILTER = "*.{xls,xlsx}";
     private Resource[] resources;
     private Resource directory;
     private int index = 0;
@@ -51,8 +54,9 @@ public class ExcelRowToReadResourceLocator extends SimpleResourceLocator<ExcelRo
         try {
             List<Resource> result = new ArrayList<>();
 
-            Files.list(directory.getFile().toPath())
-                    .forEach(path -> result.add(new FileSystemResource(path.toFile())));
+            try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory.getFile().toPath(), FILTER)) {
+                stream.forEach(path -> result.add(new FileSystemResource(path.toFile())));
+            }
 
             resources = result.toArray(new Resource[result.size()]);
         } catch (IOException e) {
