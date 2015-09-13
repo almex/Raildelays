@@ -99,6 +99,9 @@ public class ResourceContext {
         return executionContext.containsKey(getKey(RESOURCE_KEY));
     }
 
+    /**
+     * @return the current {@link Resource} without consuming it if the context contains one, {@code null} otherwise.
+     */
     public Resource getResource() {
         return (Resource) executionContext.get(getKey(RESOURCE_KEY));
     }

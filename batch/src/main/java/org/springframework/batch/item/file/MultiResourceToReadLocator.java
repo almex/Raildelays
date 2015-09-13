@@ -22,12 +22,9 @@
  * IN THE SOFTWARE.
  */
 
-package be.raildelays.batch.reader;
+package org.springframework.batch.item.file;
 
-import be.raildelays.domain.xls.ExcelRow;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.file.ResourceContext;
-import org.springframework.batch.item.file.SimpleResourceLocator;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
@@ -42,9 +39,9 @@ import java.util.List;
  * @author Almex
  * @since 1.2
  */
-public class ExcelRowToReadResourceLocator extends SimpleResourceLocator<ExcelRow> {
+public class MultiResourceToReadLocator<T> extends SimpleResourceLocator<T> {
 
-    private static final String FILTER = "*.{xls,xlsx}";
+    private String filter = "*";
     private Resource[] resources;
     private Resource directory;
     private int index = 0;
@@ -54,20 +51,25 @@ public class ExcelRowToReadResourceLocator extends SimpleResourceLocator<ExcelRo
         try {
             List<Resource> result = new ArrayList<>();
 
-            try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory.getFile().toPath(), FILTER)) {
+            try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory.getFile().toPath(), filter)) {
                 stream.forEach(path -> result.add(new FileSystemResource(path.toFile())));
             }
 
             resources = result.toArray(new Resource[result.size()]);
+            index = 0;
+
+            if (resources.length > 0) {
+                context.setResource(resources[index++]);
+            }
         } catch (IOException e) {
             throw new ItemStreamException("I/O error when reading directory", e);
         }
     }
 
     @Override
-    public ExcelRow onRead(ExcelRow item, ResourceContext context) throws Exception {
+    public T onRead(T item, ResourceContext context) throws Exception {
 
-        if (item == null || !context.containsResource()) {
+        if ((item == null || !context.containsResource()) && index < resources.length - 1) {
             context.changeResource(resources[index++]);
         }
 
@@ -78,7 +80,7 @@ public class ExcelRowToReadResourceLocator extends SimpleResourceLocator<ExcelRo
         this.directory = directory;
     }
 
-    public void setResources(Resource[] resources) {
-        this.resources = resources;
+    public void setFilter(String filter) {
+        this.filter = filter;
     }
 }

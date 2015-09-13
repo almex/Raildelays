@@ -166,7 +166,7 @@
 
 
     <bean id="readAllExcelFiles"
-          class="org.springframework.batch.item.file.MultiResourceItemReader"
+          class="org.springframework.batch.item.file.ResourceLocatorItemReaderItemStream"
           scope="step">
         <property name="delegate">
             <bean class="org.springframework.batch.item.file.ExcelSheetItemReader">
@@ -180,8 +180,13 @@
                 </property>
             </bean>
         </property>
-        <property name="resources"
-                  value="file:#{jobParameters['excel.output.path']}/*.#{jobParameters['excel.file.extension']}"/>
+        <property name="name" value="readAllExcelFiles"/>
+        <property name="resourceLocator">
+            <bean class="org.springframework.batch.item.file.MultiResourceToReadLocator">
+                <property name="directory" value="file:#{jobParameters['excel.output.path']}"/>
+                <property name="filter" value="*.#{jobParameters['excel.file.extension']}"/>
+            </bean>
+        </property>
     </bean>
 
     <!-- ================================================================================================== -->

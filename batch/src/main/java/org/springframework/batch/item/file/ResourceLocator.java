@@ -38,12 +38,14 @@ import java.util.List;
  * @author Almex
  * @see org.springframework.batch.item.ItemStream
  * @see ResourceLocatorItemWriterItemStream
+ * @see ResourceLocatorItemReaderItemStream
+ * @see AbstractResourceLocatorItemStream
  * @since 2.0
  */
 public interface ResourceLocator<T> {
 
     /**
-     * Event triggered on {@link ResourceLocatorItemWriterItemStream#open(ExecutionContext)} method.
+     * Event triggered on {@link AbstractResourceLocatorItemStream#open(ExecutionContext)} method.
      *
      * @param context to communicate changes on the resource you attempt to build
      * @throws ItemStreamException in case of any exception
@@ -51,7 +53,7 @@ public interface ResourceLocator<T> {
     void onOpen(ResourceContext context) throws ItemStreamException;
 
     /**
-     * Event triggered on {@link ResourceLocatorItemWriterItemStream#update(ExecutionContext)} method.
+     * Event triggered on {@link AbstractResourceLocatorItemStream#update(ExecutionContext)} method.
      *
      * @param context to communicate changes on the resource you attempt to build
      * @throws ItemStreamException in case of any exception
@@ -63,16 +65,17 @@ public interface ResourceLocator<T> {
      *
      * @param items   data to write
      * @param context to communicate changes on the resource you attempt to build
-     * @throws ItemStreamException in case of any exception
+     * @throws Exception in case of any exception
      */
     void onWrite(List<? extends T> items, ResourceContext context) throws Exception;
 
     /**
-     * Event triggered on {@link ResourceLocatorItemWriterItemStream#write(List)} method.
+     * Event triggered on {@link ResourceLocatorItemReaderItemStream#read()} method.
      *
+     * @implNote an implementation of this method should if the item is null to trigger the move to the next resource
      * @param item    read data
      * @param context to communicate changes on the resource you attempt to build
-     * @throws ItemStreamException in case of any exception
+     * @throws Exception in case of any exception
      */
     T onRead(T item, ResourceContext context) throws Exception;
 
