@@ -133,13 +133,6 @@
             <artifactId>commons-io</artifactId>
         </dependency>
 
-        <!-- As a complement to JSR-310 and to avoid using JodaTime since we have an overlaps with JDK 8 -->
-        <dependency>
-            <groupId>org.threeten</groupId>
-            <artifactId>threeten-extra</artifactId>
-            <version>0.9</version>
-        </dependency>
-
 
         <!-- For testing -->
         <dependency>

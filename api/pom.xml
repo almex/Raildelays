@@ -18,6 +18,7 @@
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>pojo-unit</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
