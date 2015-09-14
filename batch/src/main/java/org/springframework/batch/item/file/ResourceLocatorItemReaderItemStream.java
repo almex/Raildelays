@@ -30,6 +30,11 @@ import org.springframework.core.io.Resource;
 /**
  * This {@link ItemStreamReader} make the link between a {@link ResourceContext} and a {@link ResourceLocator} to
  * determine when to set the {@code Resource} of our delegate.
+ * <p>
+ * Any {@link ResourceLocator} that would be used by this {@code ItemStreamReader} should implement at least
+ * {@link ResourceLocator#onOpen(ResourceContext)} due to the fact that a {@link ResourceAwareItemReaderItemStream} 
+ * cannot be initiated without having a {@link Resource} at the opening of the stream.
+ * </p>
  *
  * @author Almex
  * @since 2.0
@@ -54,6 +59,12 @@ public class ResourceLocatorItemReaderItemStream<S extends ResourceAwareItemRead
      * <p>
      * Check if the {@link ResourceLocator#onRead(Object, ResourceContext)} event has changed our
      * {@link ResourceContext}.
+     * </p>
+     * <p>
+     * This implementation will close the stream if the resource from the context has changed.
+     * If the current resource in the context has not been consumed yet then another stream is opened.
+     * While there is no more item to read from the current resource and that the {@link ResourceLocator} 
+     * changes the context, we delegate a new resource coming from that context.
      * </p>
      */
     @Override
