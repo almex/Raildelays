@@ -58,7 +58,7 @@ public interface ResourceLocator<T> {
      * @param context to communicate changes on the resource you attempt to build
      * @throws ItemStreamException in case of any exception
      */
-    void onUpdate(ResourceContext context) throws ItemStreamException;
+    int intializeIndex(ResourceContext context) throws ItemStreamException;
 
     /**
      * Event triggered on {@link ResourceLocatorItemWriterItemStream#write(List)} method.
@@ -67,7 +67,7 @@ public interface ResourceLocator<T> {
      * @param context to communicate changes on the resource you attempt to build
      * @throws Exception in case of any exception
      */
-    void onWrite(List<? extends T> items, ResourceContext context) throws Exception;
+    void onWrite(T item, ResourceContext context) throws Exception;
 
     /**
      * Event triggered on {@link ResourceLocatorItemReaderItemStream#read()} method.
@@ -77,6 +77,6 @@ public interface ResourceLocator<T> {
      * @param context to communicate changes on the resource you attempt to build
      * @throws Exception in case of any exception
      */
-    T onRead(T item, ResourceContext context) throws Exception;
+    void onRead(T item, ResourceContext context) throws Exception;
 
 }
