@@ -34,9 +34,6 @@ import org.springframework.batch.item.file.ResourceContext;
 
 import java.io.File;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author Almex
@@ -60,12 +57,11 @@ public class ExcelRowToWriteResourceLocatorTest {
      */
     @Test
     public void testOnWrite() throws Exception {
-        List<ExcelRow> items = Arrays.asList(new ExcelRow
+        ExcelRow item = new ExcelRow
                         .Builder(LocalDate.of(2000, 1, 1), Sens.ARRIVAL)
-                        .build(false)
-        );
+                .build(false);
 
-        resourceLocator.onWrite(items, context);
+        resourceLocator.onWrite(item, context);
 
         Assert.assertEquals("." + File.separator + "retard_sncb 20000101.xls",
                 context.consumeResource().getFile().getPath());
@@ -76,7 +72,7 @@ public class ExcelRowToWriteResourceLocatorTest {
      */
     @Test
     public void testOnWriteNoItems() throws Exception {
-        resourceLocator.onWrite(Collections.emptyList(), context);
+        resourceLocator.onWrite(null, context);
 
         Assert.assertNull(context.consumeResource());
     }
@@ -87,13 +83,5 @@ public class ExcelRowToWriteResourceLocatorTest {
     @Test
     public void testOnOpen() throws Exception {
         resourceLocator.onOpen(context);
-    }
-
-    /**
-     * We expect nothing.
-     */
-    @Test
-    public void testOnUpdate() throws Exception {
-        resourceLocator.onUpdate(context);
     }
 }

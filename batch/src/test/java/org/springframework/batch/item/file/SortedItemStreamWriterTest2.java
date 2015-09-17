@@ -2,14 +2,14 @@ package org.springframework.batch.item.file;
 
 import be.raildelays.batch.AbstractFileTest;
 import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.batch.listener.ResourceLocatorListener;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
 import be.raildelays.batch.support.SimpleResourceItemSearch;
-import be.raildelays.batch.support.ToWriteExcelResourceLocator;
-import be.raildelays.batch.writer.BatchExcelRowAggregator;
+import be.raildelays.batch.writer.ExcelRowAggregator;
+import be.raildelays.batch.writer.MultiExcelFileToWriteLocator;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.xls.ExcelRow;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,7 +17,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.item.support.MultiResourceMaxItemCountItemWriter;
 import org.springframework.batch.item.support.SortedItemStreamWriter;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -31,25 +30,20 @@ import java.util.List;
 @RunWith(BlockJUnit4ClassRunner.class)
 public class SortedItemStreamWriterTest2 extends AbstractFileTest {
 
-    private List<BatchExcelRow> items = new ArrayList<>();
+    private List<ExcelRow> items = new ArrayList<>();
 
     private StepExecution stepExecution;
 
-    private ToWriteExcelResourceLocator resourceLocator;
-
-    private MultiResourceMaxItemCountItemWriter<BatchExcelRow> writer;
-
-    private ResourceLocatorListener listener;
+    private ResourceLocatorItemWriterItemStream<SortedItemStreamWriter<ExcelRow>, ExcelRow> writer;
 
     @Before
     public void setUp() throws Exception {
-        SortedItemStreamWriter<BatchExcelRow> delegate = new SortedItemStreamWriter<>();
+        SortedItemStreamWriter<ExcelRow> delegate = new SortedItemStreamWriter<>();
         ExcelSheetItemReader<BatchExcelRow> reader = new ExcelSheetItemReader<>();
         FileSystemResource resource = new FileSystemResource(CURRENT_PATH + "retard_sncb.xls");
-        ExcelSheetItemWriter<BatchExcelRow> writer = new ExcelSheetItemWriter<>();
-        SimpleResourceItemSearch resourceItemSearch = new SimpleResourceItemSearch();
-        resourceLocator = new ToWriteExcelResourceLocator();
-        this.writer = new MultiResourceMaxItemCountItemWriter<>();
+        ExcelSheetItemWriter<ExcelRow> writer = new ExcelSheetItemWriter<>();
+        MultiExcelFileToWriteLocator resourceLocator = new MultiExcelFileToWriteLocator();
+        SimpleResourceItemSearch<BatchExcelRow> itemSearch = new SimpleResourceItemSearch<>();
 
         copyFile();
 
@@ -58,7 +52,7 @@ public class SortedItemStreamWriterTest2 extends AbstractFileTest {
         writer.setRowsToSkip(21);
         writer.setMaxItemCount(40);
         writer.setTemplate(new ClassPathResource("template.xls"));
-        writer.setRowAggregator(new BatchExcelRowAggregator());
+        writer.setRowAggregator(new ExcelRowAggregator());
         writer.afterPropertiesSet();
 
         reader.setName("test");
@@ -69,20 +63,20 @@ public class SortedItemStreamWriterTest2 extends AbstractFileTest {
         reader.setResource(resource);
         reader.afterPropertiesSet();
 
-        resourceItemSearch.setReader(reader);
-
-        listener = new ResourceLocatorListener();
-
-        resourceLocator.setResource(resource);
-        resourceLocator.setResourceItemSearch(resourceItemSearch);
-        resourceLocator.setKeyName("foo");
-
         stepExecution = MetaDataInstanceFactory.createStepExecution();
         delegate.setReader(reader);
         delegate.setWriter(writer);
         delegate.afterPropertiesSet();
-        delegate.open(stepExecution.getExecutionContext());
 
+        itemSearch.setReader(reader);
+
+        resourceLocator.setDirectory(new FileSystemResource(CURRENT_PATH));
+        resourceLocator.setFileExtension("xls");
+        resourceLocator.setFilePrefix("retard_sncb");
+        resourceLocator.setMaxItemCount(40);
+        resourceLocator.setResourceItemSearch(itemSearch);
+
+        this.writer = new ResourceLocatorItemWriterItemStream<>();
         this.writer.setName("test");
         this.writer.setDelegate(delegate);
         this.writer.setResourceLocator(resourceLocator);
@@ -141,8 +135,6 @@ public class SortedItemStreamWriterTest2 extends AbstractFileTest {
 
     @Test
     public void testWrite() throws Exception {
-        listener.beforeStep(stepExecution);
-        listener.beforeWrite(items);
         writer.open(stepExecution.getExecutionContext());
         writer.write(items);
         writer.close();

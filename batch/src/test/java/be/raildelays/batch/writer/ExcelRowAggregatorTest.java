@@ -4,6 +4,7 @@ import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.xls.ExcelRow;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -18,7 +19,7 @@ import java.time.LocalTime;
 import java.util.Date;
 
 @RunWith(BlockJUnit4ClassRunner.class)
-public class BatchExcelRowAggregatorTest {
+public class ExcelRowAggregatorTest {
 
 
     public static final long DELAY = 10L;
@@ -28,7 +29,7 @@ public class BatchExcelRowAggregatorTest {
     public static final int SHEET_INDEX = 0;
     public static final int ROW_INDEX = 0;
 
-    private BatchExcelRowAggregator aggregator;
+    private ExcelRowAggregator aggregator;
 
     private BatchExcelRow item;
 
@@ -72,7 +73,7 @@ public class BatchExcelRowAggregatorTest {
                 .delay(DELAY) //
                 .build();
 
-        aggregator = new BatchExcelRowAggregator();
+        aggregator = new ExcelRowAggregator();
     }
 
 
@@ -89,7 +90,7 @@ public class BatchExcelRowAggregatorTest {
     @Test
     public void testRoundTrip() throws Exception {
         BatchExcelRow batchExcelRow = new BatchExcelRowMapper().mapRow(workbook.getSheetAt(SHEET_INDEX).getRow(ROW_INDEX), ROW_INDEX);
-        BatchExcelRow previousRow = aggregator.aggregate(item, workbook, SHEET_INDEX, ROW_INDEX);
+        ExcelRow previousRow = aggregator.aggregate(item, workbook, SHEET_INDEX, ROW_INDEX);
 
         Assert.assertNotNull(previousRow);
         Assert.assertNotEquals(item, previousRow);

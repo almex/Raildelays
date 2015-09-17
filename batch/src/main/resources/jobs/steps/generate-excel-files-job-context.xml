@@ -285,7 +285,7 @@
     </bean>
 
     <bean id="multiResourceItemWriter"
-          class="org.springframework.batch.item.support.MultiResourceMaxItemCountItemWriter"
+          class="org.springframework.batch.item.file.ResourceLocatorItemWriterItemStream"
           scope="step">
         <property name="delegate" ref="sortedItemWriter"/>
         <property name="name" value="multiResourceItemWriter"/>
@@ -317,7 +317,7 @@
           class="org.springframework.batch.item.file.ExcelSheetItemWriter"
           scope="step">
         <property name="rowAggregator">
-            <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator"
+            <bean class="be.raildelays.batch.writer.ExcelRowAggregator"
                   scope="step">
                 <property name="language" value="#{jobParameters['language']}"/>
             </bean>
@@ -334,12 +334,13 @@
     <!-- ================================================================================================== -->
 
     <bean id="itemWriterResourceLocator"
-          class="be.raildelays.batch.support.ToWriteExcelResourceLocator"
+          class="be.raildelays.batch.writer.MultiExcelFileToWriteLocator"
           scope="step">
-        <property name="resource"
-                  value="file:#{jobParameters['excel.output.path']}/#{jobParameters['excel.file.name']}.#{jobParameters['excel.file.extension']}"/>
+        <property name="filePrefix" value="#{jobParameters['excel.file.name']}"/>
+        <property name="fileExtension" value=".#{jobParameters['excel.file.extension']}"/>
+        <property name="directory" value="#{jobParameters['excel.output.path']}"/>
+        <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
         <property name="resourceItemSearch" ref="resourceItemSearch"/>
-        <property name="keyName" value="${excel.resource.key}"/>
     </bean>
 
     <bean id="resourceItemSearch"

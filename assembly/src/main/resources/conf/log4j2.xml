@@ -243,14 +243,14 @@
         <logger name="org.springframework.batch.item.file.ExcelSheetItemWriter" level="trace" additivity="false">
             <appender-ref ref="step2Writer"/>
         </logger>
-        <logger name="org.springframework.batch.item.support.MultiResourceMaxItemCountItemWriter" level="trace"
+        <logger name="org.springframework.batch.item.file.ResourceLocatorItemWriterItemStream" level="trace"
                 additivity="false">
             <appender-ref ref="step2Writer"/>
         </logger>
         <logger name="org.springframework.batch.item.support.SortedItemStreamWriter" level="trace" additivity="false">
             <appender-ref ref="step2Writer"/>
         </logger>
-        <logger name="be.raildelays.batch.writer.BatchExcelRowAggregator" level="trace" additivity="false">
+        <logger name="be.raildelays.batch.writer.ExcelRowAggregator" level="trace" additivity="false">
             <appender-ref ref="step2Writer"/>
         </logger>
 

@@ -24,46 +24,34 @@
 
 package org.springframework.batch.item.file;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.batch.item.ExecutionContext;
-
-import java.util.Collections;
+import org.springframework.batch.item.ItemStreamException;
 
 /**
+ * Implementation of a {@link ResourceLocator} simply counting read/written items.
+ *
  * @author Almex
- * @since 1.2
+ * @since 2.0
  */
-public class SimpleResourceLocatorTest {
+public class CountingItemResourceLocator<T> implements ResourceLocator<T> {
 
-    private SimpleResourceLocator resourceLocator;
+    protected int maxItemCount;
 
-    @Before
-    public void setUp() throws Exception {
-        resourceLocator = new SimpleResourceLocator();
+    @Override
+    public void onOpen(ResourceContext context) throws ItemStreamException {
+        context.setCurrentIndex(0);
     }
 
-    /**
-     * We expect nothing.
-     */
-    @Test
-    public void testOnOpen() throws Exception {
-        resourceLocator.onOpen(new ResourceContext(new ExecutionContext(), "foo"));
+    @Override
+    public void onWrite(T item, ResourceContext context) throws Exception {
+        context.incrementIndex();
     }
 
-    /**
-     * We expect nothing.
-     */
-    @Test
-    public void testOnUpdate() throws Exception {
-        resourceLocator.onUpdate(new ResourceContext(new ExecutionContext(), "foo"));
+    @Override
+    public void onRead(T item, ResourceContext context) throws Exception {
+        context.incrementIndex();
     }
 
-    /**
-     * We expect nothing.
-     */
-    @Test
-    public void testOnWrite() throws Exception {
-        resourceLocator.onWrite(Collections.emptyList(), new ResourceContext(new ExecutionContext(), "foo"));
+    public void setMaxItemCount(int maxItemCount) {
+        this.maxItemCount = maxItemCount;
     }
 }

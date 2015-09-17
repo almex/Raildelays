@@ -55,18 +55,11 @@ public class ResourceLocatorItemReaderItemStreamTest extends AbstractResourceLoc
         return delegate.read();
     }
 
-    @Test
+    @Test(timeout = 1000L)
     public void testReadWOResourceAtOpen() throws Exception {
         ExecutionContext executionContext = new ExecutionContext();
 
-        delegator.setResourceLocator(new SimpleResourceLocator<String>() {
-            @Override
-            public String onRead(String item, ResourceContext context) throws Exception {
-                context.changeResource(new FileSystemResource(item));
-
-                return super.onRead(item, context);
-            }
-        });
+        delegator.setResourceLocator(new StringCountingItemResourceLocator());
 
         delegator.open(executionContext);
         delegator.read();
@@ -75,26 +68,33 @@ public class ResourceLocatorItemReaderItemStreamTest extends AbstractResourceLoc
         Assert.assertNull(delegate.getResource());
     }
 
-    @Test
+    @Test(timeout = 1000L)
     public void testReadWResourceAtOpen() throws Exception {
         ExecutionContext executionContext = new ExecutionContext();
         ResourceContext resourceContext = new ResourceContext(executionContext, "foo.ResourceLocatorItemReaderItemStream");
 
         resourceContext.changeResource(new ClassPathResource("retard_sncb 20140522.xls"));
 
-        delegator.setResourceLocator(new SimpleResourceLocator<String>() {
-            @Override
-            public String onRead(String item, ResourceContext context) throws Exception {
-                context.changeResource(new FileSystemResource(item));
-
-                return super.onRead(item, context);
-            }
-        });
+        delegator.setResourceLocator(new StringCountingItemResourceLocator());
 
         delegator.open(executionContext);
         delegator.read();
         delegator.update(executionContext);
 
         Assert.assertEquals("a", delegate.getResource().getFile().getPath());
+    }
+
+    private static class StringCountingItemResourceLocator extends CountingItemResourceLocator<String> {
+        boolean once = true;
+
+        @Override
+        public void onRead(String item, ResourceContext context) throws Exception {
+            super.onRead(item, context);
+
+            if (once) {
+                context.changeResource(new FileSystemResource(item));
+                once = false;
+            }
+        }
     }
 }

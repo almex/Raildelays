@@ -27,7 +27,10 @@ package org.springframework.batch.item.file;
 import org.springframework.batch.item.ItemStreamWriter;
 import org.springframework.core.io.Resource;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This {@link ItemStreamWriter} make the link between a {@link ResourceContext} and a {@link ResourceLocator} to
@@ -40,27 +43,6 @@ public class ResourceLocatorItemWriterItemStream<S extends ResourceAwareItemWrit
         extends AbstractResourceLocatorItemStream<S, T>
         implements ItemStreamWriter<T> {
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     *     Check if the {@link ResourceLocator#onWrite(List, ResourceContext)} event has changed our
-     *     {@link ResourceContext}.
-     * </p>
-     */
-    @Override
-    public void write(List<? extends T> items) throws Exception {
-        resourceLocator.onWrite(items, resourceContext);
-
-        if (resourceContext.hasChanged()) {
-            delegate.update(resourceContext.getExecutionContext());
-            delegate.close();
-            delegate.setResource(resourceContext.consumeResource());
-            delegate.open(resourceContext.getExecutionContext());
-        }
-
-        delegate.write(items);
-    }
-
     @Override
     public void setResourceToDelegate(Resource resource) {
         if (resourceContext != null) {
@@ -68,6 +50,58 @@ public class ResourceLocatorItemWriterItemStream<S extends ResourceAwareItemWrit
             delegate.setResource(resource);
         } else {
             throw new IllegalStateException("You must open the stream before calling setResourceToDelegate()");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Check if the {@link ResourceLocator#onWrite(Object, ResourceContext)} event has changed our
+     * {@link ResourceContext}.
+     * </p>
+     */
+    @Override
+    public void write(List<? extends T> items) throws Exception {
+        Map<Resource, List<T>> splitMap = new HashMap<>();
+
+        // We initialize the first resource
+        if (resourceContext.containsResource()) {
+            splitMap.put(resourceContext.getResource(), new ArrayList<>());
+        }
+
+        // We split the current list of items into sub-list linked to one resource
+        for (T item : items) {
+            resourceLocator.onWrite(item, resourceContext);
+
+            // Does the onWrite has changed our context
+            if (resourceContext.hasChanged()) {
+                splitMap.put(resourceContext.consumeResource(), new ArrayList<>());
+            }
+
+            // We add the item to the current resource list
+            if (splitMap.containsKey(resourceContext.getResource())) {
+                splitMap.get(resourceContext.getResource()).add(item);
+            }
+        }
+
+        // Now we can get through all our resources and write all our sub-list of items
+        for (Resource resource : splitMap.keySet()) {
+            delegate.setResource(resource);
+
+            if (!opened) {
+                // If it's the first resource, it's already opened
+                delegate.open(resourceContext.getExecutionContext());
+                opened = true;
+            }
+
+            delegate.write(splitMap.get(resource));
+
+            if (splitMap.size() > 1) {
+                // If we have more than one resource, we must close the current one
+                delegate.update(resourceContext.getExecutionContext());
+                delegate.close();
+                opened = false;
+            }
         }
     }
 }

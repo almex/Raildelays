@@ -32,8 +32,8 @@ import java.util.*;
 public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SortedItemStreamWriter.class);
-    protected ResourceAwareItemWriterItemStream<T> writer;
-    protected ResourceAwareItemReaderItemStream<T> reader;
+    protected ResourceAwareItemWriterItemStream<? super T> writer;
+    protected ResourceAwareItemReaderItemStream<? extends T> reader;
     protected Resource resource;
     protected Comparator<? super T> comparator;
     private Resource outputResource;
@@ -150,7 +150,7 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
                 }
 
                 if (index == null) {
-                    index = new Long(i++);
+                    index = Long.valueOf(i++);
 
                     LOGGER.trace("Setting new index={}", index);
                 }
@@ -218,11 +218,11 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
         this.resource = resource;
     }
 
-    public void setWriter(ResourceAwareItemWriterItemStream<T> writer) {
+    public void setWriter(ResourceAwareItemWriterItemStream<? super T> writer) {
         this.writer = writer;
     }
 
-    public void setReader(ResourceAwareItemReaderItemStream<T> reader) {
+    public void setReader(ResourceAwareItemReaderItemStream<? extends T> reader) {
         this.reader = reader;
     }
 

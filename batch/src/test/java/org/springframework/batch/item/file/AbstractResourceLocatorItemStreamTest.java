@@ -62,7 +62,7 @@ public abstract class AbstractResourceLocatorItemStreamTest<
         ExecutionContext executionContext = new ExecutionContext();
 
         executionContext.put(KEY, "foo");
-        delegator.setResourceLocator(new SimpleResourceLocator<String>() {
+        delegator.setResourceLocator(new CountingItemResourceLocator<String>() {
             @Override
             public void onOpen(ResourceContext context) throws ItemStreamException {
                 context.changeResource(new FileSystemResource(executionContext.getString(KEY)));
@@ -70,27 +70,6 @@ public abstract class AbstractResourceLocatorItemStreamTest<
         });
 
         delegator.open(executionContext);
-
-        Assert.assertEquals("foo", delegate.getResource().getFile().getPath());
-    }
-
-    /**
-     * We expect that the onUpdate() method build a path by by retrieving a property from the execution context.
-     */
-    @Test
-    public void testUpdate() throws Exception {
-        ExecutionContext executionContext = new ExecutionContext();
-
-        executionContext.put(KEY, "foo");
-        delegator.setResourceLocator(new SimpleResourceLocator<String>() {
-            @Override
-            public void onUpdate(ResourceContext context) throws ItemStreamException {
-                context.changeResource(new FileSystemResource(executionContext.getString(KEY)));
-            }
-        });
-
-        delegator.open(executionContext);
-        delegator.update(executionContext);
 
         Assert.assertEquals("foo", delegate.getResource().getFile().getPath());
     }

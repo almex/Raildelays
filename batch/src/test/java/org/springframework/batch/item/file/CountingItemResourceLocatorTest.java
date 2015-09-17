@@ -24,35 +24,44 @@
 
 package org.springframework.batch.item.file;
 
-import org.springframework.batch.item.ItemStreamException;
-
-import java.util.List;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.batch.item.ExecutionContext;
 
 /**
- * Default implementation doing nothing on each event.
- *
  * @author Almex
- * @since 2.0
+ * @since 1.2
  */
-public class SimpleResourceLocator<T> implements ResourceLocator<T> {
+public class CountingItemResourceLocatorTest {
 
-    @Override
-    public void onOpen(ResourceContext context) throws ItemStreamException {
+    private CountingItemResourceLocator<String> resourceLocator;
 
+    @Before
+    public void setUp() throws Exception {
+        resourceLocator = new CountingItemResourceLocator<>();
     }
 
-    @Override
-    public void onUpdate(ResourceContext context) throws ItemStreamException {
-
+    /**
+     * We expect nothing.
+     */
+    @Test
+    public void testOnOpen() throws Exception {
+        resourceLocator.onOpen(new ResourceContext(new ExecutionContext(), "foo"));
     }
 
-    @Override
-    public void onWrite(List<? extends T> items, ResourceContext context) throws Exception {
-
+    /**
+     * We expect nothing.
+     */
+    @Test
+    public void testOnUpdate() throws Exception {
+        resourceLocator.onRead(null, new ResourceContext(new ExecutionContext(), "foo"));
     }
 
-    @Override
-    public T onRead(T item, ResourceContext context) throws Exception {
-        return item;
+    /**
+     * We expect nothing.
+     */
+    @Test
+    public void testOnWrite() throws Exception {
+        resourceLocator.onWrite(null, new ResourceContext(new ExecutionContext(), "foo"));
     }
 }

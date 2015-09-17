@@ -94,7 +94,7 @@ public class HandleMaxMonthsIT extends AbstractContextIT {
 
     @AfterClass
     public static void tearDown() {
-        cleanUp();
+        //cleanUp();
     }
 
 

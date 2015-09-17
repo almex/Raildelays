@@ -30,6 +30,7 @@ import be.raildelays.batch.reader.BatchExcelRowMapper;
 import be.raildelays.domain.Language;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.xls.ExcelRow;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -62,16 +63,16 @@ import java.util.Locale;
  * @author Almex
  * @since 1.1
  */
-public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
+public class ExcelRowAggregator implements RowAggregator<ExcelRow> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BatchExcelRowAggregator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExcelRowAggregator.class);
 
     private String language = Language.EN.name();
 
     private BatchExcelRowMapper batchExcelRowMapper;
 
 
-    public BatchExcelRowAggregator() {
+    public ExcelRowAggregator() {
         batchExcelRowMapper = new BatchExcelRowMapper();
         batchExcelRowMapper.setValidateOutcomes(true);
         batchExcelRowMapper.afterPropertiesSet();
@@ -116,7 +117,7 @@ public class BatchExcelRowAggregator implements RowAggregator<BatchExcelRow> {
     }
 
     @Override
-    public BatchExcelRow aggregate(BatchExcelRow item, Workbook workbook, int sheetIndex, int rowIndex) throws Exception {
+    public ExcelRow aggregate(ExcelRow item, Workbook workbook, int sheetIndex, int rowIndex) throws Exception {
         final Row row = workbook.getSheetAt(sheetIndex).getRow(rowIndex);
         BatchExcelRow previousRow = null;
         Language lang = Language.valueOf(language.toUpperCase());

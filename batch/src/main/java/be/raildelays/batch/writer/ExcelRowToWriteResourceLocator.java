@@ -26,13 +26,12 @@ package be.raildelays.batch.writer;
 
 import be.raildelays.batch.ExcelFileUtils;
 import be.raildelays.domain.xls.ExcelRow;
+import org.springframework.batch.item.file.CountingItemResourceLocator;
 import org.springframework.batch.item.file.ResourceContext;
-import org.springframework.batch.item.file.SimpleResourceLocator;
 import org.springframework.core.io.FileSystemResource;
 
 import java.io.File;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 /**
  * We generate the Excel file name based of the first item to write.
@@ -42,7 +41,7 @@ import java.util.List;
  * @author Almex
  * @since 2.0
  */
-public class ExcelRowToWriteResourceLocator extends SimpleResourceLocator<ExcelRow> {
+public class ExcelRowToWriteResourceLocator extends CountingItemResourceLocator<ExcelRow> {
 
     private String fileName;
     private String fileExtension;
@@ -56,14 +55,19 @@ public class ExcelRowToWriteResourceLocator extends SimpleResourceLocator<ExcelR
      * </p>
      */
     @Override
-    public void onWrite(List<? extends ExcelRow> items, ResourceContext context) throws Exception {
-        if (items.size() > 0 && !context.containsResource()) {
-            String suffix = items.get(0).getDate().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+    public void onWrite(ExcelRow item, ResourceContext context) throws Exception {
+        if (!context.containsResource() && isValid(item)) {
+            String suffix = item.getDate().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
             File file = ExcelFileUtils.getFile(new File(directoryPath), fileName, suffix, fileExtension);
 
             context.changeResource(new FileSystemResource(file));
         }
     }
+
+    private boolean isValid(ExcelRow item) {
+        return item != null && item.getDate() != null;
+    }
+
 
     public void setFileName(String fileName) {
         this.fileName = fileName;

@@ -43,7 +43,7 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
         implements IndexedResourceAwareItemStreamReader<T>, InitializingBean, ResourceAwareItemReaderItemStream<T> {
 
     private static Logger LOGGER = LoggerFactory.getLogger(ExcelSheetItemReader.class);
-    private RowMapper<T> rowMapper;
+    private RowMapper<? extends T> rowMapper;
     private Resource resource;
     private Workbook workbook;
     private boolean noInput = false;
@@ -198,7 +198,7 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
      *
      * @param rowMapper an implementation of {@link RowMapper}
      */
-    public void setRowMapper(RowMapper<T> rowMapper) {
+    public void setRowMapper(RowMapper<? extends T> rowMapper) {
         this.rowMapper = rowMapper;
     }
 

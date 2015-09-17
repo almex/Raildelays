@@ -40,13 +40,15 @@ public class ResourceContext {
 
     public static final String RESOURCE_KEY = "resource";
     public static final String HAS_CHANGED_KEY = "resource.has.changed";
+    public static final String CURRENT_INDEX_KEY = "current.index";
     private ExecutionContext executionContext;
     private String keyPrefix;
 
     public ResourceContext(ExecutionContext executionContext, String keyPrefix) {
         this.executionContext = executionContext;
         this.keyPrefix = keyPrefix;
-        this.executionContext.put(getKey(HAS_CHANGED_KEY), false);
+        setHasChanged(false);
+        setCurrentIndex(0);
     }
 
     /**
@@ -57,8 +59,9 @@ public class ResourceContext {
     public void changeResource(Resource resource) {
         Resource previousResource = getResource();
 
-        if (previousResource != resource) {
-            executionContext.put(getKey(HAS_CHANGED_KEY), true);
+        if (previousResource == null || !previousResource.equals(resource)) {
+            setCurrentIndex(0);
+            setHasChanged(true);
             setResource(resource);
         }
     }
@@ -72,7 +75,7 @@ public class ResourceContext {
         Resource result = null;
 
         if (hasChanged()) {
-            executionContext.put(getKey(HAS_CHANGED_KEY), false);
+            setHasChanged(false);
             result = getResource();
         }
 
@@ -87,6 +90,11 @@ public class ResourceContext {
      */
     public boolean hasChanged() {
         return (Boolean) executionContext.get(getKey(HAS_CHANGED_KEY));
+    }
+
+
+    private void setHasChanged(boolean hasChanged) {
+        executionContext.put(getKey(HAS_CHANGED_KEY), hasChanged);
     }
 
     /**
@@ -108,6 +116,20 @@ public class ResourceContext {
 
     public void setResource(Resource resource) {
         executionContext.put(getKey(RESOURCE_KEY), resource);
+    }
+
+    public void setCurrentIndex(int index) {
+        executionContext.putInt(getKey(CURRENT_INDEX_KEY), index);
+    }
+
+    public void incrementIndex() {
+        int index = getCurrentIndex();
+
+        setCurrentIndex(++index);
+    }
+
+    public int getCurrentIndex() {
+        return executionContext.getInt(getKey(CURRENT_INDEX_KEY));
     }
 
     /**

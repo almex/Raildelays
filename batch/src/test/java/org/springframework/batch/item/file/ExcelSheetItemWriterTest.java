@@ -2,10 +2,11 @@ package org.springframework.batch.item.file;
 
 import be.raildelays.batch.AbstractFileTest;
 import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.batch.writer.BatchExcelRowAggregator;
+import be.raildelays.batch.writer.ExcelRowAggregator;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.xls.ExcelRow;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
@@ -35,9 +36,9 @@ import java.util.List;
 @RunWith(BlockJUnit4ClassRunner.class)
 public class ExcelSheetItemWriterTest extends AbstractFileTest {
 
-    private ExcelSheetItemWriter<BatchExcelRow> writer;
+    private ExcelSheetItemWriter<ExcelRow> writer;
 
-    private List<BatchExcelRow> items = new ArrayList<>();
+    private List<ExcelRow> items = new ArrayList<>();
 
     private ExecutionContext executionContext;
 
@@ -56,7 +57,7 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
         writer = new ExcelSheetItemWriter<>();
         writer.setTemplate(new ClassPathResource("template.xls"));
         writer.setResource(new FileSystemResource(CURRENT_PATH + "output.xls"));
-        writer.setRowAggregator(new BatchExcelRowAggregator());
+        writer.setRowAggregator(new ExcelRowAggregator());
         writer.setName("test");
         writer.setRowsToSkip(21);
         writer.setMaxItemCount(40);

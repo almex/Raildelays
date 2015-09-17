@@ -67,10 +67,10 @@ public class ResourceLocatorItemWriterItemStreamTest extends AbstractResourceLoc
     public void testWrite() throws Exception {
         ExecutionContext executionContext = new ExecutionContext();
 
-        delegator.setResourceLocator(new SimpleResourceLocator<String>() {
+        delegator.setResourceLocator(new CountingItemResourceLocator<String>() {
             @Override
-            public void onWrite(List<? extends String> items, ResourceContext context) throws ItemStreamException {
-                context.changeResource(new FileSystemResource(Arrays.toString(items.toArray())));
+            public void onWrite(String item, ResourceContext context) throws ItemStreamException {
+                context.changeResource(new FileSystemResource(item));
             }
         });
 
@@ -79,7 +79,7 @@ public class ResourceLocatorItemWriterItemStreamTest extends AbstractResourceLoc
         delegator.update(executionContext);
 
         try {
-            Assert.assertEquals("[a, b, c]", delegate.getResource().getFile().getPath());
+            Assert.assertEquals("c", delegate.getResource().getFile().getPath());
         } catch (IOException e) {
             Assert.fail(e.getMessage());
         }

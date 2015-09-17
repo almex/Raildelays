@@ -4,10 +4,7 @@ import be.raildelays.batch.AbstractFileTest;
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.listener.ResourceLocatorListener;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.file.ExcelSheetItemReader;
 import org.springframework.batch.test.MetaDataInstanceFactory;
@@ -62,6 +59,7 @@ public class ItemWriterResourceLocatorWithItemSearchIT extends AbstractFileTest 
 
 
     @Test
+    @Ignore
     public void testFoundExisting() throws IOException {
         StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution();
 
@@ -74,6 +72,7 @@ public class ItemWriterResourceLocatorWithItemSearchIT extends AbstractFileTest 
     }
 
     @Test
+    @Ignore
     public void testNotFoundExisting() throws IOException {
         StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution();
 

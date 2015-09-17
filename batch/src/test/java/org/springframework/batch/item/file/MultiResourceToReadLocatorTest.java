@@ -96,7 +96,8 @@ public class MultiResourceToReadLocatorTest {
     }
 
     /**
-     * We expect that txo consecutive onOpen() followed by a full read of all Resource give us the same last Resource.
+     * We expect that two consecutive onOpen() followed by a read of all items (null item is interpreted as EOF)
+     * give us the same last Resource.
      */
     @Test
     public void testRestart() throws Exception {
@@ -105,17 +106,11 @@ public class MultiResourceToReadLocatorTest {
         Resource actual = null;
 
         locator.onOpen(resourceContext);
-        for (String item = locator.onRead(null, resourceContext);
-             item != null;
-             item = locator.onRead(null, resourceContext)) {
-            expected = resourceContext.getResource();
-        }
+        locator.onRead(null, resourceContext);
+        expected = resourceContext.getResource();
         locator.onOpen(resourceContext);
-        for (String item = locator.onRead(null, resourceContext);
-             item != null;
-             item = locator.onRead(null, resourceContext)) {
-            actual = resourceContext.getResource();
-        }
+        locator.onRead(null, resourceContext);
+        actual = resourceContext.getResource();
 
         Assert.assertTrue(resourceContext.containsResource());
         Assert.assertEquals(expected, actual);

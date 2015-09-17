@@ -52,7 +52,8 @@
     </job>
 
 
-    <bean id="handleMoreThanOneHourDelaysJobParametersValidator" class="org.springframework.batch.core.job.DefaultJobParametersValidator">
+    <bean id="handleMoreThanOneHourDelaysJobParametersValidator"
+          class="org.springframework.batch.core.job.DefaultJobParametersValidator">
         <property name="requiredKeys">
             <list>
                 <value>excel.output.path</value>
@@ -80,7 +81,7 @@
           scope="step">
         <property name="keyName" value="more.than.one.hour.excel.path"/>
         <property name="reader" ref="allExcelFilesItemReader"/>
-        <property name="thresholdDelay" value="${excel.item.delay.max.threshold}" />
+        <property name="thresholdDelay" value="${excel.item.delay.max.threshold}"/>
     </bean>
 
     <!-- ================================================================================================== -->
@@ -103,7 +104,7 @@
     </bean>
 
     <bean id="allExcelFilesItemReader"
-          class="org.springframework.batch.item.file.MultiResourceItemReaderResourceAwareAdapter"
+          class="org.springframework.batch.item.file.ResourceLocatorItemReaderItemStream"
           scope="step">
         <property name="delegate">
             <bean class="org.springframework.batch.item.file.ExcelSheetItemReader"
@@ -118,8 +119,13 @@
                 </property>
             </bean>
         </property>
-        <property name="resources"
-                  value="file:#{jobParameters['excel.output.path']}/*.#{jobParameters['excel.file.extension']}"/>
+        <property name="name" value="allExcelFilesItemReader"/>
+        <property name="resourceLocator">
+            <bean class="org.springframework.batch.item.file.MultiResourceToReadLocator">
+                <property name="directory" value="file:#{jobParameters['excel.output.path']}"/>
+                <property name="filter" value="*.#{jobParameters['excel.file.extension']}"/>
+            </bean>
+        </property>
     </bean>
 
     <!-- ================================================================================================== -->
@@ -195,7 +201,7 @@
           class="org.springframework.batch.item.file.ExcelSheetItemWriter"
           scope="step">
         <property name="rowAggregator">
-            <bean class="be.raildelays.batch.writer.BatchExcelRowAggregator"
+            <bean class="be.raildelays.batch.writer.ExcelRowAggregator"
                   scope="step">
                 <property name="language" value="#{jobParameters['language']}"/>
             </bean>
@@ -228,14 +234,6 @@
     <!-- =====================================        RESOURCES       ===================================== -->
     <!-- ================================================================================================== -->
 
-    <bean id="oneHourItemWriterResourceLocator"
-          class="be.raildelays.batch.support.ToWriteExcelResourceLocator"
-          scope="step">
-        <property name="resource"
-                  value="file:#{jobParameters['excel.output.path']}/#{jobParameters['excel.file.name']}.#{jobParameters['excel.file.extension']}"/>
-        <property name="keyName" value="${excel.resource.key}"/>
-        <property name="forceNewFile" value="true" />
-    </bean>
 
     <!-- ================================================================================================== -->
     <!-- =====================================         TASKLET        ===================================== -->
@@ -245,13 +243,15 @@
           class="be.raildelays.batch.tasklet.MoveFileTasklet"
           scope="step">
         <property name="source" value="file:#{jobParameters['more.than.one.hour.excel.path']}"/>
-        <property name="destination" value="file:#{jobParameters['excel.output.path']}/moreThanOneHourBackup/#{jobParameters['excel.file.name']}.#{jobParameters['excel.file.extension']}"/>
+        <property name="destination"
+                  value="file:#{jobParameters['excel.output.path']}/moreThanOneHourBackup/#{jobParameters['excel.file.name']}.#{jobParameters['excel.file.extension']}"/>
     </bean>
 
     <bean id="deleteFileTasklet"
           class="be.raildelays.batch.tasklet.DeleteFileTasklet"
           scope="step">
-        <property name="resources" value="file:#{jobParameters['excel.output.path']}/moreThanOneHourBackup/#{jobParameters['excel.file.name']}.#{jobParameters['excel.file.extension']}"/>
+        <property name="resources"
+                  value="file:#{jobParameters['excel.output.path']}/moreThanOneHourBackup/#{jobParameters['excel.file.name']}.#{jobParameters['excel.file.extension']}"/>
     </bean>
 
 

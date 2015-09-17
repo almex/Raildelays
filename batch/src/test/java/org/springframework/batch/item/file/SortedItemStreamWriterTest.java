@@ -3,10 +3,11 @@ package org.springframework.batch.item.file;
 import be.raildelays.batch.AbstractFileTest;
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
-import be.raildelays.batch.writer.BatchExcelRowAggregator;
+import be.raildelays.batch.writer.ExcelRowAggregator;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.xls.ExcelRow;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -39,12 +40,11 @@ public class SortedItemStreamWriterTest extends AbstractFileTest {
 
     private List<BatchExcelRow> items = new ArrayList<>();
 
-    private ExecutionContext executionContext;
-
     @Before
     public void setUp() throws Exception {
-        ExcelSheetItemWriter<BatchExcelRow> writer = new ExcelSheetItemWriter<>();
+        ExcelSheetItemWriter<ExcelRow> writer = new ExcelSheetItemWriter<>();
         ExcelSheetItemReader<BatchExcelRow> reader = new ExcelSheetItemReader<>();
+        ExecutionContext executionContext = MetaDataInstanceFactory.createStepExecution().getExecutionContext();
 
         copyFile();
 
@@ -52,7 +52,7 @@ public class SortedItemStreamWriterTest extends AbstractFileTest {
         writer.setSheetIndex(0);
         writer.setRowsToSkip(21);
         writer.setMaxItemCount(40);
-        writer.setRowAggregator(new BatchExcelRowAggregator());
+        writer.setRowAggregator(new ExcelRowAggregator());
         writer.setTemplate(new ClassPathResource("template.xls"));
         writer.setResource(new FileSystemResource(CURRENT_PATH));
         writer.afterPropertiesSet();
@@ -66,7 +66,6 @@ public class SortedItemStreamWriterTest extends AbstractFileTest {
         reader.afterPropertiesSet();
 
         sortedItemStreamWriter = new SortedItemStreamWriter<>();
-        executionContext = MetaDataInstanceFactory.createStepExecution().getExecutionContext();
         sortedItemStreamWriter.setResource(new FileSystemResource(EXCEL_FILE_DESTINATION_PATH));
         sortedItemStreamWriter.setReader(reader);
         sortedItemStreamWriter.setWriter(writer);

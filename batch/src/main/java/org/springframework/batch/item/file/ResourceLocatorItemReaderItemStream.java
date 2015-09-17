@@ -73,16 +73,16 @@ public class ResourceLocatorItemReaderItemStream<S extends ResourceAwareItemRead
 
         // While we have consumed the current resource we continues with another one.
         while (item == null) {
+            // In case it's not done yet, we delegate the resource coming from the context.
+            if (!opened) {
+                // That means we open a new stream
+                delegate.open(resourceContext.getExecutionContext());
+                opened = true;
+            }
+
             // We check if the context has been initialized
             if (resourceContext.containsResource()) {
-                // In case it's not done yet, we delegate the resource coming from the context.
-                if (!resourceContext.hasChanged()) {
-                    // That means we open a new stream
-                    delegate.setResource(resourceContext.getResource());
-                    delegate.open(resourceContext.getExecutionContext());
-                }
-
-                item = resourceLocator.onRead(delegate.read(), resourceContext);
+                resourceLocator.onRead(delegate.read(), resourceContext);
             }
 
             // We have finished to read the previous resource. We check if we don't have another one
@@ -90,6 +90,8 @@ public class ResourceLocatorItemReaderItemStream<S extends ResourceAwareItemRead
                 // That means we close the current stream.
                 delegate.update(resourceContext.getExecutionContext());
                 delegate.close();
+                delegate.setResource(resourceContext.consumeResource());
+                opened = false;
             } else {
                 // We have no more resource to consume. No matter if we return a null item or not, we've done here.
                 break;

@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * A resource locator is way to define a resource on 3 of {@code ItemStream} operations.
  * Then you can dynamically create a path based on something in the {@link ResourceContext} or
- * based on items in case of the {@link #onWrite(List, ResourceContext)} method.
+ * based on items in case of the {@link #onWrite(Object, ResourceContext)} method.
  *
  * @param <T> type of the data to write
  * @author Almex
@@ -53,21 +53,13 @@ public interface ResourceLocator<T> {
     void onOpen(ResourceContext context) throws ItemStreamException;
 
     /**
-     * Event triggered on {@link AbstractResourceLocatorItemStream#update(ExecutionContext)} method.
-     *
-     * @param context to communicate changes on the resource you attempt to build
-     * @throws ItemStreamException in case of any exception
-     */
-    void onUpdate(ResourceContext context) throws ItemStreamException;
-
-    /**
      * Event triggered on {@link ResourceLocatorItemWriterItemStream#write(List)} method.
      *
-     * @param items   data to write
+     * @param item   data to write
      * @param context to communicate changes on the resource you attempt to build
      * @throws Exception in case of any exception
      */
-    void onWrite(List<? extends T> items, ResourceContext context) throws Exception;
+    void onWrite(T item, ResourceContext context) throws Exception;
 
     /**
      * Event triggered on {@link ResourceLocatorItemReaderItemStream#read()} method.
@@ -77,6 +69,6 @@ public interface ResourceLocator<T> {
      * @param context to communicate changes on the resource you attempt to build
      * @throws Exception in case of any exception
      */
-    T onRead(T item, ResourceContext context) throws Exception;
+    void onRead(T item, ResourceContext context) throws Exception;
 
 }

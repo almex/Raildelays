@@ -28,6 +28,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamSupport;
+import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.core.io.Resource;
 
 /**
@@ -39,13 +40,18 @@ public abstract class AbstractResourceLocatorItemStream<S extends ItemStream, T>
     protected S delegate;
     protected ResourceContext resourceContext;
     protected ResourceLocator<T> resourceLocator;
+    protected boolean opened;
 
     /**
      * {@inheritDoc}
      * <p>
-     * The {@link ResourceContext} is initialized within this method based on the {@link ExecutionContext} provided.
      * Check if the  {@link ResourceLocator#onOpen(ResourceContext)} event has changed our
      * {@link ResourceContext}.
+     * </p>
+     * <p>
+     * If the delegate is an {@link AbstractItemCountingItemStreamItemWriter} or an
+     * {@link AbstractItemCountingItemStreamItemReader} then we set the current index with
+     * {@link ResourceContext#getCurrentIndex()}.
      * </p>
      */
     @Override
@@ -54,38 +60,33 @@ public abstract class AbstractResourceLocatorItemStream<S extends ItemStream, T>
                 executionContext,
                 getExecutionContextKey(this.getClass().getSimpleName())
         );
+        ;
 
         resourceLocator.onOpen(resourceContext);
+
+        if (delegate instanceof AbstractItemCountingItemStreamItemWriter) {
+            ((AbstractItemCountingItemStreamItemWriter) delegate).setCurrentItemIndex(
+                    resourceContext.getCurrentIndex()
+            );
+        } else if (delegate instanceof AbstractItemCountingItemStreamItemReader) {
+            ((AbstractItemCountingItemStreamItemReader) delegate).setCurrentItemCount(
+                    resourceContext.getCurrentIndex()
+            );
+        }
 
         if (resourceContext.hasChanged()) {
             setResourceToDelegate(resourceContext.consumeResource());
             delegate.open(executionContext);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Check if the  {@link ResourceLocator#onUpdate(ResourceContext)} event has changed our
-     * {@link ResourceContext}.
-     * </p>
-     */
-    @Override
-    public void update(ExecutionContext executionContext) throws ItemStreamException {
-        resourceLocator.onUpdate(resourceContext);
-
-        delegate.update(executionContext);
-
-        if (resourceContext.hasChanged()) {
-            delegate.close();
-            setResourceToDelegate(resourceContext.consumeResource());
-            delegate.open(resourceContext.getExecutionContext());
+            opened = true;
         }
     }
 
     @Override
     public void close() throws ItemStreamException {
-        delegate.close();
+        if (opened) {
+            delegate.close();
+            opened = false;
+        }
     }
 
     public abstract void setResourceToDelegate(Resource resource);

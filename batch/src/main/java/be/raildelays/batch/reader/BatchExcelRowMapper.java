@@ -184,7 +184,6 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
 
     private LocalTime getHHMM(Row row, int hhCellIndex, int mmCellIndex) {
         LocalTime result = null;
-        NumberFormat numberFormat = new DecimalFormat("##");
         Integer hours = getTime(row, hhCellIndex);
         Integer minutes = getTime(row, mmCellIndex);
 
@@ -196,76 +195,67 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
     }
 
     private Integer getTime(Row row, int cellIndex) {
-        return getValue(row, cellIndex, new CellParser<Integer>() {
-            @Override
-            public Integer getValue(Cell cell) {
-                Integer result = null;
-                NumberFormat numberFormat = new DecimalFormat("#");
+        return getValue(row, cellIndex, cell -> {
+            Integer result = null;
+            NumberFormat numberFormat = new DecimalFormat("#");
 
-                try {
-                    switch (cell.getCellType()) {
-                        case Cell.CELL_TYPE_STRING:
-                            result = numberFormat.parse(cell.getStringCellValue()).intValue();
-                            break;
-                        case Cell.CELL_TYPE_NUMERIC:
-                            result = (int) cell.getNumericCellValue();
-                            break;
-                        default:
-                            LOGGER.error("Cannot convert rowIndex={} cellIndex={} of type={} into String", cell.getRowIndex(), cell.getColumnIndex(), cell.getCellType());
-                    }
-                } catch (ParseException e) {
-                    LOGGER.error("Parsing exception: cannot handle rowIndex={} cellIndex={} exception={}", cell.getRowIndex(), cell.getColumnIndex(), e.getMessage());
-                }
-
-                return result;
-            }
-        });
-    }
-
-    private String getString(Row row, int cellIndex) {
-        return getValue(row, cellIndex, new CellParser<String>() {
-            @Override
-            public String getValue(Cell cell) {
-                String result = null;
-
+            try {
                 switch (cell.getCellType()) {
                     case Cell.CELL_TYPE_STRING:
-                        result = cell.getStringCellValue();
+                        result = numberFormat.parse(cell.getStringCellValue()).intValue();
+                        break;
+                    case Cell.CELL_TYPE_NUMERIC:
+                        result = (int) cell.getNumericCellValue();
                         break;
                     default:
                         LOGGER.error("Cannot convert rowIndex={} cellIndex={} of type={} into String", cell.getRowIndex(), cell.getColumnIndex(), cell.getCellType());
                 }
-
-                return result;
+            } catch (ParseException e) {
+                LOGGER.error("Parsing exception: cannot handle rowIndex={} cellIndex={} exception={}", cell.getRowIndex(), cell.getColumnIndex(), e.getMessage());
             }
+
+            return result;
+        });
+    }
+
+    private String getString(Row row, int cellIndex) {
+        return getValue(row, cellIndex, cell -> {
+            String result = null;
+
+            switch (cell.getCellType()) {
+                case Cell.CELL_TYPE_STRING:
+                    result = cell.getStringCellValue();
+                    break;
+                default:
+                    LOGGER.error("Cannot convert rowIndex={} cellIndex={} of type={} into String", cell.getRowIndex(), cell.getColumnIndex(), cell.getCellType());
+            }
+
+            return result;
         });
     }
 
     private Long getLong(Row row, int cellIndex) {
-        return getValue(row, cellIndex, new CellParser<Long>() {
-            @Override
-            public Long getValue(Cell cell) {
-                NumberFormat numberFormat = new DecimalFormat("#");
-                Long result = null;
+        return getValue(row, cellIndex, cell -> {
+            NumberFormat numberFormat = new DecimalFormat("#");
+            Long result = null;
 
-                try {
-                    switch (cell.getCellType()) {
-                        case Cell.CELL_TYPE_FORMULA:
-                        case Cell.CELL_TYPE_NUMERIC:
-                            result = (long) cell.getNumericCellValue();
-                            break;
-                        case Cell.CELL_TYPE_STRING:
-                            result = numberFormat.parse(cell.getStringCellValue()).longValue();
-                            break;
-                        default:
-                            LOGGER.error("Cannot convert rowIndex={} cellIndex={} of type={} into String", cell.getRowIndex(), cell.getColumnIndex(), cell.getCellType());
-                    }
-                } catch (ParseException e) {
-                    LOGGER.error("Parsing exception: cannot handle rowIndex={} cellIndex={} exception={}", cell.getRowIndex(), cell.getColumnIndex(), e.getMessage());
+            try {
+                switch (cell.getCellType()) {
+                    case Cell.CELL_TYPE_FORMULA:
+                    case Cell.CELL_TYPE_NUMERIC:
+                        result = (long) cell.getNumericCellValue();
+                        break;
+                    case Cell.CELL_TYPE_STRING:
+                        result = numberFormat.parse(cell.getStringCellValue()).longValue();
+                        break;
+                    default:
+                        LOGGER.error("Cannot convert rowIndex={} cellIndex={} of type={} into String", cell.getRowIndex(), cell.getColumnIndex(), cell.getCellType());
                 }
-
-                return result;
+            } catch (ParseException e) {
+                LOGGER.error("Parsing exception: cannot handle rowIndex={} cellIndex={} exception={}", cell.getRowIndex(), cell.getColumnIndex(), e.getMessage());
             }
+
+            return result;
         });
     }
 

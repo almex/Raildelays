@@ -1,9 +1,10 @@
 package be.raildelays.batch.reader;
 
 import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.batch.writer.BatchExcelRowAggregator;
+import be.raildelays.batch.writer.ExcelRowAggregator;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.xls.ExcelRow;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -90,7 +91,7 @@ public class BatchExcelRowMapperTest {
                 .build();
 
 
-        BatchExcelRow previousRow = new BatchExcelRowAggregator().aggregate(expected, workbook, SHEET_INDEX, ROW_INDEX);
+        ExcelRow previousRow = new ExcelRowAggregator().aggregate(expected, workbook, SHEET_INDEX, ROW_INDEX);
         BatchExcelRow batchExcelRow = mapper.mapRow(workbook.getSheetAt(SHEET_INDEX).getRow(ROW_INDEX), ROW_INDEX);
 
         Assert.assertNotNull(previousRow);

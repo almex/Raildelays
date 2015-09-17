@@ -39,7 +39,7 @@ import java.util.List;
  * @author Almex
  * @since 1.2
  */
-public class MultiResourceToReadLocator<T> extends SimpleResourceLocator<T> {
+public class MultiResourceToReadLocator<T> extends CountingItemResourceLocator<T> {
 
     private String filter = "*";
     private Resource[] resources;
@@ -48,6 +48,8 @@ public class MultiResourceToReadLocator<T> extends SimpleResourceLocator<T> {
 
     @Override
     public void onOpen(ResourceContext context) throws ItemStreamException {
+        super.onOpen(context);
+
         try {
             List<Resource> result = new ArrayList<>();
 
@@ -67,13 +69,12 @@ public class MultiResourceToReadLocator<T> extends SimpleResourceLocator<T> {
     }
 
     @Override
-    public T onRead(T item, ResourceContext context) throws Exception {
+    public void onRead(T item, ResourceContext context) throws Exception {
+        super.onRead(item, context);
 
-        if ((item == null || !context.containsResource()) && index < resources.length - 1) {
+        if (item == null && index < resources.length - 1) {
             context.changeResource(resources[index++]);
         }
-
-        return super.onRead(item, context);
     }
 
     public void setDirectory(Resource directory) {

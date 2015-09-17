@@ -35,19 +35,16 @@ import java.util.Comparator;
  */
 public class SimpleResourceItemSearch<T extends Comparable<? super T>> implements ResourceItemSearch<T> {
 
-    protected Comparator<? super T> comparator = new Comparator<T>() {
-        @Override
-        public int compare(T o1, T o2) {
-            int result = 0;
+    protected Comparator<? super T> comparator = (lho, rho) -> {
+        int result = 0;
 
-            if (o1 != null) {
-                result = o1.compareTo(o2);
-            } else {
-                result = o2 != null ? 1 : 0;
-            }
-
-            return result;
+        if (lho != null) {
+            result = lho.compareTo(rho);
+        } else {
+            result = rho != null ? 1 : 0;
         }
+
+        return result;
     };
     private IndexedResourceAwareItemStreamReader<? extends T> reader;
 
@@ -62,7 +59,7 @@ public class SimpleResourceItemSearch<T extends Comparable<? super T>> implement
 
         try {
             for (T object = reader.read(); object != null; object = reader.read()) {
-                if (item == null ? object == null : comparator.compare(item, object) == 0) {
+                if (comparator.compare(item, object) == 0) {
                     result = reader.getCurrentIndex();
                     break;
                 }
