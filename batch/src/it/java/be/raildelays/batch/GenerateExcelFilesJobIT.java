@@ -63,11 +63,11 @@ public class GenerateExcelFilesJobIT extends AbstractContextIT {
         parameters.put("language", new JobParameter(Language.EN.name()));
         parameters.put("station.departure", new JobParameter("Liège-Guillemins"));
         parameters.put("station.arrival", new JobParameter("Bruxelles-Central"));
-        parameters.put("excel.output.path", new JobParameter("./"));
+        parameters.put("excel.output.path", new JobParameter("./target"));
         parameters.put("excel.file.name", new JobParameter("sncb_"));
         parameters.put("excel.file.extension", new JobParameter("xls"));
-        parameters.put("excel.archive.path", new JobParameter("./"));
-        parameters.put("text.output.path", new JobParameter("./output.txt"));
+        parameters.put("excel.archive.path", new JobParameter("./target"));
+        parameters.put("text.output.path", new JobParameter("./target/output.txt"));
         parameters.put("excel.template.path",
                 new JobParameter(new ClassPathResource("template.xls").getFile().getAbsolutePath()));
 

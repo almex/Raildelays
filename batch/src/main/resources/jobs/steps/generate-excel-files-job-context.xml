@@ -30,8 +30,6 @@
                     <listeners merge="true">
                         <!-- Keep trace of skipped/filtered items -->
                         <listener ref="logSkippedItemListener"/>
-                        <!-- To compute file name of the Excel file after filtering -->
-                        <listener ref="resourceLocatorListener"/>
                         <listener ref="logStep2ItemProcessorListener"/>
                     </listeners>
                 </chunk>

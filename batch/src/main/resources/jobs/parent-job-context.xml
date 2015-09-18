@@ -47,10 +47,6 @@
           class="be.raildelays.batch.listener.LogSkippedItemListener"
           scope="step"/>
 
-    <bean id="resourceLocatorListener"
-          class="be.raildelays.batch.listener.ResourceLocatorListener"
-          scope="step"/>
-
     <bean id="logStep1ItemProcessorListener"
           class="be.raildelays.batch.listener.LogStep1ItemProcessorListener"
           scope="step"/>

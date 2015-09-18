@@ -26,7 +26,7 @@ package be.raildelays.batch.support;
 
 import be.raildelays.batch.AbstractContextIT;
 import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.batch.listener.ResourceLocatorListener;
+import be.raildelays.domain.Language;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
@@ -39,7 +39,8 @@ import org.junit.Test;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStreamWriter;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -47,8 +48,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -60,7 +61,7 @@ import java.util.List;
 import java.util.Map;
 
 @ContextConfiguration(locations = {
-        "/jobs/main-job-context.xml"})
+        "/jobs/steps/generate-excel-files-job-context.xml"})
 @DataSet(value = "classpath:GenerateExcelFilesJobIT.xml", tearDownOperation = DBOperation.DELETE_ALL)
 public class MultiResourceItemWriterIT extends AbstractContextIT {
 
@@ -72,7 +73,7 @@ public class MultiResourceItemWriterIT extends AbstractContextIT {
      */
     @Autowired
     @Qualifier("multiResourceItemWriter")
-    private ItemWriter<BatchExcelRow> writer;
+    private ItemStreamWriter<BatchExcelRow> writer;
     private List<BatchExcelRow> items = new ArrayList<>();
 
     private StepExecution stepExecution;
@@ -83,9 +84,9 @@ public class MultiResourceItemWriterIT extends AbstractContextIT {
 
         if (!directory.exists()) {
             directory.mkdir();
-        } else {
-            cleanUp();
         }
+
+        cleanUp();
 
         items = new ArrayList<>();
         List<LocalDate> dates = new ArrayList<>(80);
@@ -123,13 +124,17 @@ public class MultiResourceItemWriterIT extends AbstractContextIT {
 
     public StepExecution getStepExecution() throws ParseException, IOException {
         Map<String, JobParameter> parameters = new HashMap<>();
+        Path templatePath = new ClassPathResource("template.xls").getFile().toPath();
+        Path outputPath = templatePath.getParent().getParent();
 
-        parameters.put("input.file.path", new JobParameter("train-list.properties"));
         parameters.put("date", new JobParameter(new SimpleDateFormat("dd/MM/yyyy").parse("01/01/2000")));
         parameters.put("station.a.name", new JobParameter("Liège-Guillemins"));
         parameters.put("station.b.name", new JobParameter("Brussels (Bruxelles)-Central"));
-        parameters.put("excel.output.path", new JobParameter("./output.xls"));
-        parameters.put("excel.input.template", new JobParameter(new ClassPathResource("template.xls").getFile().getAbsolutePath()));
+        parameters.put("excel.input.template", new JobParameter(templatePath.toString()));
+        parameters.put("excel.output.path", new JobParameter(outputPath.toString()));
+        parameters.put("excel.file.extension", new JobParameter("xls"));
+        parameters.put("excel.file.name", new JobParameter("output"));
+        parameters.put("language", new JobParameter(Language.EN.name()));
 
         stepExecution = MetaDataInstanceFactory.createStepExecution(new JobParameters(parameters));
 
@@ -137,28 +142,28 @@ public class MultiResourceItemWriterIT extends AbstractContextIT {
     }
 
     @Test
-    @Ignore // Never trigger mandatory listener, nor stream -> no other way than disabling this test
+    @Ignore //FIXME I get always an AccessDeniedException and I don't know why
     public void testWrite() throws Exception {
-        ResourceLocatorListener listener = new ResourceLocatorListener();
-        listener.beforeStep(stepExecution);
-        listener.beforeWrite(items);
+        ExecutionContext executionContext = new ExecutionContext();
+
+        writer.open(executionContext);
         writer.write(items);
+        writer.update(executionContext);
     }
 
     @After
     public void tearDown() throws InterruptedException {
+        writer.close();
         cleanUp();
     }
 
     private File[] getExcelFiles() {
         final File directory = new File(CURRENT_PATH);
 
-        File[] result = directory.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return pathname.getName().endsWith(EXCEL_FILE_EXTENSION) || pathname.getName().endsWith(OPEN_XML_FILE_EXTENSION);
-            }
-        });
+        File[] result = directory.listFiles(pathname ->
+                        pathname.getName().endsWith(EXCEL_FILE_EXTENSION) ||
+                                pathname.getName().endsWith(OPEN_XML_FILE_EXTENSION)
+        );
 
         return result != null ? result : new File[0];
     }
@@ -167,7 +172,7 @@ public class MultiResourceItemWriterIT extends AbstractContextIT {
         //-- We remove any result from the test
         for (File file : getExcelFiles()) {
             if (!file.delete()) {
-                file.delete();
+                file.deleteOnExit();
             }
         }
     }

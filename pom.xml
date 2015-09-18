@@ -80,16 +80,16 @@
 
         <version.spring>4.2.1.RELEASE</version.spring>
         <version.spring.batch>3.0.5.RELEASE</version.spring.batch>
-        <version.spring.data>1.9.0.RELEASE</version.spring.data>
+        <version.spring.data>1.8.2.RELEASE</version.spring.data>
         <version.spring.data.rest>2.3.2.RELEASE</version.spring.data.rest>
-        <version.spring.data.commons>1.11.0.RELEASE</version.spring.data.commons>
+        <version.spring.data.commons>1.10.2.RELEASE</version.spring.data.commons>
         <version.spring.hateoas>0.18.0.RELEASE</version.spring.hateoas>
         <version.spring.mock>2.0.8</version.spring.mock>
         <version.spring.boot>1.2.5.RELEASE</version.spring.boot>
         <version.spring.dbunit>1.4.0</version.spring.dbunit>
         <version.xbean.spring>3.16</version.xbean.spring>
         <version.hibernate.validator>5.2.1.Final</version.hibernate.validator>
-        <version.hibernate>5.0.1.Final</version.hibernate>
+        <version.hibernate>4.3.11.Final</version.hibernate>
         <version.eclipselink>2.5.1</version.eclipselink>
         <version.openjpa>2.2.2</version.openjpa>
         <version.querydsl>3.4.2</version.querydsl>

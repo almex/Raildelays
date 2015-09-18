@@ -66,11 +66,6 @@
                        processor="splitBeforeExcelSheetProcessor"
                        writer="excelSheetBeforeItemWriter"
                        commit-interval="1">
-
-                    <listeners merge="true">
-                        <!-- To compute file name of the Excel file after filtering -->
-                        <listener ref="resourceLocatorListener"/>
-                    </listeners>
                 </chunk>
             </tasklet>
         </step>
@@ -80,11 +75,6 @@
                        processor="splitAfterExcelSheetProcessor"
                        writer="excelSheetAfterItemWriter"
                        commit-interval="1">
-
-                    <listeners merge="true">
-                        <!-- To compute file name of the Excel file after filtering -->
-                        <listener ref="resourceLocatorListener"/>
-                    </listeners>
                 </chunk>
             </tasklet>
         </step>
