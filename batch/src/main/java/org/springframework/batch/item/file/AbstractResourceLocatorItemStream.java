@@ -60,7 +60,6 @@ public abstract class AbstractResourceLocatorItemStream<S extends ItemStream, T>
                 executionContext,
                 getExecutionContextKey(this.getClass().getSimpleName())
         );
-        ;
 
         resourceLocator.onOpen(resourceContext);
 
@@ -74,8 +73,8 @@ public abstract class AbstractResourceLocatorItemStream<S extends ItemStream, T>
             );
         }
 
-        if (resourceContext.hasChanged()) {
-            setResourceToDelegate(resourceContext.consumeResource());
+        if (resourceContext.containsResource()) {
+            setResourceToDelegate(resourceContext.getResource());
             delegate.open(executionContext);
             opened = true;
         }

@@ -28,7 +28,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.test.SimpleResourceAwareItemReaderItemStream;
+import org.springframework.batch.test.SimpleResourceAwareItemStream;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 
@@ -38,8 +38,8 @@ import java.util.List;
  * @author Almex
  */
 public class ResourceLocatorItemReaderItemStreamTest extends AbstractResourceLocatorItemStreamTest<
-        SimpleResourceAwareItemReaderItemStream,
-        ResourceLocatorItemReaderItemStream<SimpleResourceAwareItemReaderItemStream, String>
+        ResourceLocatorItemReaderItemStreamTest.SimpleResourceAwareItemReaderItemStream,
+        ResourceLocatorItemReaderItemStream<ResourceLocatorItemReaderItemStreamTest.SimpleResourceAwareItemReaderItemStream, String>
         > {
 
     @Before
@@ -95,6 +95,17 @@ public class ResourceLocatorItemReaderItemStreamTest extends AbstractResourceLoc
                 context.changeResource(new FileSystemResource(item));
                 once = false;
             }
+        }
+    }
+
+    public static class SimpleResourceAwareItemReaderItemStream
+            extends SimpleResourceAwareItemStream
+            implements ResourceAwareItemReaderItemStream<String> {
+
+
+        @Override
+        public String read() throws Exception {
+            return "a";
         }
     }
 }
