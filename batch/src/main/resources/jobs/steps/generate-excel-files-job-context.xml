@@ -338,7 +338,7 @@
           scope="step">
         <property name="filePrefix" value="#{jobParameters['excel.file.name']}"/>
         <property name="fileExtension" value=".#{jobParameters['excel.file.extension']}"/>
-        <property name="directory" value="#{jobParameters['excel.output.path']}"/>
+        <property name="directory" value="file:#{jobParameters['excel.output.path']}"/>
         <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
         <property name="resourceItemSearch" ref="resourceItemSearch"/>
     </bean>
