@@ -29,10 +29,11 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.file.AbstractItemCountingItemStreamItemWriter;
-import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.core.io.Resource;
 
 /**
+ * {@link ItemStream} capable of opening a stream based on a {@link ResourceLocator}.
+ *
  * @author Almex
  * @since 2.0
  */
@@ -50,8 +51,7 @@ public abstract class AbstractResourceLocatorItemStream<S extends ItemStream, T>
      * {@link ResourceContext}.
      * </p>
      * <p>
-     * If the delegate is an {@link AbstractItemCountingItemStreamItemWriter} or an
-     * {@link AbstractItemCountingItemStreamItemReader} then we set the current index with
+     * If the delegate is an {@link AbstractItemCountingItemStreamItemWriter} then we set the current index with
      * {@link ResourceContext#getCurrentIndex()}.
      * </p>
      */
@@ -66,10 +66,6 @@ public abstract class AbstractResourceLocatorItemStream<S extends ItemStream, T>
 
         if (delegate instanceof AbstractItemCountingItemStreamItemWriter) {
             ((AbstractItemCountingItemStreamItemWriter) delegate).setCurrentItemIndex(
-                    resourceContext.getCurrentIndex()
-            );
-        } else if (delegate instanceof AbstractItemCountingItemStreamItemReader) {
-            ((AbstractItemCountingItemStreamItemReader) delegate).setCurrentItemCount(
                     resourceContext.getCurrentIndex()
             );
         }

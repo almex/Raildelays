@@ -3,7 +3,10 @@ package org.springframework.batch.item.resource;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 
 /**
+ * {@link ResourceAwareItemReaderItemStream} capable of returning the current index of the item read.
+ *
  * @author Almex
+ * @since 1.1
  */
 public interface IndexedResourceAwareItemStreamReader<T> extends ResourceAwareItemReaderItemStream<T> {
 

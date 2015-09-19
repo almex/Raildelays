@@ -31,6 +31,7 @@ import java.util.Comparator;
 
 /**
  * @author Almex
+ * @since 1.2
  */
 public class SimpleResourceItemSearch<T extends Comparable<? super T>> implements ResourceItemSearch<T> {
 
@@ -40,6 +41,7 @@ public class SimpleResourceItemSearch<T extends Comparable<? super T>> implement
     public SimpleResourceItemSearch() {
     }
 
+    @Override
     public int indexOf(T item, Resource resource) throws Exception {
         int result = EOF;
 
@@ -60,6 +62,7 @@ public class SimpleResourceItemSearch<T extends Comparable<? super T>> implement
         return result;
     }
 
+    @Override
     public void setReader(IndexedResourceAwareItemStreamReader<T> reader) {
         this.reader = reader;
     }

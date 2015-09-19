@@ -27,11 +27,29 @@ package org.springframework.batch.item.resource;
 import org.springframework.core.io.Resource;
 
 /**
+ * Search the index of an item by reading a {@link Resource}
+ *
  * @author Almex
+ * @since 1.2
  */
 public interface ResourceItemSearch<T extends Comparable<? super T>> {
 
     int EOF = -1;
 
+    /**
+     * Return the index of an {@code item} by searching it in a {@code resource}
+     *
+     * @param item     item you are looking for
+     * @param resource resource which will be used by the reader
+     * @return the index of the {@code item} or {@link #EOF} if not found.
+     * @throws Exception in any case of error
+     */
     int indexOf(T item, Resource resource) throws Exception;
+
+    /**
+     * This reader should be used in the {@link #indexOf(Comparable, Resource)} method to do the search.
+     *
+     * @param reader for which we do not provide a {@code resource}
+     */
+    void setReader(IndexedResourceAwareItemStreamReader<T> reader);
 }
