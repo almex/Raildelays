@@ -35,6 +35,7 @@ import java.util.Comparator;
  */
 public class SimpleResourceItemSearch<T extends Comparable<? super T>> implements ResourceItemSearch<T> {
 
+    private IndexedResourceAwareItemStreamReader<? extends T> reader;
     protected Comparator<? super T> comparator = (lho, rho) -> {
         int result = 0;
 
@@ -46,7 +47,6 @@ public class SimpleResourceItemSearch<T extends Comparable<? super T>> implement
 
         return result;
     };
-    private IndexedResourceAwareItemStreamReader<? extends T> reader;
 
     public SimpleResourceItemSearch() {
     }

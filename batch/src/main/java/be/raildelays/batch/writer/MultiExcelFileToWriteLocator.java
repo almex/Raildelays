@@ -28,7 +28,6 @@ import be.raildelays.batch.ExcelFileUtils;
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.support.ResourceItemSearch;
 import be.raildelays.domain.xls.ExcelRow;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.CountingItemResourceLocator;
 import org.springframework.batch.item.file.ExcelSheetItemWriter;
@@ -37,11 +36,11 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 
 /**
  * @author Almex
- * @since 2.0
  */
 public class MultiExcelFileToWriteLocator extends CountingItemResourceLocator<ExcelRow> {
 
@@ -89,8 +88,8 @@ public class MultiExcelFileToWriteLocator extends CountingItemResourceLocator<Ex
                     }
                 }
             }
-        } catch (InvalidFormatException e) {
-            throw new ItemStreamException("Excel format not supported for this workbook!", e);
+        } catch (IOException e) {
+            throw new ItemStreamException("The directory cannot be resolved", e);
         } catch (Exception e) {
             throw new ItemStreamException("Cannot find content in your Excel file", e);
         }
