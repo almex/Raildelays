@@ -62,7 +62,6 @@ public class SimpleResourceItemSearch<T extends Comparable<? super T>> implement
         return result;
     }
 
-    @Override
     public void setReader(IndexedResourceAwareItemStreamReader<T> reader) {
         this.reader = reader;
     }

@@ -32,6 +32,9 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Almex
+ */
 @RunWith(BlockJUnit4ClassRunner.class)
 public class SortedItemStreamWriterTest extends AbstractFileTest {
 

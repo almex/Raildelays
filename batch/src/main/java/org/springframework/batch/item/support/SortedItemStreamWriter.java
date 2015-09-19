@@ -150,7 +150,7 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
                 }
 
                 if (index == null) {
-                    index = Long.valueOf(i++);
+                    index = (long) i++;
 
                     LOGGER.trace("Setting new index={}", index);
                 }
@@ -199,8 +199,9 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
                     || !tempFile.renameTo(outputFile)
                     || !backupFile.delete()
                     ) {
-                backupFile.renameTo(outputFile);
-                LOGGER.error("Commit failure: we were not able to delete the original file");
+                boolean renamed = backupFile.renameTo(outputFile);
+
+                LOGGER.error("Commit failure: we were not able to delete the original file (renamed={})", renamed);
             }
         }
     }

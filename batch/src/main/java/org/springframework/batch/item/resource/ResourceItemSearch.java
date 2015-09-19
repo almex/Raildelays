@@ -32,6 +32,7 @@ import org.springframework.core.io.Resource;
  * @author Almex
  * @since 1.2
  */
+@FunctionalInterface
 public interface ResourceItemSearch<T extends Comparable<? super T>> {
 
     int EOF = -1;
@@ -45,11 +46,4 @@ public interface ResourceItemSearch<T extends Comparable<? super T>> {
      * @throws Exception in any case of error
      */
     int indexOf(T item, Resource resource) throws Exception;
-
-    /**
-     * This reader should be used in the {@link #indexOf(Comparable, Resource)} method to do the search.
-     *
-     * @param reader for which we do not provide a {@code resource}
-     */
-    void setReader(IndexedResourceAwareItemStreamReader<T> reader);
 }
