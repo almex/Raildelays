@@ -240,7 +240,7 @@
     </bean>
 
     <bean id="resourceItemSearch"
-          class="be.raildelays.batch.support.SimpleResourceItemSearch"
+          class="org.springframework.batch.item.resource.SimpleResourceItemSearch"
           scope="step">
         <property name="reader">
             <bean class="org.springframework.batch.item.file.ExcelSheetItemReader">

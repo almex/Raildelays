@@ -22,16 +22,49 @@
  * IN THE SOFTWARE.
  */
 
-package be.raildelays.batch.support;
+package org.springframework.batch.item.resource;
 
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.io.Resource;
+
+import java.util.Comparator;
 
 /**
  * @author Almex
  */
-public interface ResourceItemSearch<T extends Comparable<? super T>> {
+public class SimpleResourceItemSearch<T extends Comparable<? super T>> implements ResourceItemSearch<T> {
 
-    int EOF = -1;
+    private IndexedResourceAwareItemStreamReader<? extends T> reader;
+    protected Comparator<? super T> comparator = Comparator.naturalOrder();
 
-    int indexOf(T item, Resource resource) throws Exception;
+    public SimpleResourceItemSearch() {
+    }
+
+    public int indexOf(T item, Resource resource) throws Exception {
+        int result = EOF;
+
+        this.reader.setResource(resource);
+        reader.open(new ExecutionContext());
+
+        try {
+            for (T object = reader.read(); object != null; object = reader.read()) {
+                if (comparator.compare(item, object) == 0) {
+                    result = reader.getCurrentIndex();
+                    break;
+                }
+            }
+        } finally {
+            reader.close();
+        }
+
+        return result;
+    }
+
+    public void setReader(IndexedResourceAwareItemStreamReader<T> reader) {
+        this.reader = reader;
+    }
+
+    public void setComparator(Comparator<? super T> comparator) {
+        this.comparator = comparator;
+    }
 }

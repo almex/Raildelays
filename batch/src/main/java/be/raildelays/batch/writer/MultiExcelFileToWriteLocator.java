@@ -26,12 +26,12 @@ package be.raildelays.batch.writer;
 
 import be.raildelays.batch.ExcelFileUtils;
 import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.batch.support.ResourceItemSearch;
 import be.raildelays.domain.xls.ExcelRow;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.ExcelSheetItemWriter;
 import org.springframework.batch.item.resource.CountingItemResourceLocator;
 import org.springframework.batch.item.resource.ResourceContext;
+import org.springframework.batch.item.resource.ResourceItemSearch;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
