@@ -39,29 +39,11 @@
 /service-layer/.classpath
 /service-layer/.project
 /repository-layer/.springBeans
-/service-layer/initdata.tmp
-/service-layer/initdata.lck
-/service-layer/initdata.log
-/service-layer/initdata.properties
-/service-layer/initdata.script
-/service-layer/database.tmp
-/service-layer/database.lck
-/service-layer/database.log
-/service-layer/database.properties
-/service-layer/database.script
-/repository-layer/database.properties
-/repository-layer/database.log
-/repository-layer/database.lck
-/repository-layer/database.script
-/repository-layer/database.tmp
-/repository-layer/derby.log
-/service-layer/derby.log
 /batch-layer/.settings
 /batch-layer/target
 /batch-layer/.classpath
 /batch-layer/.project
 /batch-layer/.springBeans
-/batch-layer/derby.log
 /common-layer/bin
 /domain-layer/bin
 /httpclient-layer/bin
@@ -74,37 +56,11 @@
 /java-fx-layer/bin
 /service-layer/bin
 /target
-/batch-layer/database
-/batch-layer/output.dat
-/service-layer/*.tlog
-/service-layer/*.tlog
-database
 
 .externalToolBuilders
 
 target
 
-data
-
-/batch-layer/*.xlsx
-
-/batch-layer/logs
-
-/batch-layer/traces.log
-
-/batch-layer/*.log
-/batch-layer/*.log
-/batch-layer/*.log
-
-/repository-layer/logs
-
 .idea
 
 *.iml
-
-/logs
-
-*.log
-
-output.xlsx
-*.dat
