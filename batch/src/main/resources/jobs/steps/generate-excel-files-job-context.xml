@@ -164,7 +164,7 @@
 
 
     <bean id="readAllExcelFiles"
-          class="org.springframework.batch.item.file.ResourceLocatorItemReaderItemStream"
+          class="org.springframework.batch.item.resource.ResourceLocatorItemReaderItemStream"
           scope="step">
         <property name="delegate">
             <bean class="org.springframework.batch.item.file.ExcelSheetItemReader">
@@ -180,7 +180,7 @@
         </property>
         <property name="name" value="readAllExcelFiles"/>
         <property name="resourceLocator">
-            <bean class="org.springframework.batch.item.file.MultiResourceToReadLocator">
+            <bean class="org.springframework.batch.item.resource.MultiResourceToReadLocator">
                 <property name="directory" value="file:#{jobParameters['excel.output.path']}"/>
                 <property name="filter" value="*.#{jobParameters['excel.file.extension']}"/>
             </bean>
@@ -283,7 +283,7 @@
     </bean>
 
     <bean id="multiResourceItemWriter"
-          class="org.springframework.batch.item.file.ResourceLocatorItemWriterItemStream"
+          class="org.springframework.batch.item.resource.ResourceLocatorItemWriterItemStream"
           scope="step">
         <property name="delegate" ref="sortedItemWriter"/>
         <property name="name" value="multiResourceItemWriter"/>

@@ -26,8 +26,8 @@ package be.raildelays.batch.writer;
 
 import be.raildelays.batch.ExcelFileUtils;
 import be.raildelays.domain.xls.ExcelRow;
-import org.springframework.batch.item.file.CountingItemResourceLocator;
-import org.springframework.batch.item.file.ResourceContext;
+import org.springframework.batch.item.resource.CountingItemResourceLocator;
+import org.springframework.batch.item.resource.ResourceContext;
 import org.springframework.core.io.FileSystemResource;
 
 import java.io.File;

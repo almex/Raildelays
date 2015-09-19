@@ -25,7 +25,7 @@
 package be.raildelays.batch.support;
 
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.file.IndexedResourceAwareItemStreamReader;
+import org.springframework.batch.item.resource.IndexedResourceAwareItemStreamReader;
 import org.springframework.core.io.Resource;
 
 import java.util.Comparator;

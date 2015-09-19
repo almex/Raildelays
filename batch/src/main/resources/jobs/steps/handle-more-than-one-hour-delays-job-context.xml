@@ -104,7 +104,7 @@
     </bean>
 
     <bean id="allExcelFilesItemReader"
-          class="org.springframework.batch.item.file.ResourceLocatorItemReaderItemStream"
+          class="org.springframework.batch.item.resource.ResourceLocatorItemReaderItemStream"
           scope="step">
         <property name="delegate">
             <bean class="org.springframework.batch.item.file.ExcelSheetItemReader"
@@ -121,7 +121,7 @@
         </property>
         <property name="name" value="allExcelFilesItemReader"/>
         <property name="resourceLocator">
-            <bean class="org.springframework.batch.item.file.MultiResourceToReadLocator">
+            <bean class="org.springframework.batch.item.resource.MultiResourceToReadLocator">
                 <property name="directory" value="file:#{jobParameters['excel.output.path']}"/>
                 <property name="filter" value="*.#{jobParameters['excel.file.extension']}"/>
             </bean>
@@ -184,7 +184,7 @@
     <!-- ================================================================================================== -->
 
     <bean id="oneHourDelayItemWriter"
-          class="org.springframework.batch.item.file.ResourceLocatorItemWriterItemStream"
+          class="org.springframework.batch.item.resource.ResourceLocatorItemWriterItemStream"
           scope="step">
         <property name="resourceLocator">
             <bean class="be.raildelays.batch.writer.ExcelRowToWriteResourceLocator">

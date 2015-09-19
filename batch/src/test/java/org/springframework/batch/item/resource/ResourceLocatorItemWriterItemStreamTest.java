@@ -22,63 +22,69 @@
  * IN THE SOFTWARE.
  */
 
-package org.springframework.batch.item.file;
+package org.springframework.batch.item.resource;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.test.SimpleResourceAwareItemStream;
+import org.springframework.batch.test.SimpleResourceAwareItemWriterItemStream;
 import org.springframework.core.io.FileSystemResource;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * @author Almex
  */
-@RunWith(BlockJUnit4ClassRunner.class)
-public abstract class AbstractResourceLocatorItemStreamTest<
-        Delegate extends SimpleResourceAwareItemStream,
-        Delegator extends AbstractResourceLocatorItemStream<Delegate, String>
+public class ResourceLocatorItemWriterItemStreamTest extends AbstractResourceLocatorItemStreamTest<
+        SimpleResourceAwareItemWriterItemStream,
+        ResourceLocatorItemWriterItemStream<SimpleResourceAwareItemWriterItemStream, String>
         > {
-
-    public static final String KEY = "key";
-    protected Delegator delegator;
-    protected Delegate delegate;
 
 
     @Before
-    public abstract void setUp() throws Exception;
+    public void setUp() throws Exception {
+        delegator = new ResourceLocatorItemWriterItemStream<>();
+        delegate = new SimpleResourceAwareItemWriterItemStream();
+        delegator.setDelegate(delegate);
+        delegator.setName("foo");
+    }
+
+    @Override
+    public String doReadOrWrite(List<String> items) throws Exception {
+        delegator.write(items);
+
+        return null;
+    }
 
     /**
-     * We expect that the onOpen() method build a path by by retrieving a property from the execution context.
+     * We expect that the onWrite() method build a path by appending items into one String.
      */
     @Test
-    public void testOpen() throws Exception {
+    public void testWrite() throws Exception {
         ExecutionContext executionContext = new ExecutionContext();
 
-        executionContext.put(KEY, "foo");
         delegator.setResourceLocator(new CountingItemResourceLocator<String>() {
             @Override
-            public void onOpen(ResourceContext context) throws ItemStreamException {
-                context.changeResource(new FileSystemResource(executionContext.getString(KEY)));
+            public void onWrite(String item, ResourceContext context) throws ItemStreamException {
+                context.changeResource(new FileSystemResource(item));
             }
         });
 
         delegator.open(executionContext);
+        delegator.write(Arrays.asList("a", "b", "c"));
+        delegator.update(executionContext);
 
-        Assert.assertEquals("foo", delegate.getResource().getFile().getPath());
-    }
+        try {
+            Assert.assertEquals("c", delegate.getResource().getFile().getPath());
+        } catch (IOException e) {
+            Assert.fail(e.getMessage());
+        }
 
-    @After
-    public void tearDown() {
         delegator.close();
     }
-
-    public abstract String doReadOrWrite(List<String> items) throws Exception;
 
 }

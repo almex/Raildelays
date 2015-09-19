@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.ReaderNotOpenException;
+import org.springframework.batch.item.resource.IndexedResourceAwareItemStreamReader;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;

@@ -22,12 +22,13 @@
  * IN THE SOFTWARE.
  */
 
-package org.springframework.batch.item.file;
+package org.springframework.batch.item.resource;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamSupport;
+import org.springframework.batch.item.file.AbstractItemCountingItemStreamItemWriter;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.core.io.Resource;
 

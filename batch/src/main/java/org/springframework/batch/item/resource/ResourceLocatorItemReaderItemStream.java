@@ -22,9 +22,10 @@
  * IN THE SOFTWARE.
  */
 
-package org.springframework.batch.item.file;
+package org.springframework.batch.item.resource;
 
 import org.springframework.batch.item.ItemStreamReader;
+import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.core.io.Resource;
 
 /**
@@ -32,7 +33,7 @@ import org.springframework.core.io.Resource;
  * determine when to set the {@code Resource} of our delegate.
  * <p>
  * Any {@link ResourceLocator} that would be used by this {@code ItemStreamReader} should implement at least
- * {@link ResourceLocator#onOpen(ResourceContext)} due to the fact that a {@link ResourceAwareItemReaderItemStream} 
+ * {@link ResourceLocator#onOpen(ResourceContext)} due to the fact that a {@link ResourceAwareItemReaderItemStream}
  * cannot be initiated without having a {@link Resource} at the opening of the stream.
  * </p>
  *

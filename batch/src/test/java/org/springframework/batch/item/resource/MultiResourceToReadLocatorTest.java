@@ -22,7 +22,7 @@
  * IN THE SOFTWARE.
  */
 
-package org.springframework.batch.item.file;
+package org.springframework.batch.item.resource;
 
 import org.junit.Assert;
 import org.junit.Before;

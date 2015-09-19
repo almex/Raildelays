@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.ExcelSheetItemReader;
-import org.springframework.batch.item.file.ResourceContext;
+import org.springframework.batch.item.resource.ResourceContext;
 import org.springframework.core.io.FileSystemResource;
 
 import java.io.File;

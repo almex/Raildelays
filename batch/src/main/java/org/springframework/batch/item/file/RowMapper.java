@@ -1,6 +1,7 @@
 package org.springframework.batch.item.file;
 
 import org.apache.poi.ss.usermodel.Row;
+import org.springframework.batch.item.resource.IndexedResourceAwareItemStreamReader;
 
 /**
  * This interface allow you to provide a valid implementation to map an Excel {@link org.apache.poi.ss.usermodel.Row}

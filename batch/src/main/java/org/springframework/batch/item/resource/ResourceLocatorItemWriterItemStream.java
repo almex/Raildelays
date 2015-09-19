@@ -22,9 +22,10 @@
  * IN THE SOFTWARE.
  */
 
-package org.springframework.batch.item.file;
+package org.springframework.batch.item.resource;
 
 import org.springframework.batch.item.ItemStreamWriter;
+import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
 import org.springframework.core.io.Resource;
 
 import java.util.ArrayList;

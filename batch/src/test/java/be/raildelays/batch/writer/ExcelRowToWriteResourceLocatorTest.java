@@ -30,7 +30,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.file.ResourceContext;
+import org.springframework.batch.item.resource.ResourceContext;
 
 import java.io.File;
 import java.time.LocalDate;
