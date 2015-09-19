@@ -29,7 +29,9 @@ import java.util.*;
  * Only the {@link ItemStream#open(ExecutionContext)} method is used to have a
  * reference to the {@link ExecutionContext} during {@link SortedItemStreamWriter#write(List)}.
  */
-public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStream<T>, InitializingBean {
+public class SortedItemStreamWriter<T>
+        extends ItemStreamSupport
+        implements ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SortedItemStreamWriter.class);
     protected ResourceAwareItemWriterItemStream<? super T> writer;
@@ -38,7 +40,7 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
     protected Comparator<? super T> comparator;
     private Resource outputResource;
     private ExecutionContext executionContext;
-    private boolean createBackupFile = false;
+    private boolean useTemporaryFile = false;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -66,16 +68,6 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
         }
 
         commit();
-    }
-
-    @Override
-    public void close() throws ItemStreamException {
-
-    }
-
-    @Override
-    public void update(ExecutionContext executionContext) throws ItemStreamException {
-
     }
 
     private void sort(List<T> allItems) {
@@ -167,7 +159,7 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
     }
 
     private void initializeStreams() throws Exception {
-        if (createBackupFile) {
+        if (useTemporaryFile) {
             outputResource = new FileSystemResource(File.createTempFile(resource.getFilename(), ".tmp", resource.getFile().getParentFile()));
         } else {
             outputResource = resource;
@@ -189,7 +181,7 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
     }
 
     private void commit() throws Exception {
-        if (createBackupFile) {
+        if (useTemporaryFile) {
             File tempFile = outputResource.getFile();
             File outputFile = resource.getFile();
             File directory = outputFile.getParentFile();
@@ -207,7 +199,7 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
     }
 
     private void rollback(Exception e) throws Exception {
-        if (createBackupFile && !outputResource.getFile().delete()) {
+        if (useTemporaryFile && !outputResource.getFile().delete()) {
             throw new IllegalStateException("Rollback failure: we were not able to delete the temporary file", e);
         } else {
             throw e;
@@ -229,5 +221,9 @@ public class SortedItemStreamWriter<T> implements ResourceAwareItemWriterItemStr
 
     public void setComparator(Comparator<? super T> comparator) {
         this.comparator = comparator;
+    }
+
+    public void setUseTemporaryFile(boolean useTemporaryFile) {
+        this.useTemporaryFile = useTemporaryFile;
     }
 }

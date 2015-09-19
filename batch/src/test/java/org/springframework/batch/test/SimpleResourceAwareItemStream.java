@@ -24,8 +24,7 @@
 
 package org.springframework.batch.test;
 
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.support.ResourceAwareItemStream;
 import org.springframework.core.io.Resource;
 
@@ -33,7 +32,7 @@ import org.springframework.core.io.Resource;
  * @author Almex
  * @since 1.2
  */
-public class SimpleResourceAwareItemStream implements ResourceAwareItemStream {
+public class SimpleResourceAwareItemStream extends ItemStreamSupport implements ResourceAwareItemStream {
 
     private Resource resource;
 
@@ -44,20 +43,5 @@ public class SimpleResourceAwareItemStream implements ResourceAwareItemStream {
     @Override
     public void setResource(Resource resource) {
         this.resource = resource;
-    }
-
-    @Override
-    public void open(ExecutionContext executionContext) throws ItemStreamException {
-
-    }
-
-    @Override
-    public void update(ExecutionContext executionContext) throws ItemStreamException {
-
-    }
-
-    @Override
-    public void close() throws ItemStreamException {
-
     }
 }
