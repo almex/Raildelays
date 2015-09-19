@@ -108,7 +108,10 @@ public class ResourceLocatorItemReaderItemStreamTest extends AbstractResourceLoc
     public void testReadSetResourceBeforeOnOpen() throws Exception {
         ExecutionContext executionContext = new ExecutionContext();
         // By matching the name prefix used to store key in the execution context we can initialize the resource context
-        ResourceContext resourceContext = new ResourceContext(executionContext, "foo.ResourceLocatorItemReaderItemStream");
+        ResourceContext resourceContext = new ResourceContext(
+                executionContext,
+                "foo." + ResourceLocatorItemReaderItemStream.class.getSimpleName()
+        );
 
         resourceContext.changeResource(new ClassPathResource(EXCEL_FILE_NAME));
 
@@ -126,12 +129,19 @@ public class ResourceLocatorItemReaderItemStreamTest extends AbstractResourceLoc
     }
 
     /**
-     * We expect to read nothing despite the fact that a resource was located onRead() because we had noting to read
-     * onOpen(). So, the onRead() event was never triggered
+     * We expect to read a resource that was located onRead(). To do so we read first another resource then we change
+     * via onRead() (we need two read).
      */
     @Test(timeout = 1000L)
     public void testReadWResourceOnRead() throws Exception {
         ExecutionContext executionContext = new ExecutionContext();
+        // By matching the name prefix used to store key in the execution context we can initialize the resource context
+        ResourceContext resourceContext = new ResourceContext(
+                executionContext,
+                "foo." + ResourceLocatorItemReaderItemStream.class.getSimpleName()
+        );
+
+        resourceContext.setResource(new ClassPathResource(EXCEL_FILE_NAME));
 
         delegator.setResourceLocator(new CountingItemResourceLocator<String>() {
             @Override
@@ -141,9 +151,10 @@ public class ResourceLocatorItemReaderItemStreamTest extends AbstractResourceLoc
         });
         delegator.open(executionContext);
         delegator.read();
+        delegator.read();
         delegator.update(executionContext);
 
-        Assert.assertNull(delegate.getResource());
+        Assert.assertEquals("a", delegate.getResource().getFilename());
     }
 
     public static class SimpleResourceAwareItemReaderItemStream
