@@ -11,6 +11,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.Indexed;
+import org.springframework.batch.item.file.mapping.PassThroughLineMapper;
 import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -140,6 +141,39 @@ public class SortedItemStreamWriterTest extends AbstractFileTest {
     public void testWriteWithTemporaryFile() throws Exception {
         sortedItemStreamWriter.setUseTemporaryFile(true);
         sortedItemStreamWriter.write(items);
+
+        assertFile();
+        assertSequence("abcdefgh");
+    }
+
+    /**
+     * We expect that if we don't use an item of type {@link org.springframework.batch.item.ItemIndexAware} the index
+     * is determined by the order of the reading.
+     */
+    @Test
+    public void testWriteNonItemIndexAware() throws Exception {
+        ExecutionContext executionContext = MetaDataInstanceFactory.createStepExecution().getExecutionContext();
+        SortedItemStreamWriter<String> sortedItemStreamWriter = new SortedItemStreamWriter<>();
+        FlatFileItemWriter<String> writer = new FlatFileItemWriter<>();
+        FlatFileItemReader<String> reader = new FlatFileItemReader<>();
+
+        writer.setName("test");
+        writer.setResource(new FileSystemResource(CURRENT_PATH));
+        writer.setLineAggregator(new PassThroughLineAggregator<>());
+        writer.afterPropertiesSet();
+
+        reader.setName("test");
+        reader.setResource(new FileSystemResource(CURRENT_PATH));
+        reader.setLineMapper(new PassThroughLineMapper());
+        reader.afterPropertiesSet();
+
+        sortedItemStreamWriter.setResource(new FileSystemResource(FILE_DESTINATION_PATH));
+        sortedItemStreamWriter.setReader(reader);
+        sortedItemStreamWriter.setWriter(writer);
+        sortedItemStreamWriter.afterPropertiesSet();
+        sortedItemStreamWriter.open(executionContext);
+
+        sortedItemStreamWriter.write(Arrays.asList("d", "g", "f", "a"));
 
         assertFile();
         assertSequence("abcdefgh");

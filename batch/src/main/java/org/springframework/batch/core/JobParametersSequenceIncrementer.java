@@ -16,7 +16,7 @@ public class JobParametersSequenceIncrementer implements JobParametersIncremente
      * For legacy support we use the same name as the default one provided by
      * {@link org.springframework.batch.core.launch.support.RunIdIncrementer}
      */
-    private static final String INCREMENTER_PARAMETER_NAME = "run.id";
+    public static final String INCREMENTER_PARAMETER_NAME = "run.id";
 
     private DataFieldMaxValueIncrementer sequence;
 
