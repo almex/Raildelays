@@ -4,7 +4,11 @@ import org.apache.poi.ss.usermodel.Row;
 import org.springframework.batch.item.ParseException;
 
 /**
+ * Exception thrown when a mapping failed during a read.
+ *
  * @author Almex
+ * @since 1.2
+ * @see RowMapper
  */
 public class RowMappingException extends ParseException {
 
@@ -23,7 +27,7 @@ public class RowMappingException extends ParseException {
         this.lineNumber = lineNumber;
     }
 
-    public RowMappingException(String message, Throwable cause, Row row, int lineNumber) {
+    public RowMappingException(String message, Row row, int lineNumber, Throwable cause) {
         super("Mapping error: '" + message + "' at lineNumber=" + lineNumber + ", rowNum=" + (row != null ? row.getRowNum() : "null"), cause);
         this.row = row;
         this.lineNumber = lineNumber;
