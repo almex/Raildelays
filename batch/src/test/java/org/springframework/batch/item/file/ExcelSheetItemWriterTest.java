@@ -60,9 +60,12 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
         writer.setRowAggregator(new ExcelRowAggregator());
         writer.setName("test");
         writer.setRowsToSkip(21);
+        writer.setSheetIndex(0);
+        writer.setShouldDeleteIfExists(false);
+        writer.setUseItemIndex(true);
+        writer.setCurrentItemIndex(0);
         writer.setMaxItemCount(40);
         writer.afterPropertiesSet();
-
 
         items = new ArrayList<>();
 

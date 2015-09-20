@@ -12,6 +12,10 @@ import java.util.List;
 
 /**
  * @author Almex
+ * @see #setCurrentItemIndex(int)
+ * @see #setMaxItemCount(int)
+ * @implSpec This implementation is not thread-safe
+ * @since 1.1
  */
 public abstract class AbstractItemCountingItemStreamItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 
@@ -124,11 +128,6 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
 
     }
 
-
-    public int getCurrentItemCount() {
-        return currentItemCount;
-    }
-
     /**
      * The flag that determines whether to save internal state for restarts.
      *
@@ -151,7 +150,7 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
         this.saveState = saveState;
     }
 
-    public int getCurrentItemIndex() {
+    protected int getCurrentItemIndex() {
         return currentItemIndex;
     }
 
@@ -168,14 +167,10 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
         this.currentItemIndex = itemIndex;
     }
 
-    public int getMaxItemCount() {
-        return maxItemCount;
-    }
-
     /**
      * The maximum number of the items to be write. If the
      * {@link org.springframework.batch.item.ExecutionContext} contains a key
-     * <code>[name].read.count.max</code> (where <code>[name]</code> is the name
+     * <code>[name].write.count.max</code> (where <code>[name]</code> is the name
      * of this component) the value from the {@link org.springframework.batch.item.ExecutionContext} will be
      * used in preference.
      *
