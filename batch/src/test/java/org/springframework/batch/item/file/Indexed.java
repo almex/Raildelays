@@ -8,7 +8,7 @@ import org.springframework.batch.item.ItemIndexAware;
  *
  * @author Almex
  */
-public class Indexed implements ItemIndexAware, ItemCountAware, Comparable {
+public class Indexed implements ItemIndexAware, ItemCountAware, Comparable<Indexed> {
 
     private String value;
     private Long index;
@@ -45,7 +45,7 @@ public class Indexed implements ItemIndexAware, ItemCountAware, Comparable {
     }
 
     @Override
-    public int compareTo(Object o) {
+    public int compareTo(Indexed o) {
         int result = 1;
 
         if (o != null) {

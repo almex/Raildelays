@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -60,6 +61,7 @@ public class SortedItemStreamWriterTest extends AbstractFileTest {
 
         sortedItemStreamWriter = new SortedItemStreamWriter<>();
         sortedItemStreamWriter.setResource(new FileSystemResource(FILE_DESTINATION_PATH));
+        sortedItemStreamWriter.setComparator(Comparator.<Indexed>naturalOrder());
         sortedItemStreamWriter.setReader(reader);
         sortedItemStreamWriter.setWriter(writer);
         sortedItemStreamWriter.afterPropertiesSet();
@@ -116,14 +118,14 @@ public class SortedItemStreamWriterTest extends AbstractFileTest {
     }
 
     /**
-     * We expect to write all letters in the right order but some of them were replacing.
+     * We expect to write all letters in the right order but with some of them were replaced.
      * index    : 0 1 2 3
      * text.txt : c b h e
      * this     : d g f a
      */
     @Test
     public void testWriteIndexed() throws Exception {
-        items.get(1).setIndex(1L); // 'g' replace 'c'
+        items.get(1).setIndex(1L); // 'g' replace 'b'
 
         sortedItemStreamWriter.write(items);
 

@@ -29,7 +29,7 @@ import java.util.*;
  * Only the {@link ItemStream#open(ExecutionContext)} method is used to have a
  * reference to the {@link ExecutionContext} during {@link SortedItemStreamWriter#write(List)}.
  */
-public class SortedItemStreamWriter<T>
+public class SortedItemStreamWriter<T extends Comparable<T>>
         extends ItemStreamSupport
         implements ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
@@ -37,7 +37,7 @@ public class SortedItemStreamWriter<T>
     protected ResourceAwareItemWriterItemStream<? super T> writer;
     protected ResourceAwareItemReaderItemStream<? extends T> reader;
     protected Resource resource;
-    protected Comparator<? super T> comparator;
+    protected Comparator<? super T> comparator = Comparator.<T>naturalOrder();
     private Resource outputResource;
     private ExecutionContext executionContext;
     private boolean useTemporaryFile = false;
@@ -219,6 +219,10 @@ public class SortedItemStreamWriter<T>
         this.reader = reader;
     }
 
+    /**
+     * @param comparator specify the comparison used to sort all items. By default we use the
+     *                   {@linkplain Comparator#naturalOrder() natural order}.
+     */
     public void setComparator(Comparator<? super T> comparator) {
         this.comparator = comparator;
     }
