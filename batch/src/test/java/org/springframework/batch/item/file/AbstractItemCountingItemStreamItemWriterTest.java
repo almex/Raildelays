@@ -5,7 +5,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemIndexAware;
 import org.springframework.batch.item.ItemStreamException;
 
 import java.util.Arrays;
@@ -130,22 +129,4 @@ public class AbstractItemCountingItemStreamItemWriterTest {
         Assert.assertEquals("abcdef", writer.toString());
     }
 
-    private class Indexed implements ItemIndexAware {
-
-        private String value;
-
-        public Indexed(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return value;
-        }
-
-        @Override
-        public Long getIndex() {
-            return (long) value.hashCode();
-        }
-    }
 }

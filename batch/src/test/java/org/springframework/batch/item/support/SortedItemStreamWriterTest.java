@@ -10,7 +10,7 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.FlatFileItemWriter;
-import org.springframework.batch.item.file.mapping.PassThroughLineMapper;
+import org.springframework.batch.item.file.Indexed;
 import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -25,6 +25,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * @author Almex
@@ -34,14 +35,14 @@ public class SortedItemStreamWriterTest extends AbstractFileTest {
 
     public static final String FILE_DESTINATION_PATH = "." + File.separator + "text.txt";
 
-    private SortedItemStreamWriter<String> sortedItemStreamWriter;
+    private SortedItemStreamWriter<Indexed> sortedItemStreamWriter;
 
-    private List<String> items = new ArrayList<>();
+    private List<Indexed> items = new ArrayList<>();
 
     @Before
     public void setUp() throws Exception {
-        FlatFileItemWriter<String> writer = new FlatFileItemWriter<>();
-        FlatFileItemReader<String> reader = new FlatFileItemReader<>();
+        FlatFileItemWriter<Indexed> writer = new FlatFileItemWriter<>();
+        FlatFileItemReader<Indexed> reader = new FlatFileItemReader<>();
         ExecutionContext executionContext = MetaDataInstanceFactory.createStepExecution().getExecutionContext();
 
         cleanUp();
@@ -54,7 +55,7 @@ public class SortedItemStreamWriterTest extends AbstractFileTest {
 
         reader.setName("test");
         reader.setResource(new FileSystemResource(CURRENT_PATH));
-        reader.setLineMapper(new PassThroughLineMapper());
+        reader.setLineMapper((line, lineNumber) -> new Indexed(line));
         reader.afterPropertiesSet();
 
         sortedItemStreamWriter = new SortedItemStreamWriter<>();
@@ -64,7 +65,17 @@ public class SortedItemStreamWriterTest extends AbstractFileTest {
         sortedItemStreamWriter.afterPropertiesSet();
         sortedItemStreamWriter.open(executionContext);
 
-        items = Arrays.asList("z", "d", "c", "g", "h");
+        items = Arrays.asList(new Indexed("d"), new Indexed("g"), new Indexed("f"), new Indexed("a"));
+    }
+
+    private static void assertSequence(String expected) throws IOException {
+        StringBuilder actual = new StringBuilder();
+
+        try (Stream<String> stream = Files.lines(Paths.get(FILE_DESTINATION_PATH))) {
+            stream.forEach(actual::append);
+        }
+
+        Assert.assertEquals(expected, actual.toString());
     }
 
     public void copyFile() throws IOException {
@@ -93,18 +104,39 @@ public class SortedItemStreamWriterTest extends AbstractFileTest {
         cleanUp();
     }
 
+    /**
+     * We expect to write all letters in the right order.
+     */
     @Test
     public void testWrite() throws Exception {
         sortedItemStreamWriter.write(items);
 
         assertFile();
+        assertSequence("abcdefgh");
     }
 
+    /**
+     * We expect to write all letters in the right order but some of them were replacing.
+     */
+    @Test
+    public void testWriteIndexed() throws Exception {
+        items.get(1).setIndex(1L); // 'g' replace 'b'
+
+        sortedItemStreamWriter.write(items);
+
+        assertFile();
+        assertSequence("acdefgh");
+    }
+
+    /**
+     * We expect to write all letters in the right order and using temporary file.
+     */
     @Test
     public void testWriteWithTemporaryFile() throws Exception {
         sortedItemStreamWriter.setUseTemporaryFile(true);
         sortedItemStreamWriter.write(items);
 
         assertFile();
+        assertSequence("abcdefgh");
     }
 }
