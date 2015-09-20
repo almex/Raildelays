@@ -36,6 +36,14 @@ public class Indexed implements ItemIndexAware, ItemCountAware, Comparable {
         this.index = index;
     }
 
+    /**
+     * index is zero-based but counting start at 1.
+     */
+    @Override
+    public void setItemCount(int count) {
+        setIndex((long) count - 1);
+    }
+
     @Override
     public int compareTo(Object o) {
         int result = 1;
@@ -45,10 +53,5 @@ public class Indexed implements ItemIndexAware, ItemCountAware, Comparable {
         }
 
         return result;
-    }
-
-    @Override
-    public void setItemCount(int count) {
-        setIndex((long) count);
     }
 }

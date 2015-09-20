@@ -117,10 +117,13 @@ public class SortedItemStreamWriterTest extends AbstractFileTest {
 
     /**
      * We expect to write all letters in the right order but some of them were replacing.
+     * index    : 0 1 2 3
+     * text.txt : c b h e
+     * this     : d g f a
      */
     @Test
     public void testWriteIndexed() throws Exception {
-        items.get(1).setIndex(1L); // 'g' replace 'b'
+        items.get(1).setIndex(1L); // 'g' replace 'c'
 
         sortedItemStreamWriter.write(items);
 

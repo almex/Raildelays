@@ -131,8 +131,8 @@ public class SortedItemStreamWriter<T>
         try {
             reader.open(executionContext);
 
-            int i = 0;
-            for (T item = reader.read(); item != null; item = reader.read()) {
+            long i = 0;
+            for (T item = reader.read(); item != null; item = reader.read(), i++) {
                 Long index = null;
 
                 if (item instanceof ItemIndexAware) {
@@ -142,7 +142,7 @@ public class SortedItemStreamWriter<T>
                 }
 
                 if (index == null) {
-                    index = (long) i++;
+                    index = i;
 
                     LOGGER.trace("Setting new index={}", index);
                 }
