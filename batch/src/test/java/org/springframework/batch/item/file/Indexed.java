@@ -1,5 +1,6 @@
 package org.springframework.batch.item.file;
 
+import org.springframework.batch.item.ItemCountAware;
 import org.springframework.batch.item.ItemIndexAware;
 
 /**
@@ -7,13 +8,18 @@ import org.springframework.batch.item.ItemIndexAware;
  *
  * @author Almex
  */
-public class Indexed implements ItemIndexAware, Comparable {
+public class Indexed implements ItemIndexAware, ItemCountAware, Comparable {
 
     private String value;
     private Long index;
 
     public Indexed(String value) {
         this.value = value;
+    }
+
+    public Indexed(String value, Long index) {
+        this.value = value;
+        this.index = index;
     }
 
     @Override
@@ -39,5 +45,10 @@ public class Indexed implements ItemIndexAware, Comparable {
         }
 
         return result;
+    }
+
+    @Override
+    public void setItemCount(int count) {
+        setIndex((long) count);
     }
 }

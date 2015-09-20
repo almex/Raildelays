@@ -72,6 +72,23 @@ public class AbstractItemCountingItemStreamItemWriterTest {
     }
 
     /**
+     * We expect to write indexed items. So, there is no change in behavior in this abstract class.
+     */
+    @Test
+    public void testWriteWithReplace() throws Exception {
+        ExecutionContext context = new ExecutionContext();
+
+        writer.open(context);
+        writer.write(Arrays.asList(
+                new Indexed("a", 0L), new Indexed("b", 1L), new Indexed("c", 2L),
+                new Indexed("d", 3L), new Indexed("e", 4L), new Indexed("f", 5L)
+        ));
+        writer.update(context);
+
+        Assert.assertEquals("abcde", writer.toString());
+    }
+
+    /**
      * We expect to test a restart when we save state.
      */
     @Test
