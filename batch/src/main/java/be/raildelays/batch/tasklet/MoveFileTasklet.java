@@ -24,7 +24,6 @@
 
 package be.raildelays.batch.tasklet;
 
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
@@ -35,12 +34,14 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 /**
- *
+ * Move a file from a {@code source} to a {@code destination}. If the {@code destination} denote a directory then we
+ * don't change the file name, otherwise it may be changed by the caller.
+ * If the {@code destination} is {@code null} then it's equivalent to delete the {@code source}.
  *
  * @author Almex
  * @since 1.2
@@ -58,36 +59,38 @@ public class MoveFileTasklet implements Tasklet, InitializingBean {
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        File file = source.getFile();
+        Path sourcePath = source.getFile().toPath();
 
         // Moving to a null destination is equivalent to delete the file
         if (destination != null) {
-            File newFile = destination.getFile();
-            Path directory = null;
+            Path destinationPath = destination.getFile().toPath();
+            Path directoryPath;
 
-            if (newFile.isDirectory()) {
-                directory = newFile.toPath();
+            if (Files.isDirectory(destinationPath)) {
+                directoryPath = destinationPath;
+                destinationPath = directoryPath.resolve(sourcePath.getFileName());
             } else {
-                directory = newFile.getParentFile().toPath();
+                directoryPath = destinationPath.getParent();
             }
 
-            // We must create the destination directory if it does not exists
-            Files.createDirectories(directory);
+            /**
+             * We must create the destination directory if it does not exists
+             */
+            Files.createDirectories(directoryPath);
 
-            /*
+            /**
              * If the destination file exists but is writable then it will be overwrite.
              */
-            FileUtils.copyFile(file, newFile);
+            destinationPath = Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
 
-            LOGGER.debug("Moved file to   {}", newFile.getAbsolutePath());
+            contribution.incrementWriteCount(1);
+
+            LOGGER.debug("Moved file to {}", destinationPath);
         }
 
-        if (!file.delete()) {
-            file.deleteOnExit();
+        if (Files.deleteIfExists(sourcePath)) {
+            LOGGER.info("Deleted file {}", sourcePath);
         }
-
-        LOGGER.info("Deleted file {}", file.getCanonicalPath());
-
 
         return RepeatStatus.FINISHED;
     }
