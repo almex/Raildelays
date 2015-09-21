@@ -37,6 +37,9 @@ public class MoveFileTaskletTest extends AbstractFileTest {
         copyFile();
     }
 
+    /**
+     * We expect that a move delete the source file and increment the write count.
+     */
     @Test
     public void testMove() throws Exception {
         Assert.assertEquals(1, getExcelFiles().length);
@@ -52,6 +55,9 @@ public class MoveFileTaskletTest extends AbstractFileTest {
         Assert.assertEquals(1, stepContribution.getWriteCount());
     }
 
+    /**
+     * We expect that a move delete the source file but has the destination is null the write count should be 0.
+     */
     @Test
     public void testMoveToNullDestination() throws Exception {
         Assert.assertEquals(1, getExcelFiles().length);
