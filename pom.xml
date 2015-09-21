@@ -106,7 +106,7 @@
         <version.log4j>2.3</version.log4j>
         <version.slf4j>1.7.12</version.slf4j>
         <version.log4jdbc>1.16</version.log4jdbc>
-        <version.disruptor>3.3.0</version.disruptor>
+        <version.disruptor>3.3.2</version.disruptor>
         <version.groovy>2.3.9</version.groovy>
         <version.groovy.all>2.4.3</version.groovy.all>
         <version.groovy.eclipse.compiler>2.9.2-01</version.groovy.eclipse.compiler>

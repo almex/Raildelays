@@ -29,7 +29,15 @@
         </property>
     </bean>
 
-    <bean id="jobParameterExtractor" class="be.raildelays.batch.job.ExecutionContextJobParametersExtractor"/>
+    <bean id="jobParameterExtractor" class="org.springframework.batch.core.step.job.CompositeJobParametersExtractor">
+        <property name="delegates">
+            <list>
+                <bean class="org.springframework.batch.core.step.job.DefaultJobParametersExtractor"/>
+                <bean class="org.springframework.batch.core.step.job.JobExecutionContextJobParametersExtractor"/>
+                <bean class="org.springframework.batch.core.step.job.StepExecutionContextJobParametersExtractor"/>
+            </list>
+        </property>
+    </bean>
 
     <bean id="conversionService"
           class="org.springframework.context.support.ConversionServiceFactoryBean">

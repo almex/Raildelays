@@ -144,7 +144,7 @@
 
 
     <bean id="step1JobParameterExtractor"
-          class="be.raildelays.batch.job.ExecutionContextJobParametersExtractor">
+          parent="jobParameterExtractor">
         <!--<property name="keys">
             <list>
                 <value>trainId</value>
@@ -155,7 +155,7 @@
     </bean>
 
     <bean id="step2JobParameterExtractor"
-          class="be.raildelays.batch.job.ExecutionContextJobParametersExtractor">
+          parent="jobParameterExtractor">
         <!--<property name="keys">
             <list>
                 <value>station.departure</value>
@@ -173,7 +173,7 @@
     </bean>
 
     <bean id="step3JobParameterExtractor"
-          class="be.raildelays.batch.job.ExecutionContextJobParametersExtractor">
+          parent="jobParameterExtractor">
         <!--<property name="keys">
             <list>
                 <value>excel.output.path</value>
@@ -193,7 +193,7 @@
     </bean>
 
     <bean id="step4JobParameterExtractor"
-          class="be.raildelays.batch.job.ExecutionContextJobParametersExtractor">
+          parent="jobParameterExtractor">
         <!--<property name="keys">
             <list>
                 <value>excel.output.path</value>

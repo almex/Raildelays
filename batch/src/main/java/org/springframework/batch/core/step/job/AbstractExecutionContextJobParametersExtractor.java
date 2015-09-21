@@ -22,41 +22,28 @@
  * IN THE SOFTWARE.
  */
 
-package be.raildelays.batch.job;
+package org.springframework.batch.core.step.job;
 
-import org.springframework.batch.core.*;
-import org.springframework.batch.core.step.job.DefaultJobParametersExtractor;
+import org.springframework.batch.core.JobParameter;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.item.ExecutionContext;
 
 import java.util.Date;
 import java.util.Map;
 
 /**
- * The goal is on top of the {@link DefaultJobParametersExtractor} behavior to extract
- * all keys from an {@link ExecutionContext} as a {@link JobParameter} for the embedded {@link Job}.
- * If the {@link Job} have a {@link JobParametersIncrementer} the content of
- * {@link JobParametersIncrementer#getNext(JobParameters)} is appended to the result.
+ * Sub-classes of this abstract class should extract keys from an {@link ExecutionContext} and map them into an
+ * equivalent {@link JobParameter}.
+ *
+ * @see StepExecutionContextJobParametersExtractor
+ * @see JobExecutionContextJobParametersExtractor
+ * @author Almex
+ * @since 2.0
  */
-public class ExecutionContextJobParametersExtractor extends DefaultJobParametersExtractor {
+public abstract class AbstractExecutionContextJobParametersExtractor implements JobParametersExtractor {
 
-    @Override
-    public JobParameters getJobParameters(Job job, StepExecution stepExecution) {
-        JobParameters jobParameters = super.getJobParameters(job, stepExecution);
-        JobExecution jobExecution = stepExecution.getJobExecution();
-        JobParametersIncrementer jobParametersIncrementer = job.getJobParametersIncrementer();
-
-        if (jobParametersIncrementer != null) {
-            jobParameters = jobParametersIncrementer.getNext(jobParameters);
-        }
-
-        jobParameters = addJobParametersFromContext(jobParameters, stepExecution.getExecutionContext());
-        jobParameters = addJobParametersFromContext(jobParameters, jobExecution.getExecutionContext());
-
-        return jobParameters;
-    }
-
-
-    private static JobParameters addJobParametersFromContext(JobParameters jobParameters, ExecutionContext context) {
+    protected static JobParameters addJobParametersFromContext(JobParameters jobParameters, ExecutionContext context) {
         JobParametersBuilder builder = new JobParametersBuilder(jobParameters);
 
         for (Map.Entry<String, Object> entry : context.entrySet()) {
@@ -66,12 +53,18 @@ public class ExecutionContextJobParametersExtractor extends DefaultJobParameters
                 builder.addDate(entry.getKey(), (Date) value);
             } else if (value instanceof Long) {
                 builder.addLong(entry.getKey(), (Long) value);
-            } else if (value instanceof Double) {
-                builder.addDouble(entry.getKey(), (Double) value);
-            } else if (value instanceof String) {
-                builder.addString(entry.getKey(), (String) value);
             } else if (value instanceof Integer) {
                 builder.addLong(entry.getKey(), ((Integer) value).longValue());
+            } else if (value instanceof Double) {
+                builder.addDouble(entry.getKey(), (Double) value);
+            } else if (value instanceof Float) {
+                builder.addDouble(entry.getKey(), ((Float) value).doubleValue());
+            } else if (value instanceof String) {
+                builder.addString(entry.getKey(), (String) value);
+            } else if (value != null) {
+                builder.addString(entry.getKey(), value.toString());
+            } else {
+                builder.addString(entry.getKey(), null);
             }
         }
 
