@@ -75,6 +75,27 @@ public class MoveFileTaskletTest extends AbstractFileTest {
         Assert.assertEquals(0, stepContribution.getWriteCount());
     }
 
+    /**
+     * We expect that a move delete the source file and increment the write count. 
+     * And it should work if the destination is a directory.
+     */
+    @Test
+    public void testMoveToADirectory() throws Exception {
+        Assert.assertEquals(1, getExcelFiles().length);
+
+        StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution();
+        StepContribution stepContribution = new StepContribution(stepExecution);
+        ChunkContext chunkContext = new ChunkContext(new StepContext(stepExecution));
+
+        tasklet.setDestination(new FileSystemResource(CURRENT_PATH + File.separator + "copy" + File.separator));
+
+        RepeatStatus repeatStatus = tasklet.execute(stepContribution, chunkContext);
+
+        Assert.assertEquals(RepeatStatus.FINISHED, repeatStatus);
+        Assert.assertEquals(0, getExcelFiles().length);
+        Assert.assertEquals(1, stepContribution.getWriteCount());
+    }
+
     @After
     public void tearDown() throws Exception {
         cleanUp();
