@@ -39,7 +39,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 /**
- * Move a file from a {@code source} to a {@code destination}. If the {@code destination} denote a directory then we 
+ * Move a file from a {@code source} to a {@code destination}. If the {@code destination} denote a directory then we
  * don't change the file name, otherwise it may be changed by the caller.
  * If the {@code destination} is {@code null} then it's equivalent to delete the {@code source}.
  *
@@ -81,7 +81,9 @@ public class MoveFileTasklet implements Tasklet, InitializingBean {
             /**
              * If the destination file exists but is writable then it will be overwrite.
              */
-            Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+            destinationPath = Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+
+            contribution.incrementWriteCount(1);
 
             LOGGER.debug("Moved file to {}", destinationPath);
         }
@@ -89,7 +91,7 @@ public class MoveFileTasklet implements Tasklet, InitializingBean {
         if (Files.deleteIfExists(sourcePath)) {
             LOGGER.info("Deleted file {}", sourcePath);
         }
-        
+
         return RepeatStatus.FINISHED;
     }
 
