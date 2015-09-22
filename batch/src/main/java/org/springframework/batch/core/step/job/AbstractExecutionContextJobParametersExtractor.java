@@ -52,9 +52,7 @@ public abstract class AbstractExecutionContextJobParametersExtractor implements 
         JobParametersBuilder builder = new JobParametersBuilder(jobParameters);
 
         if (useAllContextAttributes) {
-            for (Map.Entry<String, Object> entry : context.entrySet()) {
-                addParameter(builder, entry.getKey(), entry.getValue());
-            }
+            context.entrySet().stream().forEach(entry ->  addParameter(builder, entry.getKey(), entry.getValue()));
         } else {
             keys.stream().filter(context::containsKey).forEach(key -> addParameter(builder, key, context.get(key)));
         }
