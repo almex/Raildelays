@@ -30,44 +30,83 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.item.ExecutionContext;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Sub-classes of this abstract class should extract keys from an {@link ExecutionContext} and map them into an
  * equivalent {@link JobParameter}.
  *
+ * @author Almex
  * @see StepExecutionContextJobParametersExtractor
  * @see JobExecutionContextJobParametersExtractor
- * @author Almex
  * @since 2.0
  */
 public abstract class AbstractExecutionContextJobParametersExtractor implements JobParametersExtractor {
 
-    protected static JobParameters addJobParametersFromContext(JobParameters jobParameters, ExecutionContext context) {
+    private Set<String> keys = new HashSet<>();
+    private boolean useAllContextAttributes = true;
+
+    protected JobParameters addJobParametersFromContext(JobParameters jobParameters, ExecutionContext context) {
         JobParametersBuilder builder = new JobParametersBuilder(jobParameters);
 
-        for (Map.Entry<String, Object> entry : context.entrySet()) {
-            Object value = entry.getValue();
-
-            if (value instanceof Date) {
-                builder.addDate(entry.getKey(), (Date) value);
-            } else if (value instanceof Long) {
-                builder.addLong(entry.getKey(), (Long) value);
-            } else if (value instanceof Integer) {
-                builder.addLong(entry.getKey(), ((Integer) value).longValue());
-            } else if (value instanceof Double) {
-                builder.addDouble(entry.getKey(), (Double) value);
-            } else if (value instanceof Float) {
-                builder.addDouble(entry.getKey(), ((Float) value).doubleValue());
-            } else if (value instanceof String) {
-                builder.addString(entry.getKey(), (String) value);
-            } else if (value != null) {
-                builder.addString(entry.getKey(), value.toString());
-            } else {
-                builder.addString(entry.getKey(), null);
-            }
+        if (useAllContextAttributes) {
+            context.entrySet().stream().forEach(entry ->  addParameter(builder, entry.getKey(), entry.getValue()));
+        } else {
+            keys.stream().filter(context::containsKey).forEach(key -> addParameter(builder, key, context.get(key)));
         }
 
         return builder.toJobParameters();
+    }
+
+    /**
+     * A {@code null} value is interpreted as not adding the parameter.
+     */
+    private static void addParameter(JobParametersBuilder builder, String key, Object value) {
+        JobParameter jobParameter = buildJobParameter(value);
+
+        if (jobParameter != null) {
+            builder.addParameter(key, jobParameter);
+        }
+    }
+
+    /**
+     * Build a {@link JobParameter} based on the type of the given {@code value}.
+     *
+     * @param value {@link Object} to translate into a {@link JobParameter}
+     * @return If the value is not {@code null}, return a {@link JobParameter}, otherwise return {@code null}
+     */
+    private static JobParameter buildJobParameter(Object value) {
+        JobParameter result = null;
+
+        if (value instanceof Date) {
+            result = new JobParameter((Date) value);
+        } else if (value instanceof Long) {
+            result = new JobParameter((Long) value);
+        } else if (value instanceof Integer) {
+            result = new JobParameter(((Integer) value).longValue());
+        } else if (value instanceof Double) {
+            result = new JobParameter((Double) value);
+        } else if (value instanceof Float) {
+            result = new JobParameter(((Float) value).doubleValue());
+        } else if (value instanceof String) {
+            result = new JobParameter((String) value);
+        } else if (value != null) {
+            result = new JobParameter(value.toString());
+        }
+
+        return result;
+    }
+
+    public void setKeys(Set<String> keys) {
+        this.keys = keys;
+    }
+
+    /**
+     * @param useAllContextAttributes (by default it's {@code true}).
+     */
+    public void setUseAllContextAttributes(boolean useAllContextAttributes) {
+        this.useAllContextAttributes = useAllContextAttributes;
     }
 }
