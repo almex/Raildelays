@@ -32,10 +32,12 @@ import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.resource.ResourceContext;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 import org.springframework.batch.item.support.ItemStreamItemReaderDelegator;
 import org.springframework.batch.item.support.ListItemReader;
-import org.springframework.batch.support.ResourceAwareItemStream;
+import org.springframework.batch.support.ResourceContextAccessibleItemStream;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -116,9 +118,10 @@ public class MoreThanOneHourDelayDeciderTest {
         Assert.assertEquals(FlowExecutionStatus.COMPLETED, status);
     }
 
-    private class SimpleReader extends AbstractItemStreamItemReader<ExcelRow> implements ResourceAwareItemStream {
+    private class SimpleReader extends AbstractItemStreamItemReader<ExcelRow> implements ResourceContextAccessibleItemStream {
 
         private boolean done = false;
+        private ResourceContext resourceContext = new ResourceContext(new ExecutionContext(), "foo");
 
         @Override
         public ExcelRow read() throws Exception {
@@ -136,13 +139,15 @@ public class MoreThanOneHourDelayDeciderTest {
         }
 
         @Override
-        public Resource getResource() {
-            return new ClassPathResource("./");
+        public ResourceContext getResourceContext() {
+            resourceContext.changeResource(new ClassPathResource("./"));
+
+            return resourceContext;
         }
 
         @Override
         public void setResource(Resource resource) {
-
+            resourceContext.setResource(resource);
         }
     }
 }

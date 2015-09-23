@@ -164,7 +164,7 @@
 
 
     <bean id="readAllExcelFiles"
-          class="org.springframework.batch.item.resource.ResourceLocatorItemReaderItemStream"
+          class="org.springframework.batch.item.resource.ResourceLocatorItemStreamReader"
           scope="step">
         <property name="delegate">
             <bean class="org.springframework.batch.item.file.ExcelSheetItemReader">
@@ -283,7 +283,7 @@
     </bean>
 
     <bean id="multiResourceItemWriter"
-          class="org.springframework.batch.item.resource.ResourceLocatorItemWriterItemStream"
+          class="org.springframework.batch.item.resource.ResourceLocatorItemStreamWriter"
           scope="step">
         <property name="delegate" ref="sortedItemWriter"/>
         <property name="name" value="multiResourceItemWriter"/>

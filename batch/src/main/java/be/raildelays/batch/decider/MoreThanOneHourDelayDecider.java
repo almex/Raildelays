@@ -32,7 +32,7 @@ import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.file.MultiResourceItemReader;
-import org.springframework.batch.support.ResourceAwareItemStream;
+import org.springframework.batch.support.ResourceContextAccessibleItemStream;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -43,7 +43,7 @@ import java.nio.file.Paths;
  * This {@link JobExecutionDecider} is responsible to return a custom {@link FlowExecutionStatus}
  * when we get an item with a delay greater than the max threshold in the {@link ExecutionContext}.
  * Then we return <code>COMPLETED_WITH_60M_DELAY</code> in order to go to extra steps to handle this particular item.
- * The reader must be an instance of {@link ResourceAwareItemStream}.
+ * The reader must be an instance of {@link ResourceContextAccessibleItemStream}.
  *
  * @since 1.2
  * @author Almex
@@ -63,7 +63,7 @@ public class MoreThanOneHourDelayDecider extends AbstractReadAndDecideTasklet<Ex
     /**
      * {@inheritDoc}
      *
-     * @throws UnexpectedInputException if the reader is neither an instance of {@link ResourceAwareItemStream} nor an
+     * @throws UnexpectedInputException if the reader is neither an instance of {@link ResourceContextAccessibleItemStream} nor an
      *                                  instance of {@link MultiResourceItemReader}.
      */
     @Override
@@ -73,10 +73,10 @@ public class MoreThanOneHourDelayDecider extends AbstractReadAndDecideTasklet<Ex
         if (item.getDelay() >= thresholdDelay) {
             Resource resource;
 
-            if (reader instanceof ResourceAwareItemStream) {
-                resource = ((ResourceAwareItemStream) reader).getResource();
+            if (reader instanceof ResourceContextAccessibleItemStream) {
+                resource = ((ResourceContextAccessibleItemStream) reader).getResourceContext().getResource();
             } else {
-                throw new UnexpectedInputException("The 'reader' should be an instance of ResourceAwareItemStream");
+                throw new UnexpectedInputException("The 'reader' should be an instance of ResourceContextAccessibleItemStream");
             }
 
             // We store the file path in the context

@@ -29,7 +29,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
 import org.springframework.batch.test.SimpleResourceAwareItemStream;
 import org.springframework.core.io.FileSystemResource;
 
@@ -40,15 +39,15 @@ import java.util.List;
 /**
  * @author Almex
  */
-public class ResourceLocatorItemWriterItemStreamTest extends AbstractResourceLocatorItemStreamTest<
-        ResourceLocatorItemWriterItemStreamTest.SimpleResourceAwareItemWriterItemStream,
-        ResourceLocatorItemWriterItemStream<ResourceLocatorItemWriterItemStreamTest.SimpleResourceAwareItemWriterItemStream, String>
+public class ResourceLocatorItemStreamWriterTest extends AbstractResourceLocatorItemStreamTest<
+        ResourceLocatorItemStreamWriterTest.SimpleResourceAwareItemWriterItemStream,
+        ResourceLocatorItemStreamWriter<ResourceLocatorItemStreamWriterTest.SimpleResourceAwareItemWriterItemStream, String>
         > {
 
 
     @Before
     public void setUp() throws Exception {
-        delegator = new ResourceLocatorItemWriterItemStream<>();
+        delegator = new ResourceLocatorItemStreamWriter<>();
         delegate = new SimpleResourceAwareItemWriterItemStream();
         delegator.setDelegate(delegate);
         delegator.setName("foo");
@@ -94,7 +93,7 @@ public class ResourceLocatorItemWriterItemStreamTest extends AbstractResourceLoc
      */
     public static class SimpleResourceAwareItemWriterItemStream
             extends SimpleResourceAwareItemStream
-            implements ResourceAwareItemWriterItemStream<String> {
+            implements ResourceAwareItemStreamWriter<String> {
 
         @Override
         public void write(List<? extends String> items) throws Exception {

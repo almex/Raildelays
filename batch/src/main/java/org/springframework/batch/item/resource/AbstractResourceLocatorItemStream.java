@@ -29,6 +29,7 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.file.AbstractItemCountingItemStreamItemWriter;
+import org.springframework.batch.support.ResourceContextAccessibleItemStream;
 import org.springframework.core.io.Resource;
 
 /**
@@ -37,7 +38,9 @@ import org.springframework.core.io.Resource;
  * @author Almex
  * @since 2.0
  */
-public abstract class AbstractResourceLocatorItemStream<S extends ItemStream, T> extends ItemStreamSupport {
+public abstract class AbstractResourceLocatorItemStream<S extends ResourceAwareItemStream, T>
+        extends ItemStreamSupport
+        implements ResourceContextAccessibleItemStream {
 
     protected S delegate;
     protected ResourceContext resourceContext;
@@ -71,7 +74,7 @@ public abstract class AbstractResourceLocatorItemStream<S extends ItemStream, T>
         }
 
         if (resourceContext.containsResource()) {
-            setResourceToDelegate(resourceContext.getResource());
+            delegate.setResource(resourceContext.getResource());
             delegate.open(executionContext);
             opened = true;
         }
@@ -85,13 +88,26 @@ public abstract class AbstractResourceLocatorItemStream<S extends ItemStream, T>
         }
     }
 
-    public abstract void setResourceToDelegate(Resource resource);
-
     public void setDelegate(S delegate) {
         this.delegate = delegate;
     }
 
     public void setResourceLocator(ResourceLocator<T> resourceLocator) {
         this.resourceLocator = resourceLocator;
+    }
+
+    @Override
+    public ResourceContext getResourceContext() {
+        return resourceContext;
+    }
+
+    @Override
+    public void setResource(Resource resource) {
+        if (resourceContext != null) {
+            resourceContext.setResource(resource);
+            delegate.setResource(resource);
+        } else {
+            throw new IllegalStateException("You must open the stream before calling setResource()");
+        }
     }
 }

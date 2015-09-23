@@ -25,7 +25,6 @@
 package org.springframework.batch.item.resource;
 
 import org.springframework.batch.item.ItemStreamWriter;
-import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
 import org.springframework.core.io.Resource;
 
 import java.util.ArrayList;
@@ -40,19 +39,9 @@ import java.util.Map;
  * @author Almex
  * @since 2.0
  */
-public class ResourceLocatorItemWriterItemStream<S extends ResourceAwareItemWriterItemStream<T>, T>
+public class ResourceLocatorItemStreamWriter<S extends ResourceAwareItemStreamWriter<T>, T>
         extends AbstractResourceLocatorItemStream<S, T>
-        implements ItemStreamWriter<T> {
-
-    @Override
-    public void setResourceToDelegate(Resource resource) {
-        if (resourceContext != null) {
-            resourceContext.changeResource(resource);
-            delegate.setResource(resource);
-        } else {
-            throw new IllegalStateException("You must open the stream before calling setResourceToDelegate()");
-        }
-    }
+        implements ItemStreamWriter<T>, ResourceAwareItemStreamWriter<T> {
 
     /**
      * {@inheritDoc}

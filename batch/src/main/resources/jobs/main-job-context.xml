@@ -74,7 +74,7 @@
     <bean id="taskExecutor"
           class="org.springframework.scheduling.concurrent.ConcurrentTaskExecutor">
         <property name="concurrentExecutor">
-            <bean class="be.raildelays.concurrent.scheduling.MdcThreadPoolTaskExecutor">
+            <bean class="org.springframework.batch.concurrent.scheduling.MdcThreadPoolTaskExecutor">
                 <property name="corePoolSize" value="2"/>
                 <property name="maxPoolSize" value="4"/>
                 <property name="allowCoreThreadTimeOut" value="true"/>

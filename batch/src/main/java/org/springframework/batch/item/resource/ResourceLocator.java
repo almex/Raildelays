@@ -37,8 +37,8 @@ import java.util.List;
  * @param <T> type of the data to write
  * @author Almex
  * @see org.springframework.batch.item.ItemStream
- * @see ResourceLocatorItemWriterItemStream
- * @see ResourceLocatorItemReaderItemStream
+ * @see ResourceLocatorItemStreamWriter
+ * @see ResourceLocatorItemStreamReader
  * @see AbstractResourceLocatorItemStream
  * @since 2.0
  */
@@ -53,7 +53,7 @@ public interface ResourceLocator<T> {
     void onOpen(ResourceContext context) throws ItemStreamException;
 
     /**
-     * Event triggered on {@link ResourceLocatorItemWriterItemStream#write(List)} method.
+     * Event triggered on {@link ResourceLocatorItemStreamWriter#write(List)} method.
      *
      * @param item   data to write
      * @param context to communicate changes on the resource you attempt to build
@@ -62,7 +62,7 @@ public interface ResourceLocator<T> {
     void onWrite(T item, ResourceContext context) throws Exception;
 
     /**
-     * Event triggered on {@link ResourceLocatorItemReaderItemStream#read()} method.
+     * Event triggered on {@link ResourceLocatorItemStreamReader#read()} method.
      *
      * @implNote an implementation of this method should if the item is null to trigger the move to the next resource
      * @param item    read data

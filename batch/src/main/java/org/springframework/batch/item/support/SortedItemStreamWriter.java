@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.*;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
+import org.springframework.batch.item.resource.ResourceAwareItemStreamWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -29,9 +30,10 @@ import java.util.*;
  * Only the {@link ItemStream#open(ExecutionContext)} method is used to have a
  * reference to the {@link ExecutionContext} during {@link SortedItemStreamWriter#write(List)}.
  */
-public class SortedItemStreamWriter<T extends Comparable<T>>
-        extends ItemStreamSupport
-        implements ResourceAwareItemWriterItemStream<T>, InitializingBean {
+public class SortedItemStreamWriter<T extends Comparable<T>> extends ItemStreamSupport implements
+        ResourceAwareItemStreamWriter<T>,
+        ResourceAwareItemWriterItemStream<T>,
+        InitializingBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SortedItemStreamWriter.class);
     protected ResourceAwareItemWriterItemStream<? super T> writer;
@@ -85,8 +87,8 @@ public class SortedItemStreamWriter<T extends Comparable<T>>
         for (T item : items) {
             Long index = null;
 
-            if (item instanceof ItemIndexAware) {
-                index = ((ItemIndexAware) item).getIndex();
+            if (item instanceof IndexedItem) {
+                index = ((IndexedItem) item).getIndex();
             }
 
             if (index != null) {
@@ -135,8 +137,8 @@ public class SortedItemStreamWriter<T extends Comparable<T>>
             for (T item = reader.read(); item != null; item = reader.read(), i++) {
                 Long index = null;
 
-                if (item instanceof ItemIndexAware) {
-                    index = ((ItemIndexAware) item).getIndex();
+                if (item instanceof IndexedItem) {
+                    index = ((IndexedItem) item).getIndex();
 
                     LOGGER.trace("Retrieving existing index={}", index);
                 }

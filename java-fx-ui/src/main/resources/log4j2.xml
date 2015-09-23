@@ -243,7 +243,7 @@
         <logger name="org.springframework.batch.item.file.ExcelSheetItemWriter" level="trace" additivity="false">
             <appender-ref ref="step2Writer"/>
         </logger>
-        <logger name="org.springframework.batch.item.resource.ResourceLocatorItemWriterItemStream" level="trace"
+        <logger name="org.springframework.batch.item.resource.ResourceLocatorItemStreamWriter" level="trace"
                 additivity="false">
             <appender-ref ref="step2Writer"/>
         </logger>

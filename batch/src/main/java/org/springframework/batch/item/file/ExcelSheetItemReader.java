@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.ReaderNotOpenException;
 import org.springframework.batch.item.resource.IndexedResourceAwareItemStreamReader;
+import org.springframework.batch.item.resource.ResourceAwareItemStreamReader;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
@@ -40,8 +41,11 @@ import java.io.*;
  * @implSpec This implementation is not thread-safe
  * @since 1.1
  */
-public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
-        implements IndexedResourceAwareItemStreamReader<T>, InitializingBean, ResourceAwareItemReaderItemStream<T> {
+public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements
+        IndexedResourceAwareItemStreamReader<T>,
+        InitializingBean,
+        ResourceAwareItemReaderItemStream<T>,
+        ResourceAwareItemStreamReader<T> {
 
     private static Logger LOGGER = LoggerFactory.getLogger(ExcelSheetItemReader.class);
     private RowMapper<? extends T> rowMapper;

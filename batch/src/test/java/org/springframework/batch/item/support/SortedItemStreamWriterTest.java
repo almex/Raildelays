@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.IndexedItem;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.Indexed;
@@ -147,7 +148,7 @@ public class SortedItemStreamWriterTest extends AbstractFileTest {
     }
 
     /**
-     * We expect that if we don't use an item of type {@link org.springframework.batch.item.ItemIndexAware} the index
+     * We expect that if we don't use an item of type {@link IndexedItem} the index
      * is determined by the order of the reading.
      */
     @Test

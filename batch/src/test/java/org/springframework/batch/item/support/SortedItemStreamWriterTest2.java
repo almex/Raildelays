@@ -18,7 +18,7 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.file.ExcelSheetItemReader;
 import org.springframework.batch.item.file.ExcelSheetItemWriter;
-import org.springframework.batch.item.resource.ResourceLocatorItemWriterItemStream;
+import org.springframework.batch.item.resource.ResourceLocatorItemStreamWriter;
 import org.springframework.batch.item.resource.SimpleResourceItemSearch;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -36,7 +36,7 @@ public class SortedItemStreamWriterTest2 extends AbstractFileTest {
 
     private StepExecution stepExecution;
 
-    private ResourceLocatorItemWriterItemStream<SortedItemStreamWriter<ExcelRow>, ExcelRow> writer;
+    private ResourceLocatorItemStreamWriter<SortedItemStreamWriter<ExcelRow>, ExcelRow> writer;
 
     @Before
     public void setUp() throws Exception {
@@ -78,7 +78,7 @@ public class SortedItemStreamWriterTest2 extends AbstractFileTest {
         resourceLocator.setMaxItemCount(40);
         resourceLocator.setResourceItemSearch(itemSearch);
 
-        this.writer = new ResourceLocatorItemWriterItemStream<>();
+        this.writer = new ResourceLocatorItemStreamWriter<>();
         this.writer.setName("test");
         this.writer.setDelegate(delegate);
         this.writer.setResourceLocator(resourceLocator);

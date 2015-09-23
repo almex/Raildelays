@@ -28,13 +28,13 @@ import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
 import be.raildelays.domain.xls.ExcelRow;
+import org.springframework.batch.item.IndexedItem;
 import org.springframework.batch.item.ItemCountAware;
-import org.springframework.batch.item.ItemIndexAware;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public class BatchExcelRow extends ExcelRow implements ItemIndexAware, ItemCountAware {
+public class BatchExcelRow extends ExcelRow implements IndexedItem, ItemCountAware {
 
     public static final BatchExcelRow EMPTY = new Builder(null, null).delay(0L).build(false);
     private boolean canceled;

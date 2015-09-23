@@ -172,7 +172,7 @@
     <!-- ================================================================================================== -->
 
     <bean id="excelSheetBeforeItemWriter"
-          class="org.springframework.batch.item.resource.ResourceLocatorItemWriterItemStream"
+          class="org.springframework.batch.item.resource.ResourceLocatorItemStreamWriter"
           scope="step">
         <property name="delegate">
             <bean class="org.springframework.batch.item.file.ExcelSheetItemWriter"
@@ -206,7 +206,7 @@
     </bean>
 
     <bean id="excelSheetAfterItemWriter"
-          class="org.springframework.batch.item.resource.ResourceLocatorItemWriterItemStream"
+          class="org.springframework.batch.item.resource.ResourceLocatorItemStreamWriter"
           scope="step">
         <property name="delegate">
             <bean class="org.springframework.batch.item.file.ExcelSheetItemWriter"

@@ -2,8 +2,10 @@ package be.raildelays.batch.test;
 
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.xls.ExcelRow;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.resource.ResourceContext;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
-import org.springframework.batch.support.ResourceAwareItemStream;
+import org.springframework.batch.support.ResourceContextAccessibleItemStream;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -11,11 +13,14 @@ import org.springframework.core.io.Resource;
 import java.time.LocalDate;
 
 /**
- * Created by xbmc on 28-06-15.
+ * @author Almex
  */
-public class DummyItemStreamReader extends AbstractItemStreamItemReader implements ResourceAwareItemStream, InitializingBean {
+public class DummyItemStreamReader
+        extends AbstractItemStreamItemReader
+        implements ResourceContextAccessibleItemStream, InitializingBean {
 
     private boolean open = true;
+    private ResourceContext resourceContext = new ResourceContext(new ExecutionContext(), "foo");
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -35,12 +40,15 @@ public class DummyItemStreamReader extends AbstractItemStreamItemReader implemen
     }
 
     @Override
-    public Resource getResource() {
-        return new FileSystemResource("./dummy.xls");
+    public ResourceContext getResourceContext() {
+
+        resourceContext.changeResource(new FileSystemResource("./dummy.xls"));
+
+        return resourceContext;
     }
 
     @Override
     public void setResource(Resource resource) {
-
+        resourceContext.setResource(resource);
     }
 }

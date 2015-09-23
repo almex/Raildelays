@@ -3,7 +3,7 @@ package org.springframework.batch.item.file;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemIndexAware;
+import org.springframework.batch.item.IndexedItem;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.support.AbstractItemStreamItemWriter;
 import org.springframework.util.Assert;
@@ -56,8 +56,8 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
     @Override
     public void write(List<? extends T> items) throws Exception {
         for (T item : items) {
-            if (item instanceof ItemIndexAware && useItemIndex) {
-                Long index = ((ItemIndexAware) item).getIndex();
+            if (item instanceof IndexedItem && useItemIndex) {
+                Long index = ((IndexedItem) item).getIndex();
                 if (index != null) {
                     jumpToItem(index.intValue());
                 }
@@ -182,7 +182,7 @@ public abstract class AbstractItemCountingItemStreamItemWriter<T> extends Abstra
     }
 
     /**
-     * In case we have items implementing {@link org.springframework.batch.item.ItemIndexAware} you can decide if its
+     * In case we have items implementing {@link IndexedItem} you can decide if its
      * index should be used or not during the writing process.
      * <p>
      * It's a common usage to set it to <code>false</code> when you have an

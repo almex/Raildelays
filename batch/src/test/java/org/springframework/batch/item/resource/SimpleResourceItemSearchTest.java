@@ -26,7 +26,7 @@ public class SimpleResourceItemSearchTest {
      */
     @Test
     public void testIndexOfFound() throws Exception {
-        itemSearch.setReader(new AbstractIndexedResourceAwareItemStreamReader<String>() {
+        itemSearch.setReader(new AbstractIndexedResourceAccessibleItemStreamReader<String>() {
             @Override
             public String read() throws Exception {
                 return "foo";
@@ -48,7 +48,7 @@ public class SimpleResourceItemSearchTest {
      */
     @Test
     public void testIndexOfNotFound() throws Exception {
-        itemSearch.setReader(new AbstractIndexedResourceAwareItemStreamReader<String>() {
+        itemSearch.setReader(new AbstractIndexedResourceAccessibleItemStreamReader<String>() {
 
             private boolean notEOF = false;
 
@@ -75,7 +75,7 @@ public class SimpleResourceItemSearchTest {
     @Test
     public void testIndexOfSpecificComparator() throws Exception {
         itemSearch.setComparator(Comparator.comparing(s -> "bar")); // return for everything "bar"
-        itemSearch.setReader(new AbstractIndexedResourceAwareItemStreamReader<String>() {
+        itemSearch.setReader(new AbstractIndexedResourceAccessibleItemStreamReader<String>() {
             @Override
             public String read() throws Exception {
                 return "foo";
@@ -92,7 +92,7 @@ public class SimpleResourceItemSearchTest {
         Assert.assertEquals(EXPECTED_INDEX, index);
     }
 
-    private abstract static class AbstractIndexedResourceAwareItemStreamReader<T>
+    private abstract static class AbstractIndexedResourceAccessibleItemStreamReader<T>
             extends SimpleResourceAwareItemStream
             implements IndexedResourceAwareItemStreamReader<T> {
     }

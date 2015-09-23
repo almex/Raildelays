@@ -22,7 +22,7 @@
  * IN THE SOFTWARE.
  */
 
-package be.raildelays.concurrent.scheduling;
+package org.springframework.batch.concurrent.scheduling;
 
 import org.slf4j.MDC;
 

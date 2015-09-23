@@ -40,19 +40,9 @@ import org.springframework.core.io.Resource;
  * @author Almex
  * @since 2.0
  */
-public class ResourceLocatorItemReaderItemStream<S extends ResourceAwareItemReaderItemStream<T>, T>
+public class ResourceLocatorItemStreamReader<S extends ResourceAwareItemStreamReader<T>, T>
         extends AbstractResourceLocatorItemStream<S, T>
-        implements ItemStreamReader<T> {
-
-    @Override
-    public void setResourceToDelegate(Resource resource) {
-        if (resourceContext != null) {
-            resourceContext.changeResource(resource);
-            delegate.setResource(resource);
-        } else {
-            throw new IllegalStateException("You must open the stream before calling setResourceToDelegate()");
-        }
-    }
+        implements ItemStreamReader<T>, ResourceAwareItemStreamReader<T> {
 
 
     /**
@@ -102,4 +92,5 @@ public class ResourceLocatorItemReaderItemStream<S extends ResourceAwareItemRead
 
         return item;
     }
+
 }

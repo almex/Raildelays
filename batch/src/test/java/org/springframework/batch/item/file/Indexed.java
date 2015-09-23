@@ -1,14 +1,14 @@
 package org.springframework.batch.item.file;
 
+import org.springframework.batch.item.IndexedItem;
 import org.springframework.batch.item.ItemCountAware;
-import org.springframework.batch.item.ItemIndexAware;
 
 /**
- * Purpose of this class is to have a simple implementation of {@link ItemIndexAware} for testing.
+ * Purpose of this class is to have a simple implementation of {@link IndexedItem} for testing.
  *
  * @author Almex
  */
-public class Indexed implements ItemIndexAware, ItemCountAware, Comparable<Indexed> {
+public class Indexed implements IndexedItem, ItemCountAware, Comparable<Indexed> {
 
     private String value;
     private Long index;

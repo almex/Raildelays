@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.resource.ResourceAwareItemStreamWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 
@@ -45,8 +46,10 @@ import java.time.Instant;
  * @implSpec This implementation is not thread-safe
  * @since 1.1
  */
-public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemWriter<T>
-        implements ResourceAwareItemWriterItemStream<T>, InitializingBean {
+public class ExcelSheetItemWriter<T> extends AbstractItemCountingItemStreamItemWriter<T> implements
+        ResourceAwareItemStreamWriter<T>,
+        ResourceAwareItemWriterItemStream<T>,
+        InitializingBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExcelSheetItemWriter.class);
     private static final String ROW_TO_SKIP_KEY = "row.to.skip.key";

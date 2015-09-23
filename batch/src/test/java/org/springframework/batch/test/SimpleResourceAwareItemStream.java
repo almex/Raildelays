@@ -25,23 +25,25 @@
 package org.springframework.batch.test;
 
 import org.springframework.batch.item.ItemStreamSupport;
-import org.springframework.batch.support.ResourceAwareItemStream;
+import org.springframework.batch.item.resource.ResourceAwareItemStream;
 import org.springframework.core.io.Resource;
 
 /**
  * @author Almex
  * @since 1.2
  */
-public class SimpleResourceAwareItemStream extends ItemStreamSupport implements ResourceAwareItemStream {
+public class SimpleResourceAwareItemStream
+        extends ItemStreamSupport
+        implements ResourceAwareItemStream {
 
     private Resource resource;
-
-    public Resource getResource() {
-        return resource;
-    }
 
     @Override
     public void setResource(Resource resource) {
         this.resource = resource;
+    }
+
+    public Resource getResource() {
+        return resource;
     }
 }

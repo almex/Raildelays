@@ -29,7 +29,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.test.SimpleResourceAwareItemStream;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
@@ -40,9 +39,9 @@ import java.util.List;
 /**
  * @author Almex
  */
-public class ResourceLocatorItemReaderItemStreamTest extends AbstractResourceLocatorItemStreamTest<
-        ResourceLocatorItemReaderItemStreamTest.SimpleResourceAwareItemReaderItemStream,
-        ResourceLocatorItemReaderItemStream<ResourceLocatorItemReaderItemStreamTest.SimpleResourceAwareItemReaderItemStream, String>
+public class ResourceLocatorItemStreamReaderTest extends AbstractResourceLocatorItemStreamTest<
+        ResourceLocatorItemStreamReaderTest.SimpleResourceAwareItemReaderItemStream,
+        ResourceLocatorItemStreamReader<ResourceLocatorItemStreamReaderTest.SimpleResourceAwareItemReaderItemStream, String>
         > {
 
     public static final String EXCEL_FILE_NAME = "retard_sncb 20140522.xls";
@@ -51,7 +50,7 @@ public class ResourceLocatorItemReaderItemStreamTest extends AbstractResourceLoc
     @Before
     public void setUp() throws Exception {
         delegate = new SimpleResourceAwareItemReaderItemStream();
-        delegator = new ResourceLocatorItemReaderItemStream<>();
+        delegator = new ResourceLocatorItemStreamReader<>();
         delegator.setName("foo");
         delegator.setDelegate(delegate);
     }
@@ -107,15 +106,10 @@ public class ResourceLocatorItemReaderItemStreamTest extends AbstractResourceLoc
     @Test(timeout = 1000L)
     public void testReadSetResourceBeforeOnOpen() throws Exception {
         ExecutionContext executionContext = new ExecutionContext();
-        // By matching the name prefix used to store key in the execution context we can initialize the resource context
-        ResourceContext resourceContext = new ResourceContext(
-                executionContext,
-                "foo." + ResourceLocatorItemReaderItemStream.class.getSimpleName()
-        );
-
-        resourceContext.changeResource(new ClassPathResource(EXCEL_FILE_NAME));
 
         delegator.setResourceLocator(new CountingItemResourceLocator<>());
+        delegator.open(executionContext);
+        delegator.setResource(new ClassPathResource(EXCEL_FILE_NAME));
         delegator.open(executionContext);
 
         Resource onOpen = delegate.getResource();
@@ -135,13 +129,6 @@ public class ResourceLocatorItemReaderItemStreamTest extends AbstractResourceLoc
     @Test(timeout = 1000L)
     public void testReadWResourceOnRead() throws Exception {
         ExecutionContext executionContext = new ExecutionContext();
-        // By matching the name prefix used to store key in the execution context we can initialize the resource context
-        ResourceContext resourceContext = new ResourceContext(
-                executionContext,
-                "foo." + ResourceLocatorItemReaderItemStream.class.getSimpleName()
-        );
-
-        resourceContext.setResource(new ClassPathResource(EXCEL_FILE_NAME));
 
         delegator.setResourceLocator(new CountingItemResourceLocator<String>() {
             @Override
@@ -149,6 +136,8 @@ public class ResourceLocatorItemReaderItemStreamTest extends AbstractResourceLoc
                 context.changeResource(new FileSystemResource(item));
             }
         });
+        delegator.open(executionContext);
+        delegator.setResource(new ClassPathResource(EXCEL_FILE_NAME));
         delegator.open(executionContext);
         delegator.read();
         delegator.read();
@@ -159,7 +148,7 @@ public class ResourceLocatorItemReaderItemStreamTest extends AbstractResourceLoc
 
     public static class SimpleResourceAwareItemReaderItemStream
             extends SimpleResourceAwareItemStream
-            implements ResourceAwareItemReaderItemStream<String> {
+            implements ResourceAwareItemStreamReader<String> {
 
         @Override
         public String read() throws Exception {
