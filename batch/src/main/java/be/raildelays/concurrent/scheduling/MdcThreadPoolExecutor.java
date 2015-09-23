@@ -42,71 +42,14 @@ import java.util.concurrent.*;
  */
 public class MdcThreadPoolExecutor extends ThreadPoolExecutor {
 
-    final private boolean useFixedContext;
-    final private Map<String, String> fixedContext;
-
-    private MdcThreadPoolExecutor(Map<String, String> fixedContext, int corePoolSize, int maximumPoolSize,
-                                  long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue,
-                                  ThreadFactory threadFactory, RejectedExecutionHandler rejectedExecutionHandler) {
+    public MdcThreadPoolExecutor(int corePoolSize,
+                                 int maximumPoolSize,
+                                 long keepAliveTime,
+                                 TimeUnit unit,
+                                 BlockingQueue<Runnable> workQueue,
+                                 ThreadFactory threadFactory,
+                                 RejectedExecutionHandler rejectedExecutionHandler) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, rejectedExecutionHandler);
-        this.fixedContext = fixedContext;
-        useFixedContext = (fixedContext != null);
-    }
-
-    /**
-     * Pool where task threads take MDC from the submitting thread.
-     */
-    public static MdcThreadPoolExecutor newWithInheritedMdc(int corePoolSize, int maximumPoolSize, long keepAliveTime,
-                                                            TimeUnit unit, BlockingQueue<Runnable> workQueue,
-                                                            ThreadFactory threadFactory, RejectedExecutionHandler rejectedExecutionHandler) {
-        return new MdcThreadPoolExecutor(null, corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, rejectedExecutionHandler);
-    }
-
-    /**
-     * Pool where task threads take fixed MDC from the thread that creates the pool.
-     */
-    public static MdcThreadPoolExecutor newWithCurrentMdc(int corePoolSize, int maximumPoolSize, long keepAliveTime,
-                                                          TimeUnit unit, BlockingQueue<Runnable> workQueue,
-                                                          ThreadFactory threadFactory, RejectedExecutionHandler rejectedExecutionHandler) {
-        return new MdcThreadPoolExecutor(MDC.getCopyOfContextMap(), corePoolSize, maximumPoolSize, keepAliveTime, unit,
-                workQueue, threadFactory, rejectedExecutionHandler);
-    }
-
-    /**
-     * Pool where task threads always have a specified, fixed MDC.
-     */
-    public static MdcThreadPoolExecutor newWithFixedMdc(Map<String, String> fixedContext, int corePoolSize,
-                                                        int maximumPoolSize, long keepAliveTime, TimeUnit unit,
-                                                        BlockingQueue<Runnable> workQueue,
-                                                        ThreadFactory threadFactory, RejectedExecutionHandler rejectedExecutionHandler) {
-        return new MdcThreadPoolExecutor(fixedContext, corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, rejectedExecutionHandler);
-    }
-
-    public static Runnable wrap(final Runnable runnable, final Map<String, String> context) {
-        return new Runnable() {
-            @Override
-            public void run() {
-                Map previous = MDC.getCopyOfContextMap();
-                if (context == null) {
-                    MDC.clear();
-                } else {
-                    MDC.setContextMap(context);
-                }
-                try {
-                    runnable.run();
-                } finally {
-                    if (previous == null) {
-                        MDC.clear();
-                    } else {
-                        MDC.setContextMap(previous);
-                    }
-                }
-            }
-        };
-    }
-
-    private Map<String, String> getContextForTask() {
-        return useFixedContext ? fixedContext : MDC.getCopyOfContextMap();
     }
 
     /**
@@ -115,6 +58,28 @@ public class MdcThreadPoolExecutor extends ThreadPoolExecutor {
      */
     @Override
     public void execute(Runnable command) {
-        super.execute(wrap(command, getContextForTask()));
+        super.execute(wrap(command, MDC.getCopyOfContextMap()));
+    }
+
+    public static Runnable wrap(final Runnable runnable, final Map<String, String> context) {
+        return () -> {
+            Map<String, String> previous = MDC.getCopyOfContextMap();
+
+            if (context == null) {
+                MDC.clear();
+            } else {
+                MDC.setContextMap(context);
+            }
+
+            try {
+                runnable.run();
+            } finally {
+                if (previous == null) {
+                    MDC.clear();
+                } else {
+                    MDC.setContextMap(previous);
+                }
+            }
+        };
     }
 }
