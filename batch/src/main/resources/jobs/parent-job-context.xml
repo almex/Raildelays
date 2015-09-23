@@ -64,11 +64,11 @@
           scope="step"/>
 
     <bean id="loggerContextJobListener"
-          class="be.raildelays.batch.listener.LoggerContextJobListener"
+          class="org.springframework.batch.core.listener.LoggerContextJobListener"
           scope="job"/>
 
     <bean id="loggerContextStepListener"
-          class="be.raildelays.batch.listener.LoggerContextStepListener"
+          class="org.springframework.batch.core.listener.LoggerContextStepListener"
           scope="step"/>
 
     <bean id="promoteContextListener"

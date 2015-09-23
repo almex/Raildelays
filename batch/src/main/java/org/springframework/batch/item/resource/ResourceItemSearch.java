@@ -40,7 +40,7 @@ public interface ResourceItemSearch<T extends Comparable<? super T>> {
     /**
      * Return the index of an {@code item} by searching it in a {@code resource}
      *
-     * @param item     item you are looking for
+     * @param item     the expected item to match
      * @param resource resource which will be used by the reader
      * @return the index of the {@code item} or {@link #EOF} if not found.
      * @throws Exception in any case of error

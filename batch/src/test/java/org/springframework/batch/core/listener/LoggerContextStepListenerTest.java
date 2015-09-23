@@ -22,7 +22,7 @@
  * IN THE SOFTWARE.
  */
 
-package be.raildelays.batch.listener;
+package org.springframework.batch.core.listener;
 
 import org.junit.Assert;
 import org.junit.Before;

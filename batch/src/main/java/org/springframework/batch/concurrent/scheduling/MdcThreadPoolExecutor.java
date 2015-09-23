@@ -31,14 +31,15 @@ import java.util.concurrent.*;
 
 
 /**
- * A SLF4J MDC-compatible {@link ThreadPoolExecutor}.
+ * A SLF4J MDC-compatible {@link ThreadPoolExecutor} inspired by the source code published by jlevy (Date: 6/14/13)
+ * on <a href="http://stackoverflow.com/questions/6073019/how-to-use-mdc-with-thread-pools">StackOverflow</a>.
  * <p>
- * In general, MDC is used to store diagnostic information (e.g. a user's session id) in per-thread variables, to facilitate
- * logging. However, although MDC data is passed to thread children, this doesn't work when threads are reused in a
- * thread pool. This is a drop-in replacement for {@link ThreadPoolExecutor} sets MDC data before each task appropriately.
- * <p>
- * Created by jlevy.
- * Date: 6/14/13
+ *     The goal of this implementation is to allow sub-threads to share the same {@link MDC} as the main-thread.
+ *     Therefor, when you use Spring Batch partitioning, you allow sub-steps to communicate with your {@code Logger}.
+ * </p>
+ *
+ * @author Almex
+ * @since 1.2
  */
 public class MdcThreadPoolExecutor extends ThreadPoolExecutor {
 

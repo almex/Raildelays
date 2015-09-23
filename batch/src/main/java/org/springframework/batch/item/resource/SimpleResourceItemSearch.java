@@ -30,8 +30,12 @@ import org.springframework.core.io.Resource;
 import java.util.Comparator;
 
 /**
+ * Default implementation of a {@link ResourceItemSearch} which uses an {@link IndexedResourceAwareItemStreamReader}
+ * to find the index of an expected item.
+ *
  * @author Almex
  * @since 1.2
+ * @see #setComparator(Comparator)
  */
 public class SimpleResourceItemSearch<T extends Comparable<? super T>> implements ResourceItemSearch<T> {
 
@@ -66,6 +70,10 @@ public class SimpleResourceItemSearch<T extends Comparable<? super T>> implement
         this.reader = reader;
     }
 
+    /**
+     * @param comparator used to know if the read item match the expected one. By default, we compare via the
+     * {@link Comparable#compareTo(Object)} interface method.
+     */
     public void setComparator(Comparator<? super T> comparator) {
         this.comparator = comparator;
     }

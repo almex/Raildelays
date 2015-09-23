@@ -22,7 +22,7 @@
  * IN THE SOFTWARE.
  */
 
-package be.raildelays.batch.listener;
+package org.springframework.batch.core.listener;
 
 import org.slf4j.MDC;
 import org.springframework.batch.core.ExitStatus;
@@ -30,7 +30,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 
 /**
- * Add step name and train id to {@link org.apache.logging.log4j.ThreadContext} to be able to create
+ * Add step name and train id to {@link MDC} to be able to create
  * log direction based on that fields.
  *
  * @author Almex

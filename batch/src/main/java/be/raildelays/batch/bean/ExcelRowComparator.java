@@ -41,7 +41,7 @@ public class ExcelRowComparator implements Comparator<ExcelRow> {
         if (lho == rho) {
             result = 0;
         } else if (lho == null) {
-            result = rho == null ? 0 : -1;
+            result = -1;
         } else if (rho == null) {
             result = 1;
         } else {

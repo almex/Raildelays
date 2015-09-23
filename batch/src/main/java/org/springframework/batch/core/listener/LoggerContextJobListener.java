@@ -22,7 +22,7 @@
  * IN THE SOFTWARE.
  */
 
-package be.raildelays.batch.listener;
+package org.springframework.batch.core.listener;
 
 import org.slf4j.MDC;
 import org.springframework.batch.core.JobExecution;
@@ -32,7 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Add jobExecutionId to {@link org.apache.logging.log4j.ThreadContext} to be able to create
+ * Add jobExecutionId to {@link MDC} to be able to create
  * log directory based on that number.
  *
  * @author Almex

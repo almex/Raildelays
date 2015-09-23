@@ -30,6 +30,7 @@ import java.util.concurrent.*;
 
 /**
  * @author Almex
+ * @since 1.2
  */
 public class MdcThreadPoolTaskExecutor extends ThreadPoolExecutorFactoryBean {
 
