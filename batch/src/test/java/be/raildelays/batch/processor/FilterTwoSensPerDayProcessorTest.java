@@ -275,7 +275,7 @@ public class FilterTwoSensPerDayProcessorTest {
                 .delay(5L) //
                 .build());
 
-        Assert.assertNull(excelRow);
+        Assert.assertNotNull(excelRow);
     }
 
 }
