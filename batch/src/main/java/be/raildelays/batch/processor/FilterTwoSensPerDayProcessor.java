@@ -69,7 +69,7 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
          */
         BatchExcelRow result = item;
         Language lang = Language.valueOf(language.toUpperCase(Locale.US));
-        final StationBasedExcelRowComparator comparator = new StationBasedExcelRowComparator(lang);
+        StationBasedExcelRowComparator comparator = new StationBasedExcelRowComparator(lang);
 
         LOGGER.trace("item", item);
 
@@ -114,7 +114,7 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
 
                             break;
                         } else if (item.getDate().isBefore(matchingExcelRow.getDate())) {
-                            result = null;
+                            result = item;
 
                             /*
                              * We stop searching. We expect that the content of the Excel file is sorted by date.

@@ -68,7 +68,7 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
     }
 
     @Override
-    public BatchExcelRow process(final BatchExcelRow item) throws Exception {
+    public BatchExcelRow process(BatchExcelRow item) throws Exception {
         BatchExcelRow result = item; // By default we return the item itself
         List<LineStop> candidates;
         LocalDateTime dateTime = LocalDateTime.of(item.getDate(), item.getExpectedArrivalTime());
@@ -115,7 +115,7 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
         return result;
     }
 
-    private BatchExcelRow aggregate(final BatchExcelRow item, final BatchExcelRow fasterItem) {
+    private BatchExcelRow aggregate(BatchExcelRow item, BatchExcelRow fasterItem) {
         Long delay = Delays.computeDelay(item.getExpectedArrivalTime(), fasterItem.getEffectiveArrivalTime());
 
         return new BatchExcelRow.Builder(item.getDate(), item.getSens())
@@ -141,7 +141,6 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
 		 * departure station. When you have to decide to take another train
 		 * you don't know the effective arrival time.
 		 */
-
         for (LineStop candidateArrival : candidates) {
             LineStop candidateDeparture = searchDepartureLineStop(candidateArrival, item.getDepartureStation());
 
@@ -179,10 +178,7 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
             /*
              * Do not take into account candidate which leaves after the item.
              */
-            if (candidateDeparture.getDepartureTime().isAfter(TimeDelay.of(item.getEffectiveDepartureTime()))
-            /*duration(between(candidateDeparture.getDepartureTime())
-                    .and(item.getEffectiveDepartureTime()), is(greaterThan(0L)))*/
-                    /*compareTimeAndDelay(candidateDeparture.getDepartureTime(), item.getEffectiveDepartureTime()) > 0*/) {
+            if (candidateDeparture.getDepartureTime().isAfter(TimeDelay.of(item.getEffectiveDepartureTime()))) {
                 LOGGER.trace("filter_after_departure", candidateDeparture);
                 continue; // candidate leaves after item
             }
@@ -194,9 +190,7 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
              * time of the item (its delay).
              */
             if (Delays.compareTime(candidateArrival.getArrivalTime(), item.getExpectedArrivalTime()) <
-                    Delays.compareTime(item.getEffectiveDepartureTime(), item.getExpectedDepartureTime())
-            /*compareTime(candidateArrival.getArrivalTime(), item.getExpectedArrivalTime()) <
-                    compareTime(item.getEffectiveDepartureTime(), item.getExpectedDepartureTime())*/) {
+                    Delays.compareTime(item.getEffectiveDepartureTime(), item.getExpectedDepartureTime())) {
                 LOGGER.debug("faster_delay_train_arrival", candidateArrival);
                 fastestTrain = candidateArrival;
                 break; // candidate arrives before item

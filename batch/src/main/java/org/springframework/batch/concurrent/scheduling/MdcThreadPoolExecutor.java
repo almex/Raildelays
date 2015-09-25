@@ -31,11 +31,14 @@ import java.util.concurrent.*;
 
 
 /**
- * A SLF4J MDC-compatible {@link ThreadPoolExecutor} inspired by the source code published by jlevy (Date: 6/14/13)
- * on <a href="http://stackoverflow.com/questions/6073019/how-to-use-mdc-with-thread-pools">StackOverflow</a>.
+ * A SLF4J Mapped Diagnostic Context (MDC) compatible with {@link ThreadPoolExecutor} inspired by the source code
+ * published by jlevy on
+ * <a href="http://stackoverflow.com/questions/6073019/how-to-use-mdc-with-thread-pools">StackOverflow</a>
+ * (Source code date: 6/14/2013).
  * <p>
  *     The goal of this implementation is to allow sub-threads to share the same {@link MDC} as the main-thread.
- *     Therefor, when you use Spring Batch partitioning, you allow sub-steps to communicate with your {@code Logger}.
+ *     Therefor, when you use Spring Batch partitioning, you allow sub-steps to communicate with your {@code Logger} via
+ *     the {@code ThreadContext} (another word for MDC).
  * </p>
  *
  * @author Almex

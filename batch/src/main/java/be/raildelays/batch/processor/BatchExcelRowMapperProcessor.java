@@ -153,16 +153,16 @@ public class BatchExcelRowMapperProcessor implements ItemProcessor<LineStop, Bat
         LocalTime effectiveDepartureTime = lineStopFrom.getDepartureTime() != null ? lineStopFrom.getDepartureTime().getEffectiveTime() : null;
         LocalTime effectiveArrivalTime = lineStopTo.getArrivalTime() != null ? lineStopTo.getArrivalTime().getEffectiveTime() : null;
 
-        return new Builder(lineStopFrom.getDate(), sens) //
-                .departureStation(lineStopFrom.getStation()) //
-                .arrivalStation(lineStopTo.getStation()) //
-                .expectedDepartureTime(lineStopFrom.getDepartureTime().getExpectedTime()) //
-                .expectedArrivalTime(lineStopTo.getArrivalTime().getExpectedTime()) //
-                .expectedTrain1(lineStopFrom.getTrain()) //
-                .effectiveDepartureTime(effectiveDepartureTime) //
-                .effectiveArrivalTime(effectiveArrivalTime) //
-                .effectiveTrain1(lineStopTo.getTrain()) //
-                .delay(Delays.toMinutes(lineStopTo.getArrivalTime().getDelay())) //
+        return new Builder(lineStopFrom.getDate(), sens)
+                .departureStation(lineStopFrom.getStation())
+                .arrivalStation(lineStopTo.getStation())
+                .expectedDepartureTime(lineStopFrom.getDepartureTime().getExpectedTime())
+                .expectedArrivalTime(lineStopTo.getArrivalTime().getExpectedTime())
+                .expectedTrain1(lineStopFrom.getTrain())
+                .effectiveDepartureTime(effectiveDepartureTime)
+                .effectiveArrivalTime(effectiveArrivalTime)
+                .effectiveTrain1(lineStopTo.getTrain())
+                .delay(Delays.toMinutes(lineStopTo.getArrivalTime().getDelay()))
                 .canceled(lineStopFrom.isCanceled() || lineStopTo.isCanceled())
                 .build(false);
     }

@@ -71,27 +71,14 @@
           class="org.springframework.batch.core.listener.LoggerContextStepListener"
           scope="step">
         <property name="jobParametersExtractor">
-            <bean class="org.springframework.batch.core.step.job.CompositeJobParametersExtractor">
-                <property name="delegates">
+            <bean class="org.springframework.batch.core.step.job.DefaultJobParametersExtractor">
+                <property name="keys">
                     <list>
-                        <bean class="org.springframework.batch.core.step.job.DefaultJobParametersExtractor">
-                            <property name="keys">
-                                <list>
-                                    <value>date</value>
-                                </list>
-                            </property>
-                            <property name="useAllParentParameters" value="false"/>
-                        </bean>
-                        <bean class="org.springframework.batch.core.step.job.StepExecutionContextJobParametersExtractor">
-                            <property name="keys">
-                                <list>
-                                    <value>trainId</value>
-                                </list>
-                            </property>
-                            <property name="useAllContextAttributes" value="false"/>
-                        </bean>
+                        <value>date(date)</value>
+                        <value>trainId(int)</value>
                     </list>
                 </property>
+                <property name="useAllParentParameters" value="false"/>
             </bean>
         </property>
     </bean>

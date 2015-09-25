@@ -30,7 +30,10 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 import java.util.Comparator;
 
 /**
+ * This {@link Comparator} compute the exact match between all values
+ *
  * @author Almex
+ * @since 1.1
  */
 public class ExcelRowComparator implements Comparator<ExcelRow> {
 
