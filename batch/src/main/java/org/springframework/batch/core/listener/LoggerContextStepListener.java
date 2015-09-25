@@ -25,34 +25,82 @@
 package org.springframework.batch.core.listener;
 
 import org.slf4j.MDC;
-import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.*;
+import org.springframework.batch.core.step.job.JobParametersExtractor;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Add step name and train id to {@link MDC} to be able to create
+ * Add step name and train id to {@link org.apache.logging.log4j.ThreadContext} to be able to create
  * log direction based on that fields.
  *
  * @author Almex
  * @since 1.1
  */
-public class LoggerContextStepListener implements StepExecutionListener {
+public class LoggerContextStepListener implements StepExecutionListener, InitializingBean {
 
     public static final String STEP_NAME = "stepName";
-    public static final String TRAIN_ID = "trainId";
+    public static final String STEP_EXECUTION_ID = "stepExecutionId";
+    private JobParametersExtractor jobParametersExtractor;
+    private Set<String> keys = new HashSet<>(); // To keep trace of what we have to clean-up at the end
+    private String dateFormat = "yyyy-MM-dd";
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        Assert.notNull(jobParametersExtractor, "The property 'jobParametersExtractor' is mandatory");
+    }
 
     @Override
     public void beforeStep(StepExecution stepExecution) {
         MDC.put(STEP_NAME, stepExecution.getStepName().replace(':', '-'));
-        if (stepExecution.getExecutionContext().containsKey(TRAIN_ID)) {
-            MDC.put(TRAIN_ID, Integer.toString(stepExecution.getExecutionContext().getInt(TRAIN_ID)));
+        MDC.put(STEP_EXECUTION_ID, stepExecution.getId().toString());
+        addFromJobParametersExtractor(stepExecution);
+    }
+
+    private void addFromJobParametersExtractor(StepExecution stepExecution) {
+        JobParameters jobParameters = jobParametersExtractor.getJobParameters(null, stepExecution);
+
+        for (String key : jobParameters.getParameters().keySet()) {
+            JobParameter jobParameter = jobParameters.getParameters().get(key);
+            String value;
+
+            switch (jobParameter.getType()) {
+                case DATE:
+                    Date date = (Date) jobParameter.getValue();
+
+                    value = new SimpleDateFormat(dateFormat).format(date);
+                    break;
+                default:
+                    value = jobParameter.getValue().toString();
+            }
+
+            MDC.put(key, value);
+            keys.add(key);
         }
     }
 
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
         MDC.remove(STEP_NAME);
-        MDC.remove(TRAIN_ID);
+        MDC.remove(STEP_EXECUTION_ID);
+        keys.forEach(MDC::remove);
         return null;
+    }
+
+    public void setJobParametersExtractor(JobParametersExtractor jobParametersExtractor) {
+        this.jobParametersExtractor = jobParametersExtractor;
+    }
+
+    /**
+     * @param dateFormat used by a {@link SimpleDateFormat} to format {@link JobParameter.ParameterType#DATE} type.
+     *                   By default, we use 'yyyy-MM-dd' format.
+     */
+    public void setDateFormat(String dateFormat) {
+        this.dateFormat = dateFormat;
     }
 }

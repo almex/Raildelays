@@ -30,42 +30,72 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.slf4j.MDC;
+import org.springframework.batch.core.JobParameter;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.job.DefaultJobParametersExtractor;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.test.MetaDataInstanceFactory;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @RunWith(BlockJUnit4ClassRunner.class)
 public class LoggerContextStepListenerTest {
 
     public static final String STEP_NAME = "myStep";
-    public static final Long EXECUTION_ID = 100L;
+    public static final Date DATE = new Date();
+    public static final Long STEP_EXECUTION_ID = 100L;
     public static final Integer TRAIN_ID = 10;
+    public static final String DATE_KEY = "date";
+    public static final String TRAIN_ID_KEY = "trainId";
     private LoggerContextStepListener listener;
     private StepExecution stepExecution;
 
     @Before
     public void setUp() throws Exception {
         ExecutionContext context = new ExecutionContext();
+        JobParametersBuilder builder = new JobParametersBuilder();
+        DefaultJobParametersExtractor jobParametersExtractor = new DefaultJobParametersExtractor();
 
-        context.putInt(LoggerContextStepListener.TRAIN_ID, TRAIN_ID);
-        listener = new LoggerContextStepListener();
-        stepExecution = MetaDataInstanceFactory.createStepExecution(STEP_NAME, EXECUTION_ID);
+        context.putInt(TRAIN_ID_KEY, TRAIN_ID);
+        builder.addParameter(DATE_KEY, new JobParameter(DATE));
+
+        stepExecution = MetaDataInstanceFactory.createStepExecution(
+                MetaDataInstanceFactory.createJobExecution("jobName", 1L, 1L, builder.toJobParameters()),
+                STEP_NAME,
+                STEP_EXECUTION_ID
+        );
         stepExecution.setExecutionContext(context);
+
+        jobParametersExtractor.setKeys(new String[]{DATE_KEY + "(date)", TRAIN_ID_KEY + "(int)"});
+        jobParametersExtractor.setUseAllParentParameters(false);
+
+        listener = new LoggerContextStepListener();
+        listener.setJobParametersExtractor(jobParametersExtractor);
+        listener.afterPropertiesSet();
+        listener.setDateFormat("yyyy-MM-dd");
+
     }
 
     @Test
     public void testBeforeJob() throws Exception {
         listener.beforeStep(stepExecution);
 
-        Assert.assertEquals(TRAIN_ID.toString(), MDC.get(LoggerContextStepListener.TRAIN_ID));
+        Assert.assertEquals(TRAIN_ID.toString(), MDC.get(TRAIN_ID_KEY));
+        Assert.assertEquals(new SimpleDateFormat("yyyy-MM-dd").format(DATE), MDC.get(DATE_KEY));
         Assert.assertEquals(STEP_NAME, MDC.get(LoggerContextStepListener.STEP_NAME));
+        Assert.assertEquals(STEP_EXECUTION_ID.toString(), MDC.get(LoggerContextStepListener.STEP_EXECUTION_ID));
     }
 
     @Test
     public void testAfterJob() throws Exception {
+        listener.beforeStep(stepExecution);
         listener.afterStep(stepExecution);
 
-        Assert.assertNull(MDC.get(LoggerContextStepListener.TRAIN_ID));
+        Assert.assertNull(MDC.get(TRAIN_ID_KEY));
+        Assert.assertNull(MDC.get(DATE_KEY));
         Assert.assertNull(MDC.get(LoggerContextStepListener.STEP_NAME));
+        Assert.assertNull(MDC.get(LoggerContextStepListener.STEP_EXECUTION_ID));
     }
 }

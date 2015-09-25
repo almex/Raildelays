@@ -33,14 +33,14 @@ import org.springframework.batch.core.StepExecution;
  */
 public class JobParametersIncrementerJobParametersExtractor implements JobParametersExtractor {
 
-    private JobParametersIncrementer jobParametersIncrementer;
-
     @Override
     public JobParameters getJobParameters(Job job, StepExecution stepExecution) {
-        return jobParametersIncrementer.getNext(new JobParameters());
-    }
+        JobParameters result = new JobParameters();
 
-    public void setJobParametersIncrementer(JobParametersIncrementer jobParametersIncrementer) {
-        this.jobParametersIncrementer = jobParametersIncrementer;
+        if (job != null && job.getJobParametersIncrementer() != null) {
+            result = job.getJobParametersIncrementer().getNext(new JobParameters());
+        }
+
+        return result;
     }
 }

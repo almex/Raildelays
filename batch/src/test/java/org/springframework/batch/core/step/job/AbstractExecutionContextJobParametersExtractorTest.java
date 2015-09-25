@@ -9,7 +9,6 @@ import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 
-import java.util.Collections;
 import java.util.Date;
 
 /**
@@ -50,7 +49,7 @@ public abstract class AbstractExecutionContextJobParametersExtractorTest<T exten
      */
     @Test
     public void testGetJobParametersFromKeys() throws Exception {
-        jobParametersExtractor.setKeys(Collections.singleton(KEY));
+        jobParametersExtractor.setKeys(new String[]{KEY});
         jobParametersExtractor.setUseAllContextAttributes(false);
 
         JobParameters jobParameters = jobParametersExtractor.getJobParameters(new FlowJob(), stepExecution);

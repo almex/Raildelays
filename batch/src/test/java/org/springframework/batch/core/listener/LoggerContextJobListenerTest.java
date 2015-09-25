@@ -31,17 +31,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.slf4j.MDC;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameter;
-import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.test.MetaDataInstanceFactory;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @RunWith(BlockJUnit4ClassRunner.class)
 public class LoggerContextJobListenerTest {
 
-    public static final Date DATE = new Date();
     public static final String JOB_NAME = "myJob";
     public static final Long INSTANCE_ID = 1L;
     public static final Long EXECUTION_ID = 1L;
@@ -50,14 +44,12 @@ public class LoggerContextJobListenerTest {
 
     @Before
     public void setUp() throws Exception {
-        JobParametersBuilder builder = new JobParametersBuilder();
-
-        builder.addParameter("date", new JobParameter(DATE));
         listener = new LoggerContextJobListener();
-        jobExecution = MetaDataInstanceFactory.createJobExecution(JOB_NAME,
+        jobExecution = MetaDataInstanceFactory.createJobExecution(
+                JOB_NAME,
                 INSTANCE_ID,
-                EXECUTION_ID,
-                builder.toJobParameters());
+                EXECUTION_ID
+        );
     }
 
     @Test
@@ -66,15 +58,14 @@ public class LoggerContextJobListenerTest {
 
         Assert.assertEquals(EXECUTION_ID.toString(), MDC.get(LoggerContextJobListener.JOB_EXECUTION_ID));
         Assert.assertEquals(INSTANCE_ID.toString(), MDC.get(LoggerContextJobListener.JOB_INSTANCE_ID));
-        Assert.assertEquals(new SimpleDateFormat("yyyy-MM-dd").format(DATE), MDC.get(LoggerContextJobListener.DATE_PARAMETER));
     }
 
     @Test
     public void testAfterJob() throws Exception {
+        listener.beforeJob(jobExecution);
         listener.afterJob(jobExecution);
 
         Assert.assertNull(MDC.get(LoggerContextJobListener.JOB_EXECUTION_ID));
         Assert.assertNull(MDC.get(LoggerContextJobListener.JOB_INSTANCE_ID));
-        Assert.assertNull(MDC.get(LoggerContextJobListener.DATE_PARAMETER));
     }
 }

@@ -16,6 +16,12 @@ public class JobExecutionContextJobParametersExtractor extends AbstractExecution
 
     @Override
     public JobParameters getJobParameters(Job job, StepExecution stepExecution) {
-        return addJobParametersFromContext(new JobParameters(), stepExecution.getJobExecution().getExecutionContext());
+        JobParameters result = new JobParameters();
+
+        if (stepExecution != null && stepExecution.getJobExecution() != null) {
+            result = addJobParametersFromContext(stepExecution.getJobExecution().getExecutionContext());
+        }
+
+        return result;
     }
 }

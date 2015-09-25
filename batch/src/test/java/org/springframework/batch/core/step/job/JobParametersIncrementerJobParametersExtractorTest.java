@@ -20,9 +20,6 @@ public class JobParametersIncrementerJobParametersExtractorTest {
     @Before
     public void setUp() throws Exception {
         jobParametersExtractor = new JobParametersIncrementerJobParametersExtractor();
-        jobParametersExtractor.setJobParametersIncrementer(
-                parameters -> new JobParametersBuilder().addLong(KEY, 0L).toJobParameters()
-        );
     }
 
     /**
@@ -31,8 +28,13 @@ public class JobParametersIncrementerJobParametersExtractorTest {
     @Test
     public void testGetJobParameters() throws Exception {
         StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution();
+        FlowJob job = new FlowJob();
 
-        JobParameters jobParameters = jobParametersExtractor.getJobParameters(new FlowJob(), stepExecution);
+        job.setJobParametersIncrementer(
+                parameters -> new JobParametersBuilder().addLong(KEY, 0L).toJobParameters()
+        );
+
+        JobParameters jobParameters = jobParametersExtractor.getJobParameters(job, stepExecution);
 
         Assert.assertNotNull(jobParameters.getLong(KEY));
     }

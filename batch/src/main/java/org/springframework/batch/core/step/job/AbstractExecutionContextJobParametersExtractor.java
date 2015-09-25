@@ -29,9 +29,8 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.item.ExecutionContext;
 
+import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Sub-classes of this abstract class should extract keys from an {@link ExecutionContext} and map them into an
@@ -44,16 +43,18 @@ import java.util.Set;
  */
 public abstract class AbstractExecutionContextJobParametersExtractor implements JobParametersExtractor {
 
-    private Set<String> keys = new HashSet<>();
+    private String[] keys = new String[0];
     private boolean useAllContextAttributes = true;
 
-    protected JobParameters addJobParametersFromContext(JobParameters jobParameters, ExecutionContext context) {
-        JobParametersBuilder builder = new JobParametersBuilder(jobParameters);
+    protected JobParameters addJobParametersFromContext(ExecutionContext context) {
+        JobParametersBuilder builder = new JobParametersBuilder();
 
-        if (useAllContextAttributes) {
-            context.entrySet().stream().forEach(entry ->  addParameter(builder, entry.getKey(), entry.getValue()));
-        } else {
-            keys.stream().filter(context::containsKey).forEach(key -> addParameter(builder, key, context.get(key)));
+        if (context != null) {
+            if (useAllContextAttributes) {
+                context.entrySet().stream().forEach(entry -> addParameter(builder, entry.getKey(), entry.getValue()));
+            } else {
+                Arrays.stream(keys).filter(context::containsKey).forEach(key -> addParameter(builder, key, context.get(key)));
+            }
         }
 
         return builder.toJobParameters();
@@ -98,12 +99,18 @@ public abstract class AbstractExecutionContextJobParametersExtractor implements 
         return result;
     }
 
-    public void setKeys(Set<String> keys) {
+    /**
+     * @param keys list of key to extract from the {@link ExecutionContext} (only usable in combination of
+     *             {@link #setUseAllContextAttributes(boolean)}) setted to {@code false}.
+     */
+    public void setKeys(String[] keys) {
         this.keys = keys;
     }
 
     /**
-     * @param useAllContextAttributes (by default it's {@code true}).
+     * @param useAllContextAttributes {@code true} if we retrieve all context attributes or {@code false} if we keep
+     *                                only some of them by defining {@link #setKeys(String[])}.
+     *                                By default it's {@code true}
      */
     public void setUseAllContextAttributes(boolean useAllContextAttributes) {
         this.useAllContextAttributes = useAllContextAttributes;

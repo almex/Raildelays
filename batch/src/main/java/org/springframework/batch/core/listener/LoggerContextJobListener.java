@@ -28,9 +28,6 @@ import org.slf4j.MDC;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 /**
  * Add jobExecutionId to {@link MDC} to be able to create
  * log directory based on that number.
@@ -42,15 +39,11 @@ public class LoggerContextJobListener implements JobExecutionListener {
 
     public static final String JOB_EXECUTION_ID = "jobExecutionId";
     public static final String JOB_INSTANCE_ID = "jobInstanceId";
-    public static final String DATE_PARAMETER = "dateParameter";
 
     @Override
     public void beforeJob(JobExecution jobExecution) {
-        Date date = jobExecution.getJobParameters().getDate("date");
-
         MDC.put(JOB_EXECUTION_ID, jobExecution.getId().toString());
         MDC.put(JOB_INSTANCE_ID, jobExecution.getJobId().toString());
-        MDC.put(DATE_PARAMETER, new SimpleDateFormat("yyyy-MM-dd").format(date));
     }
 
 
@@ -58,6 +51,5 @@ public class LoggerContextJobListener implements JobExecutionListener {
     public void afterJob(JobExecution jobExecution) {
         MDC.remove(JOB_EXECUTION_ID);
         MDC.remove(JOB_INSTANCE_ID);
-        MDC.remove(DATE_PARAMETER);
     }
 }

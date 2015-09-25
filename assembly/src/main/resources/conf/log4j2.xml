@@ -4,8 +4,8 @@
     <Properties>
         <Property name="jobExecutionId">default</Property>
         <Property name="jobInstanceId">default</Property>
-        <Property name="dateParameter">default</Property>
-        <Property name="stepName">step1</Property>
+        <Property name="date">default</Property>
+        <Property name="stepName">default</Property>
         <Property name="trainId">default</Property>
         <Property name="isThreadContextMapInheritable ">true</Property>
     </Properties>
@@ -59,11 +59,11 @@
         </RollingFile>
 
         <Routing name="step1Reader">
-            <Routes pattern="$${ctx:dateParameter}$${ctx:trainId}">
+            <Routes pattern="$${ctx:date}$${ctx:trainId}">
                 <Route>
                     <RollingFile name="rolling-step1Reader"
-                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/${ctx:trainId}Reader.log"
-                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/${ctx:trainId}Reader-%d{MM-dd-yyyy}-%i.log.gz"
+                                 fileName="logs/${ctx:date}/${ctx:jobExecutionId}/${ctx:trainId}Reader.log"
+                                 filePattern="logs/${ctx:date}/${ctx:jobExecutionId}/backup/${ctx:trainId}Reader-%d{MM-dd-yyyy}-%i.log.gz"
                                  append="true">
                         <PatternLayout pattern="%m%n"/>
                         <Policies>
@@ -77,11 +77,11 @@
         </Routing>
 
         <Routing name="step1Processor">
-            <Routes pattern="$${ctx:dateParameter}$${ctx:trainId}">
+            <Routes pattern="$${ctx:date}$${ctx:trainId}">
                 <Route>
                     <RollingFile name="rolling-step1Processor"
-                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/${ctx:trainId}Processor.log"
-                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/${ctx:trainId}Processor-%d{MM-dd-yyyy}-%i.log.gz"
+                                 fileName="logs/${ctx:date}/${ctx:jobExecutionId}/${ctx:trainId}Processor.log"
+                                 filePattern="logs/${ctx:date}/${ctx:jobExecutionId}/backup/${ctx:trainId}Processor-%d{MM-dd-yyyy}-%i.log.gz"
                                  append="true">
                         <PatternLayout pattern="%m%n"/>
                         <Policies>
@@ -95,11 +95,11 @@
         </Routing>
 
         <Routing name="step1Writer">
-            <Routes pattern="$${ctx:dateParameter}$${ctx:trainId}">
+            <Routes pattern="$${ctx:date}$${ctx:trainId}">
                 <Route>
                     <RollingFile name="rolling-step1Writer"
-                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/${ctx:trainId}Writer.log"
-                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/${ctx:trainId}Writer-%d{MM-dd-yyyy}-%i.log.gz"
+                                 fileName="logs/${ctx:date}/${ctx:jobExecutionId}/${ctx:trainId}Writer.log"
+                                 filePattern="logs/${ctx:date}/${ctx:jobExecutionId}/backup/${ctx:trainId}Writer-%d{MM-dd-yyyy}-%i.log.gz"
                                  append="true">
                         <PatternLayout pattern="%m%n"/>
                         <Policies>
@@ -113,11 +113,11 @@
         </Routing>
 
         <Routing name="step2Reader">
-            <Routes pattern="$${ctx:dateParameter}">
+            <Routes pattern="$${ctx:date}">
                 <Route>
                     <RollingFile name="rolling-step2Reader"
-                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/step2Reader.log"
-                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/step2Reader-%d{MM-dd-yyyy}-%i.log.gz"
+                                 fileName="logs/${ctx:date}/${ctx:jobExecutionId}/step2Reader.log"
+                                 filePattern="logs/${ctx:date}/${ctx:jobExecutionId}/backup/step2Reader-%d{MM-dd-yyyy}-%i.log.gz"
                                  append="true">
                         <PatternLayout pattern="%m%n"/>
                         <Policies>
@@ -131,11 +131,11 @@
         </Routing>
 
         <Routing name="step2Processor">
-            <Routes pattern="$${ctx:dateParameter}">
+            <Routes pattern="$${ctx:date}">
                 <Route>
                     <RollingFile name="rolling-step2Processor"
-                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/step2Processor.log"
-                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/step2Processor-%d{MM-dd-yyyy}-%i.log.gz"
+                                 fileName="logs/${ctx:date}/${ctx:jobExecutionId}/step2Processor.log"
+                                 filePattern="logs/${ctx:date}/${ctx:jobExecutionId}/backup/step2Processor-%d{MM-dd-yyyy}-%i.log.gz"
                                  append="true">
                         <PatternLayout pattern="%m%n"/>
                         <Policies>
@@ -149,11 +149,11 @@
         </Routing>
 
         <Routing name="step2Writer">
-            <Routes pattern="$${ctx:dateParameter}">
+            <Routes pattern="$${ctx:date}">
                 <Route>
                     <RollingFile name="rolling-step2Writer"
-                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/step2Writer.log"
-                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/step2Writer-%d{MM-dd-yyyy}-%i.log.gz"
+                                 fileName="logs/${ctx:date}/${ctx:jobExecutionId}/step2Writer.log"
+                                 filePattern="logs/${ctx:date}/${ctx:jobExecutionId}/backup/step2Writer-%d{MM-dd-yyyy}-%i.log.gz"
                                  append="true">
                         <PatternLayout pattern="%c{1} %m%n"/>
                         <Policies>
@@ -167,11 +167,11 @@
         </Routing>
 
         <Routing name="step2SkippedItems">
-            <Routes pattern="$${ctx:dateParameter}">
+            <Routes pattern="$${ctx:date}">
                 <Route>
                     <RollingFile name="rolling-step2SkippedItems"
-                                 fileName="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/step2SkippedItems.log"
-                                 filePattern="logs/${ctx:dateParameter}/${ctx:jobExecutionId}/backup/step2SkippedItems-%d{MM-dd-yyyy}-%i.log.gz"
+                                 fileName="logs/${ctx:date}/${ctx:jobExecutionId}/step2SkippedItems.log"
+                                 filePattern="logs/${ctx:date}/${ctx:jobExecutionId}/backup/step2SkippedItems-%d{MM-dd-yyyy}-%i.log.gz"
                                  append="true">
                         <PatternLayout pattern="%m%n"/>
                         <Policies>

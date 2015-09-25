@@ -7,23 +7,21 @@ import org.junit.Test;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Almex
  */
 public class MdcThreadPoolExecutorTest {
 
-    private MdcThreadPoolExecutor threadPoolExecutor;
+    private ThreadPoolExecutor threadPoolExecutor;
     private boolean getThroughRunnable;
 
     @Before
     public void setUp() throws Exception {
-        threadPoolExecutor = new MdcThreadPoolExecutor(
+        threadPoolExecutor = new MdcThreadPoolTaskExecutor().createExecutor(
                 1,
                 1,
                 1000,
-                TimeUnit.MILLISECONDS,
                 new ArrayBlockingQueue<>(1),
                 new MdcThreadPoolTaskExecutor(),
                 new ThreadPoolExecutor.AbortPolicy()
