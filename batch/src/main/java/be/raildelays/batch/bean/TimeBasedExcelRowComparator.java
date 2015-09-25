@@ -116,21 +116,18 @@ public class TimeBasedExcelRowComparator implements Comparator<ExcelRow> {
          * {@code Comparator}.
          */
         private static <T> Comparator<T> nullsLast(final Comparator<T> comparator) {
-            return new Comparator<T>() {
-                @Override
-                public int compare(T lho, T rho) {
-                    int result;
+            return (lho, rho) -> {
+                int result;
 
-                    if (lho == null) {
-                        result = (rho == null) ? 0 : 1;
-                    } else if (rho == null) {
-                        result = -1;
-                    } else {
-                        result = comparator.compare(lho, rho);
-                    }
-
-                    return result;
+                if (lho == null) {
+                    result = (rho == null) ? 0 : 1;
+                } else if (rho == null) {
+                    result = -1;
+                } else {
+                    result = comparator.compare(lho, rho);
                 }
+
+                return result;
             };
         }
 

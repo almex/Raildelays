@@ -12,6 +12,11 @@ import org.junit.Test;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.number.OrderingComparison.greaterThan;
+import static org.hamcrest.number.OrderingComparison.lessThan;
+
 /**
  * @author Almex
  */
@@ -51,13 +56,22 @@ public class ExcelRowComparatorTest {
     }
 
     /**
+     * We expect that if the two {@link ExcelRow} are the same reference the
+     * {@link ExcelRowComparator} considers them as identical.
+     */
+    @Test
+    public void testEqualsReferences() throws Exception {
+        Assert.assertThat(comparator.compare(lho, lho), is(equalTo(0)));
+    }
+
+    /**
      * We expect that if the two {@link ExcelRow} are not the same reference but contain same values except one then
      * the natural order of that value should define if it's balanced on the left or on the right.
      */
     @Test
     public void testGreater() throws Exception {
         rho.setDelay(15L);
-        Assert.assertEquals(-1, comparator.compare(lho, rho));
+        Assert.assertThat(comparator.compare(lho, rho), is(lessThan(0)));
     }
 
     /**
@@ -67,7 +81,7 @@ public class ExcelRowComparatorTest {
     @Test
     public void testLess() throws Exception {
         lho.setDelay(15L);
-        Assert.assertEquals(1, comparator.compare(lho, rho));
+        Assert.assertThat(comparator.compare(lho, rho), is(greaterThan(0)));
     }
 
     /**
@@ -76,7 +90,7 @@ public class ExcelRowComparatorTest {
      */
     @Test
     public void testWithNullOnLeft() throws Exception {
-        Assert.assertEquals(-1, comparator.compare(null, rho));
+        Assert.assertThat(comparator.compare(null, rho), is(lessThan(0)));
     }
 
     /**
@@ -85,6 +99,6 @@ public class ExcelRowComparatorTest {
      */
     @Test
     public void testWithNullOnRight() throws Exception {
-        Assert.assertEquals(1, comparator.compare(lho, null));
+        Assert.assertThat(comparator.compare(lho, null), is(greaterThan(0)));
     }
 }
