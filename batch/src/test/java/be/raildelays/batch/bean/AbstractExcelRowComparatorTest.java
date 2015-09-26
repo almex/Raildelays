@@ -9,8 +9,8 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 
 import java.util.Comparator;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
 
 @RunWith(BlockJUnit4ClassRunner.class)
 public abstract class AbstractExcelRowComparatorTest {
@@ -30,9 +30,6 @@ public abstract class AbstractExcelRowComparatorTest {
 
     @Test
     public final void testCompareNull() throws Exception {
-        Assert.assertThat(comparator.compare(new BatchExcelRow.Builder(null, null)
-                                .build(false),
-                        null),
-                greaterThan(0));
+        Assert.assertThat(comparator.compare(null, null), is(equalTo(0)));
     }
 }

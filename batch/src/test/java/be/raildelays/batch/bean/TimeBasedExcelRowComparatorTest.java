@@ -43,7 +43,7 @@ public class TimeBasedExcelRowComparatorTest extends AbstractExcelRowComparatorT
                         null,
                         new BatchExcelRow.Builder(null, null).build(false)
                 ),
-                lessThan(0)
+                greaterThan(0)
         );
     }
 
@@ -54,7 +54,7 @@ public class TimeBasedExcelRowComparatorTest extends AbstractExcelRowComparatorT
                         new ExcelRow.Builder(today, null).build(false),
                         null
                 ),
-                greaterThan(0)
+                lessThan(0)
         );
     }
 

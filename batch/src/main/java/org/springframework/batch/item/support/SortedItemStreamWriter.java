@@ -73,7 +73,7 @@ public class SortedItemStreamWriter<T extends Comparable<T>> extends ItemStreamS
     }
 
     private void sort(List<T> allItems) {
-        Collections.sort(allItems, comparator);
+        allItems.sort(comparator);
         indexItems(allItems);
 
         LOGGER.trace("Items sorted={}", allItems.size());
