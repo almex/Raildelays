@@ -20,9 +20,8 @@ import static org.hamcrest.number.OrderingComparison.lessThan;
 /**
  * @author Almex
  */
-public class ExcelRowComparatorTest {
+public class ExcelRowComparatorTest extends AbstractExcelRowComparatorTest {
 
-    private ExcelRowComparator comparator;
     private ExcelRow lho;
     private ExcelRow rho;
 
@@ -33,12 +32,12 @@ public class ExcelRowComparatorTest {
                 .departureStation(new Station("departureStation"))
                 .linkStation(new Station("linkStation"))
                 .arrivalStation(new Station("arrivalStation"))
-                .expectedDepartureTime(LocalTime.of(10, 01))
-                .expectedArrivalTime(LocalTime.of(11, 00))
+                .expectedDepartureTime(LocalTime.of(10, 1))
+                .expectedArrivalTime(LocalTime.of(11, 0))
                 .expectedTrain1(new Train("expectedTrain1"))
                 .expectedTrain2(new Train("expectedTrain2"))
-                .effectiveDepartureTime(LocalTime.of(10, 05))
-                .effectiveArrivalTime(LocalTime.of(11, 00))
+                .effectiveDepartureTime(LocalTime.of(10, 5))
+                .effectiveArrivalTime(LocalTime.of(11, 0))
                 .effectiveTrain1(new Train("expectedTrain1"))
                 .effectiveTrain2(new Train("effectiveTrain2"))
                 .delay(0L);
@@ -69,7 +68,7 @@ public class ExcelRowComparatorTest {
      * the natural order of that value should define if it's balanced on the left or on the right.
      */
     @Test
-    public void testGreater() throws Exception {
+    public void testLess() throws Exception {
         rho.setDelay(15L);
         Assert.assertThat(comparator.compare(lho, rho), is(lessThan(0)));
     }
@@ -79,7 +78,7 @@ public class ExcelRowComparatorTest {
      * the natural order of that value should define if it's balanced on the left or on the right.
      */
     @Test
-    public void testLess() throws Exception {
+    public void testGreater() throws Exception {
         lho.setDelay(15L);
         Assert.assertThat(comparator.compare(lho, rho), is(greaterThan(0)));
     }

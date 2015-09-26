@@ -26,8 +26,6 @@ package be.raildelays.batch.bean;
 
 import be.raildelays.domain.xls.ExcelRow;
 
-import java.util.Comparator;
-
 import static java.util.Comparator.*;
 
 /**
@@ -51,14 +49,15 @@ import static java.util.Comparator.*;
  * @see java.util.Collections
  * @since 1.2
  */
-public class TimeBasedExcelRowComparator implements Comparator<ExcelRow> {
+public class TimeBasedExcelRowComparator extends AbstractExcelRowComparator<ExcelRow> {
 
     @Override
     public int compare(ExcelRow lho, ExcelRow rho) {
-        return nullsLast(comparing(ExcelRow::getDate, nullsFirst(naturalOrder()))
-                        .thenComparing(comparing(ExcelRow::getExpectedDepartureTime, nullsFirst(naturalOrder())))
-                        .thenComparing(comparing(ExcelRow::getExpectedArrivalTime, nullsFirst(naturalOrder())))
+        return nullsLast(compareReferences(
+                comparing(ExcelRow::getDate, nullsFirst(naturalOrder()))
+                        .thenComparing(ExcelRow::getExpectedDepartureTime, nullsFirst(naturalOrder()))
+                        .thenComparing(ExcelRow::getExpectedArrivalTime, nullsFirst(naturalOrder()))
                         .reversed()
-        ).compare(lho, rho);
+        )).compare(lho, rho);
     }
 }

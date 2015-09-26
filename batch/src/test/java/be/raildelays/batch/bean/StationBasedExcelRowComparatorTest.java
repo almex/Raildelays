@@ -21,7 +21,6 @@ public class StationBasedExcelRowComparatorTest extends AbstractExcelRowComparat
         now = LocalDate.now();
     }
 
-
     @Test
     public final void testCompareNullDate() throws Exception {
         Assert.assertThat(

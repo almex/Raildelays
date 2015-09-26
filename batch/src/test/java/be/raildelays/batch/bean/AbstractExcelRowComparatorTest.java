@@ -19,7 +19,7 @@ public abstract class AbstractExcelRowComparatorTest {
 
 
     @Before
-    public abstract void setUp();
+    public abstract void setUp() throws Exception;
 
     @Test
     public final void testSameReference() throws Exception {

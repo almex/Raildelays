@@ -27,11 +27,12 @@ package be.raildelays.batch.bean;
 import be.raildelays.domain.Language;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.xls.ExcelRow;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.CompareToBuilder;
 
-import java.util.Comparator;
+import java.text.Normalizer;
 import java.util.Locale;
+import java.util.function.Function;
+
+import static java.util.Comparator.*;
 
 /**
  * Compare {@code date} and {@link be.raildelays.domain.entities.Station} name for departure and arrival without taking
@@ -41,7 +42,7 @@ import java.util.Locale;
  * @author Almex
  * @since 1.2
  */
-public class StationBasedExcelRowComparator implements Comparator<ExcelRow> {
+public class StationBasedExcelRowComparator extends AbstractExcelRowComparator<ExcelRow> {
 
     private Language language;
 
@@ -51,37 +52,30 @@ public class StationBasedExcelRowComparator implements Comparator<ExcelRow> {
 
     @Override
     public int compare(ExcelRow lho, ExcelRow rho) {
-        int result;
-
-        if (lho == rho) {
-            result = 0;
-        } else if (lho == null) {
-            result = -1;
-        } else if (rho == null) {
-            result = 1;
-        } else {
-            result = new CompareToBuilder()
-                    .append(lho.getDate(), rho.getDate())
-                    .append(getStationName(lho.getDepartureStation(), language), getStationName(rho.getDepartureStation(), language))
-                    .append(getStationName(lho.getArrivalStation(), language), getStationName(rho.getArrivalStation(), language))
-                    .toComparison();
-        }
-
-        return result;
+        return nullsFirst(compareReferences(
+                comparing(ExcelRow::getDate, nullsFirst(naturalOrder()))
+                        .thenComparing(getStationName(ExcelRow::getDepartureStation), nullsFirst(naturalOrder()))
+                        .thenComparing(getStationName(ExcelRow::getArrivalStation), nullsFirst(naturalOrder()))
+        )).compare(lho, rho);
     }
 
+    protected Function<ExcelRow, String> getStationName(Function<ExcelRow, Station> keyExtractor) {
+        return excelRow -> {
+            Station station = keyExtractor.apply(excelRow);
+            String result = null;
 
-    private static String getStationName(Station station, Language lang) {
-        String result = null;
+            if (station != null) {
+                String stationName = station.getName(language);
 
-        if (station != null) {
-            String stationName = station.getName(lang);
-
-            if (StringUtils.isNotBlank(stationName)) {
-                result = StringUtils.stripAccents(stationName.toUpperCase(Locale.UK));
+                if (!"".equals(stationName)) {
+                    result = Normalizer
+                            .normalize(stationName, Normalizer.Form.NFD)
+                            .replaceAll("[^\\p{ASCII}]", "")
+                            .toUpperCase(Locale.ENGLISH);
+                }
             }
-        }
 
-        return result;
+            return result;
+        };
     }
 }
