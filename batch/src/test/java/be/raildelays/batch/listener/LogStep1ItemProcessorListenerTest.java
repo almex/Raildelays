@@ -3,9 +3,6 @@ package be.raildelays.batch.listener;
 import be.raildelays.delays.TimeDelay;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.railtime.Direction;
-import be.raildelays.domain.railtime.Train;
-import be.raildelays.domain.railtime.TwoDirections;
 import org.apache.logging.log4j.junit.InitialLoggerContext;
 import org.apache.logging.log4j.test.appender.ListAppender;
 import org.junit.Assert;
@@ -14,8 +11,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 
 import java.time.LocalDate;
-
-import static org.junit.Assert.*;
 
 public class LogStep1ItemProcessorListenerTest {
 
@@ -35,7 +30,14 @@ public class LogStep1ItemProcessorListenerTest {
 
     @Test
     public void testInfoInputTwoDirections() throws Exception {
-        listener.beforeProcess(new TwoDirections(new Direction(new Train("416")), new Direction(new Train("416"))));
+        listener.beforeProcess(new LineStop
+                .Builder()
+                .date(LocalDate.now())
+                .station(new Station("foo"))
+                .train(new be.raildelays.domain.entities.Train("bar"))
+                .departureTime(TimeDelay.now())
+                .arrivalTime(TimeDelay.now().withDelay(15L))
+                .build());
 
         Assert.assertTrue(
                 appender.getMessages()

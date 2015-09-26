@@ -58,6 +58,21 @@ public class LogSkippedItemListenerTest {
          * We retrieve the Appender in order to express some assertion on it
          */
         appender = init.getListAppender("List");
+        appender.clear();
+    }
+
+    @Test
+    public void testOnProcessError() throws Exception {
+        listener.onProcessError(null, new Exception("foo"));
+
+        Assert.assertTrue(appender.getEvents().isEmpty());
+    }
+
+    @Test
+    public void testBeforeProcess() throws Exception {
+        listener.beforeProcess(null);
+
+        Assert.assertTrue(appender.getEvents().isEmpty());
     }
 
     @Test
@@ -196,7 +211,7 @@ public class LogSkippedItemListenerTest {
                     return formattedMessage.contains("foo") &&
                             formattedMessage.contains("bar") &&
                             formattedMessage.contains("15:00 16:00") &&
-                            formattedMessage.contains("error");
+                            formattedMessage.contains("filtering");
                 }));
 
     }
@@ -224,7 +239,7 @@ public class LogSkippedItemListenerTest {
 
                     return formattedMessage.contains("foo") &&
                             formattedMessage.contains("15:00 16:00") &&
-                            formattedMessage.contains("error");
+                            formattedMessage.contains("filtering");
                 }));
 
     }
@@ -239,7 +254,7 @@ public class LogSkippedItemListenerTest {
                 .anyMatch(logEvent -> logEvent
                                 .getMessage()
                                 .getFormattedMessage()
-                                .contains("error")
+                                .contains("filtering_unknown")
                 ));
 
     }
