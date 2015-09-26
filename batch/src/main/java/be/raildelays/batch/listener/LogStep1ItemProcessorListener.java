@@ -25,7 +25,6 @@
 package be.raildelays.batch.listener;
 
 import be.raildelays.domain.entities.LineStop;
-import be.raildelays.domain.railtime.TwoDirections;
 
 /**
  * Logging of items before and after process in retrieveDataFromAfasJob
@@ -37,8 +36,13 @@ public class LogStep1ItemProcessorListener extends AbstractLogItemProcessorListe
 
     @Override
     public void infoInput(String message, Object input) {
-        if (input instanceof TwoDirections) {
-            logger.info(message, (TwoDirections) input);
+        if (input instanceof LineStop) {
+            LineStop current = (LineStop) input;
+
+            while (current != null) {
+                logger.info(message, current);
+                current = current.getNext();
+            }
         }
     }
 

@@ -33,12 +33,11 @@ public abstract class AbstractExcelRowComparator<T extends ExcelRow> implements 
      */
     final static class ReferenceComparator<T> implements Comparator<T>, Serializable {
 
-        // if same reference, non-null Ts are considered equal
-        private final Comparator<T> real;
+        // if different reference otherwise Ts are considered equal
+        private final Comparator<? super T> real;
 
-        @SuppressWarnings("unchecked")
         ReferenceComparator(Comparator<? super T> real) {
-            this.real = (Comparator<T>) real;
+            this.real = real;
         }
 
         @Override
