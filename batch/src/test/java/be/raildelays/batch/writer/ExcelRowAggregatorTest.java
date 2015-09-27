@@ -8,6 +8,8 @@ import be.raildelays.domain.xls.ExcelRow;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,23 +43,8 @@ public class ExcelRowAggregatorTest {
     public void setUp() throws Exception {
         workbook = new HSSFWorkbook();
         row = workbook.createSheet(SHEET_NAME).createRow(ROW_INDEX);
-        row.createCell(2).setCellValue(new Date());
-        row.createCell(12).setCellValue("Liège-Guillemins");
-        row.createCell(18).setCellValue("Bruxelles-Central");
-        row.createCell(24).setCellValue("Leuven");
-        row.createCell(30).setCellValue("08");
-        row.createCell(32).setCellValue("01");
-        row.createCell(33).setCellValue("08");
-        row.createCell(35).setCellValue("58");
-        row.createCell(36).setCellValue("1717");
-        row.createCell(39).setCellValue("477");
-        row.createCell(42).setCellValue("08");
-        row.createCell(44).setCellValue("05");
-        row.createCell(45).setCellValue("09");
-        row.createCell(47).setCellValue("18");
-        row.createCell(48).setCellValue("1717");
-        row.createCell(51).setCellValue("477");
-        row.createCell(54).setCellValue(17L);
+
+        initRow(row);
 
         item = new BatchExcelRow.Builder(LocalDate.parse("2000-01-01"), null) //
                 .departureStation(new Station("BRUXELLES-CENTRAL")) //
@@ -76,6 +63,26 @@ public class ExcelRowAggregatorTest {
         aggregator = new ExcelRowAggregator();
     }
 
+    private static void initRow(Row row) {
+        row.createCell(2).setCellValue(new Date());
+        row.createCell(12).setCellValue("Liège-Guillemins");
+        row.createCell(18).setCellValue("Bruxelles-Central");
+        row.createCell(24).setCellValue("Leuven");
+        row.createCell(30).setCellValue("08");
+        row.createCell(32).setCellValue("01");
+        row.createCell(33).setCellValue("08");
+        row.createCell(35).setCellValue("58");
+        row.createCell(36).setCellValue("1717");
+        row.createCell(39).setCellValue("477");
+        row.createCell(42).setCellValue("08");
+        row.createCell(44).setCellValue("05");
+        row.createCell(45).setCellValue("09");
+        row.createCell(47).setCellValue("18");
+        row.createCell(48).setCellValue("1717");
+        row.createCell(51).setCellValue("477");
+        row.createCell(54).setCellValue(17L);
+    }
+
 
     @Test
     public void testAggregateRow() throws Exception {
@@ -85,6 +92,35 @@ public class ExcelRowAggregatorTest {
         Assert.assertNotNull(row);
         Assert.assertEquals(TRAIN1, row.getCell(36).getStringCellValue());
         Assert.assertEquals(TRAIN1, row.getCell(48).getStringCellValue());
+    }
+
+    @Test
+    public void testXSSFWorkbook() throws Exception {
+        workbook = new XSSFWorkbook();
+        row = workbook.createSheet().createRow(ROW_INDEX);
+
+        initRow(row);
+
+        aggregator.aggregate(item, workbook, SHEET_INDEX, ROW_INDEX);
+
+        Row row = workbook.getSheetAt(SHEET_INDEX).getRow(ROW_INDEX);
+        Assert.assertNotNull(row);
+        Assert.assertEquals(TRAIN1, row.getCell(36).getStringCellValue());
+        Assert.assertEquals(TRAIN1, row.getCell(48).getStringCellValue());
+    }
+
+    @Test
+    public void testInvalidFormatException() throws Exception {
+        workbook = new SXSSFWorkbook();
+        row = workbook.createSheet().createRow(ROW_INDEX);
+
+        initRow(row);
+
+        aggregator.aggregate(item, workbook, SHEET_INDEX, ROW_INDEX);
+
+        Row row = workbook.getSheetAt(SHEET_INDEX).getRow(ROW_INDEX);
+        Assert.assertNotNull(row);
+        Assert.assertNotEquals(DELAY, row.getCell(54).getNumericCellValue());
     }
 
     @Test
