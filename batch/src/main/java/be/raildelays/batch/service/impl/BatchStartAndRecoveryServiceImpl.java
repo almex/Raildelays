@@ -39,12 +39,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service("BatchStartAndRecoveryService")
 public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoveryService {
-
-    private static final String ILLEGAL_STATE_MSG = "Illegal state (only happens on a race condition): "
-            + "%s with name=%s and parameters=%s";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchStartAndRecoveryServiceImpl.class);
 
@@ -89,15 +87,16 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
                 jobExecution.setExitStatus(RECOVERY_STATUS);
 
                 // -- Set all running Step Execution as FAILED
-                for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
-                    if (stepExecution.getStatus().isRunning()) {
-                        stepExecution.setEndTime(new Date());
-                        stepExecution.setStatus(BatchStatus.FAILED);
-                        stepExecution.setExitStatus(RECOVERY_STATUS);
+                jobExecution.getStepExecutions()
+                        .stream()
+                        .filter(stepExecution -> stepExecution.getStatus().isRunning())
+                        .forEach(stepExecution -> {
+                            stepExecution.setEndTime(new Date());
+                            stepExecution.setStatus(BatchStatus.FAILED);
+                            stepExecution.setExitStatus(RECOVERY_STATUS);
 
-                        jobRepository.update(stepExecution);
-                    }
-                }
+                            jobRepository.update(stepExecution);
+                        });
 
                 jobRepository.update(jobExecution);
                 LOGGER.info("Setted job as FAILED!");
@@ -106,11 +105,10 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
     }
 
     private Set<Long> getRunningExecutions(String jobName) throws NoSuchJobException {
-        Set<Long> set = new LinkedHashSet<Long>();
-
-        for (JobExecution jobExecution : jobExplorer.findRunningJobExecutions(jobName)) {
-            set.add(jobExecution.getId());
-        }
+        Set<Long> set = jobExplorer.findRunningJobExecutions(jobName)
+                .stream()
+                .map(JobExecution::getId)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
         if (set.isEmpty() && !jobRegistry.getJobNames().contains(jobName)) {
             throw new NoSuchJobException("No such job (either in registry or in historical data): " + jobName);
@@ -150,8 +148,7 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
         for (int start = 0; ; start += count) {
             List<Long> jobInstanceIds = getJobInstances(jobName, start, count);
 
-            LOGGER.debug("Number of jobInstanceIds={} start={} count={}.",
-                    new Object[]{jobInstanceIds.size(), start, count});
+            LOGGER.debug("Number of jobInstanceIds={} start={} count={}.", jobInstanceIds.size(), start, count);
 
             if (jobInstanceIds.size() == 0) {
                 return;
@@ -167,18 +164,16 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
     }
 
     private List<Long> getExecutions(Long jobInstanceId) throws NoSuchJobInstanceException {
-        List<Long> list = new ArrayList<Long>();
         JobInstance jobInstance = jobExplorer.getJobInstance(jobInstanceId);
 
         if (jobInstance == null) {
             throw new NoSuchJobInstanceException(String.format("No job instance with id=%d", jobInstanceId));
         }
 
-        for (JobExecution jobExecution : jobExplorer.getJobExecutions(jobInstance)) {
-            list.add(jobExecution.getId());
-        }
-
-        return list;
+        return jobExplorer.getJobExecutions(jobInstance)
+                .stream()
+                .map(JobExecution::getId)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -200,11 +195,10 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
     }
 
     private List<Long> getJobInstances(String jobName, int start, int count) throws NoSuchJobException {
-        List<Long> list = new ArrayList<Long>();
-
-        for (JobInstance jobInstance : jobExplorer.getJobInstances(jobName, start, count)) {
-            list.add(jobInstance.getId());
-        }
+        List<Long> list = jobExplorer.getJobInstances(jobName, start, count)
+                .stream()
+                .map(JobInstance::getId)
+                .collect(Collectors.toList());
 
         if (list.isEmpty() && !jobRegistry.getJobNames().contains(jobName)) {
             throw new NoSuchJobException("No such job (either in registry or in historical data): " + jobName);
@@ -220,12 +214,6 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
 
     public JobExecution start(String jobName, JobParameters jobParameters, boolean newInstance) throws JobInstanceAlreadyExistsException, NoSuchJobException, JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
         LOGGER.info("Checking status of job with name=" + jobName);
-
-//		if (jobRepository.isJobInstanceExists(jobName, jobParameters)) {
-//			throw new JobInstanceAlreadyExistsException(String.format(
-//					"Cannot start a job instance that already exists with name=%s and parameters=%s", jobName,
-//					jobParameters));
-//		}   //-- Useless in our case. We would like to restart it
 
         Job job = jobRegistry.getJob(jobName);
         JobParameters effectiveJobParameters = jobParameters;
@@ -264,9 +252,7 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
 
         LOGGER.info("Attempting to resume job with name={} and parameters={}", jobName, parameters);
 
-        JobExecution jobExecution = jobLauncher.run(job, parameters);
-
-        return jobExecution;
+        return jobLauncher.run(job, parameters);
     }
 
     private JobExecution findExecutionById(Long jobExecutionId) throws NoSuchJobExecutionException {
@@ -309,7 +295,7 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
 
     @Override
     public Set<String> getJobNames() {
-        return new TreeSet<String>(jobRegistry.getJobNames());
+        return new TreeSet<>(jobRegistry.getJobNames());
     }
 
     @Override

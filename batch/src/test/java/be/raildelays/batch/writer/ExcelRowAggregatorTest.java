@@ -2,6 +2,7 @@ package be.raildelays.batch.writer;
 
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
+import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
 import be.raildelays.domain.xls.ExcelRow;
@@ -94,6 +95,9 @@ public class ExcelRowAggregatorTest {
         Assert.assertEquals(TRAIN1, row.getCell(48).getStringCellValue());
     }
 
+    /**
+     * We expect to test the '*.xlsx' format.
+     */
     @Test
     public void testXSSFWorkbook() throws Exception {
         workbook = new XSSFWorkbook();
@@ -101,7 +105,7 @@ public class ExcelRowAggregatorTest {
 
         initRow(row);
 
-        aggregator.aggregate(item, workbook, SHEET_INDEX, ROW_INDEX);
+        Assert.assertNotNull(aggregator.aggregate(item, workbook, SHEET_INDEX, ROW_INDEX));
 
         Row row = workbook.getSheetAt(SHEET_INDEX).getRow(ROW_INDEX);
         Assert.assertNotNull(row);
@@ -109,6 +113,10 @@ public class ExcelRowAggregatorTest {
         Assert.assertEquals(TRAIN1, row.getCell(48).getStringCellValue());
     }
 
+    /**
+     * We expect that if we use a {@link Workbook} sub-type which is not supported we do not aggregate the row.
+     * We should not throw any Exception.
+     */
     @Test
     public void testInvalidFormatException() throws Exception {
         workbook = new SXSSFWorkbook();
@@ -116,11 +124,53 @@ public class ExcelRowAggregatorTest {
 
         initRow(row);
 
-        aggregator.aggregate(item, workbook, SHEET_INDEX, ROW_INDEX);
+        Assert.assertNotNull(aggregator.aggregate(item, workbook, SHEET_INDEX, ROW_INDEX));
 
         Row row = workbook.getSheetAt(SHEET_INDEX).getRow(ROW_INDEX);
         Assert.assertNotNull(row);
         Assert.assertNotEquals(DELAY, row.getCell(54).getNumericCellValue());
+    }
+
+    /**
+     * We expect that if we set a non numerical as a {@link Train} then we should get a {@link java.text.ParseException}.
+     * Which will be interpreted as an error in the log. We should not throw any Exception.
+     */
+    @Test
+    public void testInvalidNumericFormat() throws Exception {
+        item = new BatchExcelRow
+                .Builder(LocalDate.now(), Sens.DEPARTURE)
+                .expectedTrain1(new Train("foo"))
+                .build(false);
+
+        row.createCell(36).setCellValue(1717);
+
+        Assert.assertNotNull(aggregator.aggregate(item, workbook, SHEET_INDEX, ROW_INDEX));
+
+        Row row = workbook.getSheetAt(SHEET_INDEX).getRow(ROW_INDEX);
+        Assert.assertNotNull(row);
+        Assert.assertNotEquals(1717, row.getCell(36).getNumericCellValue());
+    }
+
+
+    /**
+     * We expect that if aggregate an empty we return {@code null}.
+     * We should not throw any Exception.
+     */
+    @Test
+    public void testEmptyRow() throws Exception {
+        workbook.createSheet().createRow(2);
+
+        Assert.assertNull(aggregator.aggregate(item, workbook, SHEET_INDEX, 2));
+    }
+
+    /**
+     * We expect that if we map a row which does not exist we do not create a new one.
+     * We should not throw any Exception.
+     */
+    @Test
+    public void testCannotMapRowIndex() throws Exception {
+        Assert.assertNull(aggregator.aggregate(item, workbook, SHEET_INDEX, 2));
+        Assert.assertNull(workbook.getSheetAt(SHEET_INDEX).getRow(2));
     }
 
     @Test
