@@ -33,6 +33,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 
+import java.util.List;
 import java.util.Set;
 
 
@@ -40,12 +41,13 @@ public interface BatchStartAndRecoveryService {
 
     /**
      * Stop all running jobs (STARTING, STARTED, STOPPING)
+     * @return all {@link JobExecution} which have been stopped
      */
-    void stopAllRunningJobs() throws NoSuchJobException, NoSuchJobExecutionException, JobExecutionNotRunningException;
+    List<JobExecution> stopAllRunningJobs() throws NoSuchJobException, NoSuchJobExecutionException, JobExecutionNotRunningException;
 
     /**
      * This method must be call before any start of a job to recover
-     * inconsitency within batch job repository due to an unproper shutdown.
+     * inconsistency within batch job repository due, for instance, to an abrupt shutdown.
      *
      * @throws NoSuchJobException
      * @throws NoSuchJobExecutionException
@@ -56,12 +58,34 @@ public interface BatchStartAndRecoveryService {
      * @throws JobRestartException
      * @throws JobParametersInvalidException
      * @throws NoSuchJobInstanceException
+     * @return all {@link JobExecution} which have been marked as failed
      */
-    void markInconsistentJobsAsFailed() throws NoSuchJobException, NoSuchJobExecutionException, JobExecutionNotRunningException, InterruptedException, JobExecutionAlreadyRunningException, JobInstanceAlreadyCompleteException, JobRestartException, JobParametersInvalidException, NoSuchJobInstanceException;
+    List<JobExecution> markInconsistentJobsAsFailed() throws NoSuchJobException, NoSuchJobExecutionException, JobExecutionNotRunningException, InterruptedException, JobExecutionAlreadyRunningException, JobInstanceAlreadyCompleteException, JobRestartException, JobParametersInvalidException, NoSuchJobInstanceException;
 
-    void restartAllFailedJobs() throws NoSuchJobException, JobInstanceAlreadyCompleteException, NoSuchJobExecutionException, JobRestartException, JobParametersInvalidException, NoSuchJobInstanceException, JobExecutionAlreadyRunningException;
+    /**
+     * @return
+     * @throws NoSuchJobException
+     * @throws JobInstanceAlreadyCompleteException
+     * @throws NoSuchJobExecutionException
+     * @throws JobRestartException
+     * @throws JobParametersInvalidException
+     * @throws NoSuchJobInstanceException
+     * @throws JobExecutionAlreadyRunningException
+     */
+    List<JobExecution> restartAllFailedJobs() throws NoSuchJobException, JobInstanceAlreadyCompleteException, NoSuchJobExecutionException, JobRestartException, JobParametersInvalidException, NoSuchJobInstanceException, JobExecutionAlreadyRunningException;
 
-    void restartAllStoppedJobs() throws NoSuchJobException, JobInstanceAlreadyCompleteException, NoSuchJobExecutionException, JobRestartException, JobParametersInvalidException, NoSuchJobInstanceException, JobExecutionAlreadyRunningException;
+    /**
+     *
+     * @return
+     * @throws NoSuchJobException
+     * @throws JobInstanceAlreadyCompleteException
+     * @throws NoSuchJobExecutionException
+     * @throws JobRestartException
+     * @throws JobParametersInvalidException
+     * @throws NoSuchJobInstanceException
+     * @throws JobExecutionAlreadyRunningException
+     */
+    List<JobExecution> restartAllStoppedJobs() throws NoSuchJobException, JobInstanceAlreadyCompleteException, NoSuchJobExecutionException, JobRestartException, JobParametersInvalidException, NoSuchJobInstanceException, JobExecutionAlreadyRunningException;
 
     JobExecution start(String jobName, JobParameters jobParameters) throws JobInstanceAlreadyExistsException, NoSuchJobException, JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException;
 

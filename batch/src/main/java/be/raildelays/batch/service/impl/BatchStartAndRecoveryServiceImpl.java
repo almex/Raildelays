@@ -46,7 +46,10 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchStartAndRecoveryServiceImpl.class);
 
-    private static final ExitStatus RECOVERY_STATUS = new ExitStatus("FAILED_FOR_RECOVERY", "Setted as failed in order to allow to restart this job instance");
+    private static final ExitStatus RECOVERY_STATUS = new ExitStatus(
+            "FAILED_FOR_RECOVERY",
+            "Set as failed in order to allow a restart of this job instance"
+    );
 
     private JobRegistry jobRegistry;
     private JobExplorer jobExplorer;
@@ -54,20 +57,25 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
     private JobLauncher jobLauncher;
 
     @Override
-    public void stopAllRunningJobs() throws NoSuchJobException, NoSuchJobExecutionException, JobExecutionNotRunningException {
+    public List<JobExecution> stopAllRunningJobs() throws NoSuchJobException, NoSuchJobExecutionException, JobExecutionNotRunningException {
+        List<JobExecution> result = new ArrayList<>();
+
         for (String jobName : jobRegistry.getJobNames()) {
             for (Long jobExecutionId : getRunningExecutions(jobName)) {
-                stop(jobExecutionId);
+                result.add(stop(jobExecutionId));
             }
         }
+
+        return result;
     }
 
     @Override
-    public void markInconsistentJobsAsFailed() throws NoSuchJobException,
+    public List<JobExecution> markInconsistentJobsAsFailed() throws NoSuchJobException,
             NoSuchJobExecutionException, JobExecutionNotRunningException,
             InterruptedException, JobExecutionAlreadyRunningException,
             JobInstanceAlreadyCompleteException, JobRestartException,
             JobParametersInvalidException, NoSuchJobInstanceException {
+        List<JobExecution> result = new ArrayList<>();
         Collection<String> jobNames = jobRegistry.getJobNames();
 
         for (String jobName : jobNames) {
@@ -98,10 +106,13 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
                             jobRepository.update(stepExecution);
                         });
 
+                result.add(jobExecution);
                 jobRepository.update(jobExecution);
                 LOGGER.info("Setted job as FAILED!");
             }
         }
+
+        return result;
     }
 
     private Set<Long> getRunningExecutions(String jobName) throws NoSuchJobException {
@@ -118,49 +129,59 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
     }
 
     @Override
-    public void restartAllFailedJobs() throws NoSuchJobException,
+    public List<JobExecution> restartAllFailedJobs() throws NoSuchJobException,
             JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
             JobRestartException, JobParametersInvalidException,
             NoSuchJobInstanceException, JobExecutionAlreadyRunningException {
+        List<JobExecution> result = new ArrayList<>();
+
         for (String jobName : jobRegistry.getJobNames()) {
-            restartJobs(jobName, BatchStatus.FAILED);
+            result.addAll(restartJobs(jobName, BatchStatus.FAILED));
         }
+
+        return result;
     }
 
     @Override
-    public void restartAllStoppedJobs() throws NoSuchJobException,
+    public List<JobExecution> restartAllStoppedJobs() throws NoSuchJobException,
             JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
             JobRestartException, JobParametersInvalidException,
             NoSuchJobInstanceException, JobExecutionAlreadyRunningException {
+        List<JobExecution> result = new ArrayList<>();
+
         for (String jobName : jobRegistry.getJobNames()) {
-            restartJobs(jobName, BatchStatus.STOPPED);
+            result.addAll(restartJobs(jobName, BatchStatus.STOPPED));
         }
+
+        return result;
 
     }
 
-    public void restartJobs(String jobName, BatchStatus status) throws NoSuchJobException,
+    public List<JobExecution> restartJobs(String jobName, BatchStatus status) throws NoSuchJobException,
             JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
             JobRestartException, JobParametersInvalidException,
             NoSuchJobInstanceException, JobExecutionAlreadyRunningException {
-
         // -- We are retrieving ten per ten job instances
         final int count = 10;
+        List<JobExecution> result = new ArrayList<>();
+
         for (int start = 0; ; start += count) {
             List<Long> jobInstanceIds = getJobInstances(jobName, start, count);
 
             LOGGER.debug("Number of jobInstanceIds={} start={} count={}.", jobInstanceIds.size(), start, count);
 
             if (jobInstanceIds.size() == 0) {
-                return;
+                break;
             }
 
             for (Long jobInstanceId : jobInstanceIds) {
-
                 if (getStatus(jobInstanceId).equals(status)) {
-                    restart(jobInstanceId);
+                    result.add(restart(jobInstanceId));
                 }
             }
         }
+
+        return result;
     }
 
     private List<Long> getExecutions(Long jobInstanceId) throws NoSuchJobInstanceException {
