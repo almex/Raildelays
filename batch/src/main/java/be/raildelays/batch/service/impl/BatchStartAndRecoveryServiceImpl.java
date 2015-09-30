@@ -29,12 +29,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.launch.*;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.repository.dao.ExecutionContextDao;
+import org.springframework.batch.core.repository.dao.JobExecutionDao;
+import org.springframework.batch.core.repository.dao.JobInstanceDao;
+import org.springframework.batch.core.repository.dao.StepExecutionDao;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -42,7 +46,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service("BatchStartAndRecoveryService")
-public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoveryService {
+public class BatchStartAndRecoveryServiceImpl extends JobExplorerFactoryBean implements BatchStartAndRecoveryService, InitializingBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchStartAndRecoveryServiceImpl.class);
 
@@ -52,12 +56,26 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
     );
 
     private JobRegistry jobRegistry;
-    private JobExplorer jobExplorer;
-    private JobRepository jobRepository;
     private JobLauncher jobLauncher;
+    private JobInstanceDao jobInstanceDao;
+    private JobExecutionDao jobExecutionDao;
+    private StepExecutionDao stepExecutionDao;
+    private ExecutionContextDao executionContextDao;
 
     @Override
-    public List<JobExecution> stopAllRunningJobs() throws NoSuchJobException, NoSuchJobExecutionException, JobExecutionNotRunningException {
+    public void afterPropertiesSet() throws Exception {
+        super.afterPropertiesSet();
+        jobInstanceDao = createJobInstanceDao();
+        jobExecutionDao = createJobExecutionDao();
+        stepExecutionDao = createStepExecutionDao();
+        executionContextDao = createExecutionContextDao();
+    }
+
+    @Override
+    public List<JobExecution> stopAllRunningJobs() throws
+            NoSuchJobException,
+            NoSuchJobExecutionException,
+            JobExecutionNotRunningException {
         List<JobExecution> result = new ArrayList<>();
 
         for (String jobName : jobRegistry.getJobNames()) {
@@ -70,11 +88,16 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
     }
 
     @Override
-    public List<JobExecution> markInconsistentJobsAsFailed() throws NoSuchJobException,
-            NoSuchJobExecutionException, JobExecutionNotRunningException,
-            InterruptedException, JobExecutionAlreadyRunningException,
-            JobInstanceAlreadyCompleteException, JobRestartException,
-            JobParametersInvalidException, NoSuchJobInstanceException {
+    public List<JobExecution> markInconsistentJobsAsFailed() throws
+            NoSuchJobException,
+            NoSuchJobExecutionException,
+            JobExecutionNotRunningException,
+            InterruptedException,
+            JobExecutionAlreadyRunningException,
+            JobInstanceAlreadyCompleteException,
+            JobRestartException,
+            JobParametersInvalidException,
+            NoSuchJobInstanceException {
         List<JobExecution> result = new ArrayList<>();
         Collection<String> jobNames = jobRegistry.getJobNames();
 
@@ -86,10 +109,10 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
 
             // -- Set incoherent running jobs as FAILED
             for (Long jobExecutionId : jobExecutionIds) {
-                LOGGER.info("Found a job already running jobExecutionId={}.", jobExecutionId);
+                LOGGER.info("Found a job already running for jobExecutionId={}.", jobExecutionId);
 
                 // -- Set Job Execution as FAILED
-                JobExecution jobExecution = jobExplorer.getJobExecution(jobExecutionId);
+                JobExecution jobExecution = findExecutionById(jobExecutionId);
                 jobExecution.setEndTime(new Date());
                 jobExecution.setStatus(BatchStatus.FAILED);
                 jobExecution.setExitStatus(RECOVERY_STATUS);
@@ -102,13 +125,13 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
                             stepExecution.setEndTime(new Date());
                             stepExecution.setStatus(BatchStatus.FAILED);
                             stepExecution.setExitStatus(RECOVERY_STATUS);
-
-                            jobRepository.update(stepExecution);
+                            updateStepExecution(stepExecution);
                         });
 
                 result.add(jobExecution);
-                jobRepository.update(jobExecution);
-                LOGGER.info("Setted job as FAILED!");
+                updateJobExecution(jobExecution);
+
+                LOGGER.info("Mark job execution with Id={} as FAILED!", jobExecutionId);
             }
         }
 
@@ -116,7 +139,7 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
     }
 
     private Set<Long> getRunningExecutions(String jobName) throws NoSuchJobException {
-        Set<Long> set = jobExplorer.findRunningJobExecutions(jobName)
+        Set<Long> set = jobExecutionDao.findRunningJobExecutions(jobName)
                 .stream()
                 .map(JobExecution::getId)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -129,10 +152,14 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
     }
 
     @Override
-    public List<JobExecution> restartAllFailedJobs() throws NoSuchJobException,
-            JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
-            JobRestartException, JobParametersInvalidException,
-            NoSuchJobInstanceException, JobExecutionAlreadyRunningException {
+    public List<JobExecution> restartAllFailedJobs() throws
+            NoSuchJobException,
+            JobInstanceAlreadyCompleteException,
+            NoSuchJobExecutionException,
+            JobRestartException,
+            JobParametersInvalidException,
+            NoSuchJobInstanceException,
+            JobExecutionAlreadyRunningException {
         List<JobExecution> result = new ArrayList<>();
 
         for (String jobName : jobRegistry.getJobNames()) {
@@ -143,10 +170,14 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
     }
 
     @Override
-    public List<JobExecution> restartAllStoppedJobs() throws NoSuchJobException,
-            JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
-            JobRestartException, JobParametersInvalidException,
-            NoSuchJobInstanceException, JobExecutionAlreadyRunningException {
+    public List<JobExecution> restartAllStoppedJobs() throws
+            NoSuchJobException,
+            JobInstanceAlreadyCompleteException,
+            NoSuchJobExecutionException,
+            JobRestartException,
+            JobParametersInvalidException,
+            NoSuchJobInstanceException,
+            JobExecutionAlreadyRunningException {
         List<JobExecution> result = new ArrayList<>();
 
         for (String jobName : jobRegistry.getJobNames()) {
@@ -157,10 +188,14 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
 
     }
 
-    public List<JobExecution> restartJobs(String jobName, BatchStatus status) throws NoSuchJobException,
-            JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
-            JobRestartException, JobParametersInvalidException,
-            NoSuchJobInstanceException, JobExecutionAlreadyRunningException {
+    public List<JobExecution> restartJobs(String jobName, BatchStatus status) throws
+            NoSuchJobException,
+            JobInstanceAlreadyCompleteException,
+            NoSuchJobExecutionException,
+            JobRestartException,
+            JobParametersInvalidException,
+            NoSuchJobInstanceException,
+            JobExecutionAlreadyRunningException {
         // -- We are retrieving ten per ten job instances
         final int count = 10;
         List<JobExecution> result = new ArrayList<>();
@@ -184,39 +219,34 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
         return result;
     }
 
-    private List<Long> getExecutions(Long jobInstanceId) throws NoSuchJobInstanceException {
-        JobInstance jobInstance = jobExplorer.getJobInstance(jobInstanceId);
-
-        if (jobInstance == null) {
-            throw new NoSuchJobInstanceException(String.format("No job instance with id=%d", jobInstanceId));
-        }
-
-        return jobExplorer.getJobExecutions(jobInstance)
-                .stream()
-                .map(JobExecution::getId)
-                .collect(Collectors.toList());
-    }
+//    private List<Long> getJobExecutionIds(Long jobInstanceId) throws NoSuchJobInstanceException {
+//        JobInstance jobInstance = jobInstanceDao.getJobInstance(jobInstanceId);
+//
+//        if (jobInstance == null) {
+//            throw new NoSuchJobInstanceException(String.format("No job instance with id=%d", jobInstanceId));
+//        }
+//
+//        return jobExecutionDao.findJobExecutions(jobInstance)
+//                .stream()
+//                .map(JobExecution::getId)
+//                .collect(Collectors.toList());
+//    }
 
     @Override
     public BatchStatus getStatus(Long jobInstanceId) throws NoSuchJobInstanceException {
-        BatchStatus status = BatchStatus.UNKNOWN;
-        JobInstance jobInstance = jobExplorer.getJobInstance(jobInstanceId);
+        JobInstance jobInstance = jobInstanceDao.getJobInstance(jobInstanceId);
 
         if (jobInstance == null) {
             throw new NoSuchJobInstanceException(String.format("No job instance with id=%d", jobInstanceId));
         }
 
-        for (JobExecution jobExecution : jobExplorer.getJobExecutions(jobInstance)) {
-            if (jobExecution.getStatus().isGreaterThan(status)) {
-                status = jobExecution.getStatus();
-            }
-        }
+        JobExecution jobExecution = jobExecutionDao.getLastJobExecution(jobInstance);
 
-        return status;
+        return jobExecution.getStatus();
     }
 
     private List<Long> getJobInstances(String jobName, int start, int count) throws NoSuchJobException {
-        List<Long> list = jobExplorer.getJobInstances(jobName, start, count)
+        List<Long> list = jobInstanceDao.getJobInstances(jobName, start, count)
                 .stream()
                 .map(JobInstance::getId)
                 .collect(Collectors.toList());
@@ -229,46 +259,90 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
     }
 
     @Override
-    public JobExecution start(String jobName, JobParameters jobParameters) throws JobInstanceAlreadyExistsException, NoSuchJobException, JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
+    public JobExecution start(String jobName, JobParameters jobParameters) throws
+            JobInstanceAlreadyExistsException,
+            NoSuchJobException,
+            JobParametersInvalidException,
+            JobExecutionAlreadyRunningException,
+            JobRestartException,
+            JobInstanceAlreadyCompleteException {
         return start(jobName, jobParameters, false);
     }
 
-    public JobExecution start(String jobName, JobParameters jobParameters, boolean newInstance) throws JobInstanceAlreadyExistsException, NoSuchJobException, JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
-        LOGGER.info("Checking status of job with name=" + jobName);
+    public JobExecution start(String jobName, JobParameters jobParameters, boolean newInstance) throws
+            JobInstanceAlreadyExistsException,
+            NoSuchJobException,
+            JobParametersInvalidException,
+            JobExecutionAlreadyRunningException,
+            JobRestartException,
+            JobInstanceAlreadyCompleteException {
+        LOGGER.info("Checking status of job with name={}", jobName);
 
         Job job = jobRegistry.getJob(jobName);
         JobParameters effectiveJobParameters = jobParameters;
 
 
         if (newInstance) {
-            Assert.notNull(job.getJobParametersIncrementer(), "You must configure a jobParametersIncrementer for this job in order to start a new instance.");
+            Assert.notNull(job.getJobParametersIncrementer(),
+                    "You must configure a jobParametersIncrementer for this job in order to start a new instance.");
 
             effectiveJobParameters = job.getJobParametersIncrementer().getNext(jobParameters);
         }
 
-        LOGGER.info(String.format("Attempting to launch job with name=%s and parameters=%s", jobName, effectiveJobParameters.getParameters()));
+        LOGGER.info("Attempting to launch job with name={} and parameters={}", jobName,
+                effectiveJobParameters.getParameters());
 
         return jobLauncher.run(job, effectiveJobParameters);
     }
 
     @Override
-    public JobExecution restart(Long jobInstanceId)
-            throws JobExecutionAlreadyRunningException, NoSuchJobExecutionException, NoSuchJobException, JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException {
-        JobInstance jobInstance = jobExplorer.getJobInstance(jobInstanceId);
-        List<JobExecution> jobExecutions = jobExplorer.getJobExecutions(jobInstance);
+    public JobExecution restart(Long jobInstanceId) throws
+            JobExecutionAlreadyRunningException,
+            NoSuchJobExecutionException,
+            NoSuchJobException,
+            JobRestartException,
+            JobInstanceAlreadyCompleteException,
+            JobParametersInvalidException {
+        JobInstance jobInstance = jobInstanceDao.getJobInstance(jobInstanceId);
 
-        LOGGER.info("Attempting to resume job instance with id=" + jobInstanceId);
+        if (jobInstance == null) {
+            throw new NoSuchJobException(String.format(
+                    "The job with jobInstanceId=%d cannot be restarted because it has not be started yet",
+                    jobInstanceId
+            ));
+        }
 
-        assert !jobExecutions.isEmpty();
+        JobExecution jobExecution = jobExecutionDao.getLastJobExecution(jobInstance);
 
-        JobExecution jobExecution = jobExecutions.get(0);
-        JobParameters parameters = jobExecution.getJobParameters();
+        if (jobExecution == null) {
+            throw new NoSuchJobExecutionException(String.format(
+                    "No job execution belongs to the jobName=%s - jobInstanceId=%d",
+                    jobInstance.getJobName(),
+                    jobInstance.getInstanceId()
+            ));
+        }
 
-        return restart(jobInstance.getJobName(), parameters);
+        BatchStatus status = jobExecution.getStatus();
+
+        if (!(status == BatchStatus.FAILED || status == BatchStatus.STOPPED)) {
+            throw new JobRestartException(String.format(
+                    "Cannot restart that job : jobName=%s - jobInstanceId=%d! Because it's neither STOPPED or FAILED!",
+                    jobInstance.getJobName(),
+                    jobInstance.getInstanceId()
+            ));
+        }
+
+        LOGGER.info("Attempting to resume job instance with id={}", jobInstanceId);
+
+        return restart(jobInstance.getJobName(), jobExecution.getJobParameters());
     }
 
-    public JobExecution restart(String jobName, JobParameters parameters)
-            throws JobExecutionAlreadyRunningException, NoSuchJobExecutionException, NoSuchJobException, JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException {
+    public JobExecution restart(String jobName, JobParameters parameters) throws JobExecutionAlreadyRunningException,
+            NoSuchJobExecutionException,
+            NoSuchJobException,
+            JobRestartException,
+            JobInstanceAlreadyCompleteException,
+            JobParametersInvalidException {
         Job job = jobRegistry.getJob(jobName);
 
         LOGGER.info("Attempting to resume job with name={} and parameters={}", jobName, parameters);
@@ -277,17 +351,29 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
     }
 
     private JobExecution findExecutionById(Long jobExecutionId) throws NoSuchJobExecutionException {
-        JobExecution jobExecution = jobExplorer.getJobExecution(jobExecutionId);
+        JobExecution jobExecution = jobExecutionDao.getJobExecution(jobExecutionId);
 
         if (jobExecution == null) {
-            throw new NoSuchJobExecutionException("No JobExecution found for id: [" + jobExecutionId + "]");
-        }
+            throw new NoSuchJobExecutionException(String.format("No such job execution with id=%d", jobExecutionId));
+        } else {
+            //FIXME all of this should be done with one simple SQL query
+            JobInstance jobInstance = jobInstanceDao.getJobInstance(jobExecution);
 
-        return jobExecution;
+            stepExecutionDao.addStepExecutions(jobExecution);
+            jobExecution.setExecutionContext(executionContextDao.getExecutionContext(jobExecution));
+            jobExecution.setJobInstance(jobInstance);
+
+            for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
+                stepExecution.setExecutionContext(executionContextDao.getExecutionContext(stepExecution));
+            }
+
+            return jobExecution;
+        }
     }
 
     @Override
-    public JobExecution startNewInstance(String jobName, JobParameters jobParameters) throws NoSuchJobException,
+    public JobExecution startNewInstance(String jobName, JobParameters jobParameters) throws
+            NoSuchJobException,
             JobParametersInvalidException,
             JobInstanceAlreadyExistsException,
             JobExecutionAlreadyRunningException,
@@ -297,7 +383,9 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
     }
 
     @Override
-    public JobExecution stop(Long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException {
+    public JobExecution stop(Long jobExecutionId) throws
+            NoSuchJobExecutionException,
+            JobExecutionNotRunningException {
         JobExecution jobExecution = findExecutionById(jobExecutionId);
         // Indicate the execution should be stopped by setting it's status to
         // 'STOPPING'. It is assumed that
@@ -309,7 +397,7 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
         }
 
         jobExecution.setStatus(BatchStatus.STOPPING);
-        jobRepository.update(jobExecution);
+        updateJobExecution(jobExecution);
 
         return jobExecution;
     }
@@ -327,37 +415,59 @@ public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoverySe
     }
 
     @Override
-    public JobExecution abandon(Long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionAlreadyRunningException {
+    public JobExecution abandon(Long jobExecutionId) throws
+            NoSuchJobExecutionException,
+            JobExecutionAlreadyRunningException {
         JobExecution jobExecution = findExecutionById(jobExecutionId);
 
         if (jobExecution.getStatus().isLessThan(BatchStatus.STOPPING)) {
             throw new JobExecutionAlreadyRunningException(
-                    "JobExecution is running or complete and therefore cannot be aborted");
+                    "JobExecution is running or complete and therefore cannot be aborted"
+            );
         }
 
-        LOGGER.info("Aborting job execution: " + jobExecution);
+        LOGGER.info("Aborting job execution: {}", jobExecution);
 
         jobExecution.upgradeStatus(BatchStatus.ABANDONED);
         jobExecution.setEndTime(new Date());
-        jobRepository.update(jobExecution);
+        updateJobExecution(jobExecution);
 
         return jobExecution;
+    }
+
+    private void updateJobExecution(JobExecution jobExecution) {
+        jobExecution.setLastUpdated(new Date());
+        jobExecutionDao.synchronizeStatus(jobExecution);
+        jobExecutionDao.updateJobExecution(jobExecution);
+    }
+
+    private void updateStepExecution(StepExecution stepExecution) {
+        stepExecution.setLastUpdated(new Date());
+        stepExecutionDao.updateStepExecution(stepExecution);
     }
 
     public void setJobRegistry(JobRegistry jobRegistry) {
         this.jobRegistry = jobRegistry;
     }
 
-    public void setJobExplorer(JobExplorer jobExplorer) {
-        this.jobExplorer = jobExplorer;
-    }
-
-    public void setJobRepository(JobRepository jobRepository) {
-        this.jobRepository = jobRepository;
-    }
-
     public void setJobLauncher(JobLauncher jobLauncher) {
         this.jobLauncher = jobLauncher;
+    }
+
+    public void setJobInstanceDao(JobInstanceDao jobInstanceDao) {
+        this.jobInstanceDao = jobInstanceDao;
+    }
+
+    public void setJobExecutionDao(JobExecutionDao jobExecutionDao) {
+        this.jobExecutionDao = jobExecutionDao;
+    }
+
+    public void setStepExecutionDao(StepExecutionDao stepExecutionDao) {
+        this.stepExecutionDao = stepExecutionDao;
+    }
+
+    public void setExecutionContextDao(ExecutionContextDao executionContextDao) {
+        this.executionContextDao = executionContextDao;
     }
 }
 

@@ -63,7 +63,9 @@ public interface BatchStartAndRecoveryService {
     List<JobExecution> markInconsistentJobsAsFailed() throws NoSuchJobException, NoSuchJobExecutionException, JobExecutionNotRunningException, InterruptedException, JobExecutionAlreadyRunningException, JobInstanceAlreadyCompleteException, JobRestartException, JobParametersInvalidException, NoSuchJobInstanceException;
 
     /**
-     * @return
+     * Restart all job that have the {@link BatchStatus#STOPPED}.
+     *
+     * @return the list of {@link JobExecution} which have been restarted
      * @throws NoSuchJobException
      * @throws JobInstanceAlreadyCompleteException
      * @throws NoSuchJobExecutionException
@@ -75,8 +77,9 @@ public interface BatchStartAndRecoveryService {
     List<JobExecution> restartAllFailedJobs() throws NoSuchJobException, JobInstanceAlreadyCompleteException, NoSuchJobExecutionException, JobRestartException, JobParametersInvalidException, NoSuchJobInstanceException, JobExecutionAlreadyRunningException;
 
     /**
+     * Restart all job that have the {@link BatchStatus#FAILED}.
      *
-     * @return
+     * @return the list of {@link JobExecution} which have been restarted
      * @throws NoSuchJobException
      * @throws JobInstanceAlreadyCompleteException
      * @throws NoSuchJobExecutionException
