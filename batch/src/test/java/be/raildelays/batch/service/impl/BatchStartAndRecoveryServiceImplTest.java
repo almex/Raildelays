@@ -8,6 +8,7 @@ import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.NoSuchJobInstanceException;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
@@ -183,23 +184,15 @@ public class BatchStartAndRecoveryServiceImplTest {
         Assert.assertEquals(BatchStatus.STARTING, jobExecutions.get(0).getStatus());
     }
 
-    @Test
-    public void testRestartJobs() throws Exception {
-
-    }
-
-    @Test
+    @Test(expected = NoSuchJobInstanceException.class)
     public void testGetStatus() throws Exception {
-        jobExecution.setStatus(BatchStatus.COMPLETED);
 
         EasyMock.expect(jobInstanceDao.getJobInstance(INSTANCE_ID))
-                .andReturn(jobExecution.getJobInstance());
-        EasyMock.expect(jobExecutionDao.getLastJobExecution(jobExecution.getJobInstance()))
-                .andReturn(jobExecution);
+                .andReturn(null);
 
         EasyMock.replay(jobRegistry, jobLauncher, jobInstanceDao, jobExecutionDao, stepExecutionDao, executionContextDao);
 
-        Assert.assertEquals(BatchStatus.COMPLETED, service.getStatus(INSTANCE_ID));
+        service.getStatus(INSTANCE_ID);
     }
 
     @Test
