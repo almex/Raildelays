@@ -248,6 +248,30 @@ public class BatchStartAndRecoveryServiceImplTest extends EasyMockSupport {
         service.stop(EXECUTION_ID);
     }
 
+    @Test(expected = NoSuchJobException.class)
+    public void testGetJobInstancesNoSuchJobException() throws Exception {
+        expect(jobInstanceDao.getJobInstances(anyString(), anyInt(), anyInt()))
+                .andStubReturn(Collections.emptyList());
+        expect(jobRegistry.getJobNames())
+                .andStubReturn(Collections.emptyList());
+
+        replayAll();
+
+        service.getJobInstances(JOB_NAME, 1, 10);
+    }
+
+    @Test(expected = NoSuchJobException.class)
+    public void testGetRunningExecutionsNoSuchJobException() throws Exception {
+        expect(jobExecutionDao.findRunningJobExecutions(JOB_NAME))
+                .andStubReturn(Collections.emptySet());
+        expect(jobRegistry.getJobNames())
+                .andStubReturn(Collections.emptyList());
+
+        replayAll();
+
+        service.getRunningExecutions(JOB_NAME);
+    }
+
     private void expectStartOrRestart() throws NoSuchJobException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException {
         FlowJob job = new FlowJob(JOB_NAME);
         job.setJobParametersIncrementer(new RunIdIncrementer());

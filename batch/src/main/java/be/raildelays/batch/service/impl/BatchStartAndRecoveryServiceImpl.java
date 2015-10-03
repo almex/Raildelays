@@ -138,7 +138,7 @@ public class BatchStartAndRecoveryServiceImpl extends JobExplorerFactoryBean imp
         return result;
     }
 
-    private Set<Long> getRunningExecutions(String jobName) throws NoSuchJobException {
+    public Set<Long> getRunningExecutions(String jobName) throws NoSuchJobException {
         Set<Long> set = jobExecutionDao.findRunningJobExecutions(jobName)
                 .stream()
                 .map(JobExecution::getId)
@@ -245,7 +245,7 @@ public class BatchStartAndRecoveryServiceImpl extends JobExplorerFactoryBean imp
         return jobExecution.getStatus();
     }
 
-    private List<Long> getJobInstances(String jobName, int start, int count) throws NoSuchJobException {
+    public List<Long> getJobInstances(String jobName, int start, int count) throws NoSuchJobException {
         List<Long> list = jobInstanceDao.getJobInstances(jobName, start, count)
                 .stream()
                 .map(JobInstance::getId)
@@ -350,7 +350,7 @@ public class BatchStartAndRecoveryServiceImpl extends JobExplorerFactoryBean imp
         return jobLauncher.run(job, parameters);
     }
 
-    private JobExecution findExecutionById(Long jobExecutionId) throws NoSuchJobExecutionException {
+    public JobExecution findExecutionById(Long jobExecutionId) throws NoSuchJobExecutionException {
         JobExecution jobExecution = jobExecutionDao.getJobExecution(jobExecutionId);
 
         if (jobExecution == null) {
@@ -435,13 +435,13 @@ public class BatchStartAndRecoveryServiceImpl extends JobExplorerFactoryBean imp
         return jobExecution;
     }
 
-    private void updateJobExecution(JobExecution jobExecution) {
+    public void updateJobExecution(JobExecution jobExecution) {
         jobExecution.setLastUpdated(new Date());
         jobExecutionDao.synchronizeStatus(jobExecution);
         jobExecutionDao.updateJobExecution(jobExecution);
     }
 
-    private void updateStepExecution(StepExecution stepExecution) {
+    public void updateStepExecution(StepExecution stepExecution) {
         stepExecution.setLastUpdated(new Date());
         stepExecutionDao.updateStepExecution(stepExecution);
     }
