@@ -61,21 +61,8 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
     @SuppressWarnings("unused") // Injected via CDI
     private EntityManager entityManager;
 
-    private static Long executeCountQuery(TypedQuery<Long> query) {
-        Assert.notNull(query);
-
-        List<Long> totals = query.getResultList();
-        Long total = 0L;
-
-        for (Long element : totals) {
-            total += element == null ? 0 : element;
-        }
-
-        return total;
-    }
-
     @Override
-    public List<LineStop> findDepartureDelays(LocalDate date, Station station, long delayThreshold) {
+    public Page<LineStop> findDepartureDelays(LocalDate date, Station station, long delayThreshold, Pageable pageable) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
         Root<LineStop> root = query.from(LineStop.class);
@@ -84,24 +71,37 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
         Root<LineStop> canceledRoot = canceled.from(LineStop.class);
         Root<LineStop> notCanceledRoot = notCanceled.from(LineStop.class);
 
+        LOGGER.debug("Searching delays for : date={} station={} threshold={}",
+                date, station, delayThreshold);
+
         canceled.select(canceledRoot.get(LineStop_.id))
                 .where(where(dateEquals(date))
                         .and(stationEquals(station))
                         .and(isCanceledDeparture())
-                        .toPredicate(root, query, builder));
+                        .toPredicate(canceledRoot, query, builder));
 
         notCanceled.select(notCanceledRoot.get(LineStop_.id))
                 .where(where(dateEquals(date))
                         .and(stationEquals(station))
                         .and(departureDelayIsNotNull())
-                        .and(arrivalDelayGreaterThanOrEqualTo(delayThreshold))
-                        .toPredicate(root, query, builder));
+                        .and(departureDelayGreaterThanOrEqualTo(delayThreshold))
+                        .toPredicate(notCanceledRoot, query, builder));
 
+        Page<LineStop> all = findAll(where(idsIn(canceled)).or(idsIn(notCanceled)), pageable);
 
-        return findAll(where(idsIn(canceled)).or(idsIn(notCanceled)), (Pageable) null).getContent();
+        LOGGER.debug("Retrieved delays : size={}/{} elements={}/{} pages={}/{}",
+                all.getContent().size(), all.getSize(),
+                all.getNumberOfElements(), all.getTotalElements(),
+                all.getNumber(), all.getTotalPages());
+
+        return all;
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
+    public List<LineStop> findDepartureDelays(LocalDate date, Station station, long delayThreshold) {
+        return findDepartureDelays(date, station, delayThreshold, null).getContent();
+    }
+
     @Override
     public Page<LineStop> findArrivalDelays(LocalDate date, Station station, long delayThreshold, Pageable pageable) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -112,15 +112,8 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
         Root<LineStop> canceledRoot = canceled.from(LineStop.class);
         Root<LineStop> notCanceledRoot = notCanceled.from(LineStop.class);
 
-        if (LOGGER.isDebugEnabled()) {
-            if (pageable != null) {
-                LOGGER.debug("Searching delays for : date={} station={} threshold={} firstResult={} maxResult={}",
-                        date, station, delayThreshold, pageable.getOffset(), pageable.getPageSize());
-            } else {
-                LOGGER.debug("Searching delays for : date={} station={} threshold={}",
-                        date, station, delayThreshold);
-            }
-        }
+        LOGGER.debug("Searching delays for : date={} station={} threshold={}",
+                date, station, delayThreshold);
 
         canceled.select(canceledRoot.get(LineStop_.id))
                 .where(where(dateEquals(date))
@@ -146,6 +139,11 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
     }
 
     @Override
+    public List<LineStop> findArrivalDelays(LocalDate date, Station station, long delayThreshold) {
+        return findArrivalDelays(date, station, delayThreshold, null).getContent();
+    }
+
+    @Override
     public List<LineStop> findNextExpectedArrivalTime(Station station, LocalDateTime dateTime) {
         return findAll(where(dateEquals(dateTime.toLocalDate()))
                         .and(arrivalTimeIsNotNull())
@@ -153,7 +151,6 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
                         .and(stationEquals(station)),
                 new Sort(Sort.Direction.ASC, "arrivalTime.expectedTime")
         );
-
     }
 
     @Override
@@ -200,6 +197,19 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
         List<LineStop> content = total > pageable.getOffset() ? query.getResultList() : Collections.emptyList();
 
         return new PageImpl<>(content, pageable, total);
+    }
+
+    private static Long executeCountQuery(TypedQuery<Long> query) {
+        Assert.notNull(query);
+
+        List<Long> totals = query.getResultList();
+        Long total = 0L;
+
+        for (Long element : totals) {
+            total += element == null ? 0 : element;
+        }
+
+        return total;
     }
 
     private List<LineStop> findAll(Specifications<LineStop> specifications, Sort sort) {

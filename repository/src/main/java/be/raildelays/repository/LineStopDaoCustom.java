@@ -45,6 +45,7 @@ public interface LineStopDaoCustom {
      * @param delayThreshold minimum delay (in milliseconds)
      * @return a collection of {@link LineStop} belonging to departure
      */
+    Page<LineStop> findDepartureDelays(LocalDate date, Station station, long delayThreshold, Pageable request);
     List<LineStop> findDepartureDelays(LocalDate date, Station station, long delayThreshold);
 
     /**
@@ -57,6 +58,8 @@ public interface LineStopDaoCustom {
      * @return a collection of {@link LineStop} belonging to arrival
      */
     Page<LineStop> findArrivalDelays(LocalDate date, Station station, long delayThreshold, Pageable request);
+
+    List<LineStop> findArrivalDelays(LocalDate date, Station station, long delayThreshold);
 
     /**
      * Search a the next trains which is expectedTime to arrive after a certain

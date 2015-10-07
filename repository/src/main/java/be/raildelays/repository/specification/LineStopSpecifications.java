@@ -142,8 +142,8 @@ public class LineStopSpecifications {
      * @param delay the expectedTime delay
      * @return a predicate
      */
-    public static Specification<LineStop> arrivalDelayGreaterThan(final Long delay) {
-        return (root, query, builder) -> builder.greaterThan(root.get(LineStop_.arrivalTime).get(TimeDelay_.delay), delay);
+    public static Specification<LineStop> arrivalDelayGreaterThanOrEqualTo(final Long delay) {
+        return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get(LineStop_.arrivalTime).get(TimeDelay_.delay), delay);
     }
 
     /**
@@ -152,27 +152,8 @@ public class LineStopSpecifications {
      * @param delay the expectedTime delay
      * @return a predicate
      */
-    public static Specification<LineStop> arrivalDelayGreaterThanOrEqualTo(final Long delay) {
-        return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get(LineStop_.arrivalTime).get(TimeDelay_.delay), delay);
-    }
-
-    /**
-     * Creates a specification used to find LineStop whose departure time is not null.
-     *
-     * @return a predicate
-     */
-    public static Specification<LineStop> departureTimeIsNotNull() {
-        return (root, query, builder) -> root.get(LineStop_.departureTime).get(TimeDelay_.expectedTime).isNotNull();
-    }
-
-    /**
-     * Creates a specification used to find LineStop whose departure time greater than the expectedTime one.
-     *
-     * @param time the expected time
-     * @return a predicate
-     */
-    public static Specification<LineStop> departureTimeGreaterThan(final LocalTime time) {
-        return (root, query, builder) -> builder.greaterThan(root.get(LineStop_.departureTime).get(TimeDelay_.expectedTime), time);
+    public static Specification<LineStop> departureDelayGreaterThanOrEqualTo(final Long delay) {
+        return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get(LineStop_.departureTime).get(TimeDelay_.delay), delay);
     }
 
     /**
@@ -185,13 +166,12 @@ public class LineStopSpecifications {
     }
 
     /**
-     * Creates a specification used to find LineStop whose departure delay is greater than the expectedTime one.
+     * Creates a specification used to find LineStop whose departure time is not null.
      *
-     * @param delay the expectedTime delay
      * @return a predicate
      */
-    public static Specification<LineStop> departureDelayGreaterThan(final Long delay) {
-        return (root, query, builder) -> builder.greaterThan(root.get(LineStop_.departureTime).get(TimeDelay_.delay), delay);
+    public static Specification<LineStop> departureTimeIsNotNull() {
+        return (root, query, builder) -> root.get(LineStop_.departureTime).get(TimeDelay_.expectedTime).isNotNull();
     }
 
     /**
