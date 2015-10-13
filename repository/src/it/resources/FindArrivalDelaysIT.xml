@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataset>
-    <STATION ID="1" ENGLISH_NAME="Bruxelles-Midi" DTYPE="Station"/>
-    <STATION ID="2" ENGLISH_NAME="Bruxelles-Central" DTYPE="Station"/>
-    <STATION ID="3" ENGLISH_NAME="Bruxelles-Nord" DTYPE="Station"/>
-    <STATION ID="4" ENGLISH_NAME="Liège-Guillemins" DTYPE="Station"/>
+    <STATION ID="1" ENGLISH_NAME="Bruxelles-Midi"/>
+    <STATION ID="2" ENGLISH_NAME="Bruxelles-Central"/>
+    <STATION ID="3" ENGLISH_NAME="Bruxelles-Nord"/>
+    <STATION ID="4" ENGLISH_NAME="Liège-Guillemins"/>
 
     <!-- 466 -->
-    <TRAIN ID="466" ENGLISH_NAME="466" DTYPE="RailtimeTrain" RAILTIME_ID="466"/>
+    <TRAIN ID="466" ENGLISH_NAME="466"/>
 
     <LINE_STOP ID="4661" TRAIN_ID="466" STATION_ID="1" CANCELED_DEPARTURE="false" CANCELED_ARRIVAL="false" 
                DATE="2000-01-01" ARRIVAL_TIME_EXPECTED="16:24:00" ARRIVAL_TIME_DELAY="0"

@@ -32,7 +32,6 @@ import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
 import be.raildelays.repository.LineStopDao;
-import be.raildelays.repository.RailtimeTrainDao;
 import be.raildelays.repository.StationDao;
 import be.raildelays.repository.TrainDao;
 import be.raildelays.service.RaildelaysService;
@@ -62,12 +61,9 @@ import java.util.List;
 @Service(value = "raildelaysService")
 public class RaildelaysServiceImpl implements RaildelaysService {
 
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(RaildelaysServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RaildelaysServiceImpl.class);
     @Resource
     private LineStopDao lineStopDao;
-    @Resource
-    private RailtimeTrainDao railtimeTrainDao;
     @Resource
     private TrainDao trainDao;
     @Resource

@@ -5,7 +5,6 @@ import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
 import be.raildelays.repository.LineStopDao;
-import be.raildelays.repository.RailtimeTrainDao;
 import be.raildelays.repository.TrainDao;
 import org.junit.Test;
 
@@ -23,9 +22,6 @@ public class LineStopJpaDaoIT extends AbstractIT {
 
     @Resource
     private TrainDao trainDao;
-
-    @Resource
-    private RailtimeTrainDao railtimeTrainDao;
 
     @Test
     public void testSave() {
