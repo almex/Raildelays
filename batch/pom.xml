@@ -107,10 +107,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!--<dependency>-->
-            <!--<groupId>org.quartz-scheduler</groupId>-->
-            <!--<artifactId>quartz</artifactId>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>com.sun.mail</groupId>
             <artifactId>javax.mail</artifactId>
@@ -161,6 +157,21 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Core GTFS Library -->
+        <dependency>
+            <groupId>org.onebusaway</groupId>
+            <artifactId>onebusaway-gtfs</artifactId>
+        </dependency>
+        <!-- Optional Hibernate GTFS Database Persistence -->
+        <dependency>
+            <groupId>org.onebusaway</groupId>
+            <artifactId>onebusaway-gtfs-hibernate</artifactId>
+        </dependency>
+        <!-- Optional GTFS Transformation Library -->
+        <dependency>
+            <groupId>org.onebusaway</groupId>
+            <artifactId>onebusaway-gtfs-hibernate-cli</artifactId>
+        </dependency>
 
 
         <!-- Logging -->
