@@ -1,6 +1,5 @@
 package org.springframework.batch.item.file;
 
-import be.raildelays.batch.AbstractFileTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,20 +12,27 @@ import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 
-import static org.junit.Assert.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.stream.Stream;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Almex
  */
-public class UnzipTaskletTest {
+public class UnzipFileTaskletTest {
 
-    private UnzipTasklet tasklet;
+    private UnzipFileTasklet tasklet;
 
     @Before
     public void setUp() throws Exception {
-        tasklet = new UnzipTasklet();
+        tasklet = new UnzipFileTasklet();
         tasklet.setInputFile(new ClassPathResource("nmbs-latest.zip"));
-        tasklet.setDestinationFolder(new FileSystemResource("unzip"));
+        tasklet.setDestinationFolder(new FileSystemResource("./unzip"));
+        cleanUp();
     }
 
     /**
@@ -42,10 +48,25 @@ public class UnzipTaskletTest {
 
         assertEquals(RepeatStatus.FINISHED, repeatStatus);
         assertEquals(7, stepContribution.getWriteCount());
+        assertEquals(7, getFiles().count());
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() throws IOException {
+        cleanUp();
+    }
 
+    private void cleanUp() throws IOException {
+        getFiles().forEach((path) -> {
+            try {
+                Files.deleteIfExists(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private Stream<Path> getFiles() throws IOException {
+        return Files.list(Paths.get("./unzip"));
     }
 }

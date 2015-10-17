@@ -15,13 +15,19 @@
     <import resource="classpath:/jobs/parent-job-context.xml"/>
 
 
-    <job id="generateExcelFilesJob" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-        <step id="generateExcelFilesSubStep" parent="parentStep">
+    <job id="loadGtfsIntoDatabaseJob" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+        <step id="downloadFileStep" parent="parentStep">
+            <tasklet transaction-manager="batchTransactionManager" ref="httpDownloadFileTasklet"/>
+        </step>
+        <step id="unzipFileStep" parent="parentStep">
+            <tasklet transaction-manager="batchTransactionManager" ref="httpDownloadFileTasklet"/>
+        </step>
+        <step id="loadDatabaseStep" parent="parentStep">
             <tasklet transaction-manager="batchTransactionManager">
                 <chunk reader="csvReader"
                        processor="chainedProcessorsTrain"
                        writer="databaseWriter"
-                       commit-interval="${generate.excel.files.commit.interval}"
+                       commit-interval="10"
                        skip-limit="10">
                 </chunk>
                 <transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
@@ -30,7 +36,7 @@
         <validator ref="generateExcelFilesJobParametersValidator"/>
     </job>
 
-    <bean id="generateExcelFilesJobParametersValidator"
+    <!--<bean id="generateExcelFilesJobParametersValidator"
           class="org.springframework.batch.core.job.DefaultJobParametersValidator">
         <property name="requiredKeys">
             <list>
@@ -46,7 +52,7 @@
                 <value>date</value>
             </list>
         </property>
-    </bean>
+    </bean>-->
 
     <!-- ================================================================================================== -->
     <!-- =====================================         DECIDERS       ===================================== -->
@@ -60,7 +66,7 @@
     <bean id="csvReader"
           class="org.springframework.batch.item.file.FlatFileItemReader"
           scope="step">
-        <property name="resource" value="classpath:routes.txt" />
+        <property name="resource" value="${gtfs.trainlist.uri}"/>
         <property name="lineMapper">
             <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
                 <property name="lineTokenizer">
@@ -98,20 +104,24 @@
     <!-- =====================================         WRITERS        ===================================== -->
     <!-- ================================================================================================== -->
 
-    <bean id="compositeItemWriter"
-          class="org.springframework.batch.item.support.CompositeItemWriter"
+    <bean id="databaseWriter"
+          class="org.springframework.batch.item.database.JpaItemWriter"
           scope="step">
-        <property name="delegates">
-            <list>
-                <ref bean="flatFileItemWriter"/>
-                <ref bean="multiResourceItemWriter"/>
-            </list>
-        </property>
+        <property name="entityManagerFactory" ref="raildelaysEntityManagerFactory"/>
     </bean>
 
     <!-- ================================================================================================== -->
-    <!-- =====================================        RESOURCES       ===================================== -->
+    <!-- =====================================         TASKLET        ===================================== -->
     <!-- ================================================================================================== -->
 
+    <bean id="httpDownloadFileTasklet" class="org.springframework.batch.item.file.HttpDownloadFileTasklet">
+        <property name="inputFile" value="${gtfs.download.uri}"/>
+        <property name="destinationFolder" value="${gtfs.download.destination.folder.uri}"/>
+    </bean>
+
+    <bean id="unzipFileTasklet" class="org.springframework.batch.item.file.UnzipFileTasklet">
+        <property name="inputFile" value="${gtfs.unzip.input.file.uri}"/>
+        <property name="destinationFolder" value="${gtfs.unzip.destination.folder.uri}"/>
+    </bean>
 
 </beans>
