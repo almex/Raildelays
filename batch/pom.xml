@@ -107,10 +107,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!--<dependency>-->
-            <!--<groupId>org.quartz-scheduler</groupId>-->
-            <!--<artifactId>quartz</artifactId>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>com.sun.mail</groupId>
             <artifactId>javax.mail</artifactId>
@@ -160,7 +156,6 @@
             <artifactId>spring-dbunit-test</artifactId>
             <scope>test</scope>
         </dependency>
-
 
 
         <!-- Logging -->

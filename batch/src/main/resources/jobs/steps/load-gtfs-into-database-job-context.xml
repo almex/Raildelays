@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- Needed if we use a AutomaticJobRegistrar -->
+    <context:annotation-config/>
+    <!-- To make the embedded step to use scope="step" -->
+    <bean class="org.springframework.batch.core.scope.StepScope"/>
+
+    <import resource="classpath:/jobs/parent-job-context.xml"/>
+
+
+    <job id="loadGtfsIntoDatabaseJob" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+        <step id="downloadFileStep" parent="parentStep" next="unzipFileStep">
+            <tasklet transaction-manager="batchTransactionManager" ref="httpDownloadFileTasklet"/>
+        </step>
+        <step id="unzipFileStep" parent="parentStep" next="loadDatabaseStep">
+            <tasklet transaction-manager="batchTransactionManager" ref="unzipFileTasklet"/>
+        </step>
+        <step id="loadDatabaseStep" parent="parentStep">
+            <tasklet transaction-manager="batchTransactionManager">
+                <chunk reader="csvReader"
+                       processor="chainedProcessorsTrain"
+                       writer="databaseWriter"
+                       commit-interval="10">
+                </chunk>
+                <transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
+            </tasklet>
+        </step>
+        <!--<validator ref="loadGtfsIntoDatabaseValidator"/>-->
+    </job>
+
+    <!--<bean id="loadGtfsIntoDatabaseValidator"
+          class="org.springframework.batch.core.job.DefaultJobParametersValidator">
+        <property name="requiredKeys">
+            <list>
+                <value>station.departure</value>
+                <value>station.arrival</value>
+                <value>excel.output.path</value>
+                <value>excel.file.name</value>
+                <value>excel.file.extension</value>
+                <value>excel.template.path</value>
+                <value>excel.archive.path</value>
+                <value>text.output.path</value>
+                <value>language</value>
+                <value>date</value>
+            </list>
+        </property>
+    </bean>-->
+
+    <!-- ================================================================================================== -->
+    <!-- =====================================         DECIDERS       ===================================== -->
+    <!-- ================================================================================================== -->
+
+
+    <!-- ================================================================================================== -->
+    <!-- =====================================         READERS        ===================================== -->
+    <!-- ================================================================================================== -->
+
+    <bean id="csvReader"
+          class="org.springframework.batch.item.file.FlatFileItemReader"
+          scope="step">
+        <property name="resource" value="${gtfs.trainlist.uri}"/>
+        <property name="lineMapper">
+            <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+                <property name="lineTokenizer">
+                    <bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+                        <property name="names" value="route_id,agency_id,route_short_name,route_long_name,route_type" />
+                    </bean>
+                </property>
+                <property name="fieldSetMapper">
+                    <bean class="be.raildelays.batch.reader.TrainFieldSetMapper"/>
+                </property>
+            </bean>
+        </property>
+        <property name="linesToSkip" value="1" />
+    </bean>
+
+    <!-- ================================================================================================== -->
+    <!-- =====================================       PROCESSORS       ===================================== -->
+    <!-- ================================================================================================== -->
+
+    <bean id="chainedProcessorsTrain"
+          class="org.springframework.batch.item.support.CompositeItemProcessor"
+          scope="step"
+          lazy-init="true">
+        <property name="delegates">
+            <list>
+                <ref bean="validatorProcessor"/>
+            </list>
+        </property>
+    </bean>
+
+    <!-- ================================================================================================== -->
+    <!-- =====================================         WRITERS        ===================================== -->
+    <!-- ================================================================================================== -->
+
+    <bean id="databaseWriter"
+          class="org.springframework.batch.item.database.JpaItemWriter"
+          scope="step">
+        <property name="entityManagerFactory" ref="raildelaysEntityManagerFactory"/>
+    </bean>
+
+    <!-- ================================================================================================== -->
+    <!-- =====================================         TASKLET        ===================================== -->
+    <!-- ================================================================================================== -->
+
+    <bean id="httpDownloadFileTasklet" class="org.springframework.batch.item.file.HttpDownloadFileTasklet">
+        <property name="inputFile" value="${gtfs.download.uri}"/>
+        <property name="destinationFolder" value="${gtfs.download.destination.folder.uri}"/>
+    </bean>
+
+    <bean id="unzipFileTasklet" class="org.springframework.batch.item.file.UnzipFileTasklet">
+        <property name="inputFile" value="${gtfs.unzip.input.file.uri}"/>
+        <property name="destinationFolder" value="${gtfs.unzip.destination.folder.uri}"/>
+    </bean>
+
+</beans>

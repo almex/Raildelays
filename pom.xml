@@ -89,7 +89,7 @@
         <version.spring.dbunit>1.4.0</version.spring.dbunit>
         <version.xbean.spring>3.16</version.xbean.spring>
         <version.hibernate.validator>5.2.1.Final</version.hibernate.validator>
-        <version.hibernate>5.0.1.Final</version.hibernate>
+        <version.hibernate>5.0.2.Final</version.hibernate>
         <version.eclipselink>2.5.1</version.eclipselink>
         <version.openjpa>2.2.2</version.openjpa>
         <version.querydsl>3.4.2</version.querydsl>
@@ -99,7 +99,6 @@
         <version.derby>10.10.1.1</version.derby>
         <version.servlet>3.1.0</version.servlet>
         <version.undertow>1.2.10.Final</version.undertow>
-
         <version.jersey>2.19</version.jersey>
 
         <version.atomikos>3.9.2</version.atomikos>

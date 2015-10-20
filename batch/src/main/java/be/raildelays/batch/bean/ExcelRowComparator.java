@@ -28,8 +28,7 @@ import be.raildelays.domain.xls.ExcelRow;
 
 import java.util.Comparator;
 
-import static java.util.Comparator.comparing;
-import static java.util.Comparator.nullsFirst;
+import static java.util.Comparator.*;
 
 /**
  * This {@link Comparator} compute the exact match between all values
@@ -42,19 +41,19 @@ public class ExcelRowComparator extends AbstractExcelRowComparator<ExcelRow> {
     @Override
     public int compare(ExcelRow lho, ExcelRow rho) {
         return nullsFirst(compareReferences(
-                comparing(ExcelRow::getDate)
-                        .thenComparing(ExcelRow::getArrivalStation)
-                        .thenComparing(ExcelRow::getDepartureStation)
-                        .thenComparing(ExcelRow::getLinkStation)
-                        .thenComparing(ExcelRow::getExpectedDepartureTime)
-                        .thenComparing(ExcelRow::getExpectedArrivalTime)
-                        .thenComparing(ExcelRow::getExpectedTrain1)
-                        .thenComparing(ExcelRow::getExpectedTrain2)
-                        .thenComparing(ExcelRow::getEffectiveDepartureTime)
-                        .thenComparing(ExcelRow::getEffectiveArrivalTime)
-                        .thenComparing(ExcelRow::getEffectiveTrain1)
-                        .thenComparing(ExcelRow::getEffectiveTrain2)
-                        .thenComparing(ExcelRow::getDelay)
+                comparing(ExcelRow::getDate, nullsFirst(naturalOrder()))
+                        .thenComparing(ExcelRow::getArrivalStation, nullsFirst(naturalOrder()))
+                        .thenComparing(ExcelRow::getDepartureStation, nullsFirst(naturalOrder()))
+                        .thenComparing(ExcelRow::getLinkStation, nullsFirst(naturalOrder()))
+                        .thenComparing(ExcelRow::getExpectedDepartureTime, nullsFirst(naturalOrder()))
+                        .thenComparing(ExcelRow::getExpectedArrivalTime, nullsFirst(naturalOrder()))
+                        .thenComparing(ExcelRow::getExpectedTrain1, nullsFirst(naturalOrder()))
+                        .thenComparing(ExcelRow::getExpectedTrain2, nullsFirst(naturalOrder()))
+                        .thenComparing(ExcelRow::getEffectiveDepartureTime, nullsFirst(naturalOrder()))
+                        .thenComparing(ExcelRow::getEffectiveArrivalTime, nullsFirst(naturalOrder()))
+                        .thenComparing(ExcelRow::getEffectiveTrain1, nullsFirst(naturalOrder()))
+                        .thenComparing(ExcelRow::getEffectiveTrain2, nullsFirst(naturalOrder()))
+                        .thenComparing(ExcelRow::getDelay, nullsFirst(naturalOrder()))
         )).compare(lho, rho);
     }
 }

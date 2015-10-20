@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.*;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
@@ -38,7 +38,6 @@ import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -46,7 +45,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service("BatchStartAndRecoveryService")
-public class BatchStartAndRecoveryServiceImpl extends JobExplorerFactoryBean implements BatchStartAndRecoveryService, InitializingBean {
+public class BatchStartAndRecoveryServiceImpl implements BatchStartAndRecoveryService, JobExplorer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchStartAndRecoveryServiceImpl.class);
 
@@ -62,13 +61,15 @@ public class BatchStartAndRecoveryServiceImpl extends JobExplorerFactoryBean imp
     private StepExecutionDao stepExecutionDao;
     private ExecutionContextDao executionContextDao;
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        super.afterPropertiesSet();
-        jobInstanceDao = createJobInstanceDao();
-        jobExecutionDao = createJobExecutionDao();
-        stepExecutionDao = createStepExecutionDao();
-        executionContextDao = createExecutionContextDao();
+    public BatchStartAndRecoveryServiceImpl(JobInstanceDao jobInstanceDao,
+                                            JobExecutionDao jobExecutionDao,
+                                            StepExecutionDao stepExecutionDao,
+                                            ExecutionContextDao executionContextDao
+    ) {
+        this.jobInstanceDao = jobInstanceDao;
+        this.jobExecutionDao = jobExecutionDao;
+        this.stepExecutionDao = stepExecutionDao;
+        this.executionContextDao = executionContextDao;
     }
 
     @Override
@@ -201,7 +202,10 @@ public class BatchStartAndRecoveryServiceImpl extends JobExplorerFactoryBean imp
         List<JobExecution> result = new ArrayList<>();
 
         for (int start = 0; ; start += count) {
-            List<Long> jobInstanceIds = getJobInstances(jobName, start, count);
+            List<Long> jobInstanceIds = getJobInstances(jobName, start, count)
+                    .stream()
+                    .map(JobInstance::getInstanceId)
+                    .collect(Collectors.toList());
 
             LOGGER.debug("Number of jobInstanceIds={} start={} count={}.", jobInstanceIds.size(), start, count);
 
@@ -245,17 +249,8 @@ public class BatchStartAndRecoveryServiceImpl extends JobExplorerFactoryBean imp
         return jobExecution.getStatus();
     }
 
-    public List<Long> getJobInstances(String jobName, int start, int count) throws NoSuchJobException {
-        List<Long> list = jobInstanceDao.getJobInstances(jobName, start, count)
-                .stream()
-                .map(JobInstance::getId)
-                .collect(Collectors.toList());
-
-        if (list.isEmpty() && !jobRegistry.getJobNames().contains(jobName)) {
-            throw new NoSuchJobException("No such job (either in registry or in historical data): " + jobName);
-        }
-
-        return list;
+    public List<JobInstance> getJobInstances(String jobName, int start, int count) {
+        return jobInstanceDao.getJobInstances(jobName, start, count);
     }
 
     @Override
@@ -403,8 +398,18 @@ public class BatchStartAndRecoveryServiceImpl extends JobExplorerFactoryBean imp
     }
 
     @Override
-    public Set<String> getJobNames() {
-        return new TreeSet<>(jobRegistry.getJobNames());
+    public List<String> getJobNames() {
+        return new ArrayList<>(jobRegistry.getJobNames());
+    }
+
+    @Override
+    public List<JobInstance> findJobInstancesByJobName(String jobName, int start, int count) {
+        return null;
+    }
+
+    @Override
+    public int getJobInstanceCount(String jobName) throws NoSuchJobException {
+        return 0;
     }
 
     @Override
@@ -433,6 +438,31 @@ public class BatchStartAndRecoveryServiceImpl extends JobExplorerFactoryBean imp
         updateJobExecution(jobExecution);
 
         return jobExecution;
+    }
+
+    @Override
+    public JobExecution getJobExecution(Long executionId) {
+        return null;
+    }
+
+    @Override
+    public StepExecution getStepExecution(Long jobExecutionId, Long stepExecutionId) {
+        return null;
+    }
+
+    @Override
+    public JobInstance getJobInstance(Long instanceId) {
+        return null;
+    }
+
+    @Override
+    public List<JobExecution> getJobExecutions(JobInstance jobInstance) {
+        return null;
+    }
+
+    @Override
+    public Set<JobExecution> findRunningJobExecutions(String jobName) {
+        return null;
     }
 
     public void updateJobExecution(JobExecution jobExecution) {

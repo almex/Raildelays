@@ -34,7 +34,6 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 
 import java.util.List;
-import java.util.Set;
 
 
 public interface BatchStartAndRecoveryService {
@@ -100,7 +99,7 @@ public interface BatchStartAndRecoveryService {
 
     JobExecution abandon(Long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionAlreadyRunningException;
 
-    Set<String> getJobNames();
+    List<String> getJobNames();
 
     BatchStatus getStatus(Long jobInstanceId) throws NoSuchJobInstanceException;
 

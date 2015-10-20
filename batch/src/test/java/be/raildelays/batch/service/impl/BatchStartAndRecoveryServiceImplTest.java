@@ -19,7 +19,6 @@ import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 
-import javax.sql.DataSource;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -35,9 +34,9 @@ public class BatchStartAndRecoveryServiceImplTest extends EasyMockSupport {
     public static final String JOB_NAME = "foo";
     public static final long INSTANCE_ID = 1L;
     public static final long EXECUTION_ID = 1L;
+
     private JobExecution jobExecution;
-    @TestSubject
-    private BatchStartAndRecoveryServiceImpl service = new BatchStartAndRecoveryServiceImpl();
+
     @Mock(type = MockType.NICE)
     private JobLauncher jobLauncher;
     @Mock(type = MockType.NICE)
@@ -50,11 +49,13 @@ public class BatchStartAndRecoveryServiceImplTest extends EasyMockSupport {
     private StepExecutionDao stepExecutionDao;
     @Mock(type = MockType.NICE)
     private ExecutionContextDao executionContextDao;
+    @TestSubject
+    private BatchStartAndRecoveryServiceImpl service = new BatchStartAndRecoveryServiceImpl(
+            jobInstanceDao, jobExecutionDao, stepExecutionDao, executionContextDao
+    );
 
     @Before
     public void setUp() throws Exception {
-        service.setDataSource(mock(DataSource.class));
-        service.afterPropertiesSet(); // only for code-coverage otherwise we don't need it for testing
         service.setJobLauncher(jobLauncher);
         service.setJobRegistry(jobRegistry);
         service.setJobInstanceDao(jobInstanceDao);
@@ -188,7 +189,7 @@ public class BatchStartAndRecoveryServiceImplTest extends EasyMockSupport {
 
         replayAll();
 
-        Set<String> jobNames = service.getJobNames();
+        List<String> jobNames = service.getJobNames();
 
         Assert.assertEquals(1, jobNames.size());
         Assert.assertTrue(jobNames.contains(JOB_NAME));
@@ -246,18 +247,6 @@ public class BatchStartAndRecoveryServiceImplTest extends EasyMockSupport {
         replayAll();
 
         service.stop(EXECUTION_ID);
-    }
-
-    @Test(expected = NoSuchJobException.class)
-    public void testGetJobInstancesNoSuchJobException() throws Exception {
-        expect(jobInstanceDao.getJobInstances(anyString(), anyInt(), anyInt()))
-                .andStubReturn(Collections.emptyList());
-        expect(jobRegistry.getJobNames())
-                .andStubReturn(Collections.emptyList());
-
-        replayAll();
-
-        service.getJobInstances(JOB_NAME, 1, 10);
     }
 
     @Test(expected = NoSuchJobException.class)
