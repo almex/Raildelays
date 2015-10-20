@@ -78,7 +78,8 @@ public class Bootstrap extends Application {
                 "/spring/bootstrap-fx-context.xml",
                 "/jobs/main-job-context.xml",
                 "/jobs/steps/handle-max-months-job-context.xml",
-                "/jobs/steps/handle-more-than-one-hour-delays-job-context.xml"
+                "/jobs/steps/handle-more-than-one-hour-delays-job-context.xml",
+                "/jobs/steps/load-gtfs-into-database-job-context.xml"
         };
 
         FXMLLoader rootLoader = new FXMLLoader(getClass().getResource("/fxml/batch/index.fxml"));
@@ -89,11 +90,13 @@ public class Bootstrap extends Application {
 
         rootLoader.setControllerFactory(clazz -> {
             BatchScheduledService scheduledService = new BatchScheduledService();
-            JobParametersExtractor propertiesExtractor = applicationContext
-                    .getBean("jobParametersFromPropertiesExtractor", JobParametersExtractor.class);
+            JobParametersExtractor propertiesExtractor = applicationContext.getBean(
+                    "jobParametersFromPropertiesExtractor", JobParametersExtractor.class
+            );
 
-            scheduledService.setService(applicationContext
-                    .getBean("BatchStartAndRecoveryService", BatchStartAndRecoveryService.class));
+            scheduledService.setService(
+                    applicationContext.getBean("BatchStartAndRecoveryService", BatchStartAndRecoveryService.class)
+            );
 
             if (clazz.isAssignableFrom(BatchIndexController.class)) {
                 controller = new BatchIndexController();
@@ -103,6 +106,8 @@ public class Bootstrap extends Application {
                 controller = new HandleOneHourDelayBatchController();
             } else if (clazz.isAssignableFrom(HandleMaxMonthsBatchController.class)) {
                 controller = new HandleMaxMonthsBatchController();
+            } else if (clazz.isAssignableFrom(DownloadListOfTrainsBatchController.class)) {
+                controller = new DownloadListOfTrainsBatchController();
             }
 
             if (controller != null) {

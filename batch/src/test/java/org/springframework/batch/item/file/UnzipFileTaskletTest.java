@@ -25,13 +25,14 @@ import static org.junit.Assert.assertEquals;
  */
 public class UnzipFileTaskletTest {
 
+    public static final String DIRECTORY = "./unzip";
     private UnzipFileTasklet tasklet;
 
     @Before
     public void setUp() throws Exception {
         tasklet = new UnzipFileTasklet();
         tasklet.setInputFile(new ClassPathResource("nmbs-latest.zip"));
-        tasklet.setDestinationFolder(new FileSystemResource("./unzip"));
+        tasklet.setDestinationFolder(new FileSystemResource(DIRECTORY));
         cleanUp();
     }
 
@@ -67,6 +68,12 @@ public class UnzipFileTaskletTest {
     }
 
     private Stream<Path> getFiles() throws IOException {
-        return Files.list(Paths.get("./unzip"));
+        Stream<Path> result = Stream.empty();
+
+        if (Files.exists(Paths.get(DIRECTORY))) {
+            result = Files.list(Paths.get(DIRECTORY));
+        }
+
+        return result;
     }
 }

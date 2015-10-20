@@ -16,27 +16,26 @@
 
 
     <job id="loadGtfsIntoDatabaseJob" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
-        <step id="downloadFileStep" parent="parentStep">
+        <step id="downloadFileStep" parent="parentStep" next="unzipFileStep">
             <tasklet transaction-manager="batchTransactionManager" ref="httpDownloadFileTasklet"/>
         </step>
-        <step id="unzipFileStep" parent="parentStep">
-            <tasklet transaction-manager="batchTransactionManager" ref="httpDownloadFileTasklet"/>
+        <step id="unzipFileStep" parent="parentStep" next="loadDatabaseStep">
+            <tasklet transaction-manager="batchTransactionManager" ref="unzipFileTasklet"/>
         </step>
         <step id="loadDatabaseStep" parent="parentStep">
             <tasklet transaction-manager="batchTransactionManager">
                 <chunk reader="csvReader"
                        processor="chainedProcessorsTrain"
                        writer="databaseWriter"
-                       commit-interval="10"
-                       skip-limit="10">
+                       commit-interval="10">
                 </chunk>
                 <transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
             </tasklet>
         </step>
-        <validator ref="generateExcelFilesJobParametersValidator"/>
+        <!--<validator ref="loadGtfsIntoDatabaseValidator"/>-->
     </job>
 
-    <!--<bean id="generateExcelFilesJobParametersValidator"
+    <!--<bean id="loadGtfsIntoDatabaseValidator"
           class="org.springframework.batch.core.job.DefaultJobParametersValidator">
         <property name="requiredKeys">
             <list>
@@ -75,10 +74,7 @@
                     </bean>
                 </property>
                 <property name="fieldSetMapper">
-                    <bean class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
-                        <property name="prototypeBeanName" value="report" />
-                        <property name="targetType" value="be.raildelays.domain.entities.Train"/>
-                    </bean>
+                    <bean class="be.raildelays.batch.reader.TrainFieldSetMapper"/>
                 </property>
             </bean>
         </property>

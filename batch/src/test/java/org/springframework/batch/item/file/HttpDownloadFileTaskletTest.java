@@ -27,11 +27,13 @@ public class HttpDownloadFileTaskletTest {
 
     private HttpDownloadFileTasklet tasklet;
 
+    private static final String DIRECTORY = "./download";
+
     @Before
     public void setUp() throws Exception {
         tasklet = new HttpDownloadFileTasklet();
         tasklet.setInputFile(new UrlResource("http://gtfs.irail.be/nmbs/nmbs-latest.zip"));
-        tasklet.setDestinationFolder(new FileSystemResource("./download"));
+        tasklet.setDestinationFolder(new FileSystemResource(DIRECTORY));
         cleanUp();
     }
 
@@ -67,6 +69,12 @@ public class HttpDownloadFileTaskletTest {
     }
 
     private Stream<Path> getFiles() throws IOException {
-        return Files.list(Paths.get("./download"));
+        Stream<Path> result = Stream.empty();
+
+        if (Files.exists(Paths.get(DIRECTORY))) {
+            result = Files.list(Paths.get(DIRECTORY));
+        }
+
+        return result;
     }
 }

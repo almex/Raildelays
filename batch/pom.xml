@@ -157,22 +157,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Core GTFS Library -->
-        <dependency>
-            <groupId>org.onebusaway</groupId>
-            <artifactId>onebusaway-gtfs</artifactId>
-        </dependency>
-        <!-- Optional Hibernate GTFS Database Persistence -->
-        <dependency>
-            <groupId>org.onebusaway</groupId>
-            <artifactId>onebusaway-gtfs-hibernate</artifactId>
-        </dependency>
-        <!-- Optional GTFS Transformation Library -->
-        <dependency>
-            <groupId>org.onebusaway</groupId>
-            <artifactId>onebusaway-gtfs-hibernate-cli</artifactId>
-        </dependency>
-
 
         <!-- Logging -->
         <!-- To allow to use asynchronous logger with log4j2 (http://logging.apache.org/log4j/2.x/manual/async.html) -->

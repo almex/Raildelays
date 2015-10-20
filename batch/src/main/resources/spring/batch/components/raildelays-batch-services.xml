@@ -4,8 +4,13 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean id="BatchStartAndRecoveryService"
-          class="be.raildelays.batch.service.impl.BatchStartAndRecoveryServiceImpl"
+          factory-bean="batchStartAndRecoveryServiceFactory"
+          factory-method="getService"
           destroy-method="stopAllRunningJobs">
+    </bean>
+
+    <bean id="batchStartAndRecoveryServiceFactory"
+          class="be.raildelays.batch.service.impl.BatchStartAndRecoveryServiceFactory">
         <property name="jobRegistry" ref="jobRegistry"/>
         <property name="jobLauncher" ref="jobLauncher"/>
         <property name="dataSource" ref="batchDataSource"/>
