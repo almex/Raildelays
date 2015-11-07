@@ -43,10 +43,33 @@ public interface LineStopDaoCustom {
      * @param date           date for which you do the search
      * @param station        departure station
      * @param delayThreshold minimum delay (in milliseconds)
-     * @return a collection of {@link LineStop} belonging to departure
+     * @param request        define the paging
+     * @return  a sub-list (called a {@link Page}) of {@link LineStop} belonging to departure
      */
     Page<LineStop> findDepartureDelays(LocalDate date, Station station, long delayThreshold, Pageable request);
+
+    /**
+     * Search a list of delayed or canceled arrival {@link LineStop} which belong to departure or
+     * arrival station for a certain day.
+     *
+     * @param date           date for which you do the search
+     * @param station        departure station
+     * @param delayThreshold minimum delay (in milliseconds)
+     * @return a collection of {@link LineStop} belonging to departure
+     */
     List<LineStop> findDepartureDelays(LocalDate date, Station station, long delayThreshold);
+
+    /**
+     * Search a list of delayed or canceled departure {@link LineStop} which belong to departure or
+     * arrival station for a certain day.
+     *
+     * @param date           date for which you do the search
+     * @param station        arrival station
+     * @param delayThreshold minimum delay (in milliseconds)
+     * @param request        define the paging
+     * @return a sub-list (called a {@link Page}) of {@link LineStop} belonging to arrival
+     */
+    Page<LineStop> findArrivalDelays(LocalDate date, Station station, long delayThreshold, Pageable request);
 
     /**
      * Search a list of delayed or canceled departure {@link LineStop} which belong to departure or
@@ -57,18 +80,16 @@ public interface LineStopDaoCustom {
      * @param delayThreshold minimum delay (in milliseconds)
      * @return a collection of {@link LineStop} belonging to arrival
      */
-    Page<LineStop> findArrivalDelays(LocalDate date, Station station, long delayThreshold, Pageable request);
-
     List<LineStop> findArrivalDelays(LocalDate date, Station station, long delayThreshold);
 
     /**
      * Search a the next trains which is expectedTime to arrive after a certain
      * time.
      *
-     * @param station for which you do a search
-     * @param dateTime    a line stops must be of the same day of the year of this dateTime
-     *                and must have the expectedTime departure time greater than the the
-     *                hour specified into that dateTime
+     * @param station  for which you do a search
+     * @param dateTime a line stops must be of the same day of the year of this dateTime
+     *                 and must have the expectedTime departure time greater than the the
+     *                 hour specified into that dateTime
      * @return a list of line stops of the same day in order of expectedTime arrival
      * time
      */
