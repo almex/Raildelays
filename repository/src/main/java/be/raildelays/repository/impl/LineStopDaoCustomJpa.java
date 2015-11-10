@@ -162,16 +162,6 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
                 .and(trainEquals(train)));
     }
 
-    private List<LineStop> findAll(Specifications<LineStop> specifications) {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
-        Root<LineStop> root = query.from(LineStop.class);
-
-        return entityManager
-                .createQuery(query.where(specifications.toPredicate(root, query, builder)))
-                .getResultList();
-    }
-
     private Page<LineStop> findAll(Specifications<LineStop> specifications, Pageable pageable) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
