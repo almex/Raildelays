@@ -1,7 +1,7 @@
 const gulp        = require('gulp');
 const uglify      = require('gulp-uglify');
 const concat      = require('gulp-concat');
-const sass        = require('gulp-sass');
+//const sass        = require('gulp-sass');
 const minify      = require('gulp-minify-css');
 const jshint      = require('gulp-jshint');
 const cached      = require('gulp-cached');
@@ -48,7 +48,7 @@ gulp.task('styles', () => {
     return gulp.src('src/main/styles/**/*.css')
                .pipe(sourcemaps.init())
                .pipe(newer('target/styles'))
-               .pipe(sass())
+//               .pipe(sass())
                .pipe(minify())
                .pipe(sourcemaps.write('.'))
                .pipe(gulp.dest('target/styles'))

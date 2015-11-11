@@ -79,12 +79,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
 
-        <version.spring>4.2.1.RELEASE</version.spring>
+        <version.spring>4.2.2.RELEASE</version.spring>
         <version.spring.batch>3.0.5.RELEASE</version.spring.batch>
-        <version.spring.data>1.9.0.RELEASE</version.spring.data>
-        <version.spring.data.rest>2.3.2.RELEASE</version.spring.data.rest>
-        <version.spring.data.commons>1.11.0.RELEASE</version.spring.data.commons>
-        <version.spring.hateoas>0.18.0.RELEASE</version.spring.hateoas>
+        <version.spring.data>Gosling-RELEASE</version.spring.data>
+        <version.spring.hateoas>0.19.0.RELEASE</version.spring.hateoas>
         <version.spring.mock>2.0.8</version.spring.mock>
         <version.spring.boot>1.2.5.RELEASE</version.spring.boot>
         <version.spring.dbunit>1.4.0</version.spring.dbunit>
@@ -189,6 +187,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>raildelays-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>raildelays-modern-ui</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -377,24 +380,16 @@
 
             <!-- Spring Data -->
             <dependency>
-                <groupId>org.springframework.data</groupId>
-                <artifactId>spring-data-jpa</artifactId>
-                <version>${version.spring.data}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.data</groupId>
-                <artifactId>spring-data-rest-webmvc</artifactId>
-                <version>${version.spring.data.rest}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.data</groupId>
-                <artifactId>spring-data-commons</artifactId>
-                <version>${version.spring.data.commons}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.springframework.hateoas</groupId>
                 <artifactId>spring-hateoas</artifactId>
                 <version>${version.spring.hateoas}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-releasetrain</artifactId>
+                <version>${version.spring.data}</version>
+                <scope>import</scope>
+                <type>pom</type>
             </dependency>
 
             <dependency>
