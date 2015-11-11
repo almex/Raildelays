@@ -65,6 +65,7 @@
         <module>batch</module>
         <module>java-fx-ui</module>
         <module>server</module>
+        <module>modern-ui</module>
         <module>assembly</module>
     </modules>
 
@@ -925,6 +926,11 @@
                     <groupId>org.sonatype.plugins</groupId>
                     <artifactId>nexus-staging-maven-plugin</artifactId>
                     <version>1.6.5</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.github.eirslett</groupId>
+                    <artifactId>frontend-maven-plugin</artifactId>
+                    <version>0.0.26</version>
                 </plugin>
 
             </plugins>

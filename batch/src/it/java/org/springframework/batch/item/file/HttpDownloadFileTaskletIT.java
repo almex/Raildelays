@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Almex
  */
-public class HttpDownloadFileTaskletTest {
+public class HttpDownloadFileTaskletIT {
 
     private HttpDownloadFileTasklet tasklet;
 

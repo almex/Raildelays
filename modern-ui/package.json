@@ -1,0 +1,45 @@
+{
+  "name": "newui",
+  "version": "1.0.0",
+  "description": "New UI for Raildelays",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "angular2": "^2.0.0-alpha.45",
+    "browser-sync": "^2.9.12",
+    "del": "^2.0.2",
+    "gulp": "github:gulpjs/gulp#4.0",
+    "gulp-cache": "^0.4.0",
+    "gulp-cached": "^1.1.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-jshint": "^1.12.0",
+    "gulp-minify-css": "^1.2.1",
+    "gulp-newer": "^1.0.0",
+    "gulp-remember": "^0.3.0",
+    "gulp-sass": "^2.1.0",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-typescript": "^2.9.2",
+    "gulp-uglify": "^1.4.2",
+    "systemjs": "^0.19.5",
+    "typescript": "^1.6.2"
+  },
+  "dependencies": {
+    "angular2": "2.0.0-alpha.45",
+    "browser-sync": "^2.9.12",
+    "del": "^2.0.2",
+    "gulp": "^4.0.0-alpha.1",
+    "gulp-cache": "^0.4.0",
+    "gulp-cached": "^1.1.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-jshint": "^1.12.0",
+    "gulp-minify-css": "^1.2.1",
+    "gulp-remember": "^0.3.0",
+    "gulp-sass": "^2.1.0",
+    "gulp-uglify": "^1.4.2"
+  },
+  "keywords": []
+}
