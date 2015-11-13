@@ -11,6 +11,9 @@ import java.time.LocalDate;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
 
+/**
+ * @author Almex
+ */
 public class StationBasedExcelRowComparatorTest extends AbstractExcelRowComparatorTest {
 
     private LocalDate now;

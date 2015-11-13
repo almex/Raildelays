@@ -59,8 +59,20 @@ public class StationBasedExcelRowComparator extends AbstractExcelRowComparator<E
         )).compare(lho, rho);
     }
 
-    protected Function<ExcelRow, String> getStationName(Function<ExcelRow, Station> keyExtractor) {
-        return excelRow -> {
+    protected Function<ExcelRow, String> getStationName(Function<ExcelRow, Station> stationExtractor) {
+        return new StationNameExtractor(stationExtractor);
+    }
+
+    private class StationNameExtractor implements Function<ExcelRow, String> {
+
+        private final Function<ExcelRow, Station> keyExtractor;
+
+        public StationNameExtractor(Function<ExcelRow, Station> keyExtractor) {
+            this.keyExtractor = keyExtractor;
+        }
+
+        @Override
+        public String apply(ExcelRow excelRow) {
             Station station = keyExtractor.apply(excelRow);
             String result = null;
 
@@ -76,6 +88,6 @@ public class StationBasedExcelRowComparator extends AbstractExcelRowComparator<E
             }
 
             return result;
-        };
+        }
     }
 }

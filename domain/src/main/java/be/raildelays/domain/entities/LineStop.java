@@ -48,11 +48,16 @@ import java.util.Set;
  * @since 1.0
  */
 @Entity
-@Table(name = "LINE_STOP", uniqueConstraints = @UniqueConstraint(columnNames = {
-        "TRAIN_ID", "DATE", "STATION_ID"}, name ="LineStopUniqueBusinessKeyConstraint"))
+@Table(
+        name = "LINE_STOP",
+        uniqueConstraints = @UniqueConstraint(
+                columnNames = {"TRAIN_ID", "DATE", "STATION_ID"}, name = "LineStopUniqueBusinessKeyConstraint"
+        )
+)
 public class LineStop extends AbstractEntity implements Comparable<LineStop> {
 
     private static final long serialVersionUID = 7142886242889314414L;
+
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "TRAIN_ID")

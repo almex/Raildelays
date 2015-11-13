@@ -10,8 +10,9 @@ const del         = require('del');
 const browserSync = require('browser-sync').create();
 const sourcemaps  = require('gulp-sourcemaps');
 const newer       = require('gulp-newer');
-const tsc         = require('gulp-typescript');
-const tsProject   = tsc.createProject('tsconfig.json', {typescript: require('typescript')});
+const ts          = require('gulp-typescript');
+const tsProject   = ts.createProject('tsconfig.json', {typescript: require('typescript')});
+const KarmaServer = require('karma').Server;
 
 
 gulp.task('clean', () => {
@@ -19,7 +20,7 @@ gulp.task('clean', () => {
 })
 
 gulp.task('lint', () => {
-    return gulp.src('src/main/scripts/**/*.js')
+    return gulp.src('src/main/scripts/**/*.ts')
                .pipe(jshint());
 });
 
@@ -28,7 +29,7 @@ gulp.task('scripts', () => {
                .pipe(sourcemaps.init())
                .pipe(cached('scripts'))
                .pipe(newer('target/scripts/concat.js'))
-               .pipe(tsc(tsProject))
+               .pipe(ts(tsProject))
                .pipe(uglify())
                .pipe(remember('scripts'))
                .pipe(concat('concat.js'))
@@ -38,7 +39,7 @@ gulp.task('scripts', () => {
 });
 
 gulp.task('static', () => {
-    return gulp.src('src/main/static/**/*')
+    return gulp.src('src/main/resources/**/*')
                .pipe(newer('target'))
                .pipe(gulp.dest('target'))
                .pipe(browserSync.stream());
@@ -66,13 +67,32 @@ gulp.task('libs', () => {
                .pipe(gulp.dest('target/scripts'));
 });
 
+
+gulp.task('test-build', () => {
+	return gulp.src(['src/test/**/**.ts'])
+		       .pipe(sourcemaps.init())
+               .pipe(ts(tsProject))
+		       .pipe(sourcemaps.write('.'))
+               .pipe(gulp.dest('target/test'));
+});
+
+gulp.task('test-run', (done) => {
+	new KarmaServer({
+		configFile: __dirname + '/karma.conf.js',
+		singleRun: true
+	}, done).start();
+});
+
+gulp.task('test', gulp.series('test-build', 'test-run'));
+
 gulp.task('default', gulp.series(
         'clean',
         gulp.parallel(
             'styles',
             'static',
             gulp.series('lint', 'scripts')
-        )
+        ),
+        'test'
     )
 );
 
@@ -86,7 +106,7 @@ gulp.task('server', () => {
 
         gulp.watch('src/main/scripts/**/*.ts', gulp.parallel('scripts'));
         gulp.watch('src/main/styles/**/*.css', gulp.parallel('styles'));
-        gulp.watch("src/main/static/**/*", gulp.parallel('static'));
+        gulp.watch("src/main/resources/**/*", gulp.parallel('static'));
     }
 );
 

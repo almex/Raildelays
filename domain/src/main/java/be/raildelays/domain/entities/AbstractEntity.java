@@ -28,7 +28,10 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 /**
+ * It's the parent all our entities.
+ *
  * @author Almex
+ * @since 1.0
  */
 @MappedSuperclass
 public abstract class AbstractEntity implements Serializable {
@@ -37,6 +40,10 @@ public abstract class AbstractEntity implements Serializable {
     @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected Long id;
+
+    @Version
+    @Column(name = "VERSION")
+    protected Long version;
 
     public Long getId() {
         return id;
@@ -47,4 +54,12 @@ public abstract class AbstractEntity implements Serializable {
 
     @Override
     public abstract int hashCode();
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
 }

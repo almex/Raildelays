@@ -57,6 +57,7 @@ import static org.springframework.data.jpa.domain.Specifications.where;
 public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LineStopDaoCustomJpa.class);
+
     @PersistenceContext
     @SuppressWarnings("unused") // Injected via CDI
     private EntityManager entityManager;
