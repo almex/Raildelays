@@ -4,36 +4,40 @@ import be.raildelays.delays.TimeDelay;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
-import be.raildelays.service.RaildelaysService;
-import org.easymock.EasyMock;
+import be.raildelays.repository.LineStopDao;
+import org.easymock.*;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.BlockJUnit4ClassRunner;
 
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public class AggregateExpectedTimeProcessorTest {
+@RunWith(BlockJUnit4ClassRunner.class)
+public class AggregateExpectedTimeProcessorTest extends EasyMockSupport {
 
     public static final Train TRAIN = new Train("0");
     private static final LocalDate TODAY = LocalDate.now();
     private static final Station DEPARTURE_STATION = new Station("Liège-Guillemins");
     private static final Station INTERMEDIATE_STATION = new Station("Bruxelles-Nord");
     private static final Station ARRIVAL_STATION = new Station("Bruxelles-Central");
-    private AggregateExpectedTimeProcessor processor;
-    private RaildelaysService raildelaysServiceMock;
+
+    @TestSubject
+    private AggregateExpectedTimeProcessor processor = new AggregateExpectedTimeProcessor();;
+    @Mock(type = MockType.NICE)
+    private LineStopDao lineStopDao;
+    @Rule
+    public EasyMockRule easyMockRule = new EasyMockRule(this);
+
     private LineStop item;
     private LineStop expected;
 
     @Before
     public void setUp() throws ParseException {
-        processor = new AggregateExpectedTimeProcessor();
-
-        raildelaysServiceMock = EasyMock.createMock(RaildelaysService.class);
-
-        processor.setService(raildelaysServiceMock);
-
         item = new LineStop
                 .Builder()
                 .date(TODAY)
@@ -96,13 +100,14 @@ public class AggregateExpectedTimeProcessorTest {
 
     @Test
     public void testProcess() throws Exception {
-        EasyMock.expect(raildelaysServiceMock.searchScheduledLine(TRAIN, DEPARTURE_STATION))
+        EasyMock.expect(lineStopDao.findFistScheduledLine(TRAIN, DEPARTURE_STATION))
                 .andReturn(expected.getPrevious());
-        EasyMock.expect(raildelaysServiceMock.searchScheduledLine(TRAIN, INTERMEDIATE_STATION))
+        EasyMock.expect(lineStopDao.findFistScheduledLine(TRAIN, INTERMEDIATE_STATION))
                 .andReturn(expected);
-        EasyMock.expect(raildelaysServiceMock.searchScheduledLine(TRAIN, ARRIVAL_STATION))
+        EasyMock.expect(lineStopDao.findFistScheduledLine(TRAIN, ARRIVAL_STATION))
                 .andReturn(expected.getNext());
-        EasyMock.replay(raildelaysServiceMock);
+
+        replayAll();
 
         LineStop result = processor.process(item);
 
@@ -115,18 +120,19 @@ public class AggregateExpectedTimeProcessorTest {
         Assert.assertEquals(LocalTime.parse("18:30"), result.getNext().getArrivalTime().getExpectedTime());
         Assert.assertEquals(LocalTime.parse("18:31"), result.getNext().getDepartureTime().getExpectedTime());
 
-        EasyMock.verify(raildelaysServiceMock);
+        verifyAll();
     }
 
     @Test
     public void testProcessNoCandidate() throws Exception {
-        EasyMock.expect(raildelaysServiceMock.searchScheduledLine(TRAIN, DEPARTURE_STATION))
+        EasyMock.expect(lineStopDao.findFistScheduledLine(TRAIN, DEPARTURE_STATION))
                 .andReturn(null);
-        EasyMock.expect(raildelaysServiceMock.searchScheduledLine(TRAIN, INTERMEDIATE_STATION))
+        EasyMock.expect(lineStopDao.findFistScheduledLine(TRAIN, INTERMEDIATE_STATION))
                 .andReturn(null);
-        EasyMock.expect(raildelaysServiceMock.searchScheduledLine(TRAIN, ARRIVAL_STATION))
+        EasyMock.expect(lineStopDao.findFistScheduledLine(TRAIN, ARRIVAL_STATION))
                 .andReturn(null);
-        EasyMock.replay(raildelaysServiceMock);
+
+        replayAll();
 
         LineStop result = processor.process(item);
 

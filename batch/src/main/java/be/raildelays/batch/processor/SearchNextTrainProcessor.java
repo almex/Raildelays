@@ -32,10 +32,9 @@ import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.logging.Logger;
 import be.raildelays.logging.LoggerFactory;
-import be.raildelays.service.RaildelaysService;
+import be.raildelays.repository.LineStopDao;
 import org.springframework.batch.item.ItemProcessor;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,8 +51,7 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
 
     private static final Logger LOGGER = LoggerFactory.getLogger("Nxt", SearchNextTrainProcessor.class);
 
-    @Resource
-    private RaildelaysService service;
+    private LineStopDao lineStopDao;
 
     private String language = Language.EN.name();
 
@@ -76,7 +74,7 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
 
         LOGGER.trace("item", item);
 
-        candidates = service.searchNextTrain(item.getArrivalStation(), dateTime);
+        candidates = lineStopDao.findNextExpectedArrivalTime(item.getArrivalStation(), dateTime);
 
         LOGGER.trace("candidates_arrival", candidates);
 
@@ -214,8 +212,8 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
         return result;
     }
 
-    public void setService(RaildelaysService service) {
-        this.service = service;
+    public void setLineStopDao(LineStopDao lineStopDao) {
+        this.lineStopDao = lineStopDao;
     }
 
     public void setLanguage(String language) {

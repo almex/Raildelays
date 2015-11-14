@@ -219,6 +219,7 @@
 
     <bean id="aggregateExpectedTimeProcessor"
           class="be.raildelays.batch.processor.AggregateExpectedTimeProcessor">
+        <property name="lineStopDao" ref="lineStopDao" />
     </bean>
 
     <bean id="excelRowMapperProcessor"
@@ -233,6 +234,7 @@
           class="be.raildelays.batch.processor.SearchNextTrainProcessor"
           scope="step">
         <property name="language" value="#{jobParameters['language']}"/>
+        <property name="lineStopDao" ref="lineStopDao" />
     </bean>
 
     <bean id="filterTwoSensPerDayXlsProcessor"

@@ -28,10 +28,8 @@ import be.raildelays.delays.TimeDelay;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.logging.Logger;
 import be.raildelays.logging.LoggerFactory;
-import be.raildelays.service.RaildelaysService;
+import be.raildelays.repository.LineStopDao;
 import org.springframework.batch.item.ItemProcessor;
-
-import javax.annotation.Resource;
 
 /**
  * If one stop is not deserved (canceled) then we have no expectedTime time. We must
@@ -44,8 +42,7 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, L
 
     private static final Logger LOGGER = LoggerFactory.getLogger("Agg", AggregateExpectedTimeProcessor.class);
 
-    @Resource
-    private RaildelaysService service;
+    private LineStopDao lineStopDao;
 
 
     @Override
@@ -115,7 +112,7 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, L
 
     public LineStop.Builder fetchScheduling(LineStop item) throws Exception {
         LineStop.Builder result = new LineStop.Builder(item, false, false);
-        LineStop candidate = service.searchScheduledLine(item.getTrain(), item.getStation());
+        LineStop candidate = lineStopDao.findFistScheduledLine(item.getTrain(), item.getStation());
 
         //-- If we cannot retrieve one of the expectedTime time then this item is corrupted we must filter it.
         if (candidate == null) {
@@ -137,7 +134,7 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, L
         return result;
     }
 
-    public void setService(RaildelaysService service) {
-        this.service = service;
+    public void setLineStopDao(LineStopDao lineStopDao) {
+        this.lineStopDao = lineStopDao;
     }
 }
