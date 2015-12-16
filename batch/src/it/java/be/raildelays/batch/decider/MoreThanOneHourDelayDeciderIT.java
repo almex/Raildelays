@@ -6,8 +6,6 @@ import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.test.JobLauncherTestUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Collections;
@@ -15,15 +13,9 @@ import java.util.Collections;
 @ContextConfiguration(locations = {"/test/flow-job-context.xml"})
 public class MoreThanOneHourDelayDeciderIT extends AbstractContextIT {
 
-    /**
-     * SUT.
-     */
-    @Autowired
-    private JobLauncherTestUtils jobLauncherTestUtils;
-
     @Test
     public void testCompleted() throws Exception {
-        JobExecution jobExecution = jobLauncherTestUtils.launchJob(
+        JobExecution jobExecution = getJobLauncherTestUtils().launchJob(
                 new JobParameters(
                         Collections.singletonMap("thresholdDelay", new JobParameter(100L))
                 )
@@ -35,7 +27,7 @@ public class MoreThanOneHourDelayDeciderIT extends AbstractContextIT {
 
     @Test
     public void testCompletedWith60mDelay() throws Exception {
-        JobExecution jobExecution = jobLauncherTestUtils.launchJob(
+        JobExecution jobExecution = getJobLauncherTestUtils().launchJob(
                 new JobParameters(
                         Collections.singletonMap("thresholdDelay", new JobParameter(60L))
                 )
@@ -48,7 +40,7 @@ public class MoreThanOneHourDelayDeciderIT extends AbstractContextIT {
 
     @Test
     public void testFailed() throws Exception {
-        JobExecution jobExecution = jobLauncherTestUtils.launchJob(
+        JobExecution jobExecution = getJobLauncherTestUtils().launchJob(
                 new JobParameters(
                         Collections.singletonMap("thresholdDelay", new JobParameter(-1L))
                 )

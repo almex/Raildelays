@@ -25,7 +25,6 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 @ContextConfiguration(locations = {"/jobs/steps/handle-more-than-one-hour-delays-job-context.xml"})
 public class HandleMoreThanOneHourDelaysIT extends AbstractContextIT {
 
-
     private static List<String> FILES_NAMES = Collections.singletonList("20140522");
 
     private static Path TEMPLATE_PATH;

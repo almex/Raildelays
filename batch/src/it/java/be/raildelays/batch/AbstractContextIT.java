@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,8 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration(locations = {"/spring/batch/raildelays-batch-integration-test-context.xml"})
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, StepScopeTestExecutionListener.class})
 @Transactional(transactionManager = "raildelaysTransactionManager")
-@Rollback(false)
-public abstract class AbstractContextIT extends AbstractJUnit4SpringContextTests {
+@Rollback(true)
+public abstract class AbstractContextIT {
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;

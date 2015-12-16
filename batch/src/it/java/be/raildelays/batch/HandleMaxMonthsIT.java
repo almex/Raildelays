@@ -8,8 +8,6 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.item.file.ExcelSheetItemWriter;
-import org.springframework.batch.test.JobLauncherTestUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -24,12 +22,6 @@ import java.util.*;
 
 @ContextConfiguration(locations = {"/jobs/steps/handle-max-months-job-context.xml"})
 public class HandleMaxMonthsIT extends AbstractContextIT {
-
-    /**
-     * SUT.
-     */
-    @Autowired
-    private JobLauncherTestUtils jobLauncherTestUtils;
 
     private static List<String> FILES_NAMES = Arrays.asList("20140107", "20131128", "20130905");
 
@@ -86,10 +78,12 @@ public class HandleMaxMonthsIT extends AbstractContextIT {
         });
         Assert.assertEquals(3, getExcelFiles().size());
 
-        getExcelFiles().forEach(file -> {
-            Assert.assertTrue("The file name is not one of those expectedTime",
-                    FILES_NAMES.stream().anyMatch(s -> file.getName().contains(s)));
-        });
+        getExcelFiles().forEach(file ->
+                Assert.assertTrue(
+                        "The file name is not one of those expectedTime",
+                        FILES_NAMES.stream().anyMatch(s -> file.getName().contains(s))
+                )
+        );
     }
 
     @AfterClass
