@@ -102,7 +102,7 @@
         <version.jersey>2.19</version.jersey>
 
         <version.atomikos>3.9.2</version.atomikos>
-        <version.log4j>2.3</version.log4j>
+        <version.log4j>2.5</version.log4j>
         <version.slf4j>1.7.12</version.slf4j>
         <version.log4jdbc>1.16</version.log4jdbc>
         <version.disruptor>3.3.2</version.disruptor>
