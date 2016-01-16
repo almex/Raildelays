@@ -31,7 +31,7 @@ import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.Train;
 import be.raildelays.domain.xls.ExcelRow;
-import org.apache.logging.log4j.junit.InitialLoggerContext;
+import org.apache.logging.log4j.junit.LoggerContextRule;
 import org.apache.logging.log4j.test.appender.ListAppender;
 import org.junit.Assert;
 import org.junit.Before;
@@ -47,7 +47,7 @@ import java.time.LocalTime;
 public class LogSkippedItemListenerTest {
 
     @ClassRule
-    public static InitialLoggerContext init = new InitialLoggerContext("log4j2.xml");
+    public static LoggerContextRule init = new LoggerContextRule("log4j2.xml");
     private LogSkippedItemListener listener;
     private ListAppender appender;
 

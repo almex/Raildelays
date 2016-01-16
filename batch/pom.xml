@@ -103,6 +103,7 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
             <classifier>tests</classifier>
+            <type>test-jar</type>
             <version>${version.log4j}</version>
             <scope>test</scope>
         </dependency>

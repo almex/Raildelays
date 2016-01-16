@@ -3,7 +3,7 @@ package be.raildelays.batch.listener;
 import be.raildelays.delays.TimeDelay;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
-import org.apache.logging.log4j.junit.InitialLoggerContext;
+import org.apache.logging.log4j.junit.LoggerContextRule;
 import org.apache.logging.log4j.test.appender.ListAppender;
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,7 +15,7 @@ import java.time.LocalDate;
 public class LogStep1ItemProcessorListenerTest {
 
     @ClassRule
-    public static InitialLoggerContext init = new InitialLoggerContext("log4j2.xml");
+    public static LoggerContextRule init = new LoggerContextRule("log4j2.xml");
     private LogStep1ItemProcessorListener listener;
     private ListAppender appender;
 

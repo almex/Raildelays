@@ -9,7 +9,7 @@
 
     <jdbc:embedded-database id="batchDataSource" type="HSQL">
         <jdbc:script execution="INIT" location="classpath:/ddl/schema-create-hsqldb.sql"/>
-        <!--jdbc:script execution="DESTROY" location="classpath:/ddl/schema-drop-hsqldb.sql"/-->
+        <jdbc:script execution="DESTROY" location="classpath:/ddl/schema-drop-hsqldb.sql"/>
     </jdbc:embedded-database>
 
     <!-- <bean id="jobExplorer"
@@ -51,7 +51,16 @@
                           transaction-manager="batchTransactionManager"
                           isolation-level-for-create="DEFAULT"
                           table-prefix="BATCH_"
-                          max-varchar-length="1000"/>
+                          max-varchar-length="1000"
+    />
+
+    <!--<bean id="jobRepository" class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean">
+        <property name="dataSource" ref="batchDataSource" />
+        <property name="transactionManager" ref="batchTransactionManager" />
+        <property name="tablePrefix" value="BATCH_" />
+        <property name="isolationLevelForCreate" value="ISOLATION_DEFAULT" />
+        <property name="validateTransactionState" value="false" /> &lt;!&ndash; Allow to use @Transactional within your tests &ndash;&gt;
+    </bean>-->
 
     <alias name="raildelaysTransactionManager" alias="batchTransactionManager"/>
 

@@ -31,15 +31,11 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobParameter;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.test.JobLauncherTestUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Map;
 
 @ContextConfiguration(locations = {"/jobs/steps/generate-excel-files-job-context.xml"})
 @DataSet(value = "classpath:GenerateExcelFilesIT.xml",
@@ -47,32 +43,36 @@ import java.util.Map;
         dataSourceSpringName = "dataSource")
 public class GenerateExcelFilesJobIT extends AbstractContextIT {
 
-    /**
-     * SUT.
-     */
-    @Autowired
-    private JobLauncherTestUtils jobLauncherTestUtils;
-
     @Test
     public void testGrabLineStop() throws Exception {
         BatchStatus batchStatus;
-        Map<String, JobParameter> parameters = new HashMap<>();
+        JobParametersBuilder builder = new JobParametersBuilder(getJobLauncherTestUtils().getUniqueJobParameters());
 
-        parameters.put("input.file.path", new JobParameter("train-list.properties"));
-        parameters.put("date", new JobParameter(new SimpleDateFormat("dd/MM/yyyy").parse("01/01/2000")));
-        parameters.put("language", new JobParameter(Language.EN.name()));
-        parameters.put("station.departure", new JobParameter("Liège-Guillemins"));
-        parameters.put("station.arrival", new JobParameter("Bruxelles-Central"));
-        parameters.put("excel.output.path", new JobParameter("./target"));
-        parameters.put("excel.file.name", new JobParameter("sncb_"));
-        parameters.put("excel.file.extension", new JobParameter("xls"));
-        parameters.put("excel.archive.path", new JobParameter("./target"));
-        parameters.put("text.output.path", new JobParameter("./target/output.txt"));
-        parameters.put("excel.template.path",
-                new JobParameter(new ClassPathResource("template.xls").getFile().getAbsolutePath()));
+        builder.addParameter("input.file.path", new JobParameter("train-list.properties"));
+        builder.addParameter("date", new JobParameter(new SimpleDateFormat("dd/MM/yyyy").parse("01/01/2000")));
+        builder.addParameter("language", new JobParameter(Language.EN.name()));
+        builder.addParameter("station.departure", new JobParameter("Liège-Guillemins"));
+        builder.addParameter("station.arrival", new JobParameter("Bruxelles-Central"));
+        builder.addParameter("excel.output.path", new JobParameter("./target"));
+        builder.addParameter("excel.file.name", new JobParameter("sncb_"));
+        builder.addParameter("excel.file.extension", new JobParameter("xls"));
+        builder.addParameter("excel.archive.path", new JobParameter("./target"));
+        builder.addParameter("text.output.path", new JobParameter("./target/output.txt"));
+        builder.addParameter(
+                "excel.template.path",
+                new JobParameter(new ClassPathResource("template.xls").getFile().getAbsolutePath())
+        );
 
-        batchStatus = jobLauncherTestUtils.launchJob(new JobParameters(parameters)).getStatus();
+        batchStatus = getJobLauncherTestUtils().launchJob(builder.toJobParameters()).getStatus();
 
         Assert.assertFalse(batchStatus.isUnsuccessful());
+    }
+
+    /**
+     * Just to test that I can run the same test more than once.
+     */
+    @Test
+    public void testGrabLineStop2() throws Exception {
+        testGrabLineStop();
     }
 }
