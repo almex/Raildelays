@@ -34,7 +34,7 @@ import org.springframework.batch.item.ItemCountAware;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public class BatchExcelRow extends ExcelRow implements IndexedItem, ItemCountAware {
+public class BatchExcelRow extends ExcelRow<BatchExcelRow> implements IndexedItem, ItemCountAware {
 
     public static final BatchExcelRow EMPTY = new Builder(null, null).delay(0L).build(false);
     private boolean canceled;

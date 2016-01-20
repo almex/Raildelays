@@ -131,8 +131,8 @@
             <bean class="org.springframework.batch.item.file.ExcelSheetItemReader"
                   scope="step">
                 <property name="name" value="allExcelFilesToSplitItemReader"/>
-                <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
-                <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
+                <property name="rowsToSkip" value="${excel.sheet0.rows.to.skip}"/>
+                <property name="maxItemCount" value="${excel.sheet0.max.item.count}"/>
                 <property name="rowMapper">
                     <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
                         <property name="language" value="#{jobParameters['language']}"/>
@@ -186,8 +186,8 @@
                 <property name="useItemIndex" value="false"/>
                 <property name="name" value="excelSheetBeforeItemWriter"/>
                 <property name="shouldDeleteIfExists" value="false"/>
-                <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
-                <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
+                <property name="rowsToSkip" value="${excel.sheet0.rows.to.skip}"/>
+                <property name="maxItemCount" value="${excel.sheet0.max.item.count}"/>
                 <property name="template" value="file:#{jobParameters['excel.template.path']}"/>
             </bean>
         </property>
@@ -199,7 +199,8 @@
                 <property name="fileExtension" value=".#{jobParameters['excel.file.extension']}"/>
                 <property name="directory"
                           value="file:#{jobParameters['excel.archive.path']}/#{T(java.time.LocalDate).now().toString()}/"/>
-                <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
+                <property name="maxItemCount" value="${excel.sheet0.max.item.count}"/>
+                <property name="rowsToSkip" value="${excel.sheet0.rows.to.skip}"/>
                 <property name="resourceItemSearch" ref="resourceItemSearch"/>
             </bean>
         </property>
@@ -220,8 +221,8 @@
                 <property name="useItemIndex" value="false"/>
                 <property name="name" value="excelSheetAfterItemWriter"/>
                 <property name="shouldDeleteIfExists" value="true"/>
-                <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
-                <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
+                <property name="rowsToSkip" value="${excel.sheet0.rows.to.skip}"/>
+                <property name="maxItemCount" value="${excel.sheet0.max.item.count}"/>
                 <property name="template" value="file:#{jobParameters['excel.template.path']}"/>
             </bean>
         </property>
@@ -232,7 +233,8 @@
                 <property name="filePrefix" value="#{jobParameters['excel.file.name']}"/>
                 <property name="fileExtension" value=".#{jobParameters['excel.file.extension']}"/>
                 <property name="directory" value="file:#{jobParameters['excel.output.path']}"/>
-                <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
+                <property name="maxItemCount" value="${excel.sheet0.max.item.count}"/>
+                <property name="rowsToSkip" value="${excel.sheet0.rows.to.skip}"/>
                 <property name="forceNewFile" value="true"/>
                 <property name="resourceItemSearch" ref="resourceItemSearch"/>
             </bean>
@@ -245,8 +247,8 @@
         <property name="reader">
             <bean class="org.springframework.batch.item.file.ExcelSheetItemReader">
                 <property name="name" value="excelSheetItemReader3"/>
-                <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
-                <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
+                <property name="rowsToSkip" value="${excel.sheet0.rows.to.skip}"/>
+                <property name="maxItemCount" value="${excel.sheet0.max.item.count}"/>
                 <property name="rowMapper">
                     <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
                         <property name="language" value="#{jobParameters['language']}"/>

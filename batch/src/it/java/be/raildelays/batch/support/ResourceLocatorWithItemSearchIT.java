@@ -5,7 +5,6 @@ import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
 import be.raildelays.batch.writer.MultiExcelFileToWriteLocator;
 import be.raildelays.domain.Sens;
-import be.raildelays.domain.xls.ExcelRow;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -68,7 +67,7 @@ public class ResourceLocatorWithItemSearchIT extends AbstractFileTest {
         ResourceContext context = new ResourceContext(new ExecutionContext(), "foo");
 
         resourceLocator.onOpen(context);
-        resourceLocator.onWrite(new ExcelRow.Builder(LocalDate.parse("2014-05-22"), Sens.ARRIVAL).build(false), context);
+        resourceLocator.onWrite(new BatchExcelRow.Builder(LocalDate.parse("2014-05-22"), Sens.ARRIVAL).build(false), context);
 
         Assert.assertNotNull(context.getResource());
         Assert.assertEquals(EXCEL_FILE_NAME, context.getResource().getFilename());
@@ -81,7 +80,7 @@ public class ResourceLocatorWithItemSearchIT extends AbstractFileTest {
         reader.setMaxItemCount(1);
 
         resourceLocator.onOpen(context);
-        resourceLocator.onWrite(new ExcelRow.Builder(LocalDate.parse("2014-01-21"), Sens.ARRIVAL).build(false), context);
+        resourceLocator.onWrite(new BatchExcelRow.Builder(LocalDate.parse("2014-01-21"), Sens.ARRIVAL).build(false), context);
 
         Assert.assertNotNull(context.getResource());
         Assert.assertEquals(EXCEL_FILE_PREFIX + " " + DATE_TO_STRING + Format.OLE2.getFileExtension(), context.getResource().getFilename());

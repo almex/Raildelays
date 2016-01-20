@@ -54,7 +54,7 @@ import java.util.Set;
 @Entity
 @Table(name = "EXCEL_ROW", uniqueConstraints = @UniqueConstraint(columnNames = {
         "DATE", "SENS"}))
-public class ExcelRow implements Comparable<ExcelRow>, Serializable {
+public class ExcelRow<T extends ExcelRow> implements Comparable<T>, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)

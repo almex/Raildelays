@@ -21,7 +21,7 @@ public abstract class AbstractExcelRowComparator<T extends ExcelRow> implements 
      * @param comparator a {@code Comparator} for comparing non-equals references
      * @return a comparator that considers same references as equal.
      */
-    public static <T extends Comparable<? super T>> Comparator<T> compareReferences(Comparator<? super T> comparator) {
+    public static <T extends Comparable<? extends T>> Comparator<T> compareReferences(Comparator<? super T> comparator) {
         return new ReferenceComparator<>(comparator);
     }
 

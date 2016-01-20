@@ -49,15 +49,14 @@ import static java.util.Comparator.*;
  * @see java.util.Collections
  * @since 1.2
  */
-public class TimeBasedExcelRowComparator extends AbstractExcelRowComparator<ExcelRow> {
+public class TimeBasedExcelRowComparator<T extends ExcelRow> extends AbstractExcelRowComparator<ExcelRow<T>> {
 
     @Override
-    public int compare(ExcelRow lho, ExcelRow rho) {
+    public int compare(ExcelRow<T> lho, ExcelRow<T> rho) {
         return nullsLast(compareReferences(
-                comparing(ExcelRow::getDate, nullsFirst(naturalOrder()))
-                        .thenComparing(ExcelRow::getExpectedDepartureTime, nullsFirst(naturalOrder()))
-                        .thenComparing(ExcelRow::getExpectedArrivalTime, nullsFirst(naturalOrder()))
-                        .reversed()
+                comparing(T::getDate, nullsLast(naturalOrder()))
+                        .thenComparing(T::getExpectedDepartureTime, nullsLast(naturalOrder()))
+                        .thenComparing(T::getExpectedArrivalTime, nullsLast(naturalOrder()))
         )).compare(lho, rho);
     }
 }

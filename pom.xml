@@ -89,7 +89,7 @@
         <version.spring.dbunit>1.4.0</version.spring.dbunit>
         <version.xbean.spring>3.16</version.xbean.spring>
         <version.hibernate.validator>5.2.1.Final</version.hibernate.validator>
-        <version.hibernate>5.0.2.Final</version.hibernate>
+        <version.hibernate>5.0.7.Final</version.hibernate>
         <version.eclipselink>2.5.1</version.eclipselink>
         <version.openjpa>2.2.2</version.openjpa>
         <version.querydsl>3.4.2</version.querydsl>

@@ -36,24 +36,24 @@ import static java.util.Comparator.*;
  * @author Almex
  * @since 1.1
  */
-public class ExcelRowComparator extends AbstractExcelRowComparator<ExcelRow> {
+public class ExcelRowComparator<T extends ExcelRow> extends AbstractExcelRowComparator<ExcelRow<T>> {
 
     @Override
     public int compare(ExcelRow lho, ExcelRow rho) {
-        return nullsFirst(compareReferences(
-                comparing(ExcelRow::getDate, nullsFirst(naturalOrder()))
-                        .thenComparing(ExcelRow::getArrivalStation, nullsFirst(naturalOrder()))
-                        .thenComparing(ExcelRow::getDepartureStation, nullsFirst(naturalOrder()))
-                        .thenComparing(ExcelRow::getLinkStation, nullsFirst(naturalOrder()))
-                        .thenComparing(ExcelRow::getExpectedDepartureTime, nullsFirst(naturalOrder()))
-                        .thenComparing(ExcelRow::getExpectedArrivalTime, nullsFirst(naturalOrder()))
-                        .thenComparing(ExcelRow::getExpectedTrain1, nullsFirst(naturalOrder()))
-                        .thenComparing(ExcelRow::getExpectedTrain2, nullsFirst(naturalOrder()))
-                        .thenComparing(ExcelRow::getEffectiveDepartureTime, nullsFirst(naturalOrder()))
-                        .thenComparing(ExcelRow::getEffectiveArrivalTime, nullsFirst(naturalOrder()))
-                        .thenComparing(ExcelRow::getEffectiveTrain1, nullsFirst(naturalOrder()))
-                        .thenComparing(ExcelRow::getEffectiveTrain2, nullsFirst(naturalOrder()))
-                        .thenComparing(ExcelRow::getDelay, nullsFirst(naturalOrder()))
+        return nullsLast(compareReferences(
+                comparing(T::getDate, nullsLast(naturalOrder()))
+                        .thenComparing(T::getArrivalStation, nullsLast(naturalOrder()))
+                        .thenComparing(T::getDepartureStation, nullsLast(naturalOrder()))
+                        .thenComparing(T::getLinkStation, nullsLast(naturalOrder()))
+                        .thenComparing(T::getExpectedDepartureTime, nullsLast(naturalOrder()))
+                        .thenComparing(T::getExpectedArrivalTime, nullsLast(naturalOrder()))
+                        .thenComparing(T::getExpectedTrain1, nullsLast(naturalOrder()))
+                        .thenComparing(T::getExpectedTrain2, nullsLast(naturalOrder()))
+                        .thenComparing(T::getEffectiveDepartureTime, nullsLast(naturalOrder()))
+                        .thenComparing(T::getEffectiveArrivalTime, nullsLast(naturalOrder()))
+                        .thenComparing(T::getEffectiveTrain1, nullsLast(naturalOrder()))
+                        .thenComparing(T::getEffectiveTrain2, nullsLast(naturalOrder()))
+                        .thenComparing(T::getDelay, nullsLast(naturalOrder()))
         )).compare(lho, rho);
     }
 }

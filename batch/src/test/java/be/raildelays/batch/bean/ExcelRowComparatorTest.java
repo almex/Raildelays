@@ -55,6 +55,14 @@ public class ExcelRowComparatorTest extends AbstractExcelRowComparatorTest {
     }
 
     /**
+     * We expect that an EMPTY BatchExcelRow match an empty row.
+     */
+    @Test
+    public void testEqualsEmpty() throws Exception {
+        Assert.assertEquals(0, comparator.compare(new BatchExcelRow.Builder(null, null).delay(0L).build(false), BatchExcelRow.EMPTY));
+    }
+
+    /**
      * We expect that if the two {@link ExcelRow} are the same reference the
      * {@link ExcelRowComparator} considers them as identical.
      */
@@ -89,7 +97,7 @@ public class ExcelRowComparatorTest extends AbstractExcelRowComparatorTest {
      */
     @Test
     public void testWithNullOnLeft() throws Exception {
-        Assert.assertThat(comparator.compare(null, rho), is(lessThan(0)));
+        Assert.assertThat(comparator.compare(null, rho), is(greaterThan(0)));
     }
 
     /**
@@ -98,6 +106,6 @@ public class ExcelRowComparatorTest extends AbstractExcelRowComparatorTest {
      */
     @Test
     public void testWithNullOnRight() throws Exception {
-        Assert.assertThat(comparator.compare(lho, null), is(greaterThan(0)));
+        Assert.assertThat(comparator.compare(lho, null), is(lessThan(0)));
     }
 }

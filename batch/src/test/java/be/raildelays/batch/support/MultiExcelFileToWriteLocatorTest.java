@@ -1,9 +1,9 @@
 package be.raildelays.batch.support;
 
 import be.raildelays.batch.AbstractFileTest;
+import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.writer.MultiExcelFileToWriteLocator;
 import be.raildelays.domain.Sens;
-import be.raildelays.domain.xls.ExcelRow;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -87,7 +87,7 @@ public class MultiExcelFileToWriteLocatorTest extends AbstractFileTest {
 
         Assert.assertFalse(context.containsResource());
 
-        resourceLocator.onWrite(new ExcelRow.Builder(LocalDate.parse("2014-05-22"), Sens.ARRIVAL).build(false), context);
+        resourceLocator.onWrite(new BatchExcelRow.Builder(LocalDate.parse("2014-05-22"), Sens.ARRIVAL).build(false), context);
 
         Assert.assertEquals(EXCEL_FILE_NAME, context.getResource().getFilename());
     }

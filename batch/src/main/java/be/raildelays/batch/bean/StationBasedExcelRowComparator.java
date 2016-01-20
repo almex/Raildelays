@@ -42,7 +42,7 @@ import static java.util.Comparator.*;
  * @author Almex
  * @since 1.2
  */
-public class StationBasedExcelRowComparator extends AbstractExcelRowComparator<ExcelRow> {
+public class StationBasedExcelRowComparator<T extends ExcelRow> extends AbstractExcelRowComparator<ExcelRow<T>> {
 
     private Language language;
 
@@ -51,15 +51,15 @@ public class StationBasedExcelRowComparator extends AbstractExcelRowComparator<E
     }
 
     @Override
-    public int compare(ExcelRow lho, ExcelRow rho) {
-        return nullsFirst(compareReferences(
-                comparing(ExcelRow::getDate, nullsFirst(naturalOrder()))
-                        .thenComparing(getStationName(ExcelRow::getDepartureStation), nullsFirst(naturalOrder()))
-                        .thenComparing(getStationName(ExcelRow::getArrivalStation), nullsFirst(naturalOrder()))
+    public int compare(ExcelRow<T> lho, ExcelRow<T> rho) {
+        return nullsLast(compareReferences(
+                comparing(T::getDate, nullsLast(naturalOrder()))
+                        .thenComparing(getStationName(T::getDepartureStation), nullsLast(naturalOrder()))
+                        .thenComparing(getStationName(T::getArrivalStation), nullsLast(naturalOrder()))
         )).compare(lho, rho);
     }
 
-    protected Function<ExcelRow, String> getStationName(Function<ExcelRow, Station> keyExtractor) {
+    protected Function<T, String> getStationName(Function<T, Station> keyExtractor) {
         return excelRow -> {
             Station station = keyExtractor.apply(excelRow);
             String result = null;

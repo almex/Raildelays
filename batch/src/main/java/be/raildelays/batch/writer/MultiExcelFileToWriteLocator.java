@@ -26,7 +26,6 @@ package be.raildelays.batch.writer;
 
 import be.raildelays.batch.ExcelFileUtils;
 import be.raildelays.batch.bean.BatchExcelRow;
-import be.raildelays.domain.xls.ExcelRow;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.ExcelSheetItemWriter;
 import org.springframework.batch.item.resource.CountingItemResourceLocator;
@@ -40,15 +39,19 @@ import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 
 /**
+ * We search into an Excel file the first empty row. If the index of the first empty row is greater than
+ * {@code rowsToSkip} + {@code maxItemCount} then we create a new file based on the current item date.
+ *
  * @author Almex
  */
-public class MultiExcelFileToWriteLocator extends CountingItemResourceLocator<ExcelRow> {
+public class MultiExcelFileToWriteLocator extends CountingItemResourceLocator<BatchExcelRow> {
 
-    private Resource directory;
-    private String filePrefix;
-    private String fileExtension;
-    private ResourceItemSearch<BatchExcelRow> resourceItemSearch;
-    private boolean forceNewFile = false;
+    protected Resource directory;
+    protected String filePrefix;
+    protected String fileExtension;
+    protected ResourceItemSearch<BatchExcelRow> resourceItemSearch;
+    protected boolean forceNewFile = false;
+    protected int rowsToSkip = 0;
 
     @Override
     public void onOpen(ResourceContext context) throws ItemStreamException {
@@ -59,10 +62,21 @@ public class MultiExcelFileToWriteLocator extends CountingItemResourceLocator<Ex
     }
 
     @Override
-    public void onWrite(ExcelRow item, ResourceContext context) throws Exception {
+    public void onWrite(BatchExcelRow item, ResourceContext context) throws Exception {
         super.onWrite(item, context);
 
-        if (context.getCurrentIndex() >= maxItemCount || !context.containsResource()) {
+        /**
+         * In case we have an indexed item, we must set the current index with the one of the current item.
+         */
+        if (item.getIndex() != null) {
+            context.setCurrentIndex(item.getIndex().intValue());
+        }
+
+        /**
+         * Either we have reached the end of the current file, or we don't have any any resource yet, then we must
+         * create a new file.
+         */
+        if (context.getCurrentIndex() >= maxItemCount + rowsToSkip || !context.containsResource()) {
             String suffix = item.getDate().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
             File file = ExcelFileUtils.getFile(directory.getFile(), filePrefix, suffix, fileExtension);
 
@@ -113,5 +127,9 @@ public class MultiExcelFileToWriteLocator extends CountingItemResourceLocator<Ex
 
     public void setForceNewFile(boolean forceNewFile) {
         this.forceNewFile = forceNewFile;
+    }
+
+    public void setRowsToSkip(int rowsToSkip) {
+        this.rowsToSkip = rowsToSkip;
     }
 }

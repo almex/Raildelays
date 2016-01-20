@@ -28,7 +28,7 @@ public class StationBasedExcelRowComparatorTest extends AbstractExcelRowComparat
                         new ExcelRow.Builder(now, null).build(false),
                         new BatchExcelRow.Builder(null, null).build(false)
                 ),
-                greaterThan(0)
+                lessThan(0)
         );
     }
 
@@ -39,7 +39,7 @@ public class StationBasedExcelRowComparatorTest extends AbstractExcelRowComparat
                         null,
                         new BatchExcelRow.Builder(null, null).build(false)
                 ),
-                lessThan(0)
+                greaterThan(0)
         );
     }
 
@@ -50,7 +50,7 @@ public class StationBasedExcelRowComparatorTest extends AbstractExcelRowComparat
                         new ExcelRow.Builder(now, null).build(false),
                         null
                 ),
-                greaterThan(0)
+                lessThan(0)
         );
     }
 
@@ -61,7 +61,7 @@ public class StationBasedExcelRowComparatorTest extends AbstractExcelRowComparat
                         new ExcelRow.Builder(now, null).departureStation(new Station("foo")).build(false),
                         new BatchExcelRow.Builder(now, null).build(false)
                 ),
-                greaterThan(0)
+                lessThan(0)
         );
     }
 
@@ -77,7 +77,7 @@ public class StationBasedExcelRowComparatorTest extends AbstractExcelRowComparat
                                 .departureStation(new Station("foo"))
                                 .build(false)
                 ),
-                greaterThan(0)
+                lessThan(0)
         );
     }
 }

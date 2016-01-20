@@ -32,15 +32,15 @@ import java.util.List;
 @RunWith(BlockJUnit4ClassRunner.class)
 public class SortedItemStreamWriterTest2 extends AbstractFileTest {
 
-    private List<ExcelRow> items = new ArrayList<>();
+    private List<BatchExcelRow> items = new ArrayList<>();
 
     private StepExecution stepExecution;
 
-    private ResourceLocatorItemStreamWriter<SortedItemStreamWriter<ExcelRow>, ExcelRow> writer;
+    private ResourceLocatorItemStreamWriter<SortedItemStreamWriter<BatchExcelRow>, BatchExcelRow> writer;
 
     @Before
     public void setUp() throws Exception {
-        SortedItemStreamWriter<ExcelRow> delegate = new SortedItemStreamWriter<>();
+        SortedItemStreamWriter<BatchExcelRow> delegate = new SortedItemStreamWriter<>();
         ExcelSheetItemReader<BatchExcelRow> reader = new ExcelSheetItemReader<>();
         FileSystemResource resource = new FileSystemResource(CURRENT_PATH + "retard_sncb.xls");
         ExcelSheetItemWriter<ExcelRow> writer = new ExcelSheetItemWriter<>();

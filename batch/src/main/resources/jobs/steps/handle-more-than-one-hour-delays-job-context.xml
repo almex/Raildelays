@@ -92,8 +92,8 @@
           class="org.springframework.batch.item.file.ExcelSheetItemReader"
           scope="step">
         <property name="name" value="oneHourDelayItemReader"/>
-        <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
-        <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
+        <property name="rowsToSkip" value="${excel.sheet0.rows.to.skip}"/>
+        <property name="maxItemCount" value="${excel.sheet0.max.item.count}"/>
         <property name="rowMapper">
             <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
                 <property name="language" value="#{jobParameters['language']}"/>
@@ -110,8 +110,8 @@
             <bean class="org.springframework.batch.item.file.ExcelSheetItemReader"
                   scope="step">
                 <property name="name" value="allExcelFilesToSplitItemReader"/>
-                <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
-                <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
+                <property name="rowsToSkip" value="${excel.sheet0.rows.to.skip}"/>
+                <property name="maxItemCount" value="${excel.sheet0.max.item.count}"/>
                 <property name="rowMapper">
                     <bean class="be.raildelays.batch.reader.BatchExcelRowMapper">
                         <property name="language" value="#{jobParameters['language']}"/>
@@ -209,8 +209,8 @@
         <property name="name" value="excelSheetWithOneHourDelayItemWriter"/>
         <property name="shouldDeleteIfExists" value="true"/>
         <property name="useItemIndex" value="false"/>
-        <property name="rowsToSkip" value="${excel.sheet0.rowstoskip}"/>
-        <property name="maxItemCount" value="${excel.sheet0.maxitemcount}"/>
+        <property name="rowsToSkip" value="${excel.sheet0.rows.to.skip}"/>
+        <property name="maxItemCount" value="${excel.sheet0.max.item.count}"/>
         <property name="template" value="file:#{jobParameters['excel.template.path']}"/>
     </bean>
 
