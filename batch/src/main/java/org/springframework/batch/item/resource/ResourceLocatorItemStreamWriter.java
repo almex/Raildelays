@@ -88,8 +88,8 @@ public class ResourceLocatorItemStreamWriter<S extends ResourceAwareItemStreamWr
 
             if (splitMap.size() > 1) {
                 // If we have more than one resource, we must close the current one
-                delegate.update(resourceContext.getExecutionContext());
                 delegate.close();
+                delegate.update(resourceContext.getExecutionContext());
                 opened = false;
             }
         }

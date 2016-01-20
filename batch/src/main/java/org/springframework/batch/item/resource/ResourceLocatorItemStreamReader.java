@@ -80,8 +80,8 @@ public class ResourceLocatorItemStreamReader<S extends ResourceAwareItemStreamRe
             // We have finished to read the previous resource. We check if we don't have another one
             if (resourceContext.hasChanged()) {
                 // That means we close the current stream.
-                delegate.update(resourceContext.getExecutionContext());
                 delegate.close();
+                delegate.update(resourceContext.getExecutionContext());
                 delegate.setResource(resourceContext.consumeResource());
                 opened = false;
             } else {

@@ -72,7 +72,7 @@ public class MultiResourceToReadLocator<T> extends CountingItemResourceLocator<T
     public void onRead(T item, ResourceContext context) throws Exception {
         super.onRead(item, context);
 
-        if (item == null && index < resources.length - 1) {
+        if (item == null && index < resources.length) {
             context.changeResource(resources[index++]);
         }
     }

@@ -83,7 +83,9 @@ public abstract class AbstractResourceLocatorItemStream<S extends ResourceAwareI
     @Override
     public void close() throws ItemStreamException {
         if (opened) {
+            resourceContext.clear();
             delegate.close();
+            delegate.update(resourceContext.getExecutionContext());
             opened = false;
         }
     }

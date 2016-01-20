@@ -144,4 +144,13 @@ public class ResourceContext {
     private String getKey(String key) {
         return keyPrefix + "." + key;
     }
+
+    /**
+     * Free-up all properties from this context.
+     */
+    public void clear() {
+        executionContext.remove(getKey(RESOURCE_KEY));
+        executionContext.remove(getKey(HAS_CHANGED_KEY));
+        executionContext.remove(getKey(CURRENT_INDEX_KEY));
+    }
 }
