@@ -25,13 +25,22 @@
 package be.raildelays.domain.entities;
 
 import javax.persistence.*;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import java.io.Serializable;
+import java.util.Set;
 
 /**
+ * Abstract entity parent of all entities of this project.
+ *
  * @author Almex
+ * @since 1.0
  */
 @MappedSuperclass
 public abstract class AbstractEntity implements Serializable {
+
+    private static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Id
     @Column(name = "ID")
@@ -47,4 +56,23 @@ public abstract class AbstractEntity implements Serializable {
 
     @Override
     public abstract int hashCode();
+
+    protected static <T> T validate(T object) throws IllegalArgumentException {
+        Set<ConstraintViolation<T>> violations = validator.validate(object);
+
+        if (!violations.isEmpty()) {
+            StringBuilder builder = new StringBuilder();
+
+            for (ConstraintViolation violation : violations) {
+                builder.append("\n");
+                builder.append(violation.getPropertyPath().toString());
+                builder.append(' ');
+                builder.append(violation.getMessage());
+            }
+
+            throw new IllegalArgumentException(builder.toString());
+        }
+
+        return object;
+    }
 }

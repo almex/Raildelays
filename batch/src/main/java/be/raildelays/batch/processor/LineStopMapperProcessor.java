@@ -28,7 +28,7 @@ import be.raildelays.delays.TimeDelay;
 import be.raildelays.domain.Language;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.entities.TrainLine;
 import be.raildelays.domain.railtime.Direction;
 import be.raildelays.domain.railtime.Step;
 import be.raildelays.domain.railtime.TwoDirections;
@@ -48,7 +48,7 @@ import java.util.Locale;
 
 /**
  * Transform {@link be.raildelays.domain.railtime.TwoDirections} into one {@link be.raildelays.domain.entities.LineStop}.
- * This processor also merge content of the {@link be.raildelays.domain.entities.Train} and the
+ * This processor also merge content of the {@link TrainLine} and the
  * {@link be.raildelays.domain.entities.Station} (so only read access from the database are done in this processor
  * and it does not interfere with the commit-interval).
  *
@@ -113,14 +113,14 @@ public class LineStopMapperProcessor implements ItemProcessor<TwoDirections, Lin
 
     private LineStop buildLineStop(Language lang, Direction direction, Step arrivalStep, Step departureStep) {
         LineStop result;
-        Train train = mergeTrain(new Train(direction.getTrain().getIdRailtime(), lang));
+        TrainLine trainLine = mergeTrain(new TrainLine(direction.getTrain().getIdRailtime(), lang));
         Station station = mergeStation(new Station(arrivalStep.getStation().getName(), lang));
         TimeDelay arrivalTime = getTimeDelay(arrivalStep.getDateTime(), arrivalStep.getDelay());
         TimeDelay departureTime = getTimeDelay(departureStep.getDateTime(), departureStep.getDelay());
 
         result = new LineStop.Builder()
                 .date(date)
-                .train(train)
+                .train(trainLine)
                 .station(station)
                 .arrivalTime(arrivalTime)
                 .departureTime(departureTime)
@@ -137,24 +137,24 @@ public class LineStopMapperProcessor implements ItemProcessor<TwoDirections, Lin
         return TimeDelay.of(dateTime != null ? dateTime.toLocalTime() : null, delay);
     }
 
-    private Train mergeTrain(Train train) {
-        Train result = null;
+    private TrainLine mergeTrain(TrainLine trainLine) {
+        TrainLine result = null;
 
-        if (StringUtils.isNotBlank(train.getEnglishName())) {
-            result = trainDao.findByEnglishName(train.getEnglishName());
-        } else if (StringUtils.isNotBlank(train.getFrenchName())) {
-            result = trainDao.findByFrenchName(train.getFrenchName());
-        } else if (StringUtils.isNotBlank(train.getDutchName())) {
-            result = trainDao.findByDutchName(train.getDutchName());
+        if (StringUtils.isNotBlank(trainLine.getEnglishName())) {
+            result = trainDao.findByEnglishName(trainLine.getEnglishName());
+        } else if (StringUtils.isNotBlank(trainLine.getFrenchName())) {
+            result = trainDao.findByFrenchName(trainLine.getFrenchName());
+        } else if (StringUtils.isNotBlank(trainLine.getDutchName())) {
+            result = trainDao.findByDutchName(trainLine.getDutchName());
         }
 
         if (result == null) {
-            result = train;
+            result = trainLine;
 
-            LOGGER.debug("create_train={}", train);
+            LOGGER.debug("create_train={}", trainLine);
         }
 
-        LOGGER.trace("train={}", result);
+        LOGGER.trace("trainLine={}", result);
 
         return result;
     }

@@ -27,7 +27,7 @@ package be.raildelays.domain.xls;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.AbstractI18nEntity;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.entities.TrainLine;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -93,11 +93,11 @@ public class ExcelRow<T extends ExcelRow> implements Comparable<T>, Serializable
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "EXPEXTED_TRAIN1_ID")
     @NotNull
-    private Train expectedTrain1;
+    private TrainLine expectedTrainLine1;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "EXPEXTED_TRAIN2_ID")
-    private Train expectedTrain2;
+    private TrainLine expectedTrainLine2;
 
     @Column(name = "EFFECTIVE_DEPARTURE_TIME")
     @NotNull
@@ -112,11 +112,11 @@ public class ExcelRow<T extends ExcelRow> implements Comparable<T>, Serializable
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "EFFECTIVE_TRAIN1_ID")
     @NotNull
-    private Train effectiveTrain1;
+    private TrainLine effectiveTrainLine1;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "EFFECTIVE_TRAIN2_ID")
-    private Train effectiveTrain2;
+    private TrainLine effectiveTrainLine2;
 
     @Column(name = "DELAY")
     @Min(0)
@@ -132,12 +132,12 @@ public class ExcelRow<T extends ExcelRow> implements Comparable<T>, Serializable
         this.linkStation = builder.linkStation;
         this.expectedDepartureTime = builder.expectedDepartureTime;
         this.expectedArrivalTime = builder.expectedArrivalTime;
-        this.expectedTrain1 = builder.expectedTrain1;
-        this.expectedTrain2 = builder.expectedTrain2;
+        this.expectedTrainLine1 = builder.expectedTrainLine1;
+        this.expectedTrainLine2 = builder.expectedTrainLine2;
         this.effectiveDepartureTime = builder.effectiveDepartureTime;
         this.effectiveArrivalTime = builder.effectiveArrivalTime;
-        this.effectiveTrain1 = builder.effectiveTrain1;
-        this.effectiveTrain2 = builder.effectiveTrain2;
+        this.effectiveTrainLine1 = builder.effectiveTrainLine1;
+        this.effectiveTrainLine2 = builder.effectiveTrainLine2;
         this.delay = builder.delay;
         this.sens = builder.sens;
     }
@@ -236,20 +236,20 @@ public class ExcelRow<T extends ExcelRow> implements Comparable<T>, Serializable
         this.expectedArrivalTime = expectedArrivalTime;
     }
 
-    public Train getExpectedTrain1() {
-        return expectedTrain1;
+    public TrainLine getExpectedTrainLine1() {
+        return expectedTrainLine1;
     }
 
-    public void setExpectedTrain1(Train expectedTrain1) {
-        this.expectedTrain1 = expectedTrain1;
+    public void setExpectedTrainLine1(TrainLine expectedTrainLine1) {
+        this.expectedTrainLine1 = expectedTrainLine1;
     }
 
-    public Train getExpectedTrain2() {
-        return expectedTrain2;
+    public TrainLine getExpectedTrainLine2() {
+        return expectedTrainLine2;
     }
 
-    public void setExpectedTrain2(Train expectedTrain2) {
-        this.expectedTrain2 = expectedTrain2;
+    public void setExpectedTrainLine2(TrainLine expectedTrainLine2) {
+        this.expectedTrainLine2 = expectedTrainLine2;
     }
 
     public LocalTime getEffectiveDepartureTime() {
@@ -268,20 +268,20 @@ public class ExcelRow<T extends ExcelRow> implements Comparable<T>, Serializable
         this.effectiveArrivalTime = effectiveArrivalTime;
     }
 
-    public Train getEffectiveTrain1() {
-        return effectiveTrain1;
+    public TrainLine getEffectiveTrainLine1() {
+        return effectiveTrainLine1;
     }
 
-    public void setEffectiveTrain1(Train effectiveTrain1) {
-        this.effectiveTrain1 = effectiveTrain1;
+    public void setEffectiveTrainLine1(TrainLine effectiveTrainLine1) {
+        this.effectiveTrainLine1 = effectiveTrainLine1;
     }
 
-    public Train getEffectiveTrain2() {
-        return effectiveTrain2;
+    public TrainLine getEffectiveTrainLine2() {
+        return effectiveTrainLine2;
     }
 
-    public void setEffectiveTrain2(Train effectiveTrain2) {
-        this.effectiveTrain2 = effectiveTrain2;
+    public void setEffectiveTrainLine2(TrainLine effectiveTrainLine2) {
+        this.effectiveTrainLine2 = effectiveTrainLine2;
     }
 
     public Long getDelay() {
@@ -311,8 +311,8 @@ public class ExcelRow<T extends ExcelRow> implements Comparable<T>, Serializable
                 .append("arrivalStation") //
                 .append("departureStation") //
                 .append("linkStation") //
-                .append("expectedTrain1") //
-                .append("expectedTrain2") //
+                .append("expectedTrainLine1") //
+                .append("expectedTrainLine2") //
                 .hashCode();
     }
 
@@ -330,8 +330,8 @@ public class ExcelRow<T extends ExcelRow> implements Comparable<T>, Serializable
                     .append(this.arrivalStation, target.arrivalStation) //
                     .append(this.departureStation, target.departureStation) //
                     .append(this.linkStation, target.linkStation) //
-                    .append(this.expectedTrain1, target.expectedTrain1) //
-                    .append(this.expectedTrain2, target.expectedTrain2) //
+                    .append(this.expectedTrainLine1, target.expectedTrainLine1) //
+                    .append(this.expectedTrainLine2, target.expectedTrainLine2) //
                     .isEquals();
         }
 
@@ -354,17 +354,17 @@ public class ExcelRow<T extends ExcelRow> implements Comparable<T>, Serializable
         builder.append(" ");
         builder.append(expectedArrivalTime != null ? expectedArrivalTime.format(DateTimeFormatter.ISO_TIME) : "N/A");
         builder.append(" ");
-        builder.append(notNullToString(expectedTrain1));
+        builder.append(notNullToString(expectedTrainLine1));
         builder.append(" ");
-        builder.append(notNullToString(expectedTrain2));
+        builder.append(notNullToString(expectedTrainLine2));
         builder.append(" ");
         builder.append(effectiveDepartureTime != null ? effectiveDepartureTime.format(DateTimeFormatter.ISO_TIME) : "N/A");
         builder.append(" ");
         builder.append(effectiveArrivalTime != null ? effectiveArrivalTime.format(DateTimeFormatter.ISO_TIME) : "N/A");
         builder.append(" ");
-        builder.append(notNullToString(effectiveTrain1));
+        builder.append(notNullToString(effectiveTrainLine1));
         builder.append(" ");
-        builder.append(notNullToString(effectiveTrain2));
+        builder.append(notNullToString(effectiveTrainLine2));
         builder.append(" ");
         builder.append(delay);
         builder.append(" ");
@@ -383,12 +383,12 @@ public class ExcelRow<T extends ExcelRow> implements Comparable<T>, Serializable
         protected Station linkStation;
         protected LocalTime expectedDepartureTime;
         protected LocalTime expectedArrivalTime;
-        protected Train expectedTrain1;
-        protected Train expectedTrain2;
+        protected TrainLine expectedTrainLine1;
+        protected TrainLine expectedTrainLine2;
         protected LocalTime effectiveDepartureTime;
         protected LocalTime effectiveArrivalTime;
-        protected Train effectiveTrain1;
-        protected Train effectiveTrain2;
+        protected TrainLine effectiveTrainLine1;
+        protected TrainLine effectiveTrainLine2;
         protected Long delay;
 
         public Builder(final LocalDate date, final Sens sens) {
@@ -423,13 +423,13 @@ public class ExcelRow<T extends ExcelRow> implements Comparable<T>, Serializable
             return this;
         }
 
-        public Builder expectedTrain1(final Train expectedTrain1) {
-            this.expectedTrain1 = expectedTrain1;
+        public Builder expectedTrain1(final TrainLine expectedTrainLine1) {
+            this.expectedTrainLine1 = expectedTrainLine1;
             return this;
         }
 
-        public Builder expectedTrain2(final Train expectedTrain2) {
-            this.expectedTrain2 = expectedTrain2;
+        public Builder expectedTrain2(final TrainLine expectedTrainLine2) {
+            this.expectedTrainLine2 = expectedTrainLine2;
             return this;
         }
 
@@ -445,13 +445,13 @@ public class ExcelRow<T extends ExcelRow> implements Comparable<T>, Serializable
             return this;
         }
 
-        public Builder effectiveTrain1(final Train effectiveTrain1) {
-            this.effectiveTrain1 = effectiveTrain1;
+        public Builder effectiveTrain1(final TrainLine effectiveTrainLine1) {
+            this.effectiveTrainLine1 = effectiveTrainLine1;
             return this;
         }
 
-        public Builder effectiveTrain2(final Train effectiveTrain2) {
-            this.effectiveTrain2 = effectiveTrain2;
+        public Builder effectiveTrain2(final TrainLine effectiveTrainLine2) {
+            this.effectiveTrainLine2 = effectiveTrainLine2;
             return this;
         }
 

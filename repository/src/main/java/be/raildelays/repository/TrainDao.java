@@ -24,43 +24,43 @@
 
 package be.raildelays.repository;
 
-import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.entities.TrainLine;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
- * Repository that manage storing a {@link Train}.
+ * Repository that manage storing a {@link TrainLine}.
  *
  * @author Almex
  */
-public interface TrainDao extends JpaRepository<Train, Long> {
+public interface TrainDao extends JpaRepository<TrainLine, Long> {
 
     /**
-     * Search for a Train by its English name.
+     * Search for a TrainLine by its English name.
      *
-     * @param name     strict name that should match to find a Train.
+     * @param name     strict name that should match to find a TrainLine.
      * @param language in which you want to do the search.
-     * @return a {@link Train}
+     * @return a {@link TrainLine}
      */
-    public Train findByEnglishName(String englishName);
-
-
-    /**
-     * Search for a Train by its French name.
-     *
-     * @param name     strict name that should match to find a Train.
-     * @param language in which you want to do the search.
-     * @return a {@link Train}
-     */
-    public Train findByFrenchName(String frenchName);
+    public TrainLine findByEnglishName(String englishName);
 
 
     /**
-     * Search for a Train by its Dutch name.
+     * Search for a TrainLine by its French name.
      *
-     * @param name     strict name that should match to find a Train.
+     * @param name     strict name that should match to find a TrainLine.
      * @param language in which you want to do the search.
-     * @return a {@link Train}
+     * @return a {@link TrainLine}
      */
-    public Train findByDutchName(String dutchName);
+    public TrainLine findByFrenchName(String frenchName);
+
+
+    /**
+     * Search for a TrainLine by its Dutch name.
+     *
+     * @param name     strict name that should match to find a TrainLine.
+     * @param language in which you want to do the search.
+     * @return a {@link TrainLine}
+     */
+    public TrainLine findByDutchName(String dutchName);
 
 }

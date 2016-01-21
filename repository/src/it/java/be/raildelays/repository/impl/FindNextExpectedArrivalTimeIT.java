@@ -37,7 +37,7 @@ public class FindNextExpectedArrivalTimeIT extends AbstractIT {
         List<LineStop> lineStops = lineStopDao.findNextExpectedArrivalTime(station, date);
 
         Assert.assertEquals(3, lineStops.size());
-        Assert.assertEquals("1715", lineStops.get(0).getTrain().getEnglishName());
+        Assert.assertEquals("1715", lineStops.get(0).getTrainLine().getEnglishName());
     }
 
 }

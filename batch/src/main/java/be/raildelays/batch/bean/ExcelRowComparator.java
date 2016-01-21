@@ -47,12 +47,12 @@ public class ExcelRowComparator<T extends ExcelRow> extends AbstractExcelRowComp
                         .thenComparing(T::getLinkStation, nullsLast(naturalOrder()))
                         .thenComparing(T::getExpectedDepartureTime, nullsLast(naturalOrder()))
                         .thenComparing(T::getExpectedArrivalTime, nullsLast(naturalOrder()))
-                        .thenComparing(T::getExpectedTrain1, nullsLast(naturalOrder()))
-                        .thenComparing(T::getExpectedTrain2, nullsLast(naturalOrder()))
+                        .thenComparing(T::getExpectedTrainLine1, nullsLast(naturalOrder()))
+                        .thenComparing(T::getExpectedTrainLine2, nullsLast(naturalOrder()))
                         .thenComparing(T::getEffectiveDepartureTime, nullsLast(naturalOrder()))
                         .thenComparing(T::getEffectiveArrivalTime, nullsLast(naturalOrder()))
-                        .thenComparing(T::getEffectiveTrain1, nullsLast(naturalOrder()))
-                        .thenComparing(T::getEffectiveTrain2, nullsLast(naturalOrder()))
+                        .thenComparing(T::getEffectiveTrainLine1, nullsLast(naturalOrder()))
+                        .thenComparing(T::getEffectiveTrainLine2, nullsLast(naturalOrder()))
                         .thenComparing(T::getDelay, nullsLast(naturalOrder()))
         )).compare(lho, rho);
     }

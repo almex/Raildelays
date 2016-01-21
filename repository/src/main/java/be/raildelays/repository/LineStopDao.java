@@ -27,7 +27,7 @@ package be.raildelays.repository;
 
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.entities.TrainLine;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -43,36 +43,36 @@ import java.util.List;
 public interface LineStopDao extends JpaRepository<LineStop, Long>, LineStopDaoCustom {
 
     /**
-     * Search a list of line stops that belong to a train for a certain day.
+     * Search a list of line stops that belong to a trainLine for a certain day.
      *
-     * @param train train id in Railtime format.
+     * @param trainLine trainLine id in Railtime format.
      * @param date  day of the year for which you do the search
      * @return a list of line stop
      */
-    LineStop findByTrainAndDateAndStation(Train train, LocalDate date, Station station);
+    LineStop findByTrainAndDateAndStation(TrainLine trainLine, LocalDate date, Station station);
 
     /**
-     * Search a list of line stops that belong to a train for a certain day.
+     * Search a list of line stops that belong to a trainLine for a certain day.
      *
-     * @param trainId train id coming from our internal respository.
+     * @param trainId trainLine id coming from our internal respository.
      * @param date    day of the year for which you do the search
      * @return a list of line stop
      */
     @Query("SELECT o "
             + "FROM LineStop o "
             + "WHERE o.date = :date "
-            + "AND o.train.id = :trainId ")
+            + "AND o.trainLine.id = :trainId ")
     LineStop findByTrainIdAndDate(@Param("trainId") Long trainId, @Param("date") LocalDate date);
 
 
     /**
-     * Search a list of line stops that belong to a train for a certain day.
+     * Search a list of line stops that belong to a trainLine for a certain day.
      *
-     * @param train for which we match its names.
+     * @param trainLine for which we match its names.
      * @param date  day of the year for which you do the search
      * @return a list of line stop
      */
-    List<LineStop> findByTrainAndDate(Train train, LocalDate date);
+    List<LineStop> findByTrainAndDate(TrainLine trainLine, LocalDate date);
 
     /**
      * Search all dates containing a line stop already stored in the database.

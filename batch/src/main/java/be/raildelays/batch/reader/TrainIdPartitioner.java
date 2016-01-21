@@ -39,11 +39,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This {@link org.springframework.batch.core.partition.support.Partitioner} is used to create one partition per train.
- * Meaning that we will have dynamically one step per train. And depending on the
+ * This {@link org.springframework.batch.core.partition.support.Partitioner} is used to create one partition per trainLine.
+ * Meaning that we will have dynamically one step per trainLine. And depending on the
  * {@code TaskExecutor} those steps can be executed concurrently.
  * <p>
- *     The {@link ExecutionContext} of each train contains the key {@code trainId} with a value of {@link Integer} type.
+ *     The {@link ExecutionContext} of each trainLine contains the key {@code trainId} with a value of {@link Integer} type.
  *     The name of the partition is 'partitionX' where 'X' is the zero-based index in order of creation.
  * </p>
  *
@@ -87,7 +87,7 @@ public class TrainIdPartitioner implements Partitioner, InitializingBean {
                         result = RepeatStatus.FINISHED;
                     }
                 } catch (Exception e) {
-                    throw new UnexpectedInputException("Error during reading list of train", e);
+                    throw new UnexpectedInputException("Error during reading list of trainLine", e);
                 }
 
                 return result;

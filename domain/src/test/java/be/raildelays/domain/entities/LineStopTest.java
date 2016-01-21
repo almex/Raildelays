@@ -26,7 +26,7 @@ public class LineStopTest extends AbstractObjectTest {
     @Override
     @Before
     public void setUp() throws ParseException {
-        Train train = new Train("466");
+        TrainLine trainLine = new TrainLine.Builder(466L).build();
         Station station = new Station("Liège (Liège-Guillemins)");
         TimeDelay arrivalTime = TimeDelay.of(LocalTime.parse("12:00"), 5L);
         TimeDelay departureTime = TimeDelay.of(LocalTime.parse("12:05"), 5L);
@@ -34,7 +34,7 @@ public class LineStopTest extends AbstractObjectTest {
 
         DATA_POINT1 = new LineStop.Builder()
                 .date(date)
-                .train(train)
+                .train(trainLine)
                 .station(station)
                 .arrivalTime(arrivalTime)
                 .departureTime(departureTime)
@@ -44,7 +44,7 @@ public class LineStopTest extends AbstractObjectTest {
 
         DATA_POINT2 = DATA_POINT1;
 
-        DATA_POINT3 = new LineStop.Builder().date(date).train(train)
+        DATA_POINT3 = new LineStop.Builder().date(date).train(trainLine)
                 .station(station)
                 .arrivalTime(arrivalTime)
                 .departureTime(departureTime)
@@ -53,7 +53,7 @@ public class LineStopTest extends AbstractObjectTest {
                 .build();
 
         DATA_POINT4 = new LineStop.Builder().date(LocalDate.now())
-                .train(new Train("469"))
+                .train(new TrainLine.Builder(469L).build())
                 .station(new Station("Brussels (Bruxelles-central)"))
                 .arrivalTime(arrivalTime)
                 .departureTime(departureTime)

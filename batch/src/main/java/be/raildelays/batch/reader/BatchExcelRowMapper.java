@@ -27,7 +27,7 @@ package be.raildelays.batch.reader;
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.domain.Language;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.entities.TrainLine;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -136,13 +136,13 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
     }
 
 
-    private Train getTrain(Row row, int cellIndex) {
+    private TrainLine getTrain(Row row, int cellIndex) {
         NumberFormat numberFormat = new DecimalFormat("#");
-        Train result = null;
+        TrainLine result = null;
 
         Long trainId = getLong(row, cellIndex);
         if (trainId != null) {
-            result = new Train(numberFormat.format(trainId), getLanguage());
+            result = new TrainLine(numberFormat.format(trainId), getLanguage());
         }
 
         return result;

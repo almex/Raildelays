@@ -8,7 +8,7 @@ import be.raildelays.domain.Language;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.entities.TrainLine;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class BatchExcelRowMapperProcessorTest {
         LineStop.Builder builder = new LineStop
                 .Builder()
                 .date(today)
-                .train(new Train("466"))
+                .train(new TrainLine("466"))
                 .station(new Station("station1"))
                 .arrivalTime(arrivalTime)
                 .departureTime(departureTime)
@@ -56,7 +56,7 @@ public class BatchExcelRowMapperProcessorTest {
         builder.addNext(new LineStop
                 .Builder()
                 .date(today)
-                .train(new Train("466"))
+                .train(new TrainLine("466"))
                 .station(new Station("stationA"))
                 .arrivalTime(arrivalTime)
                 .departureTime(departureTime)
@@ -67,7 +67,7 @@ public class BatchExcelRowMapperProcessorTest {
         builder.addNext(new LineStop
                 .Builder()
                 .date(today)
-                .train(new Train("466"))
+                .train(new TrainLine("466"))
                 .station(new Station("station2"))
                 .arrivalTime(arrivalTime)
                 .departureTime(departureTime)
@@ -78,7 +78,7 @@ public class BatchExcelRowMapperProcessorTest {
         builder.addNext(new LineStop
                 .Builder()
                 .date(today)
-                .train(new Train("466"))
+                .train(new TrainLine("466"))
                 .station(new Station("stationB"))
                 .arrivalTime(arrivalTime)
                 .departureTime(departureTime)
@@ -89,7 +89,7 @@ public class BatchExcelRowMapperProcessorTest {
         builder.addNext(new LineStop
                 .Builder()
                 .date(today)
-                .train(new Train("466"))
+                .train(new TrainLine("466"))
                 .station(new Station("station3"))
                 .arrivalTime(arrivalTime)
                 .departureTime(departureTime)
@@ -115,8 +115,8 @@ public class BatchExcelRowMapperProcessorTest {
 
         Assert.assertEquals(new Station("stationA"), excelRow.getDepartureStation());
         Assert.assertEquals(new Station("stationB"), excelRow.getArrivalStation());
-        Assert.assertEquals(new Train("466"), excelRow.getExpectedTrain1());
-        Assert.assertEquals(new Train("466"), excelRow.getEffectiveTrain1());
+        Assert.assertEquals(new TrainLine("466"), excelRow.getExpectedTrainLine1());
+        Assert.assertEquals(new TrainLine("466"), excelRow.getEffectiveTrainLine1());
         Assert.assertEquals(LocalTime.parse("12:25"), excelRow.getExpectedDepartureTime());
         Assert.assertEquals(LocalTime.parse("12:55"), excelRow.getExpectedArrivalTime());
         Assert.assertEquals(LocalTime.parse("12:35"), excelRow.getEffectiveDepartureTime());

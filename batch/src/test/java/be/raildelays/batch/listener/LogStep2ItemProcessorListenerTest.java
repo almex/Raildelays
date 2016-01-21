@@ -4,6 +4,7 @@ import be.raildelays.delays.TimeDelay;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
+import be.raildelays.domain.entities.TrainLine;
 import be.raildelays.domain.xls.ExcelRow;
 import org.apache.logging.log4j.junit.LoggerContextRule;
 import org.apache.logging.log4j.test.appender.ListAppender;
@@ -36,7 +37,7 @@ public class LogStep2ItemProcessorListenerTest {
                         .Builder()
                         .date(LocalDate.now())
                         .station(new Station("foo"))
-                        .train(new be.raildelays.domain.entities.Train("bar"))
+                        .train(new TrainLine("bar"))
                         .departureTime(TimeDelay.now())
                         .arrivalTime(TimeDelay.now().withDelay(15L))
                         .build()

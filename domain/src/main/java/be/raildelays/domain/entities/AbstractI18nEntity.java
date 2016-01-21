@@ -59,7 +59,7 @@ public class AbstractI18nEntity extends AbstractEntity implements Serializable, 
     /**
      * Initialization constructor.
      *
-     * @param englishName English name for this train station.
+     * @param englishName English name for this trainLine station.
      */
     public AbstractI18nEntity(final String englishName) {
         this(englishName, "", "");
@@ -68,7 +68,7 @@ public class AbstractI18nEntity extends AbstractEntity implements Serializable, 
     /**
      * Initialization constructor.
      *
-     * @param name for this train station.
+     * @param name for this trainLine station.
      */
     public AbstractI18nEntity(final String name, Language language) {
         switch (language) {
@@ -97,9 +97,9 @@ public class AbstractI18nEntity extends AbstractEntity implements Serializable, 
     /**
      * Initialization constructor.
      *
-     * @param englishName English name for this train
-     * @param dutchName   Dutch name for this train
-     * @param frenchName  French name for this train
+     * @param englishName English name for this trainLine
+     * @param dutchName   Dutch name for this trainLine
+     * @param frenchName  French name for this trainLine
      */
     public AbstractI18nEntity(final String englishName, final String dutchName, final String frenchName) {
         this.englishName = englishName;

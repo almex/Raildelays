@@ -19,7 +19,7 @@
         <mapping-file>META-INF/orm.xml</mapping-file>
         <class>be.raildelays.domain.entities.LineStop</class>
         <class>be.raildelays.domain.entities.Station</class>
-        <class>be.raildelays.domain.entities.Train</class>
+        <class>be.raildelays.domain.entities.TrainLine</class>
         <!-- AttributeConverter to handle java.time API with JPA -->
         <class>be.raildelays.jpa.LocalDateAttributeConverter</class>
         <class>be.raildelays.jpa.LocalTimeAttributeConverter</class>
@@ -62,7 +62,7 @@
         <!--<jta-data-source>raildelays-repository-jta</jta-data-source>-->
         <class>be.raildelays.domain.entities.LineStop</class>
         <class>be.raildelays.domain.entities.Station</class>
-        <class>be.raildelays.domain.entities.Train</class>
+        <class>be.raildelays.domain.entities.TrainLine</class>
 
         <properties>
             <!-- JPA Standard -->

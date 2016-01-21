@@ -45,7 +45,7 @@ public class ExcelSheetItemReaderTest {
     }
 
     /*
-     * We expect to read the entire and that somewhere in that file we have a train number 515.
+     * We expect to read the entire and that somewhere in that file we have a trainLine number 515.
      */
     @Test
     public void testRead() throws Exception {
@@ -57,7 +57,7 @@ public class ExcelSheetItemReaderTest {
         }
 
         Assert.assertTrue(result.stream().anyMatch(
-                row -> "515".equals(row.getEffectiveTrain1().getEnglishName())
+                row -> "515".equals(row.getEffectiveTrainLine1().getEnglishName())
         ));
 
         reader.close();

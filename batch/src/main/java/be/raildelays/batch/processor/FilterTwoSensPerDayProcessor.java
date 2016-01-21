@@ -157,8 +157,8 @@ public class FilterTwoSensPerDayProcessor implements ItemProcessor<BatchExcelRow
             result = isEmpty(row.getDate())
                     && isEmpty(row.getDepartureStation())
                     && isEmpty(row.getArrivalStation())
-                    && isEmpty(row.getExpectedTrain1())
-                    && isEmpty(row.getEffectiveTrain1());
+                    && isEmpty(row.getExpectedTrainLine1())
+                    && isEmpty(row.getEffectiveTrainLine1());
         }
 
         return result;

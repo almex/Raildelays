@@ -7,7 +7,7 @@ import be.raildelays.domain.Language;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.entities.TrainLine;
 import be.raildelays.repository.LineStopDao;
 import org.easymock.*;
 import org.junit.Assert;
@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.List;
 
 @RunWith(value = BlockJUnit4ClassRunner.class)
-public class SearchNextTrainProcessorTest extends EasyMockSupport {
+public class SearchNextTrainLineProcessorTest extends EasyMockSupport {
 
     public static final String LIEGE_GUILLEMINS = "Liège-Guillemins";
     public static final String BRUXELLES_CENTRAL = "Bruxelles-Central";
@@ -61,10 +61,10 @@ public class SearchNextTrainProcessorTest extends EasyMockSupport {
         item = new BatchExcelRow.Builder(TODAY, Sens.DEPARTURE) //
                 .departureStation(DEPARTURE_STATION) //
                 .arrivalStation(ARRIVAL_STATION) //
-                .expectedTrain1(new Train(Y)) //
+                .expectedTrain1(new TrainLine(Y)) //
                 .expectedDepartureTime(LocalTime.parse("16:30")) //
                 .expectedArrivalTime(LocalTime.parse("17:00")) //
-                .effectiveTrain1(new Train(Y)) //
+                .effectiveTrain1(new TrainLine(Y)) //
                 .effectiveDepartureTime(LocalTime.parse("16:30")) //
                 .effectiveArrivalTime(LocalTime.parse("17:00")) //
                 .canceled(false) //
@@ -72,13 +72,13 @@ public class SearchNextTrainProcessorTest extends EasyMockSupport {
                 .build();
 
         stop0 = new LineStop.Builder().date(TODAY)
-                .train(new Train(N0)).station(ARRIVAL_STATION)
+                .train(new TrainLine(N0)).station(ARRIVAL_STATION)
                 .arrivalTime(TimeDelay.of(LocalTime.parse("18:00"), 0L))
                 .departureTime(TimeDelay.of(LocalTime.parse("18:00"), 0L))
                 .canceledArrival(false)
                 .canceledDeparture(false)
                 .addPrevious(new LineStop.Builder().date(TODAY)
-                        .train(new Train(N0)).station(DEPARTURE_STATION)
+                        .train(new TrainLine(N0)).station(DEPARTURE_STATION)
                         .arrivalTime(TimeDelay.of(LocalTime.parse("17:30"), 0L))
                         .departureTime(TimeDelay.of(LocalTime.parse("17:30"), 0L))
                         .canceledArrival(false)
@@ -86,13 +86,13 @@ public class SearchNextTrainProcessorTest extends EasyMockSupport {
                 .build();
 
         stop1 = new LineStop.Builder().date(TODAY)
-                .train(new Train(N1)).station(ARRIVAL_STATION)
+                .train(new TrainLine(N1)).station(ARRIVAL_STATION)
                 .arrivalTime(TimeDelay.of(LocalTime.parse("18:30"), 0L))
                 .departureTime(TimeDelay.of(LocalTime.parse("18:30"), 0L))
                 .canceledArrival(false)
                 .canceledDeparture(false)
                 .addPrevious(new LineStop.Builder().date(TODAY)
-                        .train(new Train(N1)).station(DEPARTURE_STATION)
+                        .train(new TrainLine(N1)).station(DEPARTURE_STATION)
                         .arrivalTime(TimeDelay.of(LocalTime.parse("17:00"), 0L))
                         .departureTime(TimeDelay.of(LocalTime.parse("17:00"), 0L))
                         .canceledArrival(false)
@@ -141,7 +141,7 @@ public class SearchNextTrainProcessorTest extends EasyMockSupport {
         BatchExcelRow result = processor.process(item);
 
         Assert.assertNotNull(result);
-        Assert.assertEquals(new Train(N0), result.getEffectiveTrain1());
+        Assert.assertEquals(new TrainLine(N0), result.getEffectiveTrainLine1());
         Assert.assertEquals(90, result.getDelay().longValue());
 
         verifyAll();
@@ -161,27 +161,27 @@ public class SearchNextTrainProcessorTest extends EasyMockSupport {
         final Language lang = Language.FR;
 
         stop0 = new LineStop.Builder(stop0, false, false)
-                .train(new Train(N0, lang))
+                .train(new TrainLine(N0, lang))
                 .station(new Station(BRUXELLES_CENTRAL, lang))
                 .addPrevious(new LineStop
                         .Builder(stop0.getPrevious(), false, false)
-                        .train(new Train(N0, lang))
+                        .train(new TrainLine(N0, lang))
                         .station(new Station(LIEGE_GUILLEMINS, lang))
                 )
                 .canceledArrival(true)
                 .canceledDeparture(true)
                 .build();
         stop1 = new LineStop.Builder(stop1, false, false)
-                .train(new Train(N1, lang))
+                .train(new TrainLine(N1, lang))
                 .station(new Station(BRUXELLES_CENTRAL, lang))
                 .addPrevious(new LineStop
                         .Builder(stop1.getPrevious(), false, false)
-                        .train(new Train(N1, lang))
+                        .train(new TrainLine(N1, lang))
                         .station(new Station(LIEGE_GUILLEMINS, lang))
                 )
                 .build();
-        item.setExpectedTrain1(new Train(Y, lang));
-        item.setEffectiveTrain1(new Train(Y, lang));
+        item.setExpectedTrainLine1(new TrainLine(Y, lang));
+        item.setEffectiveTrainLine1(new TrainLine(Y, lang));
         item.setDepartureStation(new Station(LIEGE_GUILLEMINS, lang));
         item.setArrivalStation(new Station(BRUXELLES_CENTRAL, lang));
         processor.setLanguage(lang.name());
@@ -200,7 +200,7 @@ public class SearchNextTrainProcessorTest extends EasyMockSupport {
         BatchExcelRow result = processor.process(item);
 
         Assert.assertNotNull(result);
-        Assert.assertEquals(new Train(N1, lang), result.getEffectiveTrain1());
+        Assert.assertEquals(new TrainLine(N1, lang), result.getEffectiveTrainLine1());
         Assert.assertEquals(90, result.getDelay().longValue());
 
         verifyAll();
@@ -220,20 +220,20 @@ public class SearchNextTrainProcessorTest extends EasyMockSupport {
         final Language lang = Language.NL;
 
         stop0 = new LineStop.Builder(stop0, false, false)
-                .train(new Train(N0, lang))
+                .train(new TrainLine(N0, lang))
                 .station(new Station(BRUXELLES_CENTRAL, lang))
                 .addPrevious(new LineStop
                         .Builder(stop0.getPrevious(), false, false)
-                        .train(new Train(N0, lang))
+                        .train(new TrainLine(N0, lang))
                         .station(new Station(LIEGE_GUILLEMINS, lang))
                 )
                 .build();
         stop1 = new LineStop.Builder(stop1, false, false)
-                .train(new Train(N1, lang))
+                .train(new TrainLine(N1, lang))
                 .station(new Station(BRUXELLES_CENTRAL, lang))
                 .addPrevious(new LineStop
                         .Builder(stop1.getPrevious(), false, false)
-                        .train(new Train(N1, lang))
+                        .train(new TrainLine(N1, lang))
                         .station(new Station(LIEGE_GUILLEMINS, lang))
                 )
                 .build();
@@ -243,8 +243,8 @@ public class SearchNextTrainProcessorTest extends EasyMockSupport {
         item.setEffectiveDepartureTime(LocalTime.parse("17:45"));
         item.setEffectiveArrivalTime(LocalTime.parse("19:00"));
         item.setDelay(120);
-        item.setExpectedTrain1(new Train(Y, lang));
-        item.setEffectiveTrain1(new Train(Y, lang));
+        item.setExpectedTrainLine1(new TrainLine(Y, lang));
+        item.setEffectiveTrainLine1(new TrainLine(Y, lang));
         item.setDepartureStation(new Station(LIEGE_GUILLEMINS, lang));
         item.setArrivalStation(new Station(BRUXELLES_CENTRAL, lang));
         processor.setLanguage(lang.name());
@@ -259,7 +259,7 @@ public class SearchNextTrainProcessorTest extends EasyMockSupport {
         BatchExcelRow result = processor.process(item);
 
         Assert.assertNotNull(result);
-        Assert.assertEquals(new Train(N0, lang), result.getEffectiveTrain1());
+        Assert.assertEquals(new TrainLine(N0, lang), result.getEffectiveTrainLine1());
         Assert.assertEquals(60, result.getDelay().longValue());
 
         verifyAll();
@@ -286,7 +286,7 @@ public class SearchNextTrainProcessorTest extends EasyMockSupport {
         BatchExcelRow result = processor.process(item);
 
         Assert.assertNotNull(result);
-        Assert.assertEquals(new Train(Y), result.getEffectiveTrain1());
+        Assert.assertEquals(new TrainLine(Y), result.getEffectiveTrainLine1());
         Assert.assertEquals(0, result.getDelay().longValue());
 
         verifyAll();
@@ -316,7 +316,7 @@ public class SearchNextTrainProcessorTest extends EasyMockSupport {
         BatchExcelRow result = processor.process(item);
 
         Assert.assertNotNull(result);
-        Assert.assertEquals(new Train(Y), result.getEffectiveTrain1());
+        Assert.assertEquals(new TrainLine(Y), result.getEffectiveTrainLine1());
         Assert.assertEquals(90, result.getDelay().longValue());
 
         verifyAll();
@@ -337,7 +337,7 @@ public class SearchNextTrainProcessorTest extends EasyMockSupport {
         List<BatchExcelRow> result = processor.process(Collections.singletonList(item));
 
         Assert.assertNotNull(result);
-        Assert.assertEquals(new Train(Y), result.get(0).getEffectiveTrain1());
+        Assert.assertEquals(new TrainLine(Y), result.get(0).getEffectiveTrainLine1());
         Assert.assertEquals(90, result.get(0).getDelay().longValue());
 
         verifyAll();
@@ -370,7 +370,7 @@ public class SearchNextTrainProcessorTest extends EasyMockSupport {
         BatchExcelRow result = processor.process(item);
 
         Assert.assertNotNull(result);
-        Assert.assertEquals(new Train(Y), result.getEffectiveTrain1());
+        Assert.assertEquals(new TrainLine(Y), result.getEffectiveTrainLine1());
 
         verifyAll();
     }
@@ -400,7 +400,7 @@ public class SearchNextTrainProcessorTest extends EasyMockSupport {
         BatchExcelRow result = processor.process(item);
 
         Assert.assertNotNull(result);
-        Assert.assertEquals(new Train(Y), result.getEffectiveTrain1());
+        Assert.assertEquals(new TrainLine(Y), result.getEffectiveTrainLine1());
 
         verifyAll();
     }
@@ -426,7 +426,7 @@ public class SearchNextTrainProcessorTest extends EasyMockSupport {
         BatchExcelRow result = processor.process(item);
 
         Assert.assertNotNull(result);
-        Assert.assertEquals(new Train(Y), result.getEffectiveTrain1());
+        Assert.assertEquals(new TrainLine(Y), result.getEffectiveTrainLine1());
 
         verifyAll();
     }
@@ -443,7 +443,7 @@ public class SearchNextTrainProcessorTest extends EasyMockSupport {
         BatchExcelRow result = processor.process(item);
 
         Assert.assertNotNull(result);
-        Assert.assertEquals(new Train(Y), result.getEffectiveTrain1());
+        Assert.assertEquals(new TrainLine(Y), result.getEffectiveTrainLine1());
 
         verifyAll();
     }

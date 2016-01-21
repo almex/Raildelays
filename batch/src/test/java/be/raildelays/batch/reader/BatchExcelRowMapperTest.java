@@ -3,7 +3,7 @@ package be.raildelays.batch.reader;
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.writer.ExcelRowAggregator;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.entities.TrainLine;
 import be.raildelays.domain.xls.ExcelRow;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
@@ -70,7 +70,7 @@ public class BatchExcelRowMapperTest {
 
         Assert.assertNotNull(batchExcelRow);
         Assert.assertEquals(DELAY, batchExcelRow.getDelay().longValue());
-        Assert.assertEquals(format.format(TRAIN1), batchExcelRow.getEffectiveTrain1().getEnglishName());
+        Assert.assertEquals(format.format(TRAIN1), batchExcelRow.getEffectiveTrainLine1().getEnglishName());
     }
 
     @Test
@@ -81,12 +81,12 @@ public class BatchExcelRowMapperTest {
                 .arrivalStation(new Station("LIEGE-GUILLEMINS")) //
                 .expectedDepartureTime(LocalTime.parse("14:00")) //
                 .expectedArrivalTime(LocalTime.parse("15:00")) //
-                .expectedTrain1(new Train("529")) //
-                .expectedTrain2(new Train("516")) //
+                .expectedTrain1(new TrainLine("529")) //
+                .expectedTrain2(new TrainLine("516")) //
                 .effectiveDepartureTime(LocalTime.parse("14:05")) //
                 .effectiveArrivalTime(LocalTime.parse("15:15")) //
-                .effectiveTrain1(new Train("529")) //
-                .effectiveTrain2(new Train("516")) //
+                .effectiveTrain1(new TrainLine("529")) //
+                .effectiveTrain2(new TrainLine("516")) //
                 .delay(10L) //
                 .build();
 

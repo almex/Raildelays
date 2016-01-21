@@ -36,7 +36,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Add step name and train id to {@link org.apache.logging.log4j.ThreadContext} to be able to create
+ * Add step name and trainLine id to {@link org.apache.logging.log4j.ThreadContext} to be able to create
  * log direction based on that fields.
  *
  * @author Almex

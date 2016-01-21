@@ -29,7 +29,7 @@ import be.raildelays.delays.TimeDelay
 import be.raildelays.domain.Language
 import be.raildelays.domain.entities.LineStop
 import be.raildelays.domain.entities.Station
-import be.raildelays.domain.entities.Train
+import be.raildelays.domain.entities.TrainLine
 import be.raildelays.httpclient.Stream
 import be.raildelays.httpclient.impl.DelaysRequestV2
 import be.raildelays.parser.StreamParser
@@ -128,11 +128,11 @@ class DelaysStreamParserV2 implements StreamParser<LineStop, DelaysRequestV2> {
         return result;
     }
 
-    private static Train getTrain(Map object, Language language) {
-        Train result = null;
+    private static TrainLine getTrain(Map object, Language language) {
+        TrainLine result = null;
 
         if (object.tNr != null) {
-            result = new Train(object.tNr, language);
+            result = new TrainLine.Builder(Long.parseLong(object.tNr)).build();
         }
 
         return result;

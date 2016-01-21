@@ -40,7 +40,7 @@ import java.util.Map;
 /**
  * @author Almex
  */
-public class TrainIdPartitionerTest {
+public class TrainLineIdPartitionerTest {
 
     public static final List<String> TRAIN_IDS = Arrays.asList("414", "415", "416");
     private TrainIdPartitioner partitioner;

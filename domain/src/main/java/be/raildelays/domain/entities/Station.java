@@ -25,6 +25,7 @@
 package be.raildelays.domain.entities;
 
 import be.raildelays.domain.Language;
+import be.raildelays.location.Location;
 
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
@@ -32,9 +33,9 @@ import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 
 /**
- * Immutable entity defining a train station.
+ * Immutable entity defining a trainLine station.
  * <p>
- * Unicity of a train is done on the English name.
+ * Unicity of a trainLine is done on the English name.
  *
  * @author Almex
  * @see AbstractEntity
@@ -42,7 +43,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "STATION")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public class Station extends AbstractI18nEntity {
+public class Station extends AbstractI18nEntity implements Location {
 
     private static final long serialVersionUID = -3436298381031779337L;
 
@@ -73,4 +74,8 @@ public class Station extends AbstractI18nEntity {
                 .append(" }").toString();
     }
 
+    @Override
+    public String getName() {
+        return getEnglishName();
+    }
 }

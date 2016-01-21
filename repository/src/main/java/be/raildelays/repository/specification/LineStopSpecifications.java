@@ -72,26 +72,26 @@ public class LineStopSpecifications {
     }
 
     /**
-     * Creates a specification used to find LineStop whose Train equals the expectedTime one.
+     * Creates a specification used to find LineStop whose TrainLine equals the expectedTime one.
      *
-     * @param train for which we should match the name
+     * @param trainLine for which we should match the name
      * @return a predicate or null if all of name in each language are null
      */
-    public static Specification<LineStop> trainEquals(final Train train) {
+    public static Specification<LineStop> trainEquals(final TrainLine trainLine) {
 
         return (root, query, builder) -> {
             Predicate predicate = null;
-            Path<Train> path = root.get(LineStop_.train);
+            Path<TrainLine> path = root.get(LineStop_.train);
 
-            if (StringUtils.isNotBlank(train.getEnglishName())) {
+            if (StringUtils.isNotBlank(trainLine.getEnglishName())) {
                 predicate = builder.and(builder.equal(builder.upper(path.get(Train_.englishName)),
-                        train.getEnglishName().toUpperCase(Locale.ENGLISH)));
-            } else if (StringUtils.isNotBlank(train.getFrenchName())) {
+                        trainLine.getEnglishName().toUpperCase(Locale.ENGLISH)));
+            } else if (StringUtils.isNotBlank(trainLine.getFrenchName())) {
                 predicate = builder.and(builder.equal(builder.upper(path.get(Train_.frenchName)),
-                        train.getFrenchName().toUpperCase(Locale.ENGLISH)));
-            } else if (StringUtils.isNotBlank(train.getDutchName())) {
+                        trainLine.getFrenchName().toUpperCase(Locale.ENGLISH)));
+            } else if (StringUtils.isNotBlank(trainLine.getDutchName())) {
                 predicate = builder.and(builder.equal(builder.upper(path.get(Train_.dutchName)),
-                        train.getDutchName().toUpperCase(Locale.ENGLISH)));
+                        trainLine.getDutchName().toUpperCase(Locale.ENGLISH)));
             }
 
             return predicate;

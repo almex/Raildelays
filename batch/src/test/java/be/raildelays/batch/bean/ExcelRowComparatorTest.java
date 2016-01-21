@@ -3,7 +3,7 @@ package be.raildelays.batch.bean;
 
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.entities.TrainLine;
 import be.raildelays.domain.xls.ExcelRow;
 import org.junit.Assert;
 import org.junit.Before;
@@ -34,12 +34,12 @@ public class ExcelRowComparatorTest extends AbstractExcelRowComparatorTest {
                 .arrivalStation(new Station("arrivalStation"))
                 .expectedDepartureTime(LocalTime.of(10, 1))
                 .expectedArrivalTime(LocalTime.of(11, 0))
-                .expectedTrain1(new Train("expectedTrain1"))
-                .expectedTrain2(new Train("expectedTrain2"))
+                .expectedTrain1(new TrainLine("expectedTrainLine1"))
+                .expectedTrain2(new TrainLine("expectedTrainLine2"))
                 .effectiveDepartureTime(LocalTime.of(10, 5))
                 .effectiveArrivalTime(LocalTime.of(11, 0))
-                .effectiveTrain1(new Train("expectedTrain1"))
-                .effectiveTrain2(new Train("effectiveTrain2"))
+                .effectiveTrain1(new TrainLine("expectedTrainLine1"))
+                .effectiveTrain2(new TrainLine("effectiveTrainLine2"))
                 .delay(0L);
         lho = builder.build();
         rho = builder.build();

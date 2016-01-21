@@ -27,7 +27,7 @@ package be.raildelays.repository.impl;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.LineStop_;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.entities.TrainLine;
 import be.raildelays.repository.LineStopDaoCustom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,12 +154,12 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
     }
 
     @Override
-    public LineStop findFistScheduledLine(Train train, Station station) {
+    public LineStop findFistScheduledLine(TrainLine trainLine, Station station) {
         return findFirstOne(where(arrivalTimeIsNotNull())
                 .and(departureTimeIsNotNull())
                 .and(isNotCanceled())
                 .and(stationEquals(station))
-                .and(trainEquals(train)));
+                .and(trainEquals(trainLine)));
     }
 
     private Page<LineStop> findAll(Specifications<LineStop> specifications, Pageable pageable) {

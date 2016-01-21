@@ -112,7 +112,7 @@ public class AggregateExpectedTimeProcessor implements ItemProcessor<LineStop, L
 
     public LineStop.Builder fetchScheduling(LineStop item) throws Exception {
         LineStop.Builder result = new LineStop.Builder(item, false, false);
-        LineStop candidate = lineStopDao.findFistScheduledLine(item.getTrain(), item.getStation());
+        LineStop candidate = lineStopDao.findFistScheduledLine(item.getTrainLine(), item.getStation());
 
         //-- If we cannot retrieve one of the expectedTime time then this item is corrupted we must filter it.
         if (candidate == null) {

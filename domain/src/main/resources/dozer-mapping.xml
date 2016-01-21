@@ -25,8 +25,8 @@
             <b>id</b>
         </field-exclude>
         <field-exclude>
-            <a>train</a>
-            <b>train</b>
+            <a>trainLine</a>
+            <b>trainLine</b>
         </field-exclude>
         <field-exclude>
             <a>station</a>
@@ -65,7 +65,7 @@
 
     <mapping map-null="false">
         <class-a>be.raildelays.domain.railtime.Train</class-a>
-        <class-b>be.raildelays.domain.entities.Train</class-b>
+        <class-b>be.raildelays.domain.entities.TrainLine</class-b>
     </mapping>
 
     <mapping map-null="false">

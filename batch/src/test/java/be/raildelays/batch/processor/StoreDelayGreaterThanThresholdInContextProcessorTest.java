@@ -4,7 +4,7 @@ import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.delays.Delays;
 import be.raildelays.domain.Language;
 import be.raildelays.domain.Sens;
-import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.entities.TrainLine;
 import be.raildelays.test.RaildelaysTestUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,7 +29,7 @@ public class StoreDelayGreaterThanThresholdInContextProcessorTest {
 
     @Before
     public void setUp() throws Exception {
-        Train train = new Train("dummy");
+        TrainLine trainLine = new TrainLine("dummy");
 
         stepbExecution = MetaDataInstanceFactory.createStepExecution();
 

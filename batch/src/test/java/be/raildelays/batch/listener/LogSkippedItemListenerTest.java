@@ -29,7 +29,7 @@ import be.raildelays.delays.TimeDelay;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.entities.TrainLine;
 import be.raildelays.domain.xls.ExcelRow;
 import org.apache.logging.log4j.junit.LoggerContextRule;
 import org.apache.logging.log4j.test.appender.ListAppender;
@@ -150,7 +150,7 @@ public class LogSkippedItemListenerTest {
                         .Builder()
                         .date(LocalDate.now())
                         .station(new Station("foo"))
-                        .train(new Train("bar"))
+                        .train(new TrainLine("bar"))
                         .departureTime(TimeDelay.of(LocalTime.parse("15:00")))
                         .arrivalTime(TimeDelay.of(LocalTime.parse("16:00")))
                         .build(),
@@ -223,7 +223,7 @@ public class LogSkippedItemListenerTest {
                         .Builder()
                         .date(LocalDate.now())
                         .station(new Station("foo"))
-                        .train(new Train("bar"))
+                        .train(new TrainLine("bar"))
                         .departureTime(TimeDelay.of(LocalTime.parse("15:00")))
                         .arrivalTime(TimeDelay.of(LocalTime.parse("16:00")))
                         .build(),

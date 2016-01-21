@@ -4,7 +4,7 @@ import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.entities.TrainLine;
 import be.raildelays.domain.xls.ExcelRow;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
@@ -52,12 +52,12 @@ public class ExcelRowAggregatorTest {
                 .arrivalStation(new Station("LIEGE-GUILLEMINS")) //
                 .expectedDepartureTime(LocalTime.parse("14:00")) //
                 .expectedArrivalTime(LocalTime.parse("15:00")) //
-                .expectedTrain1(new Train(TRAIN1)) //
-                .expectedTrain2(new Train(TRAIN2)) //
+                .expectedTrain1(new TrainLine(TRAIN1)) //
+                .expectedTrain2(new TrainLine(TRAIN2)) //
                 .effectiveDepartureTime(LocalTime.parse("14:05")) //
                 .effectiveArrivalTime(LocalTime.parse("15:15")) //
-                .effectiveTrain1(new Train(TRAIN1)) //
-                .effectiveTrain2(new Train(TRAIN2)) //
+                .effectiveTrain1(new TrainLine(TRAIN1)) //
+                .effectiveTrain2(new TrainLine(TRAIN2)) //
                 .delay(DELAY) //
                 .build();
 
@@ -132,14 +132,14 @@ public class ExcelRowAggregatorTest {
     }
 
     /**
-     * We expect that if we set a non numerical as a {@link Train} then we should get a {@link java.text.ParseException}.
+     * We expect that if we set a non numerical as a {@link TrainLine} then we should get a {@link java.text.ParseException}.
      * Which will be interpreted as an error in the log. We should not throw any Exception.
      */
     @Test
     public void testInvalidNumericFormat() throws Exception {
         item = new BatchExcelRow
                 .Builder(LocalDate.now(), Sens.DEPARTURE)
-                .expectedTrain1(new Train("foo"))
+                .expectedTrain1(new TrainLine("foo"))
                 .build(false);
 
         row.createCell(36).setCellValue(1717);

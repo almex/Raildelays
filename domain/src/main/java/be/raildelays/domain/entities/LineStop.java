@@ -25,6 +25,7 @@
 package be.raildelays.domain.entities;
 
 import be.raildelays.delays.TimeDelay;
+import be.raildelays.scheduling.Stop;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -41,23 +42,24 @@ import java.util.Set;
 /**
  * Line stop determine a stop for train line.
  * To help building this entity and as the only way to do it
- * we embedded a {@link be.raildelays.domain.entities.LineStop.Builder}.
+ * we embedded a {@link Builder}.
  *
  * @author Almex
  * @see AbstractEntity
  * @since 1.0
+ * @implNote this class apply the Value Object pattern and is therefor immutable
  */
 @Entity
 @Table(name = "LINE_STOP", uniqueConstraints = @UniqueConstraint(columnNames = {
         "TRAIN_ID", "DATE", "STATION_ID"}, name ="LineStopUniqueBusinessKeyConstraint"))
-public class LineStop extends AbstractEntity implements Comparable<LineStop> {
+public class LineStop extends AbstractEntity implements Stop<Station>, Comparable<LineStop> {
 
     private static final long serialVersionUID = 7142886242889314414L;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "TRAIN_ID")
     @NotNull
-    protected Train train;
+    protected TrainLine trainLine;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "STATION_ID")
@@ -97,7 +99,7 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
     protected LineStop() {
         this.id = null;
         this.date = null;
-        this.train = null;
+        this.trainLine = null;
         this.station = null;
         this.arrivalTime = null;
         this.departureTime = null;
@@ -110,7 +112,7 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
     private LineStop(Builder builder) {
         this.id = builder.id;
         this.date = builder.date != null ? builder.date : null;
-        this.train = builder.train;
+        this.trainLine = builder.trainLine;
         this.station = builder.station;
         this.arrivalTime = builder.arrivalTime;
         this.departureTime = builder.departureTime;
@@ -128,7 +130,7 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
                 .append("date: ")
                 .append(date.format(DateTimeFormatter.ISO_DATE))
                 .append(", ") //
-                .append("train: {").append(train) //
+                .append("trainLine: {").append(trainLine) //
                 .append("}, ") //
                 .append("station: {").append(station) //
                 .append("}, ") //
@@ -151,7 +153,7 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
                 LineStop lineStop = (LineStop) obj;
 
                 result = new EqualsBuilder() //
-                        .append(train, lineStop.train) //
+                        .append(trainLine, lineStop.trainLine) //
                         .append(station, lineStop.station) //
                         .append(date, lineStop.date) //
                         .isEquals();
@@ -164,7 +166,7 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(11, 3) //
-                .append(train) //
+                .append(trainLine) //
                 .append(station) //
                 .append(date) //
                 .toHashCode();
@@ -229,7 +231,7 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
             result = new CompareToBuilder()
                     .append(date, lineStop.getDate())
                     .append(station, lineStop.getStation())
-                    .append(train, lineStop.getTrain())
+                    .append(trainLine, lineStop.getTrainLine())
                     .append(arrivalTime, lineStop.getArrivalTime())
                     .append(departureTime, lineStop.getDepartureTime())
                     .toComparison();
@@ -250,6 +252,11 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
         this.arrivalTime = arrivalTime;
     }
 
+    @Override
+    public Station getLocation() {
+        return getStation();
+    }
+
     public TimeDelay getDepartureTime() {
         return departureTime;
     }
@@ -258,12 +265,12 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
         this.departureTime = departureTime;
     }
 
-    public Train getTrain() {
-        return train;
+    public TrainLine getTrainLine() {
+        return trainLine;
     }
 
-    public void setTrain(Train train) {
-        this.train = train;
+    public void setTrainLine(TrainLine trainLine) {
+        this.trainLine = trainLine;
     }
 
     public Station getStation() {
@@ -339,9 +346,9 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
      * @since 1.0
      */
     public static class Builder {
-        private static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
         private Long id;
-        private Train train;
+        private TrainLine trainLine;
         private Station station;
         private boolean canceledDeparture;
         private boolean canceledArrival;
@@ -361,7 +368,7 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
         public Builder(LineStop lineStop, boolean copyPrevious, boolean copyNext) {
             this.id = lineStop.id;
             this.date = lineStop.date;
-            this.train = lineStop.train;
+            this.trainLine = lineStop.trainLine;
             this.station = lineStop.station;
             this.arrivalTime = lineStop.arrivalTime;
             this.departureTime = lineStop.departureTime;
@@ -375,7 +382,7 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
                 backwardBuilder.previous = new Builder()
                         .id(previousLineStop.id)
                         .date(previousLineStop.date)
-                        .train(previousLineStop.train)
+                        .train(previousLineStop.trainLine)
                         .station(previousLineStop.station)
                         .arrivalTime(previousLineStop.arrivalTime)
                         .departureTime(previousLineStop.departureTime)
@@ -394,7 +401,7 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
                 forwardBuilder.next = new Builder()
                         .id(nextLineStop.id)
                         .date(nextLineStop.date)
-                        .train(nextLineStop.train)
+                        .train(nextLineStop.trainLine)
                         .station(nextLineStop.station)
                         .arrivalTime(nextLineStop.arrivalTime)
                         .departureTime(nextLineStop.departureTime)
@@ -427,30 +434,14 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
             }
         }
 
-        private static void validate(LineStop lineStop) throws IllegalArgumentException {
-            Set<ConstraintViolation<LineStop>> violations = validator.validate(lineStop);
-            if (!violations.isEmpty()) {
-                StringBuilder builder = new StringBuilder();
-
-                for (ConstraintViolation violation : violations) {
-                    builder.append("\n");
-                    builder.append(violation.getPropertyPath().toString());
-                    builder.append(' ');
-                    builder.append(violation.getMessage());
-                }
-
-                throw new IllegalArgumentException(builder.toString());
-            }
-        }
-
         public Builder id(Long id) {
             this.id = id;
 
             return this;
         }
 
-        public Builder train(Train train) {
-            this.train = train;
+        public Builder train(TrainLine trainLine) {
+            this.trainLine = trainLine;
 
             return this;
         }
@@ -534,10 +525,23 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
         }
 
         public LineStop build() {
+            return build(true);
+        }
+
+        public LineStop build(final boolean validate) {
+            LineStop result = doBuild();
+
+            if (validate) {
+                validate(doBuild());
+            }
+
+            return result;
+        }
+
+        public LineStop doBuild() {
             LineStop result;
 
             result = new LineStop(this);
-            validate(result);
 
             //-- Copy backward
             LineStop backwardLineStop = result;

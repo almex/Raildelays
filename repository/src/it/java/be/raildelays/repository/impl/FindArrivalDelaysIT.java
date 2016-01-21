@@ -3,7 +3,7 @@ package be.raildelays.repository.impl;
 import be.raildelays.delays.Delays;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.entities.TrainLine;
 import be.raildelays.repository.LineStopDao;
 import com.excilys.ebi.spring.dbunit.config.DBOperation;
 import com.excilys.ebi.spring.dbunit.test.DataSet;
@@ -98,8 +98,8 @@ public class FindArrivalDelaysIT extends AbstractIT {
 
     private static List<Integer> extractTrainIds(List<LineStop> lineStops) {
         return lineStops.stream()
-                .map(LineStop::getTrain)
-                .map(Train::getEnglishName)
+                .map(LineStop::getTrainLine)
+                .map(TrainLine::getEnglishName)
                 .map(Integer::parseInt)
                 .sorted()
                 .collect(Collectors.toList());

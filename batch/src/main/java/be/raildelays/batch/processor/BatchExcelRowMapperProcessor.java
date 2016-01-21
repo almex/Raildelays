@@ -158,10 +158,10 @@ public class BatchExcelRowMapperProcessor implements ItemProcessor<LineStop, Bat
                 .arrivalStation(lineStopTo.getStation())
                 .expectedDepartureTime(lineStopFrom.getDepartureTime().getExpectedTime())
                 .expectedArrivalTime(lineStopTo.getArrivalTime().getExpectedTime())
-                .expectedTrain1(lineStopFrom.getTrain())
+                .expectedTrain1(lineStopFrom.getTrainLine())
                 .effectiveDepartureTime(effectiveDepartureTime)
                 .effectiveArrivalTime(effectiveArrivalTime)
-                .effectiveTrain1(lineStopTo.getTrain())
+                .effectiveTrain1(lineStopTo.getTrainLine())
                 .delay(Delays.toMinutes(lineStopTo.getArrivalTime().getDelay()))
                 .canceled(lineStopFrom.isCanceled() || lineStopTo.isCanceled())
                 .build(false);

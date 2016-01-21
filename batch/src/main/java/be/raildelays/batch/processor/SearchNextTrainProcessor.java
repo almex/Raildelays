@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Search next train which allow you to arrive earlier to your destination.
+ * Search next trainLine which allow you to arrive earlier to your destination.
  * This processor take into account delays from your departure station and
  * cancellation.
  *
@@ -119,10 +119,10 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
         return new BatchExcelRow.Builder(item.getDate(), item.getSens())
                 .arrivalStation(item.getArrivalStation())
                 .departureStation(item.getDepartureStation())
-                .expectedTrain1(item.getExpectedTrain1())
-                .expectedTrain2(item.getExpectedTrain2())
-                .effectiveTrain1(fasterItem.getEffectiveTrain1())
-                .effectiveTrain2(fasterItem.getEffectiveTrain2())
+                .expectedTrain1(item.getExpectedTrainLine1())
+                .expectedTrain2(item.getExpectedTrainLine2())
+                .effectiveTrain1(fasterItem.getEffectiveTrainLine1())
+                .effectiveTrain2(fasterItem.getEffectiveTrainLine2())
                 .expectedDepartureTime(item.getExpectedDepartureTime())
                 .expectedArrivalTime(item.getExpectedArrivalTime())
                 .effectiveDepartureTime(fasterItem.getEffectiveDepartureTime())
@@ -136,7 +136,7 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
 
 		/*
          * The only delay that we can take into account is the one from the
-		 * departure station. When you have to decide to take another train
+		 * departure station. When you have to decide to take another trainLine
 		 * you don't know the effective arrival time.
 		 */
         for (LineStop candidateArrival : candidates) {
@@ -152,7 +152,7 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
 
             /*
              * Normally we don't need to go recursively into each LineStop of the chain to check cancellation.
-             * If our start point is not canceled and than our stop is ever then we can take this train.
+             * If our start point is not canceled and than our stop is ever then we can take this trainLine.
              * No matter if in between some stop are canceled.
              */
             if (candidateDeparture.isCanceledDeparture()) {

@@ -26,7 +26,7 @@ package be.raildelays.batch.bean;
 
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.entities.TrainLine;
 import be.raildelays.domain.xls.ExcelRow;
 import org.springframework.batch.item.IndexedItem;
 import org.springframework.batch.item.ItemCountAware;
@@ -130,14 +130,14 @@ public class BatchExcelRow extends ExcelRow<BatchExcelRow> implements IndexedIte
         }
 
         @Override
-        public Builder expectedTrain1(final Train expectedTrain1) {
-            super.expectedTrain1(expectedTrain1);
+        public Builder expectedTrain1(final TrainLine expectedTrainLine1) {
+            super.expectedTrain1(expectedTrainLine1);
             return this;
         }
 
         @Override
-        public Builder expectedTrain2(final Train expectedTrain2) {
-            super.expectedTrain2(expectedTrain2);
+        public Builder expectedTrain2(final TrainLine expectedTrainLine2) {
+            super.expectedTrain2(expectedTrainLine2);
             return this;
         }
 
@@ -156,13 +156,13 @@ public class BatchExcelRow extends ExcelRow<BatchExcelRow> implements IndexedIte
         }
 
         @Override
-        public Builder effectiveTrain1(final Train effectiveTrain1) {
-            super.effectiveTrain1(effectiveTrain1);
+        public Builder effectiveTrain1(final TrainLine effectiveTrainLine1) {
+            super.effectiveTrain1(effectiveTrainLine1);
             return this;
         }
 
-        public Builder effectiveTrain2(final Train effectiveTrain2) {
-            super.effectiveTrain2(effectiveTrain2);
+        public Builder effectiveTrain2(final TrainLine effectiveTrainLine2) {
+            super.effectiveTrain2(effectiveTrainLine2);
             return this;
         }
 

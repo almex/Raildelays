@@ -3,7 +3,7 @@ package be.raildelays.batch.processor;
 import be.raildelays.delays.TimeDelay;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.entities.TrainLine;
 import be.raildelays.repository.LineStopDao;
 import org.easymock.*;
 import org.junit.Assert;
@@ -20,7 +20,7 @@ import java.time.LocalTime;
 @RunWith(BlockJUnit4ClassRunner.class)
 public class AggregateExpectedTimeProcessorTest extends EasyMockSupport {
 
-    public static final Train TRAIN = new Train("0");
+    public static final TrainLine TRAIN_LINE = new TrainLine("0");
     private static final LocalDate TODAY = LocalDate.now();
     private static final Station DEPARTURE_STATION = new Station("Liège-Guillemins");
     private static final Station INTERMEDIATE_STATION = new Station("Bruxelles-Nord");
@@ -41,14 +41,14 @@ public class AggregateExpectedTimeProcessorTest extends EasyMockSupport {
         item = new LineStop
                 .Builder()
                 .date(TODAY)
-                .train(TRAIN)
+                .train(TRAIN_LINE)
                 .station(INTERMEDIATE_STATION)
                 .arrivalTime(TimeDelay.of(LocalTime.parse("18:20"), 0L))
                 .departureTime(TimeDelay.of(LocalTime.parse("18:20"), 0L))
                 .addNext(new LineStop
                                 .Builder()
                                 .date(TODAY)
-                                .train(TRAIN)
+                                .train(TRAIN_LINE)
                                 .station(ARRIVAL_STATION)
                                 .arrivalTime(TimeDelay.of(null, 0L))
                                 .departureTime(TimeDelay.of(null, 0L))
@@ -57,7 +57,7 @@ public class AggregateExpectedTimeProcessorTest extends EasyMockSupport {
                 .addPrevious(new LineStop
                                 .Builder()
                                 .date(TODAY)
-                                .train(TRAIN)
+                                .train(TRAIN_LINE)
                                 .station(DEPARTURE_STATION)
                                 .arrivalTime(TimeDelay.of(null, 0L))
                                 .departureTime(TimeDelay.of(null, 0L))
@@ -67,7 +67,7 @@ public class AggregateExpectedTimeProcessorTest extends EasyMockSupport {
         expected = new LineStop
                 .Builder()
                 .date(TODAY)
-                .train(TRAIN)
+                .train(TRAIN_LINE)
                 .station(INTERMEDIATE_STATION)
                 .arrivalTime(TimeDelay.of(LocalTime.parse("18:20"), 0L))
                 .departureTime(TimeDelay.of(LocalTime.parse("18:21"), 0L))
@@ -76,7 +76,7 @@ public class AggregateExpectedTimeProcessorTest extends EasyMockSupport {
                 .addNext(new LineStop
                                 .Builder()
                                 .date(TODAY)
-                                .train(new Train("1")).station(ARRIVAL_STATION)
+                                .train(new TrainLine("1")).station(ARRIVAL_STATION)
                                 .arrivalTime(TimeDelay.of(LocalTime.parse("18:30"), 0L))
                                 .departureTime(TimeDelay.of(LocalTime.parse("18:31"), 0L))
                                 .canceledDeparture(true)
@@ -85,7 +85,7 @@ public class AggregateExpectedTimeProcessorTest extends EasyMockSupport {
                 .addPrevious(new LineStop
                                 .Builder()
                                 .date(TODAY)
-                                .train(new Train("1")).station(DEPARTURE_STATION)
+                                .train(new TrainLine("1")).station(DEPARTURE_STATION)
                                 .arrivalTime(TimeDelay.of(LocalTime.parse("17:00"), 0L))
                                 .departureTime(TimeDelay.of(LocalTime.parse("17:01"), 0L))
                                 .canceledDeparture(true)
@@ -100,11 +100,11 @@ public class AggregateExpectedTimeProcessorTest extends EasyMockSupport {
 
     @Test
     public void testProcess() throws Exception {
-        EasyMock.expect(lineStopDao.findFistScheduledLine(TRAIN, DEPARTURE_STATION))
+        EasyMock.expect(lineStopDao.findFistScheduledLine(TRAIN_LINE, DEPARTURE_STATION))
                 .andReturn(expected.getPrevious());
-        EasyMock.expect(lineStopDao.findFistScheduledLine(TRAIN, INTERMEDIATE_STATION))
+        EasyMock.expect(lineStopDao.findFistScheduledLine(TRAIN_LINE, INTERMEDIATE_STATION))
                 .andReturn(expected);
-        EasyMock.expect(lineStopDao.findFistScheduledLine(TRAIN, ARRIVAL_STATION))
+        EasyMock.expect(lineStopDao.findFistScheduledLine(TRAIN_LINE, ARRIVAL_STATION))
                 .andReturn(expected.getNext());
 
         replayAll();
@@ -125,11 +125,11 @@ public class AggregateExpectedTimeProcessorTest extends EasyMockSupport {
 
     @Test
     public void testProcessNoCandidate() throws Exception {
-        EasyMock.expect(lineStopDao.findFistScheduledLine(TRAIN, DEPARTURE_STATION))
+        EasyMock.expect(lineStopDao.findFistScheduledLine(TRAIN_LINE, DEPARTURE_STATION))
                 .andReturn(null);
-        EasyMock.expect(lineStopDao.findFistScheduledLine(TRAIN, INTERMEDIATE_STATION))
+        EasyMock.expect(lineStopDao.findFistScheduledLine(TRAIN_LINE, INTERMEDIATE_STATION))
                 .andReturn(null);
-        EasyMock.expect(lineStopDao.findFistScheduledLine(TRAIN, ARRIVAL_STATION))
+        EasyMock.expect(lineStopDao.findFistScheduledLine(TRAIN_LINE, ARRIVAL_STATION))
                 .andReturn(null);
 
         replayAll();

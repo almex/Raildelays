@@ -1,15 +1,15 @@
 package be.raildelays.location;
 
+import be.raildelays.scheduling.Stop;
+
 /**
  * @author Almex
- * @since 4.0
+ * @since 2.0
  */
-public interface Route {
+public interface Route<T extends Stop> {
 
-    Location getDEparture();
+    T getDeparture();
 
-    Location getDestination();
-
-
+    T getDestination();
 
 }

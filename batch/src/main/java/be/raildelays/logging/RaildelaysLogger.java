@@ -30,6 +30,7 @@ import be.raildelays.delays.TimeDelay;
 import be.raildelays.domain.dto.RouteLogDTO;
 import be.raildelays.domain.dto.ServedStopDTO;
 import be.raildelays.domain.entities.LineStop;
+import be.raildelays.domain.entities.TrainLine;
 import be.raildelays.domain.railtime.Direction;
 import be.raildelays.domain.railtime.Step;
 import be.raildelays.domain.railtime.Train;
@@ -133,7 +134,7 @@ public class RaildelaysLogger implements Logger {
                     .message(message)
                     .id(object.getId())
                     .date(object.getDate())
-                    .expectedTrain(getTrainId(object.getTrain()))
+                    .expectedTrain(getTrainId(object.getTrainLine()))
                     .departureStation(getStationName(object.getStation()))
                     .expectedDepartureTime(object.getArrivalTime() != null ? object.getArrivalTime().getExpectedTime() : null)
                     .expectedArrivalTime(object.getDepartureTime() != null ? object.getDepartureTime().getExpectedTime() : null)
@@ -153,8 +154,8 @@ public class RaildelaysLogger implements Logger {
                     .message(message)
                     .id(object.getId())
                     .date(object.getDate())
-                    .expectedTrain(getTrainId(object.getExpectedTrain1()))
-                    .effectiveTrain(getTrainId(object.getEffectiveTrain1()))
+                    .expectedTrain(getTrainId(object.getExpectedTrainLine1()))
+                    .effectiveTrain(getTrainId(object.getEffectiveTrainLine1()))
                     .departureStation(getStationName(object.getDepartureStation()))
                     .arrivalStation(getStationName(object.getArrivalStation()))
                     .expectedDepartureTime(object.getExpectedDepartureTime())
@@ -171,8 +172,8 @@ public class RaildelaysLogger implements Logger {
                     .message(message)
                     .id(object.getId())
                     .date(object.getDate())
-                    .expectedTrain(getTrainId(object.getExpectedTrain1()))
-                    .effectiveTrain(getTrainId(object.getEffectiveTrain1()))
+                    .expectedTrain(getTrainId(object.getExpectedTrainLine1()))
+                    .effectiveTrain(getTrainId(object.getEffectiveTrainLine1()))
                     .departureStation(getStationName(object.getDepartureStation()))
                     .arrivalStation(getStationName(object.getArrivalStation()))
                     .expectedDepartureTime(object.getExpectedDepartureTime())
@@ -229,17 +230,17 @@ public class RaildelaysLogger implements Logger {
         this.marker = marker;
     }
 
-    private static Long getTrainId(be.raildelays.domain.entities.Train train) {
+    private static Long getTrainId(TrainLine trainLine) {
         Long result = null;
 
-        if (train != null) {
+        if (trainLine != null) {
             try {
-                if (StringUtils.isNotBlank(train.getEnglishName())) {
-                    result = Long.parseLong(train.getEnglishName());
-                } else if (StringUtils.isNotBlank(train.getFrenchName())) {
-                    result = Long.parseLong(train.getFrenchName());
-                } else if (StringUtils.isNotBlank(train.getDutchName())) {
-                    result = Long.parseLong(train.getDutchName());
+                if (StringUtils.isNotBlank(trainLine.getEnglishName())) {
+                    result = Long.parseLong(trainLine.getEnglishName());
+                } else if (StringUtils.isNotBlank(trainLine.getFrenchName())) {
+                    result = Long.parseLong(trainLine.getFrenchName());
+                } else if (StringUtils.isNotBlank(trainLine.getDutchName())) {
+                    result = Long.parseLong(trainLine.getDutchName());
                 }
             } catch (NumberFormatException e) {
                 result = 0L;

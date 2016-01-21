@@ -26,7 +26,7 @@ package be.raildelays.repository;
 
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.entities.TrainLine;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -97,12 +97,12 @@ public interface LineStopDaoCustom {
 
     /**
      * Return the first {@link be.raildelays.domain.entities.LineStop } for a certain
-     * {@link be.raildelays.domain.entities.Train} at a certain {@link be.raildelays.domain.entities.Station}.
+     * {@link TrainLine} at a certain {@link be.raildelays.domain.entities.Station}.
      *
-     * @param train   which stop the the <code>station</code>
+     * @param trainLine   which stop the the <code>station</code>
      * @param station representing the stop of the line
      * @return the first line stop from a list ascending ordered by expectedTime arrival time
      */
-    LineStop findFistScheduledLine(Train train, Station station);
+    LineStop findFistScheduledLine(TrainLine trainLine, Station station);
 
 }

@@ -15,7 +15,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Test validation of Train bean.
+ * Test validation of TrainLine bean.
  *
  * @author Almex
  */
@@ -34,14 +34,14 @@ public class TrainIT {
     public void testEmptyId() {
         Set<ConstraintViolation<Train>> constraintViolations = validator.validate(new Train(""));
 
-        assertFalse("A train with an empty id should not be valid", constraintViolations.size() == 0);
+        assertFalse("A trainLine with an empty id should not be valid", constraintViolations.size() == 0);
     }
 
     @Test
     public void testValidId() {
         Set<ConstraintViolation<Train>> constraintViolations = validator.validate(new Train("IC466"));
 
-        assertTrue("This train id should be valid", constraintViolations.size() == 0);
+        assertTrue("This trainLine id should be valid", constraintViolations.size() == 0);
     }
 
 
@@ -49,7 +49,7 @@ public class TrainIT {
     public void testInvalidId() {
         Set<ConstraintViolation<Train>> constraintViolations = validator.validate(new Train("IC46600"));
 
-        assertTrue("This train id should be invalid", constraintViolations.size() == 0);
+        assertTrue("This trainLine id should be invalid", constraintViolations.size() == 0);
     }
 
 }

@@ -7,7 +7,7 @@ import be.raildelays.batch.writer.ExcelRowAggregator;
 import be.raildelays.batch.writer.MultiExcelFileToWriteLocator;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.entities.TrainLine;
 import be.raildelays.domain.xls.ExcelRow;
 import org.junit.After;
 import org.junit.Assert;
@@ -90,10 +90,10 @@ public class SortedItemStreamWriterTest2 extends AbstractFileTest {
                 .arrivalStation(new Station("Bruxelles-central")) //
                 .expectedDepartureTime(LocalTime.parse("08:00")) //
                 .expectedArrivalTime(LocalTime.parse("09:00")) //
-                .expectedTrain1(new Train("466")) //
+                .expectedTrain1(new TrainLine("466")) //
                 .effectiveDepartureTime(LocalTime.parse("08:05")) //
                 .effectiveArrivalTime(LocalTime.parse("09:15")) //
-                .effectiveTrain1(new Train("466")) //
+                .effectiveTrain1(new TrainLine("466")) //
                 .delay(15L) //
                 .build();
         BatchExcelRow to = new BatchExcelRow.Builder(LocalDate.parse("2014-05-23"), Sens.ARRIVAL) //
@@ -101,10 +101,10 @@ public class SortedItemStreamWriterTest2 extends AbstractFileTest {
                 .arrivalStation(new Station("Liège-Guillemins")) //
                 .expectedDepartureTime(LocalTime.parse("14:00")) //
                 .expectedArrivalTime(LocalTime.parse("15:00")) //
-                .expectedTrain1(new Train("529")) //
+                .expectedTrain1(new TrainLine("529")) //
                 .effectiveDepartureTime(LocalTime.parse("14:05")) //
                 .effectiveArrivalTime(LocalTime.parse("15:15")) //
-                .effectiveTrain1(new Train("529")) //
+                .effectiveTrain1(new TrainLine("529")) //
                 .delay(15L) //
                 .build();
         BatchExcelRow replace = new BatchExcelRow.Builder(LocalDate.parse("2014-05-22"), Sens.DEPARTURE) //
@@ -112,10 +112,10 @@ public class SortedItemStreamWriterTest2 extends AbstractFileTest {
                 .arrivalStation(new Station("Bruxelles-central")) //
                 .expectedDepartureTime(LocalTime.parse("14:00")) //
                 .expectedArrivalTime(LocalTime.parse("15:00")) //
-                .expectedTrain1(new Train("516")) //
+                .expectedTrain1(new TrainLine("516")) //
                 .effectiveDepartureTime(LocalTime.parse("14:05")) //
                 .effectiveArrivalTime(LocalTime.parse("15:25")) //
-                .effectiveTrain1(new Train("516")) //
+                .effectiveTrain1(new TrainLine("516")) //
                 .delay(25L) //
                 .index(1L) //
                 .build();

@@ -28,7 +28,7 @@ import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.batch.reader.BatchExcelRowMapper;
 import be.raildelays.domain.Language;
 import be.raildelays.domain.entities.Station;
-import be.raildelays.domain.entities.Train;
+import be.raildelays.domain.entities.TrainLine;
 import be.raildelays.domain.xls.ExcelRow;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
@@ -105,11 +105,11 @@ public class ExcelRowAggregator implements RowAggregator<ExcelRow> {
         return result;
     }
 
-    private static String getTrainName(Train train, Language lang) {
+    private static String getTrainName(TrainLine trainLine, Language lang) {
         String result = null;
 
-        if (train != null) {
-            result = train.getName(lang);
+        if (trainLine != null) {
+            result = trainLine.getName(lang);
         }
 
         return result;
@@ -140,14 +140,14 @@ public class ExcelRowAggregator implements RowAggregator<ExcelRow> {
             setMMFormat(row, 32, item.getExpectedDepartureTime());
             setHHFormat(row, 33, item.getExpectedArrivalTime());
             setMMFormat(row, 35, item.getExpectedArrivalTime());
-            setNumericFormat(row, 36, getTrainName(item.getExpectedTrain1(), lang));
-            setNumericFormat(row, 39, getTrainName(item.getExpectedTrain2(), lang));
+            setNumericFormat(row, 36, getTrainName(item.getExpectedTrainLine1(), lang));
+            setNumericFormat(row, 39, getTrainName(item.getExpectedTrainLine2(), lang));
             setHHFormat(row, 42, item.getEffectiveDepartureTime());
             setMMFormat(row, 44, item.getEffectiveDepartureTime());
             setHHFormat(row, 45, item.getEffectiveArrivalTime());
             setMMFormat(row, 47, item.getEffectiveArrivalTime());
-            setNumericFormat(row, 48, getTrainName(item.getEffectiveTrain1(), lang));
-            setNumericFormat(row, 51, getTrainName(item.getEffectiveTrain2(), lang));
+            setNumericFormat(row, 48, getTrainName(item.getEffectiveTrainLine1(), lang));
+            setNumericFormat(row, 51, getTrainName(item.getEffectiveTrainLine2(), lang));
             evaluateFormula(workbook, row, 56);
             evaluateFormula(workbook, row, 55);
             evaluateFormula(workbook, row, 54);
