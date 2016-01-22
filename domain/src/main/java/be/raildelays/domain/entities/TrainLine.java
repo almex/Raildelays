@@ -218,6 +218,6 @@ public class TrainLine extends AbstractEntity implements Train, Route<LineStop>,
 
     @Override
     public String getName() {
-        return getShortName();
+        return "" + getRouteId();
     }
 }

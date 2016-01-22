@@ -113,7 +113,9 @@ public class LineStopMapperProcessor implements ItemProcessor<TwoDirections, Lin
 
     private LineStop buildLineStop(Language lang, Direction direction, Step arrivalStep, Step departureStep) {
         LineStop result;
-        TrainLine trainLine = mergeTrain(new TrainLine(direction.getTrain().getIdRailtime(), lang));
+        TrainLine trainLine = mergeTrain(new TrainLine.Builder(
+                Long.parseLong(direction.getTrain().getIdRailtime())
+        ).build());
         Station station = mergeStation(new Station(arrivalStep.getStation().getName(), lang));
         TimeDelay arrivalTime = getTimeDelay(arrivalStep.getDateTime(), arrivalStep.getDelay());
         TimeDelay departureTime = getTimeDelay(departureStep.getDateTime(), departureStep.getDelay());
@@ -140,12 +142,8 @@ public class LineStopMapperProcessor implements ItemProcessor<TwoDirections, Lin
     private TrainLine mergeTrain(TrainLine trainLine) {
         TrainLine result = null;
 
-        if (StringUtils.isNotBlank(trainLine.getEnglishName())) {
-            result = trainDao.findByEnglishName(trainLine.getEnglishName());
-        } else if (StringUtils.isNotBlank(trainLine.getFrenchName())) {
-            result = trainDao.findByFrenchName(trainLine.getFrenchName());
-        } else if (StringUtils.isNotBlank(trainLine.getDutchName())) {
-            result = trainDao.findByDutchName(trainLine.getDutchName());
+        if (trainLine.getRouteId() != null) {
+            result = trainDao.findByRouteId(trainLine.getRouteId());
         }
 
         if (result == null) {

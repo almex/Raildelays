@@ -137,12 +137,11 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
 
 
     private TrainLine getTrain(Row row, int cellIndex) {
-        NumberFormat numberFormat = new DecimalFormat("#");
         TrainLine result = null;
 
         Long trainId = getLong(row, cellIndex);
         if (trainId != null) {
-            result = new TrainLine(numberFormat.format(trainId), getLanguage());
+            result = new TrainLine.Builder(trainId).build();
         }
 
         return result;

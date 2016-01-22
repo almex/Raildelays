@@ -96,11 +96,10 @@ public class FindArrivalDelaysIT extends AbstractIT {
         );
     }
 
-    private static List<Integer> extractTrainIds(List<LineStop> lineStops) {
+    private static List<Long> extractTrainIds(List<LineStop> lineStops) {
         return lineStops.stream()
                 .map(LineStop::getTrainLine)
-                .map(TrainLine::getEnglishName)
-                .map(Integer::parseInt)
+                .map(TrainLine::getRouteId)
                 .sorted()
                 .collect(Collectors.toList());
     }

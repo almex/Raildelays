@@ -81,17 +81,10 @@ public class LineStopSpecifications {
 
         return (root, query, builder) -> {
             Predicate predicate = null;
-            Path<TrainLine> path = root.get(LineStop_.train);
+            Path<TrainLine> path = root.get(LineStop_.trainLine);
 
-            if (StringUtils.isNotBlank(trainLine.getEnglishName())) {
-                predicate = builder.and(builder.equal(builder.upper(path.get(Train_.englishName)),
-                        trainLine.getEnglishName().toUpperCase(Locale.ENGLISH)));
-            } else if (StringUtils.isNotBlank(trainLine.getFrenchName())) {
-                predicate = builder.and(builder.equal(builder.upper(path.get(Train_.frenchName)),
-                        trainLine.getFrenchName().toUpperCase(Locale.ENGLISH)));
-            } else if (StringUtils.isNotBlank(trainLine.getDutchName())) {
-                predicate = builder.and(builder.equal(builder.upper(path.get(Train_.dutchName)),
-                        trainLine.getDutchName().toUpperCase(Locale.ENGLISH)));
+            if (trainLine.getRouteId() != null) {
+                predicate = builder.and(builder.equal(path.get(TrainLine_.routeId), trainLine.getRouteId()));
             }
 
             return predicate;

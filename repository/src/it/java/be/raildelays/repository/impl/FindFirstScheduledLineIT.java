@@ -22,14 +22,14 @@ public class FindFirstScheduledLineIT extends AbstractIT {
 
     @Test
     public void testFound() throws ParseException {
-        LineStop result = lineStopDao.findFistScheduledLine(new TrainLine("466"), new Station("Bruxelles-Central"));
+        LineStop result = lineStopDao.findFistScheduledLine(new TrainLine.Builder(466L).build(), new Station("Bruxelles-Central"));
 
         Assert.assertEquals(LocalDate.of(2000, 1, 1), result.getDate());
     }
 
     @Test
     public void testNotFound() throws ParseException {
-        LineStop result = lineStopDao.findFistScheduledLine(new TrainLine("555"), new Station("Bruxelles-Central"));
+        LineStop result = lineStopDao.findFistScheduledLine(new TrainLine.Builder(555L).build(), new Station("Bruxelles-Central"));
 
         Assert.assertNull(result);
     }

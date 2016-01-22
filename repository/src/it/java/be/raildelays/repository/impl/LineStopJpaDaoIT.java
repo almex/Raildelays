@@ -28,7 +28,7 @@ public class LineStopJpaDaoIT extends AbstractIT {
         assertNotNull(
                 "Creation should return a result",
                 lineStopDao.save(new LineStop.Builder().date(LocalDate.now())
-                        .train(new TrainLine("466"))
+                        .train(new TrainLine.Builder(466L).build())
                         .station(new Station("Liège-Guillemins"))
                         .arrivalTime(TimeDelay.now())
                         .departureTime(TimeDelay.now())
@@ -40,7 +40,7 @@ public class LineStopJpaDaoIT extends AbstractIT {
     @Test
     public void testFindByTrainAndDate() {
         LocalDate date = LocalDate.now();
-        TrainLine trainLine = trainDao.saveAndFlush(new TrainLine("466"));
+        TrainLine trainLine = trainDao.saveAndFlush(new TrainLine.Builder(466L).build());
         LineStop expectedLineStop = lineStopDao.save(new LineStop.Builder().date(date)
                 .train(trainLine)
                 .station(new Station("Liège-Guillemins"))
@@ -58,7 +58,7 @@ public class LineStopJpaDaoIT extends AbstractIT {
     @Test
     public void testFindByTrainIdAndDate() {
         LocalDate date = LocalDate.now();
-        TrainLine trainLine = trainDao.saveAndFlush(new TrainLine("466"));
+        TrainLine trainLine = trainDao.saveAndFlush(new TrainLine.Builder(466L).build());
         LineStop expectedLineStop = lineStopDao.save(new LineStop.Builder().date(date)
                 .train(trainLine)
                 .station(new Station("Liège-Guillemins"))

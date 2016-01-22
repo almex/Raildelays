@@ -80,7 +80,7 @@ class DelaysStreamParserV2 implements StreamParser<LineStop, DelaysRequestV2> {
                 LineStop.Builder builder = new LineStop.Builder();
 
                 builder.date(request.day)
-                        .train(getTrain(object, request.language))
+                        .train(getTrain(object))
                         .station(getStation(object, request.language))
                         .departureTime(getDepartureTime(object))
                         .arrivalTime(getArrivalTime(object))
@@ -128,7 +128,7 @@ class DelaysStreamParserV2 implements StreamParser<LineStop, DelaysRequestV2> {
         return result;
     }
 
-    private static TrainLine getTrain(Map object, Language language) {
+    private static TrainLine getTrain(Map object) {
         TrainLine result = null;
 
         if (object.tNr != null) {

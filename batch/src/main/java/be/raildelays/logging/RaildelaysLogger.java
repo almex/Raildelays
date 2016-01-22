@@ -235,12 +235,8 @@ public class RaildelaysLogger implements Logger {
 
         if (trainLine != null) {
             try {
-                if (StringUtils.isNotBlank(trainLine.getEnglishName())) {
-                    result = Long.parseLong(trainLine.getEnglishName());
-                } else if (StringUtils.isNotBlank(trainLine.getFrenchName())) {
-                    result = Long.parseLong(trainLine.getFrenchName());
-                } else if (StringUtils.isNotBlank(trainLine.getDutchName())) {
-                    result = Long.parseLong(trainLine.getDutchName());
+                if (trainLine.getRouteId() != null) {
+                    result = trainLine.getRouteId();
                 }
             } catch (NumberFormatException e) {
                 result = 0L;

@@ -105,11 +105,11 @@ public class ExcelRowAggregator implements RowAggregator<ExcelRow> {
         return result;
     }
 
-    private static String getTrainName(TrainLine trainLine, Language lang) {
+    private static String getTrainName(TrainLine trainLine) {
         String result = null;
 
         if (trainLine != null) {
-            result = trainLine.getName(lang);
+            result = trainLine.getName();
         }
 
         return result;
@@ -140,14 +140,14 @@ public class ExcelRowAggregator implements RowAggregator<ExcelRow> {
             setMMFormat(row, 32, item.getExpectedDepartureTime());
             setHHFormat(row, 33, item.getExpectedArrivalTime());
             setMMFormat(row, 35, item.getExpectedArrivalTime());
-            setNumericFormat(row, 36, getTrainName(item.getExpectedTrainLine1(), lang));
-            setNumericFormat(row, 39, getTrainName(item.getExpectedTrainLine2(), lang));
+            setNumericFormat(row, 36, getTrainName(item.getExpectedTrainLine1()));
+            setNumericFormat(row, 39, getTrainName(item.getExpectedTrainLine2()));
             setHHFormat(row, 42, item.getEffectiveDepartureTime());
             setMMFormat(row, 44, item.getEffectiveDepartureTime());
             setHHFormat(row, 45, item.getEffectiveArrivalTime());
             setMMFormat(row, 47, item.getEffectiveArrivalTime());
-            setNumericFormat(row, 48, getTrainName(item.getEffectiveTrainLine1(), lang));
-            setNumericFormat(row, 51, getTrainName(item.getEffectiveTrainLine2(), lang));
+            setNumericFormat(row, 48, getTrainName(item.getEffectiveTrainLine1()));
+            setNumericFormat(row, 51, getTrainName(item.getEffectiveTrainLine2()));
             evaluateFormula(workbook, row, 56);
             evaluateFormula(workbook, row, 55);
             evaluateFormula(workbook, row, 54);

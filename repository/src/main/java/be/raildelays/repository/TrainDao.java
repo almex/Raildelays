@@ -35,32 +35,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface TrainDao extends JpaRepository<TrainLine, Long> {
 
     /**
-     * Search for a TrainLine by its English name.
+     * Search for a TrainLine by its route it (coming from GTFS data).
      *
-     * @param name     strict name that should match to find a TrainLine.
-     * @param language in which you want to do the search.
+     * @param routeId     strict name that should match to find a TrainLine.
      * @return a {@link TrainLine}
      */
-    public TrainLine findByEnglishName(String englishName);
-
-
-    /**
-     * Search for a TrainLine by its French name.
-     *
-     * @param name     strict name that should match to find a TrainLine.
-     * @param language in which you want to do the search.
-     * @return a {@link TrainLine}
-     */
-    public TrainLine findByFrenchName(String frenchName);
-
-
-    /**
-     * Search for a TrainLine by its Dutch name.
-     *
-     * @param name     strict name that should match to find a TrainLine.
-     * @param language in which you want to do the search.
-     * @return a {@link TrainLine}
-     */
-    public TrainLine findByDutchName(String dutchName);
+    public TrainLine findByRouteId(Long routeId);
 
 }
