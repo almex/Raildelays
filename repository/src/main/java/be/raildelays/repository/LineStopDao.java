@@ -49,7 +49,7 @@ public interface LineStopDao extends JpaRepository<LineStop, Long>, LineStopDaoC
      * @param date  day of the year for which you do the search
      * @return a list of line stop
      */
-    LineStop findByTrainAndDateAndStation(TrainLine trainLine, LocalDate date, Station station);
+    LineStop findByTrainLineAndDateAndStation(TrainLine trainLine, LocalDate date, Station station);
 
     /**
      * Search a list of line stops that belong to a trainLine for a certain day.
@@ -62,7 +62,7 @@ public interface LineStopDao extends JpaRepository<LineStop, Long>, LineStopDaoC
             + "FROM LineStop o "
             + "WHERE o.date = :date "
             + "AND o.trainLine.id = :trainId ")
-    LineStop findByTrainIdAndDate(@Param("trainId") Long trainId, @Param("date") LocalDate date);
+    LineStop findByTrainLineIdAndDate(@Param("trainId") Long trainId, @Param("date") LocalDate date);
 
 
     /**
@@ -72,7 +72,7 @@ public interface LineStopDao extends JpaRepository<LineStop, Long>, LineStopDaoC
      * @param date  day of the year for which you do the search
      * @return a list of line stop
      */
-    List<LineStop> findByTrainAndDate(TrainLine trainLine, LocalDate date);
+    List<LineStop> findByTrainLineAndDate(TrainLine trainLine, LocalDate date);
 
     /**
      * Search all dates containing a line stop already stored in the database.

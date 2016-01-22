@@ -49,7 +49,7 @@ public class LineStopJpaDaoIT extends AbstractIT {
                 .canceledArrival(false)
                 .canceledDeparture(false)
                 .build());
-        List<LineStop> lineStops = lineStopDao.findByTrainAndDate(trainLine, date);
+        List<LineStop> lineStops = lineStopDao.findByTrainLineAndDate(trainLine, date);
 
         assertEquals("You should have a certain number of results.", 1, lineStops.size());
         assertEquals("You should have the same result as expectedTime.", expectedLineStop, lineStops.get(0));
@@ -67,7 +67,7 @@ public class LineStopJpaDaoIT extends AbstractIT {
                 .canceledArrival(false)
                 .canceledDeparture(false)
                 .build());
-        LineStop lineStop = lineStopDao.findByTrainIdAndDate(expectedLineStop.getTrainLine().getId(), date);
+        LineStop lineStop = lineStopDao.findByTrainLineIdAndDate(expectedLineStop.getTrainLine().getId(), date);
 
         assertEquals("You should have the same result as expectedTime.", expectedLineStop, lineStop);
     }

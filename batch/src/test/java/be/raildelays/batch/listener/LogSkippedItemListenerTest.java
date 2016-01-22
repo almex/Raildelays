@@ -150,7 +150,7 @@ public class LogSkippedItemListenerTest {
                         .Builder()
                         .date(LocalDate.now())
                         .station(new Station("foo"))
-                        .train(new TrainLine("bar"))
+                        .train(new TrainLine.Builder(466L).build())
                         .departureTime(TimeDelay.of(LocalTime.parse("15:00")))
                         .arrivalTime(TimeDelay.of(LocalTime.parse("16:00")))
                         .build(),
@@ -223,7 +223,7 @@ public class LogSkippedItemListenerTest {
                         .Builder()
                         .date(LocalDate.now())
                         .station(new Station("foo"))
-                        .train(new TrainLine("bar"))
+                        .train(new TrainLine.Builder(466L).build())
                         .departureTime(TimeDelay.of(LocalTime.parse("15:00")))
                         .arrivalTime(TimeDelay.of(LocalTime.parse("16:00")))
                         .build(),

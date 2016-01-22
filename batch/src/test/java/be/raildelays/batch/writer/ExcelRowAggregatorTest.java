@@ -26,8 +26,8 @@ public class ExcelRowAggregatorTest {
 
 
     public static final long DELAY = 10L;
-    public static final String TRAIN1 = "466";
-    public static final String TRAIN2 = "516";
+    public static final Long TRAIN1 = 466L;
+    public static final Long TRAIN2 = 516L;
     public static final String SHEET_NAME = "new sheet";
     public static final int SHEET_INDEX = 0;
     public static final int ROW_INDEX = 0;
@@ -52,12 +52,12 @@ public class ExcelRowAggregatorTest {
                 .arrivalStation(new Station("LIEGE-GUILLEMINS")) //
                 .expectedDepartureTime(LocalTime.parse("14:00")) //
                 .expectedArrivalTime(LocalTime.parse("15:00")) //
-                .expectedTrain1(new TrainLine(TRAIN1)) //
-                .expectedTrain2(new TrainLine(TRAIN2)) //
+                .expectedTrain1(new TrainLine.Builder(TRAIN1).build()) //
+                .expectedTrain2(new TrainLine.Builder(TRAIN2).build()) //
                 .effectiveDepartureTime(LocalTime.parse("14:05")) //
                 .effectiveArrivalTime(LocalTime.parse("15:15")) //
-                .effectiveTrain1(new TrainLine(TRAIN1)) //
-                .effectiveTrain2(new TrainLine(TRAIN2)) //
+                .effectiveTrain1(new TrainLine.Builder(TRAIN1).build()) //
+                .effectiveTrain2(new TrainLine.Builder(TRAIN2).build()) //
                 .delay(DELAY) //
                 .build();
 
@@ -91,8 +91,8 @@ public class ExcelRowAggregatorTest {
 
         Row row = workbook.getSheetAt(SHEET_INDEX).getRow(ROW_INDEX);
         Assert.assertNotNull(row);
-        Assert.assertEquals(TRAIN1, row.getCell(36).getStringCellValue());
-        Assert.assertEquals(TRAIN1, row.getCell(48).getStringCellValue());
+        Assert.assertEquals(TRAIN1.toString(), row.getCell(36).getStringCellValue());
+        Assert.assertEquals(TRAIN1.toString(), row.getCell(48).getStringCellValue());
     }
 
     /**
@@ -109,8 +109,8 @@ public class ExcelRowAggregatorTest {
 
         Row row = workbook.getSheetAt(SHEET_INDEX).getRow(ROW_INDEX);
         Assert.assertNotNull(row);
-        Assert.assertEquals(TRAIN1, row.getCell(36).getStringCellValue());
-        Assert.assertEquals(TRAIN1, row.getCell(48).getStringCellValue());
+        Assert.assertEquals(TRAIN1.toString(), row.getCell(36).getStringCellValue());
+        Assert.assertEquals(TRAIN1.toString(), row.getCell(48).getStringCellValue());
     }
 
     /**
@@ -139,7 +139,7 @@ public class ExcelRowAggregatorTest {
     public void testInvalidNumericFormat() throws Exception {
         item = new BatchExcelRow
                 .Builder(LocalDate.now(), Sens.DEPARTURE)
-                .expectedTrain1(new TrainLine("foo"))
+                .expectedTrain1(new TrainLine.Builder(466L).build())
                 .build(false);
 
         row.createCell(36).setCellValue(1717);

@@ -20,7 +20,7 @@ import java.time.LocalTime;
 @RunWith(BlockJUnit4ClassRunner.class)
 public class AggregateExpectedTimeProcessorTest extends EasyMockSupport {
 
-    public static final TrainLine TRAIN_LINE = new TrainLine("0");
+    public static final TrainLine TRAIN_LINE = new TrainLine.Builder(0L).build();
     private static final LocalDate TODAY = LocalDate.now();
     private static final Station DEPARTURE_STATION = new Station("Liège-Guillemins");
     private static final Station INTERMEDIATE_STATION = new Station("Bruxelles-Nord");
@@ -76,7 +76,7 @@ public class AggregateExpectedTimeProcessorTest extends EasyMockSupport {
                 .addNext(new LineStop
                                 .Builder()
                                 .date(TODAY)
-                                .train(new TrainLine("1")).station(ARRIVAL_STATION)
+                        .train(new TrainLine.Builder(1L).build()).station(ARRIVAL_STATION)
                                 .arrivalTime(TimeDelay.of(LocalTime.parse("18:30"), 0L))
                                 .departureTime(TimeDelay.of(LocalTime.parse("18:31"), 0L))
                                 .canceledDeparture(true)
@@ -85,7 +85,7 @@ public class AggregateExpectedTimeProcessorTest extends EasyMockSupport {
                 .addPrevious(new LineStop
                                 .Builder()
                                 .date(TODAY)
-                                .train(new TrainLine("1")).station(DEPARTURE_STATION)
+                        .train(new TrainLine.Builder(1L).build()).station(DEPARTURE_STATION)
                                 .arrivalTime(TimeDelay.of(LocalTime.parse("17:00"), 0L))
                                 .departureTime(TimeDelay.of(LocalTime.parse("17:01"), 0L))
                                 .canceledDeparture(true)

@@ -70,7 +70,7 @@ public class BatchExcelRowMapperTest {
 
         Assert.assertNotNull(batchExcelRow);
         Assert.assertEquals(DELAY, batchExcelRow.getDelay().longValue());
-        Assert.assertEquals(format.format(TRAIN1), batchExcelRow.getEffectiveTrainLine1().getEnglishName());
+        Assert.assertEquals(format.format(TRAIN1), batchExcelRow.getEffectiveTrainLine1().getName());
     }
 
     @Test
@@ -81,12 +81,12 @@ public class BatchExcelRowMapperTest {
                 .arrivalStation(new Station("LIEGE-GUILLEMINS")) //
                 .expectedDepartureTime(LocalTime.parse("14:00")) //
                 .expectedArrivalTime(LocalTime.parse("15:00")) //
-                .expectedTrain1(new TrainLine("529")) //
-                .expectedTrain2(new TrainLine("516")) //
+                .expectedTrain1(new TrainLine.Builder(529L).build()) //
+                .expectedTrain2(new TrainLine.Builder(516L).build()) //
                 .effectiveDepartureTime(LocalTime.parse("14:05")) //
                 .effectiveArrivalTime(LocalTime.parse("15:15")) //
-                .effectiveTrain1(new TrainLine("529")) //
-                .effectiveTrain2(new TrainLine("516")) //
+                .effectiveTrain1(new TrainLine.Builder(529L).build()) //
+                .effectiveTrain2(new TrainLine.Builder(516L).build()) //
                 .delay(10L) //
                 .build();
 

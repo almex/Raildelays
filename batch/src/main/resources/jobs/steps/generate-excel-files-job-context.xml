@@ -49,17 +49,6 @@
         <validator ref="generateExcelFilesJobParametersValidator"/>
     </job>
 
-    <!-- Enforce lazy-init of MultiResourceItemReader which needs to defer resolution of resources as late as possible.
-         Because some resources have been created during the Step execution.
-     -->
-    <!--<bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">-->
-    <!--<property name="customTargetSourceCreators">-->
-    <!--<list>-->
-    <!--<bean class="org.springframework.aop.framework.autoproxy.target.LazyInitTargetSourceCreator"/>-->
-    <!--</list>-->
-    <!--</property>-->
-    <!--</bean>-->
-
     <bean id="generateExcelFilesJobParametersValidator"
           class="org.springframework.batch.core.job.DefaultJobParametersValidator">
         <property name="requiredKeys">

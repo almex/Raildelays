@@ -82,20 +82,20 @@ public class ExcelSheetItemWriterTest extends AbstractFileTest {
                     .arrivalStation(new Station("Bruxelles-central")) //
                     .expectedDepartureTime(LocalTime.parse("08:00")) //
                     .expectedArrivalTime(LocalTime.parse("09:00")) //
-                    .expectedTrain1(new TrainLine("466")) //
+                    .expectedTrain1(new TrainLine.Builder(466L).build()) //
                     .effectiveDepartureTime(LocalTime.parse("08:05")) //
                     .effectiveArrivalTime(LocalTime.parse("09:15")) //
-                    .effectiveTrain1(new TrainLine("466")) //
+                    .effectiveTrain1(new TrainLine.Builder(466L).build()) //
                     .build();
             BatchExcelRow to = new BatchExcelRow.Builder(date, Sens.ARRIVAL) //
                     .departureStation(new Station("Bruxelles-central")) //
                     .arrivalStation(new Station("Liège-Guillemins")) //
                     .expectedDepartureTime(LocalTime.parse("14:00")) //
                     .expectedArrivalTime(LocalTime.parse("15:00")) //
-                    .expectedTrain1(new TrainLine("529")) //
+                    .expectedTrain1(new TrainLine.Builder(529L).build()) //
                     .effectiveDepartureTime(LocalTime.parse("14:05")) //
                     .effectiveArrivalTime(LocalTime.parse("15:15")) //
-                    .effectiveTrain1(new TrainLine("529")) //
+                    .effectiveTrain1(new TrainLine.Builder(529L).build()) //
                     .build();
 
             items.add(from);

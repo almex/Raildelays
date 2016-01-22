@@ -34,12 +34,12 @@ public class ExcelRowComparatorTest extends AbstractExcelRowComparatorTest {
                 .arrivalStation(new Station("arrivalStation"))
                 .expectedDepartureTime(LocalTime.of(10, 1))
                 .expectedArrivalTime(LocalTime.of(11, 0))
-                .expectedTrain1(new TrainLine("expectedTrainLine1"))
-                .expectedTrain2(new TrainLine("expectedTrainLine2"))
+                .expectedTrain1(new TrainLine.Builder(466L).build())
+                .expectedTrain2(new TrainLine.Builder(515L).build())
                 .effectiveDepartureTime(LocalTime.of(10, 5))
                 .effectiveArrivalTime(LocalTime.of(11, 0))
-                .effectiveTrain1(new TrainLine("expectedTrainLine1"))
-                .effectiveTrain2(new TrainLine("effectiveTrainLine2"))
+                .effectiveTrain1(new TrainLine.Builder(466L).build())
+                .effectiveTrain2(new TrainLine.Builder(515L).build())
                 .delay(0L);
         lho = builder.build();
         rho = builder.build();

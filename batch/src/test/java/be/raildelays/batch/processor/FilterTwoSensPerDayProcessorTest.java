@@ -75,10 +75,10 @@ public class FilterTwoSensPerDayProcessorTest {
         list.add(new Builder(LocalDate.parse("2000-01-01"), Sens.DEPARTURE) //
                 .departureStation(stationA) //
                 .arrivalStation(stationB) //
-                .expectedTrain1(new TrainLine("466")) //
+                .expectedTrain1(new TrainLine.Builder(466L).build()) //
                 .expectedArrivalTime(LocalTime.parse("07:00")) //
                 .expectedDepartureTime(LocalTime.parse("07:05")) //
-                .effectiveTrain1(new TrainLine("466")) //
+                .effectiveTrain1(new TrainLine.Builder(466L).build()) //
                 .effectiveDepartureTime(LocalTime.parse("07:03")) //
                 .effectiveArrivalTime(LocalTime.parse("07:10")) //
                 .delay(5L) //
@@ -88,10 +88,10 @@ public class FilterTwoSensPerDayProcessorTest {
         list.add(new Builder(LocalDate.parse("2000-01-01"), Sens.ARRIVAL) //
                 .departureStation(stationB) //
                 .arrivalStation(stationA) //
-                .expectedTrain1(new TrainLine("467")) //
+                .expectedTrain1(new TrainLine.Builder(467L).build()) //
                 .expectedArrivalTime(LocalTime.parse("15:00")) //
                 .expectedDepartureTime(LocalTime.parse("15:05")) //
-                .effectiveTrain1(new TrainLine("466")) //
+                .effectiveTrain1(new TrainLine.Builder(466L).build()) //
                 .effectiveDepartureTime(LocalTime.parse("15:03")) //
                 .effectiveArrivalTime(LocalTime.parse("15:10")) //
                 .delay(5L) //
@@ -101,10 +101,10 @@ public class FilterTwoSensPerDayProcessorTest {
         list.add(new Builder(LocalDate.parse("2000-01-02"), Sens.DEPARTURE) //
                 .departureStation(stationA) //
                 .arrivalStation(stationB) //
-                .expectedTrain1(new TrainLine("530")) //
+                .expectedTrain1(new TrainLine.Builder(530L).build()) //
                 .expectedArrivalTime(LocalTime.parse("08:00")) //
                 .expectedDepartureTime(LocalTime.parse("08:05")) //
-                .effectiveTrain1(new TrainLine("466")) //
+                .effectiveTrain1(new TrainLine.Builder(466L).build()) //
                 .effectiveDepartureTime(LocalTime.parse("08:03")) //
                 .effectiveArrivalTime(LocalTime.parse("08:15")) //
                 .delay(10L) //
@@ -114,10 +114,10 @@ public class FilterTwoSensPerDayProcessorTest {
         list.add(new Builder(LocalDate.parse("2000-01-02"), Sens.ARRIVAL) //
                 .departureStation(stationB) //
                 .arrivalStation(stationA) //
-                .expectedTrain1(new TrainLine("477")) //
+                .expectedTrain1(new TrainLine.Builder(477L).build()) //
                 .expectedArrivalTime(LocalTime.parse("16:00")) //
                 .expectedDepartureTime(LocalTime.parse("16:05")) //
-                .effectiveTrain1(new TrainLine("466")) //
+                .effectiveTrain1(new TrainLine.Builder(466L).build()) //
                 .effectiveDepartureTime(LocalTime.parse("16:03")) //
                 .effectiveArrivalTime(LocalTime.parse("16:10")) //
                 .delay(5L) //
@@ -127,10 +127,10 @@ public class FilterTwoSensPerDayProcessorTest {
         list.add(new Builder(LocalDate.parse("2000-01-03"), Sens.DEPARTURE) //
                 .departureStation(stationA) //
                 .arrivalStation(stationB) //
-                .expectedTrain1(new TrainLine("531")) //
+                .expectedTrain1(new TrainLine.Builder(531L).build()) //
                 .expectedArrivalTime(LocalTime.parse("12:00")) //
                 .expectedDepartureTime(LocalTime.parse("12:05")) //
-                .effectiveTrain1(new TrainLine("466")) //
+                .effectiveTrain1(new TrainLine.Builder(466L).build()) //
                 .effectiveDepartureTime(LocalTime.parse("12:03")) //
                 .effectiveArrivalTime(LocalTime.parse("12:20")) //
                 .delay(15L) //
@@ -153,10 +153,10 @@ public class FilterTwoSensPerDayProcessorTest {
         BatchExcelRow excelRow = processor.process(new Builder(LocalDate.parse("2000-01-05"), Sens.ARRIVAL) //
                 .departureStation(stationB) //
                 .arrivalStation(stationA) //
-                .expectedTrain1(new TrainLine("578")) //
+                .expectedTrain1(new TrainLine.Builder(578L).build()) //
                 .expectedArrivalTime(LocalTime.parse("22:00")) //
                 .expectedDepartureTime(LocalTime.parse("22:05")) //
-                .effectiveTrain1(new TrainLine("578")) //
+                .effectiveTrain1(new TrainLine.Builder(578L).build()) //
                 .effectiveDepartureTime(LocalTime.parse("16:03")) //
                 .effectiveArrivalTime(LocalTime.parse("16:10")) //
                 .delay(5L) //
@@ -171,10 +171,10 @@ public class FilterTwoSensPerDayProcessorTest {
         BatchExcelRow expected = new Builder(LocalDate.parse("2000-01-02"), Sens.ARRIVAL) //
                 .departureStation(stationB) //
                 .arrivalStation(stationA) //
-                .expectedTrain1(new TrainLine("578")) //
+                .expectedTrain1(new TrainLine.Builder(578L).build()) //
                 .expectedArrivalTime(LocalTime.parse("17:00")) //
                 .expectedDepartureTime(LocalTime.parse("17:05")) //
-                .effectiveTrain1(new TrainLine("578")) //
+                .effectiveTrain1(new TrainLine.Builder(578L).build()) //
                 .effectiveDepartureTime(LocalTime.parse("16:03")) //
                 .effectiveArrivalTime(LocalTime.parse("16:10")) //
                 .delay(25L) //
@@ -189,10 +189,10 @@ public class FilterTwoSensPerDayProcessorTest {
         BatchExcelRow excelRow = processor.process(new Builder(LocalDate.parse("2000-01-02"), Sens.ARRIVAL) //
                 .departureStation(stationB) //
                 .arrivalStation(stationA) //
-                .expectedTrain1(new TrainLine("578")) //
+                .expectedTrain1(new TrainLine.Builder(578L).build()) //
                 .expectedArrivalTime(LocalTime.parse("17:00")) //
                 .expectedDepartureTime(LocalTime.parse("17:05")) //
-                .effectiveTrain1(new TrainLine("578")) //
+                .effectiveTrain1(new TrainLine.Builder(578L).build()) //
                 .effectiveDepartureTime(LocalTime.parse("16:03")) //
                 .effectiveArrivalTime(LocalTime.parse("16:10")) //
                 .delay(25L) //
@@ -207,10 +207,10 @@ public class FilterTwoSensPerDayProcessorTest {
         BatchExcelRow excelRow = processor.process(new Builder(LocalDate.parse("2000-01-02"), Sens.ARRIVAL) //
                 .departureStation(stationB) //
                 .arrivalStation(stationA) //
-                .expectedTrain1(new TrainLine("578")) //
+                .expectedTrain1(new TrainLine.Builder(578L).build()) //
                 .expectedArrivalTime(LocalTime.parse("16:00")) //
                 .expectedDepartureTime(LocalTime.parse("16:05")) //
-                .effectiveTrain1(new TrainLine("466")) //
+                .effectiveTrain1(new TrainLine.Builder(466L).build()) //
                 .effectiveDepartureTime(LocalTime.parse("16:03")) //
                 .effectiveArrivalTime(LocalTime.parse("16:10")) //
                 .delay(0L) //
@@ -226,10 +226,10 @@ public class FilterTwoSensPerDayProcessorTest {
         processor.process(new Builder(LocalDate.parse("2000-01-02"), Sens.ARRIVAL) //
                 .departureStation(stationB) //
                 .arrivalStation(stationA) //
-                .expectedTrain1(new TrainLine("578")) //
+                .expectedTrain1(new TrainLine.Builder(578L).build()) //
                 .expectedArrivalTime(LocalTime.parse("17:00")) //
                 .expectedDepartureTime(LocalTime.parse("17:05")) //
-                .effectiveTrain1(new TrainLine("578")) //
+                .effectiveTrain1(new TrainLine.Builder(578L).build()) //
                 .effectiveDepartureTime(LocalTime.parse("16:03")) //
                 .effectiveArrivalTime(LocalTime.parse("16:10")) //
                 .delay(25L) //
@@ -248,10 +248,10 @@ public class FilterTwoSensPerDayProcessorTest {
         BatchExcelRow input = new Builder(LocalDate.parse("2000-01-02"), Sens.ARRIVAL) //
                 .departureStation(stationB) //
                 .arrivalStation(stationA) //
-                .expectedTrain1(new TrainLine("578")) //
+                .expectedTrain1(new TrainLine.Builder(578L).build()) //
                 .expectedArrivalTime(LocalTime.parse("17:00")) //
                 .expectedDepartureTime(LocalTime.parse("17:05")) //
-                .effectiveTrain1(new TrainLine("578")) //
+                .effectiveTrain1(new TrainLine.Builder(578L).build()) //
                 .effectiveDepartureTime(LocalTime.parse("16:03")) //
                 .effectiveArrivalTime(LocalTime.parse("16:10")) //
                 .delay(25L) //
@@ -266,10 +266,10 @@ public class FilterTwoSensPerDayProcessorTest {
         BatchExcelRow excelRow = processor.process(new Builder(LocalDate.parse("1999-12-31"), Sens.ARRIVAL) //
                 .departureStation(stationB) //
                 .arrivalStation(stationA) //
-                .expectedTrain1(new TrainLine("578")) //
+                .expectedTrain1(new TrainLine.Builder(578L).build()) //
                 .expectedArrivalTime(LocalTime.parse("22:00")) //
                 .expectedDepartureTime(LocalTime.parse("22:05")) //
-                .effectiveTrain1(new TrainLine("578")) //
+                .effectiveTrain1(new TrainLine.Builder(578L).build()) //
                 .effectiveDepartureTime(LocalTime.parse("16:03")) //
                 .effectiveArrivalTime(LocalTime.parse("16:10")) //
                 .delay(5L) //

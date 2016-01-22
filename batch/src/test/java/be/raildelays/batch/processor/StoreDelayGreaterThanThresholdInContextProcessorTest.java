@@ -4,7 +4,6 @@ import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.delays.Delays;
 import be.raildelays.domain.Language;
 import be.raildelays.domain.Sens;
-import be.raildelays.domain.entities.TrainLine;
 import be.raildelays.test.RaildelaysTestUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,8 +28,6 @@ public class StoreDelayGreaterThanThresholdInContextProcessorTest {
 
     @Before
     public void setUp() throws Exception {
-        TrainLine trainLine = new TrainLine("dummy");
-
         stepbExecution = MetaDataInstanceFactory.createStepExecution();
 
         processor = new StoreDelayGreaterThanThresholdInContextProcessor();
@@ -41,7 +38,7 @@ public class StoreDelayGreaterThanThresholdInContextProcessorTest {
 
         input = new BatchExcelRow
                 .Builder(LocalDate.now(), Sens.DEPARTURE)
-                .expectedTrain1(RaildelaysTestUtils.generateTrain("dummy", Language.EN))
+                .expectedTrain1(RaildelaysTestUtils.generateTrain(466L))
                 .build(false);
     }
 
@@ -64,12 +61,12 @@ public class StoreDelayGreaterThanThresholdInContextProcessorTest {
     public void testThat2TrainIdsAreInTheContext() throws Exception {
         processor.process(new BatchExcelRow
                 .Builder(LocalDate.now(), Sens.DEPARTURE)
-                .expectedTrain1(RaildelaysTestUtils.generateTrain("dummy", Language.EN))
+                .expectedTrain1(RaildelaysTestUtils.generateTrain(466L))
                 .delay(Delays.toMillis(75L))
                 .build(false));
         processor.process(new BatchExcelRow
                 .Builder(LocalDate.now(), Sens.ARRIVAL)
-                .expectedTrain1(RaildelaysTestUtils.generateTrain("dummy", Language.EN))
+                .expectedTrain1(RaildelaysTestUtils.generateTrain(466L))
                 .delay(Delays.toMillis(66L))
                 .build(false));
 

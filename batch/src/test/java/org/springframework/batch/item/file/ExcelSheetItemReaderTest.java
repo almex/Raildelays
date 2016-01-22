@@ -57,7 +57,7 @@ public class ExcelSheetItemReaderTest {
         }
 
         Assert.assertTrue(result.stream().anyMatch(
-                row -> "515".equals(row.getEffectiveTrainLine1().getEnglishName())
+                row -> "515".equals(row.getEffectiveTrainLine1().getName())
         ));
 
         reader.close();

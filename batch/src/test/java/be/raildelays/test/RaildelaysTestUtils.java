@@ -1,6 +1,5 @@
 package be.raildelays.test;
 
-import be.raildelays.domain.Language;
 import be.raildelays.domain.entities.TrainLine;
 
 /**
@@ -10,8 +9,8 @@ public class RaildelaysTestUtils {
 
     private static long SEQUENCE = 0;
 
-    public static TrainLine generateTrain(String name, Language language) {
-        TrainLineTest train = new TrainLineTest(name, language);
+    public static TrainLine generateTrain(Long routeId) {
+        TrainLineTest train = new TrainLineTest(routeId);
         train.setId(SEQUENCE++);
 
         return train;
@@ -19,8 +18,8 @@ public class RaildelaysTestUtils {
 
     private static class TrainLineTest extends TrainLine {
 
-        public TrainLineTest(String name, Language language) {
-            super(name, language);
+        public TrainLineTest(Long routeId) {
+            super(new Builder(routeId));
         }
 
         public void setId(Long id) {

@@ -25,7 +25,7 @@ public class LineStopMapperProcessorTest {
 
     private static final LocalDate TODAY = LocalDate.now();
     private static final String LANGUAGE = Language.EN.name();
-    private static final String DUMMY = "dummy";
+    private static final Long DUMMY = 515L;
     private static final String DEPARTURE_STATION = "departure";
     private static final String INTERMEDIATE_STATION = "intermediate";
     private static final String ARRIVAL_STATION = "arrival";
@@ -42,9 +42,9 @@ public class LineStopMapperProcessorTest {
     public void setUp() throws Exception {
         trainDaoMock = EasyMock.createMock(TrainDao.class);
         stationDaoMock = EasyMock.createMock(StationDao.class);
-        final TrainLine trainLine = new TrainLine(DUMMY);
-        final Direction departure = new Direction(new be.raildelays.domain.railtime.Train(DUMMY));
-        final Direction arrival = new Direction(new be.raildelays.domain.railtime.Train(DUMMY));
+        final TrainLine trainLine = new TrainLine.Builder(DUMMY).build();
+        final Direction departure = new Direction(new be.raildelays.domain.railtime.Train(DUMMY.toString()));
+        final Direction arrival = new Direction(new be.raildelays.domain.railtime.Train(DUMMY.toString()));
 
         processor = new LineStopMapperProcessor();
         processor.setStationDao(stationDaoMock);
@@ -93,7 +93,7 @@ public class LineStopMapperProcessorTest {
         EasyMock.expect(stationDaoMock.findByEnglishName(DEPARTURE_STATION)).andReturn(new Station(DEPARTURE_STATION));
         EasyMock.expect(stationDaoMock.findByEnglishName(INTERMEDIATE_STATION)).andReturn(new Station(INTERMEDIATE_STATION));
         EasyMock.expect(stationDaoMock.findByEnglishName(ARRIVAL_STATION)).andReturn(new Station(ARRIVAL_STATION));
-        EasyMock.expect(trainDaoMock.findByEnglishName(DUMMY)).andReturn(new TrainLine(DUMMY)).anyTimes();
+        EasyMock.expect(trainDaoMock.findByRouteId(DUMMY)).andReturn(new TrainLine.Builder(DUMMY).build()).anyTimes();
         EasyMock.replay(trainDaoMock, stationDaoMock);
 
         processor.setLanguage(Language.EN.name());
@@ -106,7 +106,7 @@ public class LineStopMapperProcessorTest {
         EasyMock.expect(stationDaoMock.findByDutchName(DEPARTURE_STATION)).andReturn(new Station(DEPARTURE_STATION));
         EasyMock.expect(stationDaoMock.findByDutchName(INTERMEDIATE_STATION)).andReturn(new Station(INTERMEDIATE_STATION));
         EasyMock.expect(stationDaoMock.findByDutchName(ARRIVAL_STATION)).andReturn(new Station(ARRIVAL_STATION));
-        EasyMock.expect(trainDaoMock.findByDutchName(DUMMY)).andReturn(new TrainLine(DUMMY)).anyTimes();
+        EasyMock.expect(trainDaoMock.findByRouteId(DUMMY)).andReturn(new TrainLine.Builder(DUMMY).build()).anyTimes();
         EasyMock.replay(trainDaoMock, stationDaoMock);
 
         processor.setLanguage(Language.NL.name());
@@ -119,7 +119,7 @@ public class LineStopMapperProcessorTest {
         EasyMock.expect(stationDaoMock.findByFrenchName(DEPARTURE_STATION)).andReturn(new Station(DEPARTURE_STATION));
         EasyMock.expect(stationDaoMock.findByFrenchName(INTERMEDIATE_STATION)).andReturn(new Station(INTERMEDIATE_STATION));
         EasyMock.expect(stationDaoMock.findByFrenchName(ARRIVAL_STATION)).andReturn(new Station(ARRIVAL_STATION));
-        EasyMock.expect(trainDaoMock.findByFrenchName(DUMMY)).andReturn(new TrainLine(DUMMY)).anyTimes();
+        EasyMock.expect(trainDaoMock.findByRouteId(DUMMY)).andReturn(new TrainLine.Builder(DUMMY).build()).anyTimes();
         EasyMock.replay(trainDaoMock, stationDaoMock);
 
         processor.setLanguage(Language.FR.name());
@@ -132,9 +132,7 @@ public class LineStopMapperProcessorTest {
         EasyMock.expect(stationDaoMock.findByEnglishName(DEPARTURE_STATION)).andReturn(new Station(DEPARTURE_STATION));
         EasyMock.expect(stationDaoMock.findByEnglishName(INTERMEDIATE_STATION)).andReturn(new Station(INTERMEDIATE_STATION));
         EasyMock.expect(stationDaoMock.findByEnglishName(ARRIVAL_STATION)).andReturn(new Station(ARRIVAL_STATION));
-        EasyMock.expect(trainDaoMock.findByEnglishName(EasyMock.anyString())).andReturn(null).anyTimes();
-        EasyMock.expect(trainDaoMock.findByDutchName(EasyMock.anyString())).andReturn(null).anyTimes();
-        EasyMock.expect(trainDaoMock.findByFrenchName(EasyMock.anyString())).andReturn(null).anyTimes();
+        EasyMock.expect(trainDaoMock.findByRouteId(EasyMock.anyLong())).andReturn(null).anyTimes();
         EasyMock.replay(trainDaoMock, stationDaoMock);
 
         Assert.assertEquals(expected, processor.process(input));
@@ -145,7 +143,7 @@ public class LineStopMapperProcessorTest {
         EasyMock.expect(stationDaoMock.findByEnglishName(EasyMock.anyString())).andReturn(null).anyTimes();
         EasyMock.expect(stationDaoMock.findByDutchName(EasyMock.anyString())).andReturn(null).anyTimes();
         EasyMock.expect(stationDaoMock.findByFrenchName(EasyMock.anyString())).andReturn(null).anyTimes();
-        EasyMock.expect(trainDaoMock.findByEnglishName(DUMMY)).andReturn(new TrainLine(DUMMY)).anyTimes();
+        EasyMock.expect(trainDaoMock.findByRouteId(DUMMY)).andReturn(new TrainLine.Builder(DUMMY).build()).anyTimes();
         EasyMock.replay(trainDaoMock, stationDaoMock);
 
         Assert.assertEquals(expected, processor.process(input));
