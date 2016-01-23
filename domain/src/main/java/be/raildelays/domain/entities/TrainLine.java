@@ -28,8 +28,6 @@ import be.raildelays.location.Route;
 import be.raildelays.vehicule.Train;
 
 import javax.persistence.*;
-import javax.validation.Validation;
-import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
@@ -130,8 +128,6 @@ public class TrainLine extends AbstractEntity implements Train, Route<LineStop>,
         private LineStop departure;
         private LineStop destination;
 
-        private static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-
         /**
          * Minimal initialization constructor.
          *
@@ -161,11 +157,6 @@ public class TrainLine extends AbstractEntity implements Train, Route<LineStop>,
 
         public Builder longName(final String longName) {
             this.longName = longName;
-            return this;
-        }
-
-        public Builder routeId(final Long routeId) {
-            this.routeId = routeId;
             return this;
         }
 

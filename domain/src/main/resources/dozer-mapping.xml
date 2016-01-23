@@ -39,31 +39,6 @@
     </mapping>
 
     <mapping map-null="false">
-        <class-a>be.raildelays.domain.dto.ServedStopDTO</class-a>
-        <class-b>be.raildelays.domain.entities.LineStop</class-b>
-        <field>
-            <a>stationName</a>
-            <b>station.englishName</b>
-        </field>
-        <field>
-            <a>departureTime</a>
-            <b>departureTime.expectedTime</b>
-        </field>
-        <field>
-            <a>departureDelay</a>
-            <b>departureTime.delay</b>
-        </field>
-        <field>
-            <a>arrivalTime</a>
-            <b>arrivalTime.expectedTime</b>
-        </field>
-        <field>
-            <a>arrivalDelay</a>
-            <b>arrivalTime.delay</b>
-        </field>
-    </mapping>
-
-    <mapping map-null="false">
         <class-a>be.raildelays.domain.railtime.Train</class-a>
         <class-b>be.raildelays.domain.entities.TrainLine</class-b>
     </mapping>

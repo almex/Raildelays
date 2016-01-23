@@ -27,8 +27,6 @@ package be.raildelays.logging;
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.delays.Delays;
 import be.raildelays.delays.TimeDelay;
-import be.raildelays.domain.dto.RouteLogDTO;
-import be.raildelays.domain.dto.ServedStopDTO;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.TrainLine;
 import be.raildelays.domain.railtime.Direction;
@@ -185,39 +183,7 @@ public class RaildelaysLogger implements Logger {
                     .build();
         }
     };
-    private Delegator<RouteLogDTO> routeLogDTODelegator = new Delegator<RouteLogDTO>() {
-        @Override
-        public String logLine(String message, RouteLogDTO object) {
-            return new LogLineBuilder()
-                    .message(message)
-                    .date(object.getDate())
-                    .expectedTrain(object.getTrainId() != null ? Long.parseLong(object.getTrainId()) : null)
-                    .build();
-        }
-    };
-    private Delegator<ServedStopDTO> servedStopDTODelegator = new Delegator<ServedStopDTO>() {
-        @Override
-        public String logLine(String message, ServedStopDTO object) {
-            /**
-             * We revert here departure and arrival because what we want to show here it's a stop:
-             * - we reach the stop at the arrival time <-> we start our route at departure time
-             * - we leave the stop at the departure time <-> we stop our route at arrival time
-             */
-            TimeDelay arrivalTime = TimeDelay.of(object.getArrivalTime(), object.getArrivalDelay());
-            TimeDelay departureTime = TimeDelay.of(object.getDepartureTime(), object.getDepartureDelay());
 
-            return new LogLineBuilder()
-                    .message(message)
-                    .departureStation(object.getStationName())
-                    .expectedDepartureTime(object.getArrivalTime())
-                    .expectedArrivalTime(object.getDepartureTime())
-                    .effectiveDepartureTime(arrivalTime != null ? arrivalTime.getEffectiveTime() : null)
-                    .effectiveArrivalTime(departureTime != null ? departureTime.getEffectiveTime() : null)
-                    .canceledDeparture(object.isCanceled())
-                    .canceledArrival(object.isCanceled())
-                    .build();
-        }
-    };
 
     public RaildelaysLogger(String type, org.slf4j.Logger delegate) {
         this.type = type;
@@ -334,30 +300,6 @@ public class RaildelaysLogger implements Logger {
     @Override
     public void trace(String message, BatchExcelRow excelRow) {
         excelRowDelegator.log(message, Level.TRACE, excelRow);
-    }
-
-    @Override
-    public void info(String message, RouteLogDTO routeLog) {
-        if (routeLog != null) {
-            routeLogDTODelegator.log(message, Level.INFO, routeLog);
-            servedStopDTODelegator.log("stops", Level.INFO, routeLog.getStops());
-        }
-    }
-
-    @Override
-    public void debug(String message, RouteLogDTO routeLog) {
-        if (routeLog != null) {
-            routeLogDTODelegator.log(message, Level.DEBUG, routeLog);
-            servedStopDTODelegator.log("stops", Level.DEBUG, routeLog.getStops());
-        }
-    }
-
-    @Override
-    public void trace(String message, RouteLogDTO routeLog) {
-        if (routeLog != null) {
-            routeLogDTODelegator.log(message, Level.TRACE, routeLog);
-            servedStopDTODelegator.log("stops", Level.TRACE, routeLog.getStops());
-        }
     }
 
     @Override

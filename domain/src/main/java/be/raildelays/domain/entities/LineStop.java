@@ -31,13 +31,9 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Set;
 
 /**
  * Line stop determine a stop for train line.
@@ -95,19 +91,6 @@ public class LineStop extends AbstractEntity implements Stop<Station>, Comparabl
     @OneToOne(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER, optional = true)
     @JoinColumn(name = "NEXT_ID")
     protected LineStop next;
-
-    protected LineStop() {
-        this.id = null;
-        this.date = null;
-        this.trainLine = null;
-        this.station = null;
-        this.arrivalTime = null;
-        this.departureTime = null;
-        this.canceledDeparture = false;
-        this.canceledArrival = false;
-        this.previous = null;
-        this.next = null;
-    }
 
     private LineStop(Builder builder) {
         this.id = builder.id;
@@ -248,10 +231,6 @@ public class LineStop extends AbstractEntity implements Stop<Station>, Comparabl
         return arrivalTime;
     }
 
-    public void setArrivalTime(TimeDelay arrivalTime) {
-        this.arrivalTime = arrivalTime;
-    }
-
     @Override
     public Station getLocation() {
         return getStation();
@@ -261,83 +240,53 @@ public class LineStop extends AbstractEntity implements Stop<Station>, Comparabl
         return departureTime;
     }
 
-    public void setDepartureTime(TimeDelay departureTime) {
-        this.departureTime = departureTime;
-    }
-
     public TrainLine getTrainLine() {
         return trainLine;
-    }
-
-    public void setTrainLine(TrainLine trainLine) {
-        this.trainLine = trainLine;
     }
 
     public Station getStation() {
         return station;
     }
 
-    public void setStation(Station station) {
-        this.station = station;
-    }
-
     public LocalDate getDate() {
         return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
     }
 
     public boolean isCanceled() {
         return canceledDeparture || canceledArrival;
     }
 
-    /**
-     * Use {@link #setCanceledDeparture} or {@link #setCanceledArrival} instead.
-     */
-    @Deprecated
-    public void setCanceled(boolean canceled) {
-        this.canceledDeparture = this.canceledArrival = canceled;
-    }
-
     public boolean isCanceledDeparture() {
         return canceledDeparture;
     }
 
-    public void setCanceledDeparture(boolean canceledDeparture) {
-        this.canceledDeparture = canceledDeparture;
-    }
 
     public boolean isCanceledArrival() {
         return canceledArrival;
     }
 
-    public void setCanceledArrival(boolean canceledArrival) {
-        this.canceledArrival = canceledArrival;
-    }
 
     public LineStop getPrevious() {
         return previous;
     }
 
-    public void setPrevious(LineStop previous) {
+    /*public void setPrevious(LineStop previous) {
         if (previous != null) {
             previous.next = this;
         }
         this.previous = previous;
-    }
+    }*/
 
     public LineStop getNext() {
         return next;
     }
 
-    public void setNext(LineStop next) {
+    /*public void setNext(LineStop next) {
         if (next != null) {
             next.previous = this;
         }
         this.next = next;
-    }
+    }*/
 
     /**
      * This builder is the only way to get a new instance of a {@link be.raildelays.domain.entities.LineStop}.

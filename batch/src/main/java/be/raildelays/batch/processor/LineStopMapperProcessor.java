@@ -76,7 +76,8 @@ public class LineStopMapperProcessor implements ItemProcessor<TwoDirections, Lin
 
     @Override
     public LineStop process(final TwoDirections item) throws Exception {
-        LineStop result = null;
+        LineStop result;
+        LineStop.Builder builder = null;
         Language lang = Language.valueOf(language.toUpperCase(Locale.US));
 
         LOGGER.trace("item", item);
@@ -85,8 +86,6 @@ public class LineStopMapperProcessor implements ItemProcessor<TwoDirections, Lin
         Direction arrivalDirection = item.getArrival();
 
         if (departureDirection != null && arrivalDirection != null) {
-            LineStop next = null;
-
             LOGGER.debug("departure_direction", departureDirection);
             LOGGER.debug("arrival_direction", arrivalDirection);
 
@@ -94,25 +93,23 @@ public class LineStopMapperProcessor implements ItemProcessor<TwoDirections, Lin
                 int index = arrivalDirection.getSteps().indexOf(arrivalStep);
                 Step departureStep = departureDirection.getSteps().get(index);
 
-                if (result == null) {
-                    result = buildLineStop(lang, arrivalDirection, arrivalStep, departureStep);
-                    next = result;
+                if (builder == null) {
+                    builder = buildLineStop(lang, arrivalDirection, arrivalStep, departureStep);
                 } else {
-                    next.setNext(buildLineStop(lang, arrivalDirection, arrivalStep, departureStep));
-                    next.getNext().setPrevious(next);
-                    next = next.getNext();
-
+                    builder.addNext(buildLineStop(lang, arrivalDirection, arrivalStep, departureStep));
                 }
             }
         }
+
+        result = builder != null ? builder.build() : null;
 
         LOGGER.trace("result", result);
 
         return result;
     }
 
-    private LineStop buildLineStop(Language lang, Direction direction, Step arrivalStep, Step departureStep) {
-        LineStop result;
+    private LineStop.Builder buildLineStop(Language lang, Direction direction, Step arrivalStep, Step departureStep) {
+        LineStop.Builder result;
         TrainLine trainLine = mergeTrain(new TrainLine.Builder(
                 Long.parseLong(direction.getTrain().getIdRailtime())
         ).build());
@@ -127,8 +124,7 @@ public class LineStopMapperProcessor implements ItemProcessor<TwoDirections, Lin
                 .arrivalTime(arrivalTime)
                 .departureTime(departureTime)
                 .canceledArrival(arrivalStep.isCanceled())
-                .canceledDeparture(departureStep.isCanceled())
-                .build();
+                .canceledDeparture(departureStep.isCanceled());
 
         LOGGER.debug("processing_done", result);
 
