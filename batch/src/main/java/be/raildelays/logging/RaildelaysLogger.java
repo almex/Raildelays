@@ -29,10 +29,8 @@ import be.raildelays.delays.Delays;
 import be.raildelays.delays.TimeDelay;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.TrainLine;
-import be.raildelays.domain.railtime.Direction;
 import be.raildelays.domain.railtime.Step;
 import be.raildelays.domain.railtime.Train;
-import be.raildelays.domain.railtime.TwoDirections;
 import be.raildelays.domain.xls.ExcelRow;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Marker;
@@ -94,17 +92,6 @@ public class RaildelaysLogger implements Logger {
     private char separator = ' ';
 
     private String type;
-    private Delegator<Direction> directionDelegator = new Delegator<Direction>() {
-        @Override
-        public String logLine(String message, Direction object) {
-            return new LogLineBuilder()
-                    .message(object.getLibelle())
-                    .expectedTrain(getTrainId(object.getTrain()))
-                    .departureStation(object.getFrom() != null ? object.getFrom().getName() : null)
-                    .arrivalStation(object.getTo() != null ? object.getTo().getName() : null)
-                    .build();
-        }
-    };
     private Delegator<Step> stepDelegator = new Delegator<Step>() {
         @Override
         public String logLine(String message, Step object) {
@@ -300,48 +287,6 @@ public class RaildelaysLogger implements Logger {
     @Override
     public void trace(String message, BatchExcelRow excelRow) {
         excelRowDelegator.log(message, Level.TRACE, excelRow);
-    }
-
-    @Override
-    public void info(String message, TwoDirections twoDirections) {
-        if (twoDirections != null) {
-            if (twoDirections.getDeparture() != null) {
-                directionDelegator.log(message, Level.INFO, twoDirections.getDeparture());
-                stepDelegator.log(message, Level.INFO, twoDirections.getDeparture().getSteps());
-            }
-            if (twoDirections.getArrival() != null) {
-                directionDelegator.log(message, Level.INFO, twoDirections.getArrival());
-                stepDelegator.log(message, Level.INFO, twoDirections.getArrival().getSteps());
-            }
-        }
-    }
-
-    @Override
-    public void debug(String message, TwoDirections twoDirections) {
-        if (twoDirections != null) {
-            if (twoDirections.getDeparture() != null) {
-                directionDelegator.log(message, Level.DEBUG, twoDirections.getDeparture());
-                stepDelegator.log(message, Level.DEBUG, twoDirections.getDeparture().getSteps());
-            }
-            if (twoDirections.getArrival() != null) {
-                directionDelegator.log(message, Level.DEBUG, twoDirections.getArrival());
-                stepDelegator.log(message, Level.DEBUG, twoDirections.getArrival().getSteps());
-            }
-        }
-    }
-
-    @Override
-    public void trace(String message, TwoDirections twoDirections) {
-        if (twoDirections != null) {
-            if (twoDirections.getDeparture() != null) {
-                directionDelegator.log(message, Level.TRACE, twoDirections.getDeparture());
-                stepDelegator.log(message, Level.TRACE, twoDirections.getDeparture().getSteps());
-            }
-            if (twoDirections.getArrival() != null) {
-                directionDelegator.log(message, Level.TRACE, twoDirections.getArrival());
-                stepDelegator.log(message, Level.TRACE, twoDirections.getArrival().getSteps());
-            }
-        }
     }
 
     public void setDelegate(org.slf4j.Logger logger) {

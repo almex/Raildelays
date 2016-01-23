@@ -92,6 +92,13 @@ public class LineStop extends AbstractEntity implements Stop<Station>, Comparabl
     @JoinColumn(name = "NEXT_ID")
     protected LineStop next;
 
+    /**
+     * Default constructor used by Hibernate.
+     */
+    protected LineStop() {
+        // Noop
+    }
+
     private LineStop(Builder builder) {
         this.id = builder.id;
         this.date = builder.date != null ? builder.date : null;

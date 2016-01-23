@@ -26,7 +26,6 @@ package be.raildelays.logging;
 
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.domain.entities.LineStop;
-import be.raildelays.domain.railtime.TwoDirections;
 import be.raildelays.domain.xls.ExcelRow;
 
 import java.util.List;
@@ -61,11 +60,5 @@ public interface Logger extends org.slf4j.Logger {
     void debug(String message, BatchExcelRow excelRow);
 
     void trace(String message, BatchExcelRow excelRow);
-
-    void info(String message, TwoDirections twoDirections);
-
-    void debug(String message, TwoDirections twoDirections);
-
-    void trace(String message, TwoDirections twoDirections);
 
 }

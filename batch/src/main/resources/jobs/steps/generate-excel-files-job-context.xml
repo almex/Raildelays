@@ -199,13 +199,6 @@
         </property>
     </bean>
 
-    <bean id="lineStopMapperProcessor"
-          class="be.raildelays.batch.processor.LineStopMapperProcessor"
-          scope="step">
-        <property name="date" value="#{jobParameters[date]}"/>
-        <property name="language" value="#{jobParameters['language']}"/>
-    </bean>
-
     <bean id="aggregateExpectedTimeProcessor"
           class="be.raildelays.batch.processor.AggregateExpectedTimeProcessor">
         <property name="lineStopDao" ref="lineStopDao" />

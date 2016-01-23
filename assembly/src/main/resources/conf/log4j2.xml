@@ -199,9 +199,6 @@
         <logger name="be.raildelays.parser" level="trace" additivity="false">
             <appender-ref ref="step1Reader"/>
         </logger>
-        <logger name="be.raildelays.batch.processor.LineStopMapperProcessor" level="trace" additivity="false">
-            <appender-ref ref="step1Processor"/>
-        </logger>
         <logger name="be.raildelays.batch.listener.LogStep1ItemProcessorListener" level="trace" additivity="false">
             <appender-ref ref="step1Processor"/>
         </logger>
