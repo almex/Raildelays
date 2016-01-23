@@ -45,7 +45,7 @@ public class FindArrivalDelaysIT extends AbstractIT {
 
 
         Assert.assertEquals(
-                Arrays.asList(466, 477, 515),
+                Arrays.asList(466L, 477L, 515L),
                 extractTrainIds(lineStops)
         );
     }
@@ -57,7 +57,7 @@ public class FindArrivalDelaysIT extends AbstractIT {
         List<LineStop> lineStops = lineStopDao.findArrivalDelays(date, station, Delays.toMillis(15L));
 
         Assert.assertEquals(
-                Arrays.asList(466, 477, 515),
+                Arrays.asList(466L, 477L, 515L),
                 extractTrainIds(lineStops)
         );
     }
@@ -79,7 +79,7 @@ public class FindArrivalDelaysIT extends AbstractIT {
         ))).getContent());
 
         Assert.assertEquals(
-                Arrays.asList(466, 477, 1715),
+                Arrays.asList(466L, 477L, 1715L),
                 extractTrainIds(lineStops)
         );
     }
@@ -91,7 +91,7 @@ public class FindArrivalDelaysIT extends AbstractIT {
         List<LineStop> lineStops = lineStopDao.findDepartureDelays(date, station, Delays.toMillis(15L));
 
         Assert.assertEquals(
-                Arrays.asList(466, 477, 1715),
+                Arrays.asList(466L, 477L, 1715L),
                 extractTrainIds(lineStops)
         );
     }

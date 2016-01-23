@@ -1,6 +1,5 @@
 package be.raildelays.domain.entities;
 
-import be.raildelays.domain.Language;
 import com.github.almex.pojounit.AbstractObjectTest;
 import org.junit.experimental.theories.DataPoint;
 
@@ -37,7 +36,7 @@ public class TrainLineTest extends AbstractObjectTest {
 
         DATA_POINT4 = new TrainLine.Builder(1717L).build();
 
-        DATA_POINT5 = new TrainLine.Builder((Long) null).build();
+        DATA_POINT5 = new TrainLine.Builder((Long) null).build(false);
 
     }
 }
