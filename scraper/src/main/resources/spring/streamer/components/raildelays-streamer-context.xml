@@ -4,7 +4,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <!-- Streamer -->
-    <bean id="streamer" class="be.raildelays.httpclient.impl.DelaysRequestStreamer">
+    <bean id="streamer" class="be.raildelays.httpclient.impl.DelaysRequestStreamerV2">
         <property name="proxyHost" value="${proxy.host}"/>
         <property name="proxyPort" value="${proxy.port}"/>
         <property name="username" value="${proxy.username}"/>
