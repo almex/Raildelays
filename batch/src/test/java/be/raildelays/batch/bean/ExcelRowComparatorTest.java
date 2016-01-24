@@ -1,6 +1,7 @@
 package be.raildelays.batch.bean;
 
 
+import be.raildelays.delays.Delays;
 import be.raildelays.domain.Sens;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.TrainLine;
@@ -22,8 +23,8 @@ import static org.hamcrest.number.OrderingComparison.lessThan;
  */
 public class ExcelRowComparatorTest extends AbstractExcelRowComparatorTest {
 
-    private ExcelRow lho;
-    private ExcelRow rho;
+    private ExcelRow.Builder lho;
+    private ExcelRow.Builder rho;
 
     @Before
     public void setUp() throws Exception {
@@ -41,8 +42,8 @@ public class ExcelRowComparatorTest extends AbstractExcelRowComparatorTest {
                 .effectiveTrain1(new TrainLine.Builder(466L).build())
                 .effectiveTrain2(new TrainLine.Builder(515L).build())
                 .delay(0L);
-        lho = builder.build();
-        rho = builder.build();
+        lho = builder;
+        rho = new ExcelRow.Builder(builder.build());
     }
 
     /**
@@ -51,7 +52,7 @@ public class ExcelRowComparatorTest extends AbstractExcelRowComparatorTest {
      */
     @Test
     public void testEquals() throws Exception {
-        Assert.assertEquals(0, comparator.compare(lho, rho));
+        Assert.assertEquals(0, comparator.compare(lho.build(), rho.build()));
     }
 
     /**
@@ -68,7 +69,7 @@ public class ExcelRowComparatorTest extends AbstractExcelRowComparatorTest {
      */
     @Test
     public void testEqualsReferences() throws Exception {
-        Assert.assertThat(comparator.compare(lho, lho), is(equalTo(0)));
+        Assert.assertThat(comparator.compare(lho.build(), lho.build()), is(equalTo(0)));
     }
 
     /**
@@ -77,8 +78,8 @@ public class ExcelRowComparatorTest extends AbstractExcelRowComparatorTest {
      */
     @Test
     public void testLess() throws Exception {
-        rho.setDelay(15L);
-        Assert.assertThat(comparator.compare(lho, rho), is(lessThan(0)));
+        rho.delay(Delays.toMillis(15L));
+        Assert.assertThat(comparator.compare(lho.build(), rho.build()), is(lessThan(0)));
     }
 
     /**
@@ -87,8 +88,8 @@ public class ExcelRowComparatorTest extends AbstractExcelRowComparatorTest {
      */
     @Test
     public void testGreater() throws Exception {
-        lho.setDelay(15L);
-        Assert.assertThat(comparator.compare(lho, rho), is(greaterThan(0)));
+        lho.delay(Delays.toMillis(15L));
+        Assert.assertThat(comparator.compare(lho.build(), rho.build()), is(greaterThan(0)));
     }
 
     /**
@@ -97,7 +98,7 @@ public class ExcelRowComparatorTest extends AbstractExcelRowComparatorTest {
      */
     @Test
     public void testWithNullOnLeft() throws Exception {
-        Assert.assertThat(comparator.compare(null, rho), is(greaterThan(0)));
+        Assert.assertThat(comparator.compare(null, rho.build()), is(greaterThan(0)));
     }
 
     /**
@@ -106,6 +107,6 @@ public class ExcelRowComparatorTest extends AbstractExcelRowComparatorTest {
      */
     @Test
     public void testWithNullOnRight() throws Exception {
-        Assert.assertThat(comparator.compare(lho, null), is(lessThan(0)));
+        Assert.assertThat(comparator.compare(lho.build(), null), is(lessThan(0)));
     }
 }

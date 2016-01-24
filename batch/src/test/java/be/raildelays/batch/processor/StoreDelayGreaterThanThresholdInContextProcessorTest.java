@@ -22,39 +22,38 @@ public class StoreDelayGreaterThanThresholdInContextProcessorTest {
      * The System Under Test.
      */
     private StoreDelayGreaterThanThresholdInContextProcessor processor;
-    private StepExecution stepbExecution;
+    private StepExecution stepExecution;
 
-    private BatchExcelRow input;
+    private BatchExcelRow.Builder input;
 
     @Before
     public void setUp() throws Exception {
-        stepbExecution = MetaDataInstanceFactory.createStepExecution();
+        stepExecution = MetaDataInstanceFactory.createStepExecution();
 
         processor = new StoreDelayGreaterThanThresholdInContextProcessor();
         processor.setKeyName(KEY_NAME);
         processor.setThreshold(60L);
-        processor.beforeStep(stepbExecution);
+        processor.beforeStep(stepExecution);
         processor.afterPropertiesSet();
 
         input = new BatchExcelRow
                 .Builder(LocalDate.now(), Sens.DEPARTURE)
-                .expectedTrain1(RaildelaysTestUtils.generateTrain(466L))
-                .build(false);
+                .expectedTrain1(RaildelaysTestUtils.generateTrain(466L));
     }
 
     @Test
     public void testThatItemIsNotFiltered() throws Exception {
-        input.setDelay(Delays.toMillis(59L));
+        input.delay(Delays.toMillis(59L));
 
-        Assert.assertNotNull(processor.process(input));
+        Assert.assertNotNull(processor.process(input.build(false)));
     }
 
     @Test
     public void testThatTrainIdIsInTheContext() throws Exception {
-        input.setDelay(Delays.toMillis(61L));
-        processor.process(input);
+        input.delay(Delays.toMillis(61L));
+        processor.process(input.build(false));
 
-        Assert.assertEquals(input, ((Map) stepbExecution.getExecutionContext().get(KEY_NAME)).get(Sens.DEPARTURE));
+        Assert.assertEquals(input.build(false), ((Map) stepExecution.getExecutionContext().get(KEY_NAME)).get(Sens.DEPARTURE));
     }
 
     @Test
@@ -70,7 +69,7 @@ public class StoreDelayGreaterThanThresholdInContextProcessorTest {
                 .delay(Delays.toMillis(66L))
                 .build(false));
 
-        Assert.assertNotNull(((Map) stepbExecution.getExecutionContext().get(KEY_NAME)).get(Sens.DEPARTURE));
-        Assert.assertNotNull(((Map) stepbExecution.getExecutionContext().get(KEY_NAME)).get(Sens.ARRIVAL));
+        Assert.assertNotNull(((Map) stepExecution.getExecutionContext().get(KEY_NAME)).get(Sens.DEPARTURE));
+        Assert.assertNotNull(((Map) stepExecution.getExecutionContext().get(KEY_NAME)).get(Sens.ARRIVAL));
     }
 }

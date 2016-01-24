@@ -169,7 +169,7 @@ public class ExcelRow<T extends ExcelRow> implements Comparable<T>, Serializable
     }
 
     @Override
-    public int compareTo(ExcelRow excelRow) {
+    public int compareTo(T excelRow) {
         int result;
 
         if (excelRow == this) {
@@ -192,112 +192,56 @@ public class ExcelRow<T extends ExcelRow> implements Comparable<T>, Serializable
         return date;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
     public Station getArrivalStation() {
         return arrivalStation;
-    }
-
-    public void setArrivalStation(Station arrivalStation) {
-        this.arrivalStation = arrivalStation;
     }
 
     public Station getDepartureStation() {
         return departureStation;
     }
 
-    public void setDepartureStation(Station departureStation) {
-        this.departureStation = departureStation;
-    }
-
     public Station getLinkStation() {
         return linkStation;
-    }
-
-    public void setLinkStation(Station linkStation) {
-        this.linkStation = linkStation;
     }
 
     public LocalTime getExpectedDepartureTime() {
         return expectedDepartureTime;
     }
 
-    public void setExpectedDepartureTime(LocalTime expectedDepartureTime) {
-        this.expectedDepartureTime = expectedDepartureTime;
-    }
-
     public LocalTime getExpectedArrivalTime() {
         return expectedArrivalTime;
-    }
-
-    public void setExpectedArrivalTime(LocalTime expectedArrivalTime) {
-        this.expectedArrivalTime = expectedArrivalTime;
     }
 
     public TrainLine getExpectedTrainLine1() {
         return expectedTrainLine1;
     }
 
-    public void setExpectedTrainLine1(TrainLine expectedTrainLine1) {
-        this.expectedTrainLine1 = expectedTrainLine1;
-    }
-
     public TrainLine getExpectedTrainLine2() {
         return expectedTrainLine2;
-    }
-
-    public void setExpectedTrainLine2(TrainLine expectedTrainLine2) {
-        this.expectedTrainLine2 = expectedTrainLine2;
     }
 
     public LocalTime getEffectiveDepartureTime() {
         return effectiveDepartureTime;
     }
 
-    public void setEffectiveDepartureTime(LocalTime effectiveDepartureTime) {
-        this.effectiveDepartureTime = effectiveDepartureTime;
-    }
-
     public LocalTime getEffectiveArrivalTime() {
         return effectiveArrivalTime;
-    }
-
-    public void setEffectiveArrivalTime(LocalTime effectiveArrivalTime) {
-        this.effectiveArrivalTime = effectiveArrivalTime;
     }
 
     public TrainLine getEffectiveTrainLine1() {
         return effectiveTrainLine1;
     }
 
-    public void setEffectiveTrainLine1(TrainLine effectiveTrainLine1) {
-        this.effectiveTrainLine1 = effectiveTrainLine1;
-    }
-
     public TrainLine getEffectiveTrainLine2() {
         return effectiveTrainLine2;
-    }
-
-    public void setEffectiveTrainLine2(TrainLine effectiveTrainLine2) {
-        this.effectiveTrainLine2 = effectiveTrainLine2;
     }
 
     public Long getDelay() {
         return delay;
     }
 
-    public void setDelay(long delay) {
-        this.delay = delay;
-    }
-
     public Sens getSens() {
         return sens;
-    }
-
-    public void setSens(Sens sens) {
-        this.sens = sens;
     }
 
     public Long getId() {
@@ -394,6 +338,23 @@ public class ExcelRow<T extends ExcelRow> implements Comparable<T>, Serializable
         public Builder(final LocalDate date, final Sens sens) {
             this.date = date;
             this.sens = sens;
+        }
+
+        public Builder(ExcelRow excelRow) {
+            this.date = excelRow.date;
+            this.arrivalStation = excelRow.arrivalStation;
+            this.departureStation = excelRow.departureStation;
+            this.linkStation = excelRow.linkStation;
+            this.expectedDepartureTime = excelRow.expectedDepartureTime;
+            this.expectedArrivalTime = excelRow.expectedArrivalTime;
+            this.expectedTrainLine1 = excelRow.expectedTrainLine1;
+            this.expectedTrainLine2 = excelRow.expectedTrainLine2;
+            this.effectiveDepartureTime = excelRow.effectiveDepartureTime;
+            this.effectiveArrivalTime = excelRow.effectiveArrivalTime;
+            this.effectiveTrainLine1 = excelRow.effectiveTrainLine1;
+            this.effectiveTrainLine2 = excelRow.effectiveTrainLine2;
+            this.delay = excelRow.delay;
+            this.sens = excelRow.sens;
         }
 
         public Builder arrivalStation(final Station arrivalStation) {
