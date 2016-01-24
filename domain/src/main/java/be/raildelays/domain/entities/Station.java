@@ -35,7 +35,7 @@ import javax.persistence.Table;
 /**
  * Immutable entity defining a trainLine station.
  * <p>
- * Unicity of a trainLine is done on the English name.
+ * Uniqueness of a Station is done on the English name.
  *
  * @author Almex
  * @see AbstractEntity

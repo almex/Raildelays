@@ -5,7 +5,7 @@ import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.TrainLine;
 import be.raildelays.repository.LineStopDao;
-import be.raildelays.repository.TrainDao;
+import be.raildelays.repository.TrainLineDao;
 import org.junit.Test;
 
 import javax.annotation.Resource;
@@ -21,7 +21,7 @@ public class LineStopJpaDaoIT extends AbstractIT {
     private LineStopDao lineStopDao;
 
     @Resource
-    private TrainDao trainDao;
+    private TrainLineDao trainLineDao;
 
     @Test
     public void testSave() {
@@ -40,7 +40,7 @@ public class LineStopJpaDaoIT extends AbstractIT {
     @Test
     public void testFindByTrainAndDate() {
         LocalDate date = LocalDate.now();
-        TrainLine trainLine = trainDao.saveAndFlush(new TrainLine.Builder(466L).build());
+        TrainLine trainLine = trainLineDao.saveAndFlush(new TrainLine.Builder(466L).build());
         LineStop expectedLineStop = lineStopDao.save(new LineStop.Builder().date(date)
                 .train(trainLine)
                 .station(new Station("Liège-Guillemins"))
@@ -58,7 +58,7 @@ public class LineStopJpaDaoIT extends AbstractIT {
     @Test
     public void testFindByTrainIdAndDate() {
         LocalDate date = LocalDate.now();
-        TrainLine trainLine = trainDao.saveAndFlush(new TrainLine.Builder(466L).build());
+        TrainLine trainLine = trainLineDao.saveAndFlush(new TrainLine.Builder(466L).build());
         LineStop expectedLineStop = lineStopDao.save(new LineStop.Builder().date(date)
                 .train(trainLine)
                 .station(new Station("Liège-Guillemins"))

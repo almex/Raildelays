@@ -41,7 +41,7 @@ public interface StationDao extends JpaRepository<Station, Long> {
      * @param language in which you want to do the search.
      * @return a {@link Station}
      */
-    public Station findByEnglishName(String englishName);
+    Station findByEnglishName(String englishName);
 
 
     /**
@@ -51,7 +51,7 @@ public interface StationDao extends JpaRepository<Station, Long> {
      * @param language in which you want to do the search.
      * @return a {@link Station}
      */
-    public Station findByFrenchName(String frenchName);
+    Station findByFrenchName(String frenchName);
 
 
     /**
@@ -61,5 +61,5 @@ public interface StationDao extends JpaRepository<Station, Long> {
      * @param language in which you want to do the search.
      * @return a {@link Station}
      */
-    public Station findByDutchName(String dutchName);
+    Station findByDutchName(String dutchName);
 }

@@ -22,20 +22,24 @@
  * IN THE SOFTWARE.
  */
 
-package be.raildelays.domain.xls;
+package be.raildelays.repository;
 
-import java.util.List;
+import be.raildelays.domain.entities.TrainLine;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public class ExcelSheet {
+/**
+ * Repository that manage storing a {@link TrainLine}.
+ *
+ * @author Almex
+ */
+public interface TrainLineDao extends JpaRepository<TrainLine, Long> {
 
+    /**
+     * Search for a TrainLine by its route it (coming from GTFS data).
+     *
+     * @param routeId     strict name that should match to find a TrainLine.
+     * @return a {@link TrainLine}
+     */
+    TrainLine findByRouteId(Long routeId);
 
-    private List<ExcelRow> excelRows;
-
-    public List<ExcelRow> getExcelRows() {
-        return excelRows;
-    }
-
-    public void setExcelRows(List<ExcelRow> excelRows) {
-        this.excelRows = excelRows;
-    }
 }

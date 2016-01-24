@@ -26,11 +26,8 @@ package be.raildelays.logging;
 
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.delays.Delays;
-import be.raildelays.delays.TimeDelay;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.TrainLine;
-import be.raildelays.domain.railtime.Step;
-import be.raildelays.domain.railtime.Train;
 import be.raildelays.domain.xls.ExcelRow;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Marker;
@@ -92,21 +89,6 @@ public class RaildelaysLogger implements Logger {
     private char separator = ' ';
 
     private String type;
-    private Delegator<Step> stepDelegator = new Delegator<Step>() {
-        @Override
-        public String logLine(String message, Step object) {
-            TimeDelay departureTime = TimeDelay.of(object.getDateTime().toLocalTime(), object.getDelay());
-
-            return new LogLineBuilder()
-                    .message(message)
-                    .departureStation(object.getStation() != null ? object.getStation().getName() : null)
-                    .expectedDepartureTime(object.getDateTime().toLocalTime())
-                    .effectiveDepartureTime(departureTime != null ? departureTime.getEffectiveTime() : null)
-                    .canceledDeparture(object.isCanceled())
-                    .canceledArrival(object.isCanceled())
-                    .build();
-        }
-    };
     private Delegator<LineStop> lineStopDelegator = new Delegator<LineStop>() {
         @Override
         public String logLine(String message, LineStop object) {
@@ -209,20 +191,6 @@ public class RaildelaysLogger implements Logger {
                 result = station.getFrenchName();
             } else if (StringUtils.isNotBlank(station.getDutchName())) {
                 result = station.getDutchName();
-            }
-        }
-
-        return result;
-    }
-
-    private static Long getTrainId(Train train) {
-        Long result = null;
-
-        if (train != null && train.getIdRailtime() != null) {
-            try {
-                result = Long.parseLong(train.getIdRailtime());
-            } catch (NumberFormatException e) {
-                result = 0L;
             }
         }
 

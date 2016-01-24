@@ -3,11 +3,18 @@ package be.raildelays.domain.entities;
 import be.raildelays.delays.TimeDelay;
 import com.github.almex.pojounit.AbstractCloneableObjectTest;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.experimental.theories.DataPoint;
 
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.number.OrderingComparison.greaterThan;
 
 public class LineStopTest extends AbstractCloneableObjectTest {
 
@@ -60,6 +67,21 @@ public class LineStopTest extends AbstractCloneableObjectTest {
                 .canceledArrival(false)
                 .canceledDeparture(false)
                 .build();
+    }
+
+    @Test
+    public void testCompareToEquals() {
+        assertThat(DATA_POINT1.compareTo(DATA_POINT2), is(equalTo(0)));
+    }
+
+    @Test
+    public void testCompareToGreater() {
+        assertThat(DATA_POINT1.compareTo(DATA_POINT4), is(greaterThan(0)));
+    }
+
+    @Test
+    public void testCompareToLess() {
+        assertThat(DATA_POINT4.compareTo(DATA_POINT1), is(lessThan(0)));
     }
 
 }
