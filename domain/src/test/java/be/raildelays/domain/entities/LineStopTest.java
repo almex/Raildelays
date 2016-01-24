@@ -1,7 +1,7 @@
 package be.raildelays.domain.entities;
 
 import be.raildelays.delays.TimeDelay;
-import com.github.almex.pojounit.AbstractObjectTest;
+import com.github.almex.pojounit.AbstractCloneableObjectTest;
 import org.junit.Before;
 import org.junit.experimental.theories.DataPoint;
 
@@ -9,7 +9,7 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public class LineStopTest extends AbstractObjectTest {
+public class LineStopTest extends AbstractCloneableObjectTest {
 
     @DataPoint
     public static LineStop DATA_POINT1;

@@ -119,7 +119,7 @@
         <version.jodatime>2.3</version.jodatime>
         <version.animal.snifer>1.14</version.animal.snifer>
 
-        <version.pojo.unit>1.0.0</version.pojo.unit>
+        <version.pojo.unit>1.1.0</version.pojo.unit>
         <version.junit>4.12</version.junit>
         <version.hamcrest>2.0.0.0</version.hamcrest>
         <version.dbunit>2.4.9</version.dbunit>
