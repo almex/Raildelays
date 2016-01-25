@@ -437,7 +437,7 @@ public class LineStop extends AbstractEntity implements Stop<Station>, Comparabl
             LineStop result = doBuild();
 
             if (validate) {
-                validate(doBuild());
+                validate(result);
             }
 
             return result;
