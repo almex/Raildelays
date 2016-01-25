@@ -44,10 +44,7 @@ import static java.util.Comparator.*;
  * @implNote this class apply the Value Object pattern and is therefor immutable
  */
 @Entity
-@Table(
-        name = "TRAIN_LINE",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"SHORT_NAME"})
-)
+@Table(name = "TRAIN_LINE")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class TrainLine extends AbstractEntity implements Train, Route<LineStop>, Comparable<TrainLine> {
 
