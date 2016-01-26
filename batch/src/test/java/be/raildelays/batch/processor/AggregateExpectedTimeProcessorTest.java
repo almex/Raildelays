@@ -41,14 +41,14 @@ public class AggregateExpectedTimeProcessorTest extends EasyMockSupport {
         item = new LineStop
                 .Builder()
                 .date(TODAY)
-                .train(TRAIN_LINE)
+                .trainLine(TRAIN_LINE)
                 .station(INTERMEDIATE_STATION)
                 .arrivalTime(TimeDelay.of(LocalTime.parse("18:20"), 0L))
                 .departureTime(TimeDelay.of(LocalTime.parse("18:20"), 0L))
                 .addNext(new LineStop
                                 .Builder()
                                 .date(TODAY)
-                                .train(TRAIN_LINE)
+                        .trainLine(TRAIN_LINE)
                                 .station(ARRIVAL_STATION)
                                 .arrivalTime(TimeDelay.of(null, 0L))
                                 .departureTime(TimeDelay.of(null, 0L))
@@ -57,7 +57,7 @@ public class AggregateExpectedTimeProcessorTest extends EasyMockSupport {
                 .addPrevious(new LineStop
                                 .Builder()
                                 .date(TODAY)
-                                .train(TRAIN_LINE)
+                        .trainLine(TRAIN_LINE)
                                 .station(DEPARTURE_STATION)
                                 .arrivalTime(TimeDelay.of(null, 0L))
                                 .departureTime(TimeDelay.of(null, 0L))
@@ -67,7 +67,7 @@ public class AggregateExpectedTimeProcessorTest extends EasyMockSupport {
         expected = new LineStop
                 .Builder()
                 .date(TODAY)
-                .train(TRAIN_LINE)
+                .trainLine(TRAIN_LINE)
                 .station(INTERMEDIATE_STATION)
                 .arrivalTime(TimeDelay.of(LocalTime.parse("18:20"), 0L))
                 .departureTime(TimeDelay.of(LocalTime.parse("18:21"), 0L))
@@ -76,7 +76,7 @@ public class AggregateExpectedTimeProcessorTest extends EasyMockSupport {
                 .addNext(new LineStop
                                 .Builder()
                                 .date(TODAY)
-                        .train(new TrainLine.Builder(1L).build()).station(ARRIVAL_STATION)
+                        .trainLine(new TrainLine.Builder(1L).build()).station(ARRIVAL_STATION)
                                 .arrivalTime(TimeDelay.of(LocalTime.parse("18:30"), 0L))
                                 .departureTime(TimeDelay.of(LocalTime.parse("18:31"), 0L))
                                 .canceledDeparture(true)
@@ -85,7 +85,7 @@ public class AggregateExpectedTimeProcessorTest extends EasyMockSupport {
                 .addPrevious(new LineStop
                                 .Builder()
                                 .date(TODAY)
-                        .train(new TrainLine.Builder(1L).build()).station(DEPARTURE_STATION)
+                        .trainLine(new TrainLine.Builder(1L).build()).station(DEPARTURE_STATION)
                                 .arrivalTime(TimeDelay.of(LocalTime.parse("17:00"), 0L))
                                 .departureTime(TimeDelay.of(LocalTime.parse("17:01"), 0L))
                                 .canceledDeparture(true)

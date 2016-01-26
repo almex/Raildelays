@@ -1,7 +1,11 @@
 package be.raildelays.domain.entities;
 
 import com.github.almex.pojounit.AbstractObjectTest;
+import org.junit.Test;
 import org.junit.experimental.theories.DataPoint;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class TrainLineTest extends AbstractObjectTest {
 
@@ -42,6 +46,15 @@ public class TrainLineTest extends AbstractObjectTest {
         DATA_POINT4 = new TrainLine.Builder(1717L).build();
 
         DATA_POINT5 = new TrainLine.Builder((Long) null).build(false);
+    }
 
+    @Test
+    public void testAccessors() {
+        assertNull(DATA_POINT1.getDeparture());
+        assertNull(DATA_POINT1.getDestination());
+        assertNotNull(DATA_POINT1.getShortName());
+        assertNotNull(DATA_POINT1.getLongName());
+        assertNotNull(DATA_POINT1.getRouteId());
+        assertNotNull(DATA_POINT1.getName());
     }
 }

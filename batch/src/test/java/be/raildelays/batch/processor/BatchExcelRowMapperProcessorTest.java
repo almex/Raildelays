@@ -45,7 +45,7 @@ public class BatchExcelRowMapperProcessorTest {
         LineStop.Builder builder = new LineStop
                 .Builder()
                 .date(today)
-                .train(new TrainLine.Builder(466L).build())
+                .trainLine(new TrainLine.Builder(466L).build())
                 .station(new Station("station1"))
                 .arrivalTime(arrivalTime)
                 .departureTime(departureTime)
@@ -56,7 +56,7 @@ public class BatchExcelRowMapperProcessorTest {
         builder.addNext(new LineStop
                 .Builder()
                 .date(today)
-                .train(new TrainLine.Builder(466L).build())
+                .trainLine(new TrainLine.Builder(466L).build())
                 .station(new Station("stationA"))
                 .arrivalTime(arrivalTime)
                 .departureTime(departureTime)
@@ -67,7 +67,7 @@ public class BatchExcelRowMapperProcessorTest {
         builder.addNext(new LineStop
                 .Builder()
                 .date(today)
-                .train(new TrainLine.Builder(466L).build())
+                .trainLine(new TrainLine.Builder(466L).build())
                 .station(new Station("station2"))
                 .arrivalTime(arrivalTime)
                 .departureTime(departureTime)
@@ -78,7 +78,7 @@ public class BatchExcelRowMapperProcessorTest {
         builder.addNext(new LineStop
                 .Builder()
                 .date(today)
-                .train(new TrainLine.Builder(466L).build())
+                .trainLine(new TrainLine.Builder(466L).build())
                 .station(new Station("stationB"))
                 .arrivalTime(arrivalTime)
                 .departureTime(departureTime)
@@ -88,7 +88,7 @@ public class BatchExcelRowMapperProcessorTest {
         builder.addNext(new LineStop
                 .Builder()
                 .date(today)
-                .train(new TrainLine.Builder(466L).build())
+                .trainLine(new TrainLine.Builder(466L).build())
                 .station(new Station("station3"))
                 .arrivalTime(arrivalTime)
                 .departureTime(null)

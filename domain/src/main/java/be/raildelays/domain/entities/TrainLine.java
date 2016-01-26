@@ -34,7 +34,7 @@ import java.util.Objects;
 import static java.util.Comparator.*;
 
 /**
- * Entity defining a train line.
+ * Entity defining a trainLine line.
  * To help building this entity and as the only way to do it
  * we embedded a {@link Builder}.
  * The unity of this entity is based on its {@link #routeId}
@@ -110,8 +110,6 @@ public class TrainLine extends AbstractEntity implements Train, Route<LineStop>,
     public int compareTo(TrainLine trainLine) {
         return Objects.compare(this, trainLine, (lho, rho) ->
                 comparing(TrainLine::getRouteId, nullsLast(naturalOrder()))
-                        //.thenComparing(TrainLine::getShortName, nullsLast(naturalOrder()))
-                        //.thenComparing(TrainLine::getLongName, nullsLast(naturalOrder()))
                         .compare(lho, rho)
         );
     }
@@ -120,8 +118,8 @@ public class TrainLine extends AbstractEntity implements Train, Route<LineStop>,
         private String shortName;
         private String longName;
         private Long routeId;
-        private LineStop.Builder departure;
-        private LineStop.Builder destination;
+        private LineStop departure;
+        private LineStop destination;
 
         /**
          * Minimal initialization constructor.
@@ -142,8 +140,8 @@ public class TrainLine extends AbstractEntity implements Train, Route<LineStop>,
                 this.routeId = toCopy.routeId;
                 this.shortName = toCopy.shortName;
                 this.longName = toCopy.longName;
-                this.departure = new LineStop.Builder(toCopy.departure);
-                this.destination = new LineStop.Builder(toCopy.destination);
+                this.departure = toCopy.departure;
+                this.destination = toCopy.destination;
             }
         }
 
@@ -158,12 +156,12 @@ public class TrainLine extends AbstractEntity implements Train, Route<LineStop>,
         }
 
         public Builder departure(final LineStop departure) {
-            this.departure = new LineStop.Builder(departure);
+            this.departure = departure;
             return this;
         }
 
         public Builder destination(final LineStop destination) {
-            this.destination = new LineStop.Builder(destination);
+            this.destination = destination;
             return this;
         }
 
@@ -173,9 +171,6 @@ public class TrainLine extends AbstractEntity implements Train, Route<LineStop>,
 
         public TrainLine build(final boolean validate) {
             TrainLine result = new TrainLine(this);
-
-            result.destination = this.destination != null ? this.destination.build(validate) : null;
-            result.departure = this.departure != null ? this.departure.build(validate) : null;
 
             if (validate) {
                 validate(result);

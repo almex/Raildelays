@@ -57,7 +57,13 @@ public abstract class AbstractEntity implements Serializable {
     @Override
     public abstract int hashCode();
 
-    protected static <T> T validate(T object) throws IllegalArgumentException {
+    /**
+     * @param object
+     * @param <T>
+     * @return
+     * @throws IllegalArgumentException
+     */
+    protected static <T> T validate(T object) {
         Set<ConstraintViolation<T>> violations = validator.validate(object);
 
         if (!violations.isEmpty()) {

@@ -36,7 +36,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Line stop determine a stop for train line.
+ * Line stop determine a stop for trainLine line.
  * To help building this entity and as the only way to do it
  * we embedded a {@link Builder}.
  *
@@ -162,19 +162,6 @@ public class LineStop extends AbstractEntity implements Stop<Station>, Comparabl
                 .toHashCode();
     }
 
-    @SuppressWarnings("CloneDoesntDeclareCloneNotSupportedException")
-    // I want to expose the fact that this method does not throw CloneNotSupportedException
-    @Override
-    public LineStop clone() {
-        try {
-            super.clone();
-        } catch (CloneNotSupportedException e) {
-            // Swallow the Exception because in that case it means that super does
-            // not have to be involved in the cloning.
-        }
-        return new Builder(this).build();
-    }
-
     @Override
     @SuppressWarnings("NullableProblems") // We handle it in our implementation
     public int compareTo(final LineStop lineStop) {
@@ -195,10 +182,12 @@ public class LineStop extends AbstractEntity implements Stop<Station>, Comparabl
         return result;
     }
 
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public TimeDelay getArrivalTime() {
         return arrivalTime;
     }
@@ -208,6 +197,7 @@ public class LineStop extends AbstractEntity implements Stop<Station>, Comparabl
         return getStation();
     }
 
+    @Override
     public TimeDelay getDepartureTime() {
         return departureTime;
     }
@@ -263,13 +253,28 @@ public class LineStop extends AbstractEntity implements Stop<Station>, Comparabl
         private Builder previous;
         private Builder next;
 
+        /**
+         * Default constructor.
+         */
         public Builder() {
         }
 
+        /**
+         * Copy constructor.
+         *
+         * @param lineStop to copy
+         */
         public Builder(LineStop lineStop) {
             this(lineStop, true, true);
         }
 
+        /**
+         * Copy constructor where you can define if you want to copy linked elements.
+         *
+         * @param lineStop     to copy
+         * @param copyPrevious enable copying of backwards links
+         * @param copyNext     enable copying of forwards links
+         */
         public Builder(LineStop lineStop, boolean copyPrevious, boolean copyNext) {
             if (lineStop != null) {
                 this.id = lineStop.id;
@@ -288,7 +293,7 @@ public class LineStop extends AbstractEntity implements Stop<Station>, Comparabl
                     backwardBuilder.previous = new Builder()
                             .id(previousLineStop.id)
                             .date(previousLineStop.date)
-                            .train(previousLineStop.trainLine)
+                            .trainLine(previousLineStop.trainLine)
                             .station(previousLineStop.station)
                             .arrivalTime(previousLineStop.arrivalTime)
                             .departureTime(previousLineStop.departureTime)
@@ -307,7 +312,7 @@ public class LineStop extends AbstractEntity implements Stop<Station>, Comparabl
                     forwardBuilder.next = new Builder()
                             .id(nextLineStop.id)
                             .date(nextLineStop.date)
-                            .train(nextLineStop.trainLine)
+                            .trainLine(nextLineStop.trainLine)
                             .station(nextLineStop.station)
                             .arrivalTime(nextLineStop.arrivalTime)
                             .departureTime(nextLineStop.departureTime)
@@ -347,7 +352,7 @@ public class LineStop extends AbstractEntity implements Stop<Station>, Comparabl
             return this;
         }
 
-        public Builder train(TrainLine trainLine) {
+        public Builder trainLine(TrainLine trainLine) {
             this.trainLine = trainLine;
 
             return this;
@@ -355,16 +360,6 @@ public class LineStop extends AbstractEntity implements Stop<Station>, Comparabl
 
         public Builder station(Station station) {
             this.station = station;
-
-            return this;
-        }
-
-        /**
-         * Use {@link #canceledDeparture} or {@link #canceledArrival} instead.
-         */
-        @Deprecated
-        public Builder canceled(boolean canceled) {
-            this.canceledDeparture = this.canceledArrival = canceled;
 
             return this;
         }
@@ -456,9 +451,6 @@ public class LineStop extends AbstractEntity implements Stop<Station>, Comparabl
             while (previousBuilder != null) {
                 backwardLineStop.previous = new LineStop(previousBuilder);
                 backwardLineStop.previous.next = backwardLineStop;
-
-                validate(backwardLineStop.previous);
-
                 previousBuilder = previousBuilder.previous;
                 backwardLineStop = backwardLineStop.previous;
             }
@@ -469,9 +461,6 @@ public class LineStop extends AbstractEntity implements Stop<Station>, Comparabl
             while (nextBuilder != null) {
                 forwardLineStop.next = new LineStop(nextBuilder);
                 forwardLineStop.next.previous = forwardLineStop;
-
-                validate(forwardLineStop.next);
-
                 nextBuilder = nextBuilder.next;
                 forwardLineStop = forwardLineStop.next;
             }

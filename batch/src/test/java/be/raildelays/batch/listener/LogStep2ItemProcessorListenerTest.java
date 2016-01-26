@@ -37,7 +37,7 @@ public class LogStep2ItemProcessorListenerTest {
                         .Builder()
                         .date(LocalDate.now())
                         .station(new Station("foo"))
-                .train(new TrainLine.Builder(466L).build())
+                .trainLine(new TrainLine.Builder(466L).build())
                         .departureTime(TimeDelay.now())
                         .arrivalTime(TimeDelay.now().withDelay(15L))
                         .build()

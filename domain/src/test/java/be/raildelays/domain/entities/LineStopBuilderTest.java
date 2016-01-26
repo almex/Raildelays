@@ -19,7 +19,7 @@ public class LineStopBuilderTest {
     @Test
     public void testMostSimpleBuild() {
         final LineStop.Builder builder = new LineStop.Builder()
-                .train(new TrainLine())
+                .trainLine(new TrainLine())
                 .station(new Station())
                 .date(LocalDate.now());
 
@@ -30,7 +30,7 @@ public class LineStopBuilderTest {
     public void testToBuildAllValues() {
         final LineStop.Builder builder = new LineStop.Builder()
                 .id(1L)
-                .train(new TrainLine())
+                .trainLine(new TrainLine())
                 .station(new Station())
                 .date(LocalDate.now())
                 .arrivalTime(TimeDelay.now())
@@ -46,7 +46,7 @@ public class LineStopBuilderTest {
         final LocalDate firstDate = LocalDate.ofEpochDay(0);
         final LocalDate secondDate = LocalDate.ofEpochDay(5000);
         final LineStop.Builder builder = new LineStop.Builder()
-                .train(new TrainLine())
+                .trainLine(new TrainLine())
                 .station(new Station())
                 .date(firstDate);
 
@@ -60,15 +60,15 @@ public class LineStopBuilderTest {
     @Test
     public void testAddNextBuilder() {
         final LineStop.Builder builder = new LineStop.Builder()
-                .train(new TrainLine())
+                .trainLine(new TrainLine())
                 .station(new Station())
                 .date(LocalDate.now())
                 .addNext(new LineStop.Builder()
-                        .train(new TrainLine())
+                        .trainLine(new TrainLine())
                         .station(new Station())
                         .date(LocalDate.now()))
                 .addNext(new LineStop.Builder()
-                        .train(new TrainLine())
+                        .trainLine(new TrainLine())
                         .station(new Station())
                         .date(LocalDate.now()));
 
@@ -83,16 +83,16 @@ public class LineStopBuilderTest {
     @Test
     public void testAddNextLineStop() {
         final LineStop.Builder builder = new LineStop.Builder()
-                .train(new TrainLine())
+                .trainLine(new TrainLine())
                 .station(new Station())
                 .date(LocalDate.now())
                 .addNext(new LineStop.Builder()
-                        .train(new TrainLine())
+                        .trainLine(new TrainLine())
                         .station(new Station())
                         .date(LocalDate.now())
                         .build())
                 .addNext(new LineStop.Builder()
-                        .train(new TrainLine())
+                        .trainLine(new TrainLine())
                         .station(new Station())
                         .date(LocalDate.now())
                         .build());
@@ -104,15 +104,15 @@ public class LineStopBuilderTest {
     @Test
     public void testAddPreviousBuilder() {
         final LineStop.Builder builder = new LineStop.Builder()
-                .train(new TrainLine())
+                .trainLine(new TrainLine())
                 .station(new Station())
                 .date(LocalDate.now())
                 .addPrevious(new LineStop.Builder()
-                        .train(new TrainLine())
+                        .trainLine(new TrainLine())
                         .station(new Station())
                         .date(LocalDate.now()))
                 .addPrevious(new LineStop.Builder()
-                        .train(new TrainLine())
+                        .trainLine(new TrainLine())
                         .station(new Station())
                         .date(LocalDate.now()));
 
@@ -123,16 +123,16 @@ public class LineStopBuilderTest {
     @Test
     public void testAddPreviousLineStop() {
         final LineStop.Builder builder = new LineStop.Builder()
-                .train(new TrainLine())
+                .trainLine(new TrainLine())
                 .station(new Station())
                 .date(LocalDate.now())
                 .addPrevious(new LineStop.Builder()
-                        .train(new TrainLine())
+                        .trainLine(new TrainLine())
                         .station(new Station())
                         .date(LocalDate.now())
                         .build())
                 .addPrevious(new LineStop.Builder()
-                        .train(new TrainLine())
+                        .trainLine(new TrainLine())
                         .station(new Station())
                         .date(LocalDate.now())
                         .build());

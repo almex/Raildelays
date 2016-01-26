@@ -71,13 +71,13 @@ public class SearchNextTrainLineProcessorTest extends EasyMockSupport {
                 .delay(0L);
 
         stop0 = new LineStop.Builder().date(TODAY)
-                .train(new TrainLine.Builder(N0).build()).station(ARRIVAL_STATION)
+                .trainLine(new TrainLine.Builder(N0).build()).station(ARRIVAL_STATION)
                 .arrivalTime(TimeDelay.of(LocalTime.parse("18:00"), 0L))
                 .departureTime(TimeDelay.of(LocalTime.parse("18:00"), 0L))
                 .canceledArrival(false)
                 .canceledDeparture(false)
                 .addPrevious(new LineStop.Builder().date(TODAY)
-                        .train(new TrainLine.Builder(N0).build()).station(DEPARTURE_STATION)
+                        .trainLine(new TrainLine.Builder(N0).build()).station(DEPARTURE_STATION)
                         .arrivalTime(TimeDelay.of(LocalTime.parse("17:30"), 0L))
                         .departureTime(TimeDelay.of(LocalTime.parse("17:30"), 0L))
                         .canceledArrival(false)
@@ -85,13 +85,13 @@ public class SearchNextTrainLineProcessorTest extends EasyMockSupport {
                 .build();
 
         stop1 = new LineStop.Builder().date(TODAY)
-                .train(new TrainLine.Builder(N1).build()).station(ARRIVAL_STATION)
+                .trainLine(new TrainLine.Builder(N1).build()).station(ARRIVAL_STATION)
                 .arrivalTime(TimeDelay.of(LocalTime.parse("18:30"), 0L))
                 .departureTime(TimeDelay.of(LocalTime.parse("18:30"), 0L))
                 .canceledArrival(false)
                 .canceledDeparture(false)
                 .addPrevious(new LineStop.Builder().date(TODAY)
-                        .train(new TrainLine.Builder(N1).build()).station(DEPARTURE_STATION)
+                        .trainLine(new TrainLine.Builder(N1).build()).station(DEPARTURE_STATION)
                         .arrivalTime(TimeDelay.of(LocalTime.parse("17:00"), 0L))
                         .departureTime(TimeDelay.of(LocalTime.parse("17:00"), 0L))
                         .canceledArrival(false)
@@ -160,22 +160,22 @@ public class SearchNextTrainLineProcessorTest extends EasyMockSupport {
         final Language lang = Language.FR;
 
         stop0 = new LineStop.Builder(stop0, false, false)
-                .train(new TrainLine.Builder(N0).build())
+                .trainLine(new TrainLine.Builder(N0).build())
                 .station(new Station(BRUXELLES_CENTRAL, lang))
                 .addPrevious(new LineStop
                         .Builder(stop0.getPrevious(), false, false)
-                        .train(new TrainLine.Builder(N0).build())
+                        .trainLine(new TrainLine.Builder(N0).build())
                         .station(new Station(LIEGE_GUILLEMINS, lang))
                 )
                 .canceledArrival(true)
                 .canceledDeparture(true)
                 .build();
         stop1 = new LineStop.Builder(stop1, false, false)
-                .train(new TrainLine.Builder(N1).build())
+                .trainLine(new TrainLine.Builder(N1).build())
                 .station(new Station(BRUXELLES_CENTRAL, lang))
                 .addPrevious(new LineStop
                         .Builder(stop1.getPrevious(), false, false)
-                        .train(new TrainLine.Builder(N1).build())
+                        .trainLine(new TrainLine.Builder(N1).build())
                         .station(new Station(LIEGE_GUILLEMINS, lang))
                 )
                 .build();
@@ -219,20 +219,20 @@ public class SearchNextTrainLineProcessorTest extends EasyMockSupport {
         final Language lang = Language.NL;
 
         stop0 = new LineStop.Builder(stop0, false, false)
-                .train(new TrainLine.Builder(N0).build())
+                .trainLine(new TrainLine.Builder(N0).build())
                 .station(new Station(BRUXELLES_CENTRAL, lang))
                 .addPrevious(new LineStop
                         .Builder(stop0.getPrevious(), false, false)
-                        .train(new TrainLine.Builder(N0).build())
+                        .trainLine(new TrainLine.Builder(N0).build())
                         .station(new Station(LIEGE_GUILLEMINS, lang))
                 )
                 .build();
         stop1 = new LineStop.Builder(stop1, false, false)
-                .train(new TrainLine.Builder(N1).build())
+                .trainLine(new TrainLine.Builder(N1).build())
                 .station(new Station(BRUXELLES_CENTRAL, lang))
                 .addPrevious(new LineStop
                         .Builder(stop1.getPrevious(), false, false)
-                        .train(new TrainLine.Builder(N1).build())
+                        .trainLine(new TrainLine.Builder(N1).build())
                         .station(new Station(LIEGE_GUILLEMINS, lang))
                 )
                 .build();
