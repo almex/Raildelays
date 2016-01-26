@@ -28,11 +28,16 @@ public class TrainLineTest extends AbstractObjectTest {
      */
     @Override
     public void setUp() throws Exception {
-        DATA_POINT1 = new TrainLine.Builder(466L).build();
+        DATA_POINT1 = new TrainLine.Builder(466L)
+                .shortName("Liège - Verviers")
+                .longName("IC466 : Liège - Verviers")
+                .departure(null)
+                .destination(null)
+                .build(false);
 
         DATA_POINT2 = DATA_POINT1;
 
-        DATA_POINT3 = new TrainLine.Builder(466L).build();
+        DATA_POINT3 = new TrainLine.Builder(DATA_POINT1).build(false);
 
         DATA_POINT4 = new TrainLine.Builder(1717L).build();
 

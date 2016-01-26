@@ -271,51 +271,53 @@ public class LineStop extends AbstractEntity implements Stop<Station>, Comparabl
         }
 
         public Builder(LineStop lineStop, boolean copyPrevious, boolean copyNext) {
-            this.id = lineStop.id;
-            this.date = lineStop.date;
-            this.trainLine = lineStop.trainLine;
-            this.station = lineStop.station;
-            this.arrivalTime = lineStop.arrivalTime;
-            this.departureTime = lineStop.departureTime;
-            this.canceledDeparture = lineStop.canceledDeparture;
-            this.canceledArrival = lineStop.canceledArrival;
+            if (lineStop != null) {
+                this.id = lineStop.id;
+                this.date = lineStop.date;
+                this.trainLine = lineStop.trainLine;
+                this.station = lineStop.station;
+                this.arrivalTime = lineStop.arrivalTime;
+                this.departureTime = lineStop.departureTime;
+                this.canceledDeparture = lineStop.canceledDeparture;
+                this.canceledArrival = lineStop.canceledArrival;
 
-            //-- Copy backward
-            LineStop previousLineStop = lineStop.previous;
-            Builder backwardBuilder = this;
-            while (previousLineStop != null && copyPrevious) {
-                backwardBuilder.previous = new Builder()
-                        .id(previousLineStop.id)
-                        .date(previousLineStop.date)
-                        .train(previousLineStop.trainLine)
-                        .station(previousLineStop.station)
-                        .arrivalTime(previousLineStop.arrivalTime)
-                        .departureTime(previousLineStop.departureTime)
-                        .canceledDeparture(previousLineStop.canceledDeparture)
-                        .canceledArrival(previousLineStop.canceledArrival)
-                        .addNext(backwardBuilder);
+                //-- Copy backward
+                LineStop previousLineStop = lineStop.previous;
+                Builder backwardBuilder = this;
+                while (previousLineStop != null && copyPrevious) {
+                    backwardBuilder.previous = new Builder()
+                            .id(previousLineStop.id)
+                            .date(previousLineStop.date)
+                            .train(previousLineStop.trainLine)
+                            .station(previousLineStop.station)
+                            .arrivalTime(previousLineStop.arrivalTime)
+                            .departureTime(previousLineStop.departureTime)
+                            .canceledDeparture(previousLineStop.canceledDeparture)
+                            .canceledArrival(previousLineStop.canceledArrival)
+                            .addNext(backwardBuilder);
 
-                backwardBuilder = backwardBuilder.previous;
-                previousLineStop = previousLineStop.previous;
-            }
+                    backwardBuilder = backwardBuilder.previous;
+                    previousLineStop = previousLineStop.previous;
+                }
 
-            //-- Copy forward
-            LineStop nextLineStop = lineStop.next;
-            Builder forwardBuilder = this;
-            while (nextLineStop != null && copyNext) {
-                forwardBuilder.next = new Builder()
-                        .id(nextLineStop.id)
-                        .date(nextLineStop.date)
-                        .train(nextLineStop.trainLine)
-                        .station(nextLineStop.station)
-                        .arrivalTime(nextLineStop.arrivalTime)
-                        .departureTime(nextLineStop.departureTime)
-                        .canceledDeparture(nextLineStop.canceledDeparture)
-                        .canceledArrival(nextLineStop.canceledArrival)
-                        .addPrevious(forwardBuilder);
+                //-- Copy forward
+                LineStop nextLineStop = lineStop.next;
+                Builder forwardBuilder = this;
+                while (nextLineStop != null && copyNext) {
+                    forwardBuilder.next = new Builder()
+                            .id(nextLineStop.id)
+                            .date(nextLineStop.date)
+                            .train(nextLineStop.trainLine)
+                            .station(nextLineStop.station)
+                            .arrivalTime(nextLineStop.arrivalTime)
+                            .departureTime(nextLineStop.departureTime)
+                            .canceledDeparture(nextLineStop.canceledDeparture)
+                            .canceledArrival(nextLineStop.canceledArrival)
+                            .addPrevious(forwardBuilder);
 
-                forwardBuilder = forwardBuilder.next;
-                nextLineStop = nextLineStop.next;
+                    forwardBuilder = forwardBuilder.next;
+                    nextLineStop = nextLineStop.next;
+                }
             }
         }
 

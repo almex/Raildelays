@@ -40,8 +40,8 @@ import static java.util.Comparator.*;
  * The unity of this entity is based on its {@link #routeId}
  *
  * @author Almex
- * @see AbstractEntity
  * @implNote this class apply the Value Object pattern and is therefor immutable
+ * @see AbstractEntity
  */
 @Entity
 @Table(name = "TRAIN_LINE")
@@ -77,8 +77,6 @@ public class TrainLine extends AbstractEntity implements Train, Route<LineStop>,
         this.shortName = builder.shortName;
         this.longName = builder.longName;
         this.routeId = builder.routeId;
-        this.departure = builder.departure;
-        this.destination = builder.destination;
     }
 
     @Override
@@ -112,8 +110,8 @@ public class TrainLine extends AbstractEntity implements Train, Route<LineStop>,
     public int compareTo(TrainLine trainLine) {
         return Objects.compare(this, trainLine, (lho, rho) ->
                 comparing(TrainLine::getRouteId, nullsLast(naturalOrder()))
-                //.thenComparing(TrainLine::getShortName, nullsLast(naturalOrder()))
-                //.thenComparing(TrainLine::getLongName, nullsLast(naturalOrder()))
+                        //.thenComparing(TrainLine::getShortName, nullsLast(naturalOrder()))
+                        //.thenComparing(TrainLine::getLongName, nullsLast(naturalOrder()))
                         .compare(lho, rho)
         );
     }
@@ -122,8 +120,8 @@ public class TrainLine extends AbstractEntity implements Train, Route<LineStop>,
         private String shortName;
         private String longName;
         private Long routeId;
-        private LineStop departure;
-        private LineStop destination;
+        private LineStop.Builder departure;
+        private LineStop.Builder destination;
 
         /**
          * Minimal initialization constructor.
@@ -140,11 +138,13 @@ public class TrainLine extends AbstractEntity implements Train, Route<LineStop>,
          * @param toCopy {@link TrainLine} to copy
          */
         public Builder(final TrainLine toCopy) {
-            this.routeId = toCopy.routeId;
-            this.shortName = toCopy.shortName;
-            this.longName = toCopy.longName;
-            this.departure = new LineStop.Builder(toCopy.departure).build();
-            this.destination = new LineStop.Builder(toCopy.destination).build();
+            if (toCopy != null) {
+                this.routeId = toCopy.routeId;
+                this.shortName = toCopy.shortName;
+                this.longName = toCopy.longName;
+                this.departure = new LineStop.Builder(toCopy.departure);
+                this.destination = new LineStop.Builder(toCopy.destination);
+            }
         }
 
         public Builder shortName(final String shortName) {
@@ -158,12 +158,12 @@ public class TrainLine extends AbstractEntity implements Train, Route<LineStop>,
         }
 
         public Builder departure(final LineStop departure) {
-            this.departure = departure;
+            this.departure = new LineStop.Builder(departure);
             return this;
         }
 
         public Builder destination(final LineStop destination) {
-            this.destination = destination;
+            this.destination = new LineStop.Builder(destination);
             return this;
         }
 
@@ -173,6 +173,9 @@ public class TrainLine extends AbstractEntity implements Train, Route<LineStop>,
 
         public TrainLine build(final boolean validate) {
             TrainLine result = new TrainLine(this);
+
+            result.destination = this.destination != null ? this.destination.build(validate) : null;
+            result.departure = this.departure != null ? this.departure.build(validate) : null;
 
             if (validate) {
                 validate(result);
