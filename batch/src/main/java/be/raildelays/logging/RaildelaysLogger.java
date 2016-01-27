@@ -26,6 +26,7 @@ package be.raildelays.logging;
 
 import be.raildelays.batch.bean.BatchExcelRow;
 import be.raildelays.delays.Delays;
+import be.raildelays.domain.entities.I18nEntity;
 import be.raildelays.domain.entities.LineStop;
 import be.raildelays.domain.entities.TrainLine;
 import be.raildelays.domain.xls.ExcelRow;
@@ -102,7 +103,7 @@ public class RaildelaysLogger implements Logger {
                     .id(object.getId())
                     .date(object.getDate())
                     .expectedTrain(getTrainId(object.getTrainLine()))
-                    .departureStation(getStationName(object.getStation()))
+                    .departureStation(I18nEntity.getNotNullName(object.getStation()))
                     .expectedDepartureTime(object.getArrivalTime() != null ? object.getArrivalTime().getExpectedTime() : null)
                     .expectedArrivalTime(object.getDepartureTime() != null ? object.getDepartureTime().getExpectedTime() : null)
                     .effectiveDepartureTime(object.getArrivalTime() != null ? object.getArrivalTime().getEffectiveTime() : null)
@@ -114,7 +115,7 @@ public class RaildelaysLogger implements Logger {
                     .build();
         }
     };
-    private Delegator<ExcelRow> excelRowDelegator = new Delegator<ExcelRow>() {
+    private Delegator<ExcelRow> excelRowDelegator = new Delegator<ExcelRow>() { // NOSONAR
         @Override
         public String logLine(String message, ExcelRow object) {
             return new LogLineBuilder()
@@ -123,8 +124,8 @@ public class RaildelaysLogger implements Logger {
                     .date(object.getDate())
                     .expectedTrain(getTrainId(object.getExpectedTrainLine1()))
                     .effectiveTrain(getTrainId(object.getEffectiveTrainLine1()))
-                    .departureStation(getStationName(object.getDepartureStation()))
-                    .arrivalStation(getStationName(object.getArrivalStation()))
+                    .departureStation(I18nEntity.getNotNullName(object.getDepartureStation()))
+                    .arrivalStation(I18nEntity.getNotNullName(object.getArrivalStation()))
                     .expectedDepartureTime(object.getExpectedDepartureTime())
                     .expectedArrivalTime(object.getExpectedArrivalTime())
                     .effectiveDepartureTime(object.getEffectiveDepartureTime())
@@ -141,8 +142,8 @@ public class RaildelaysLogger implements Logger {
                     .date(object.getDate())
                     .expectedTrain(getTrainId(object.getExpectedTrainLine1()))
                     .effectiveTrain(getTrainId(object.getEffectiveTrainLine1()))
-                    .departureStation(getStationName(object.getDepartureStation()))
-                    .arrivalStation(getStationName(object.getArrivalStation()))
+                    .departureStation(I18nEntity.getNotNullName(object.getDepartureStation()))
+                    .arrivalStation(I18nEntity.getNotNullName(object.getArrivalStation()))
                     .expectedDepartureTime(object.getExpectedDepartureTime())
                     .expectedArrivalTime(object.getExpectedArrivalTime())
                     .effectiveDepartureTime(object.getEffectiveDepartureTime())
@@ -175,22 +176,6 @@ public class RaildelaysLogger implements Logger {
                 }
             } catch (NumberFormatException e) {
                 result = 0L;
-            }
-        }
-
-        return result;
-    }
-
-    private static String getStationName(be.raildelays.domain.entities.Station station) {
-        String result = null;
-
-        if (station != null) {
-            if (StringUtils.isNotBlank(station.getEnglishName())) {
-                result = station.getEnglishName();
-            } else if (StringUtils.isNotBlank(station.getFrenchName())) {
-                result = station.getFrenchName();
-            } else if (StringUtils.isNotBlank(station.getDutchName())) {
-                result = station.getDutchName();
             }
         }
 
@@ -792,6 +777,8 @@ public class RaildelaysLogger implements Logger {
                 case TRACE:
                     delegate.trace(builder.toString());
                     break;
+                default:
+                    delegate.error(" [NO_LOG_LEVEL] " + builder.toString());
             }
 
         }

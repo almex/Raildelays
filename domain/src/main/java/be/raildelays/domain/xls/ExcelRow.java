@@ -25,7 +25,6 @@
 package be.raildelays.domain.xls;
 
 import be.raildelays.domain.Sens;
-import be.raildelays.domain.entities.AbstractI18nEntity;
 import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.TrainLine;
 import org.apache.commons.lang3.StringUtils;
@@ -140,22 +139,6 @@ public class ExcelRow<T extends ExcelRow> implements Comparable<T>, Serializable
         this.effectiveTrainLine2 = builder.effectiveTrainLine2;
         this.delay = builder.delay;
         this.sens = builder.sens;
-    }
-
-    protected static String notNullToString(AbstractI18nEntity entity) {
-        String result = "";
-
-        if (entity != null) {
-            if (StringUtils.isNotBlank(entity.getEnglishName())) {
-                result = entity.getEnglishName();
-            } else if (StringUtils.isNotBlank(entity.getFrenchName())) {
-                result = entity.getFrenchName();
-            } else if (StringUtils.isNotBlank(entity.getDutchName())) {
-                result = entity.getDutchName();
-            }
-        }
-
-        return result;
     }
 
     protected static String notNullToString(Object obj) {

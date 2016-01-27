@@ -1,10 +1,14 @@
 package be.raildelays.domain.entities;
 
+import be.raildelays.domain.Language;
 import com.github.almex.pojounit.AbstractObjectTest;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.experimental.theories.DataPoint;
 
 import java.text.ParseException;
+
+import static org.junit.Assert.assertNotNull;
 
 public class StationTest extends AbstractObjectTest {
 
@@ -29,7 +33,6 @@ public class StationTest extends AbstractObjectTest {
     @Override
     @Before
     public void setUp() throws ParseException {
-
         DATA_POINT1 = new Station("Liège (Liège-Guillemins)", "Luik (Luik-Guillemins)", "Liège (Liège-Guillemins)");
 
         DATA_POINT2 = DATA_POINT1;
@@ -40,7 +43,12 @@ public class StationTest extends AbstractObjectTest {
 
         DATA_POINT5 = new Station("Brussels (Bruxelles-central)");
 
-        DATA_POINT6 = new Station("Brussels (Bruxelles-central)", null, null);
+        DATA_POINT6 = new Station("Brussels (Bruxelles-central)", Language.EN);
+    }
+
+    @Test
+    public void testAccessors() {
+        assertNotNull(DATA_POINT1.getName());
     }
 
 }

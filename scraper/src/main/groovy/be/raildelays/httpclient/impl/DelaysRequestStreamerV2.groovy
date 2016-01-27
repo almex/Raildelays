@@ -39,7 +39,7 @@ class DelaysRequestStreamerV2 extends SncbRequestStreamer<DelaysRequestV2> {
 
     @Override
     Stream<DelaysRequestV2> stream(DelaysRequestV2 request) {
-        return new DefaultStream<DelaysRequestV2>(httpGet('/bin/trainsearch.exe/' + request.language.sncbParameter
+        return new DefaultStream<DelaysRequestV2>(httpGet('/bin/trainsearch.exe/' + request.language.afasParameter
                 , [trainname: request.trainId, date: request.day.format(DateTimeFormatter.ofPattern("dd.MM.yy")), getTrainFromArchive: 'yes'])
                 , request);
     }

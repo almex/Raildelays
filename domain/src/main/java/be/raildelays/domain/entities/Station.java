@@ -43,7 +43,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "STATION")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public class Station extends AbstractI18nEntity implements Location {
+public class Station extends I18nEntity implements Location {
 
     private static final long serialVersionUID = -3436298381031779337L;
 

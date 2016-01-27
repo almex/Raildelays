@@ -38,7 +38,7 @@ import java.io.Serializable;
  * @author Almex
  */
 @MappedSuperclass
-public class AbstractI18nEntity extends AbstractEntity implements Serializable, Cloneable, Comparable<AbstractI18nEntity> {
+public class I18nEntity extends AbstractEntity implements Serializable, Comparable<I18nEntity> {
 
     @Column(name = "ENGLISH_NAME")
     protected String englishName;
@@ -50,7 +50,7 @@ public class AbstractI18nEntity extends AbstractEntity implements Serializable, 
     /**
      * Default contrcutor.
      */
-    protected AbstractI18nEntity() {
+    protected I18nEntity() {
         this.englishName = "";
         this.dutchName = "";
         this.frenchName = "";
@@ -61,7 +61,7 @@ public class AbstractI18nEntity extends AbstractEntity implements Serializable, 
      *
      * @param englishName English name for this trainLine station.
      */
-    public AbstractI18nEntity(final String englishName) {
+    public I18nEntity(final String englishName) {
         this(englishName, "", "");
     }
 
@@ -70,27 +70,29 @@ public class AbstractI18nEntity extends AbstractEntity implements Serializable, 
      *
      * @param name for this trainLine station.
      */
-    public AbstractI18nEntity(final String name, Language language) {
-        switch (language) {
-            case EN:
-                this.englishName = name;
-                this.dutchName = "";
-                this.frenchName = "";
-                break;
-            case NL:
-                this.englishName = "";
-                this.dutchName = name;
-                this.frenchName = "";
-                break;
-            case FR:
-                this.englishName = "";
-                this.dutchName = "";
-                this.frenchName = name;
-                break;
-            default:
-                this.englishName = "";
-                this.dutchName = "";
-                this.frenchName = "";
+    public I18nEntity(final String name, Language language) {
+        if (language != null) {
+            switch (language) {
+                case EN:
+                    this.englishName = name;
+                    this.dutchName = "";
+                    this.frenchName = "";
+                    break;
+                case NL:
+                    this.englishName = "";
+                    this.dutchName = name;
+                    this.frenchName = "";
+                    break;
+                case FR:
+                    this.englishName = "";
+                    this.dutchName = "";
+                    this.frenchName = name;
+                    break;
+                default:
+                    this.englishName = "";
+                    this.dutchName = "";
+                    this.frenchName = "";
+            }
         }
     }
 
@@ -101,7 +103,7 @@ public class AbstractI18nEntity extends AbstractEntity implements Serializable, 
      * @param dutchName   Dutch name for this trainLine
      * @param frenchName  French name for this trainLine
      */
-    public AbstractI18nEntity(final String englishName, final String dutchName, final String frenchName) {
+    public I18nEntity(final String englishName, final String dutchName, final String frenchName) {
         this.englishName = englishName;
         this.dutchName = dutchName;
         this.frenchName = frenchName;
@@ -114,8 +116,8 @@ public class AbstractI18nEntity extends AbstractEntity implements Serializable, 
         if (obj == this) {
             result = true;
         } else {
-            if (obj instanceof AbstractI18nEntity) {
-                AbstractI18nEntity entity = (AbstractI18nEntity) obj;
+            if (obj instanceof I18nEntity) {
+                I18nEntity entity = (I18nEntity) obj;
 
                 result = new EqualsBuilder()
                         .append(englishName, entity.englishName)
@@ -152,20 +154,29 @@ public class AbstractI18nEntity extends AbstractEntity implements Serializable, 
     }
 
     public String getName(Language language) {
-        switch (language) {
-            case EN:
-                return getEnglishName();
-            case NL:
-                return getDutchName();
-            case FR:
-                return getFrenchName();
-            default:
-                return "";
+        String result = null;
+
+        if (language != null) {
+            switch (language) {
+                case EN:
+                    result = getEnglishName();
+                    break;
+                case NL:
+                    result = getDutchName();
+                    break;
+                case FR:
+                    result = getFrenchName();
+                    break;
+                default:
+                    result = "";
+            }
         }
+
+        return result;
     }
 
     @Override
-    public int compareTo(@SuppressWarnings("NullableProblems") AbstractI18nEntity entity) {
+    public int compareTo(@SuppressWarnings("NullableProblems") I18nEntity entity) {
         int result;
 
         if (entity == null) {
@@ -176,6 +187,22 @@ public class AbstractI18nEntity extends AbstractEntity implements Serializable, 
                     .append(StringUtils.stripAccents(frenchName), StringUtils.stripAccents(entity.getFrenchName()), String.CASE_INSENSITIVE_ORDER)
                     .append(StringUtils.stripAccents(dutchName), StringUtils.stripAccents(entity.getDutchName()), String.CASE_INSENSITIVE_ORDER)
                     .toComparison();
+        }
+
+        return result;
+    }
+
+    public static String getNotNullName(I18nEntity entity) {
+        String result = "";
+
+        if (entity != null) {
+            if (StringUtils.isNotBlank(entity.getEnglishName())) {
+                result = entity.getEnglishName();
+            } else if (StringUtils.isNotBlank(entity.getFrenchName())) {
+                result = entity.getFrenchName();
+            } else if (StringUtils.isNotBlank(entity.getDutchName())) {
+                result = entity.getDutchName();
+            }
         }
 
         return result;

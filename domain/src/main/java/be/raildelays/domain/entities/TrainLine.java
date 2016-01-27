@@ -77,6 +77,8 @@ public class TrainLine extends AbstractEntity implements Train, Route<LineStop>,
         this.shortName = builder.shortName;
         this.longName = builder.longName;
         this.routeId = builder.routeId;
+        this.destination = builder.destination;
+        this.departure = builder.departure;
     }
 
     @Override

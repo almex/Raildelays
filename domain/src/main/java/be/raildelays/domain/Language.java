@@ -36,35 +36,17 @@ package be.raildelays.domain;
  */
 public enum Language {
 
-    EN("en", "EN", "en", "eny"),
-    FR("fr", "FR", "fr", "fny"),
-    NL("nl", "NL", "nl", "nny");
+    EN("eny"),
+    FR("fny"),
+    NL("nny");
 
-    private String railtimeParameter;
-    private String mobileParameter;
-    private String bRailParameter;
-    private String sncbParameter;
+    private String afasParameter;
 
-    Language(String railtimeParameter, String mobileParameter, String bRailParameter, String sncbParameter) {
-        this.bRailParameter = bRailParameter;
-        this.mobileParameter = mobileParameter;
-        this.railtimeParameter = railtimeParameter;
-        this.sncbParameter = sncbParameter;
+    Language(String afasParameter) {
+        this.afasParameter = afasParameter;
     }
 
-    public String getRailtimeParameter() {
-        return railtimeParameter;
-    }
-
-    public String getMobileParameter() {
-        return mobileParameter;
-    }
-
-    public String getbRailParameter() {
-        return bRailParameter;
-    }
-
-    public String getSncbParameter() {
-        return sncbParameter;
+    public String getAfasParameter() {
+        return afasParameter;
     }
 }
