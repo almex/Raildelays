@@ -25,10 +25,13 @@
 package be.raildelays.domain.entities;
 
 import be.raildelays.location.Route;
+import be.raildelays.scheduling.Line;
 import be.raildelays.vehicule.Train;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static java.util.Comparator.*;
@@ -46,7 +49,7 @@ import static java.util.Comparator.*;
 @Entity
 @Table(name = "TRAIN_LINE")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public class TrainLine extends AbstractEntity implements Train, Route<LineStop>, Comparable<TrainLine> {
+public class TrainLine extends AbstractEntity implements Train, Line<Train, LineStop>, Route<Station>, Comparable<TrainLine> {
 
     private static final long serialVersionUID = -1527666012499664304L;
 
@@ -60,20 +63,25 @@ public class TrainLine extends AbstractEntity implements Train, Route<LineStop>,
     @NotNull
     private Long routeId;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "DEPARTURE_ID")
-    private LineStop departure;
+    private Station departure;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "DESTINATION_ID")
-    private LineStop destination;
+    private Station destination;
 
+    @OneToMany(mappedBy = "trainLine", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<LineStop> stops;
+
+    /**
+     * Default constructor used by Hibernate.
+     */
     protected TrainLine() {
-        this.shortName = "";
-        this.longName = "";
     }
 
     protected TrainLine(Builder builder) {
+        this.stops = new ArrayList<>();
         this.shortName = builder.shortName;
         this.longName = builder.longName;
         this.routeId = builder.routeId;
@@ -120,8 +128,8 @@ public class TrainLine extends AbstractEntity implements Train, Route<LineStop>,
         private String shortName;
         private String longName;
         private Long routeId;
-        private LineStop departure;
-        private LineStop destination;
+        private Station departure;
+        private Station destination;
 
         /**
          * Minimal initialization constructor.
@@ -157,12 +165,12 @@ public class TrainLine extends AbstractEntity implements Train, Route<LineStop>,
             return this;
         }
 
-        public Builder departure(final LineStop departure) {
+        public Builder departure(final Station departure) {
             this.departure = departure;
             return this;
         }
 
-        public Builder destination(final LineStop destination) {
+        public Builder destination(final Station destination) {
             this.destination = destination;
             return this;
         }
@@ -195,13 +203,23 @@ public class TrainLine extends AbstractEntity implements Train, Route<LineStop>,
     }
 
     @Override
-    public LineStop getDeparture() {
+    public Station getDeparture() {
         return departure;
     }
 
     @Override
-    public LineStop getDestination() {
+    public Station getDestination() {
         return destination;
+    }
+
+    @Override
+    public Train getDiscriminator() {
+        return this;
+    }
+
+    @Override
+    public List<LineStop> getStops() {
+        return stops;
     }
 
     @Override

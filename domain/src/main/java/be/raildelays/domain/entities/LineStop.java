@@ -48,7 +48,7 @@ import java.time.format.DateTimeFormatter;
 @Entity
 @Table(name = "LINE_STOP", uniqueConstraints = @UniqueConstraint(columnNames = {
         "TRAIN_ID", "DATE", "STATION_ID"}, name ="LineStopUniqueBusinessKeyConstraint"))
-public class LineStop extends AbstractEntity implements Stop<Station>, Comparable<LineStop>, Cloneable {
+public class LineStop extends AbstractEntity implements Stop<Station>, Comparable<LineStop> {
 
     private static final long serialVersionUID = 7142886242889314414L;
 
@@ -257,6 +257,7 @@ public class LineStop extends AbstractEntity implements Stop<Station>, Comparabl
          * Default constructor.
          */
         public Builder() {
+            // Noop
         }
 
         /**

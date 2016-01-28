@@ -24,6 +24,12 @@
 
 package be.raildelays.domain;
 
+/**
+ * Determine the sens of a route.
+ *
+ * @author Almex
+ * @since 1.0
+ */
 public enum Sens {
     DEPARTURE, ARRIVAL
 }

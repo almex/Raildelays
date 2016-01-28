@@ -18,7 +18,7 @@ package be.raildelays.vehicule;
  * @since 2.0
  */
 public enum VehiculeType {
-    TRAIN(Train.class), BUS(Bus.class), FERRY(Ferry.class), SUBWAY(Subway.class), TAXI(Taxi.class), TRAMWAY(Tramway.class);
+    TRAM(Tramway.class), SUBWAY(Subway.class), RAIL(Train.class), BUS(Bus.class), FERRY(Ferry.class), TAXI(Taxi.class);
 
     private Class<? extends Vehicle> type;
 

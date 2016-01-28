@@ -35,7 +35,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface TrainLineDao extends JpaRepository<TrainLine, Long> {
 
     /**
-     * Search for a TrainLine by its route it (coming from GTFS data).
+     * Search for a TrainLine by its route id (coming from GTFS data).
      *
      * @param routeId     strict name that should match to find a TrainLine.
      * @return a {@link TrainLine}
