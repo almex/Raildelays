@@ -27,6 +27,8 @@ package be.raildelays.batch.reader;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
@@ -40,6 +42,7 @@ import java.util.Map;
 /**
  * @author Almex
  */
+@RunWith(BlockJUnit4ClassRunner.class)
 public class TrainLineIdPartitionerTest {
 
     public static final List<String> TRAIN_IDS = Arrays.asList("414", "415", "416");

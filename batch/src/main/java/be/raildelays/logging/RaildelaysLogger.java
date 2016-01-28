@@ -133,37 +133,11 @@ public class RaildelaysLogger implements Logger {
                     .build();
         }
     };
-    private Delegator<BatchExcelRow> batchExcelRowDelegator = new Delegator<BatchExcelRow>() {
-        @Override
-        public String logLine(String message, BatchExcelRow object) {
-            return new LogLineBuilder()
-                    .message(message)
-                    .id(object.getId())
-                    .date(object.getDate())
-                    .expectedTrain(getTrainId(object.getExpectedTrainLine1()))
-                    .effectiveTrain(getTrainId(object.getEffectiveTrainLine1()))
-                    .departureStation(I18nEntity.getNotNullName(object.getDepartureStation()))
-                    .arrivalStation(I18nEntity.getNotNullName(object.getArrivalStation()))
-                    .expectedDepartureTime(object.getExpectedDepartureTime())
-                    .expectedArrivalTime(object.getExpectedArrivalTime())
-                    .effectiveDepartureTime(object.getEffectiveDepartureTime())
-                    .effectiveArrivalTime(object.getEffectiveArrivalTime())
-                    .canceledArrival(object.isCanceled())
-                    .canceledDeparture(object.isCanceled())
-                    .build();
-        }
-    };
 
 
     public RaildelaysLogger(String type, org.slf4j.Logger delegate) {
         this.type = type;
         this.delegate = delegate;
-    }
-
-    public RaildelaysLogger(String type, org.slf4j.Logger delegate, Marker marker) {
-        this.type = type;
-        this.delegate = delegate;
-        this.marker = marker;
     }
 
     private static Long getTrainId(TrainLine trainLine) {

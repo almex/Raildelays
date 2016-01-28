@@ -98,7 +98,6 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
             LOGGER.warn("Cannot map rowIndex={} cellIndex={} this cell does not exists", row.getRowNum(), cellIndex);
         }
 
-
         return result;
     }
 
@@ -113,7 +112,7 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
     @Override
     public BatchExcelRow mapRow(Row row, int rowIndex) throws RowMappingException {
         try {
-            BatchExcelRow result = new BatchExcelRow.Builder(getDate(row, DATE_INDEX), null)
+            return new BatchExcelRow.Builder(getDate(row, DATE_INDEX), null)
                     .departureStation(getStation(row, DEPARTURE_STATION_INDEX))
                     .arrivalStation(getStation(row, ARRIVAL_STATION_INDEX))
                     .linkStation(getStation(row, LINK_STATION_INDEX))
@@ -128,8 +127,6 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
                     .delay(getLong(row, DELAY_INDEX))
                     .index((long) row.getRowNum())
                     .build(validateOutcomes);
-
-            return result;
         } catch (ValidationException e) {
             throw new RowMappingException(e.getMessage(), row, rowIndex);
         }

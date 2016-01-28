@@ -19,13 +19,23 @@
         <step id="downloadFileStep" parent="parentStep" next="unzipFileStep">
             <tasklet transaction-manager="batchTransactionManager" ref="httpDownloadFileTasklet"/>
         </step>
-        <step id="unzipFileStep" parent="parentStep" next="loadDatabaseStep">
+        <step id="unzipFileStep" parent="parentStep" next="loadTrainStep">
             <tasklet transaction-manager="batchTransactionManager" ref="unzipFileTasklet"/>
         </step>
-        <step id="loadDatabaseStep" parent="parentStep">
+        <step id="loadTrainStep" parent="parentStep">
             <tasklet transaction-manager="batchTransactionManager">
-                <chunk reader="csvReader"
+                <chunk reader="csvTrainReader"
                        processor="chainedProcessorsTrain"
+                       writer="databaseWriter"
+                       commit-interval="10">
+                </chunk>
+                <transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
+            </tasklet>
+        </step>
+        <step id="loadStopStep" parent="parentStep">
+            <tasklet transaction-manager="batchTransactionManager">
+                <chunk reader="csvStopReader"
+                       processor="chainedProcessorsStop"
                        writer="databaseWriter"
                        commit-interval="10">
                 </chunk>
@@ -62,7 +72,7 @@
     <!-- =====================================         READERS        ===================================== -->
     <!-- ================================================================================================== -->
 
-    <bean id="csvReader"
+    <bean id="csvTrainReader"
           class="org.springframework.batch.item.file.FlatFileItemReader"
           scope="step">
         <property name="resource" value="${gtfs.trainlist.uri}"/>
@@ -81,11 +91,43 @@
         <property name="linesToSkip" value="1" />
     </bean>
 
+    <bean id="csvStopReader"
+          class="org.springframework.batch.item.file.FlatFileItemReader"
+          scope="step">
+        <property name="resource" value="${gtfs.stoplist.uri}"/>
+        <property name="lineMapper">
+            <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+                <property name="lineTokenizer">
+                    <bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+                        <property name="names"
+                                  value="trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type,shape_dist_traveled,timepoint"/>
+                    </bean>
+                </property>
+                <property name="fieldSetMapper">
+                    <bean class="be.raildelays.batch.reader.StopFieldSetMapper"/>
+                </property>
+            </bean>
+        </property>
+        <property name="linesToSkip" value="1"/>
+    </bean>
+
     <!-- ================================================================================================== -->
     <!-- =====================================       PROCESSORS       ===================================== -->
     <!-- ================================================================================================== -->
 
     <bean id="chainedProcessorsTrain"
+          class="org.springframework.batch.item.support.CompositeItemProcessor"
+          scope="step"
+          lazy-init="true">
+        <property name="delegates">
+            <list>
+                <ref bean="validatorProcessor"/>
+            </list>
+        </property>
+    </bean>
+
+
+    <bean id="chainedProcessorsStop"
           class="org.springframework.batch.item.support.CompositeItemProcessor"
           scope="step"
           lazy-init="true">

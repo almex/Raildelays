@@ -60,6 +60,8 @@ public class DelayMatcher<T> implements Matcher<T> {
      * @param matcher the {@link OperatorMatcher} to clone
      * @return a {@link OperatorMatcher} containing the {@link ValueMatcher} with an opposite {@code value} and the
      * opposite {@link be.raildelays.delays.DelayMatcher.Operator}.
+     * @throws UnsupportedOperationException if the {@link OperatorMatcher#operator} is not supported by this
+     * implementation.
      */
     private static OperatorMatcher<Long> opposite(OperatorMatcher<Long> matcher) {
         Operator operator = matcher.getOperator();
@@ -78,6 +80,11 @@ public class DelayMatcher<T> implements Matcher<T> {
             case LESS_OR_EQUAL:
                 operator = Operator.GREATER_OR_EQUAL;
                 break;
+            case EQUAL:
+                operator = Operator.EQUAL;
+                break;
+            default:
+                throw new UnsupportedOperationException(String.format("The '%s' operator is not supported", operator));
         }
 
         return OperatorMatcher.operator(operator, valueMatcher);
@@ -113,12 +120,9 @@ public class DelayMatcher<T> implements Matcher<T> {
 
         @Override
         public boolean match(Long value) {
-            boolean result = false;
+            boolean result;
 
             switch (operator) {
-                case EQUAL:
-                    result = Delays.compareTimeAndDelay(from, to) == value;
-                    break;
                 case GREATER:
                     result = Delays.compareTimeAndDelay(from, to) > value;
                     break;
@@ -131,7 +135,9 @@ public class DelayMatcher<T> implements Matcher<T> {
                 case LESS_OR_EQUAL:
                     result = Delays.compareTimeAndDelay(from, to) <= value;
                     break;
-
+                case EQUAL:
+                default:
+                    result = Delays.compareTimeAndDelay(from, to) == value;
             }
 
             return result;

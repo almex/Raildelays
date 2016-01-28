@@ -30,6 +30,8 @@ import be.raildelays.httpclient.Stream;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.retry.backoff.NoBackOffPolicy;
 import org.springframework.retry.policy.NeverRetryPolicy;
 
@@ -37,6 +39,7 @@ import java.io.BufferedReader;
 import java.io.CharArrayReader;
 import java.io.Reader;
 
+@RunWith(BlockJUnit4ClassRunner.class)
 public class ScraperItemReaderTest {
 
     private ScraperItemReader<java.util.stream.Stream<String>, AbstractRequest> reader;
