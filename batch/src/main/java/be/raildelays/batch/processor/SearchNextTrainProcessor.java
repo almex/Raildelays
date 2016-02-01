@@ -46,6 +46,7 @@ import java.util.Locale;
  * cancellation.
  *
  * @author Almex
+ * @since 1.1
  */
 public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, BatchExcelRow> {
 

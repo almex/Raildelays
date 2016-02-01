@@ -1,6 +1,5 @@
-package be.raildelays.batch.reader;
+package be.raildelays.batch.gtfs;
 
-import be.raildelays.domain.entities.LineStop;
 import org.easymock.*;
 import org.junit.Assert;
 import org.junit.Before;
@@ -10,18 +9,16 @@ import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.batch.item.file.transform.FieldSet;
 
-import java.util.Date;
-
 import static org.easymock.EasyMock.expect;
 
 /**
  * @author Almex
  */
 @RunWith(BlockJUnit4ClassRunner.class)
-public class StopFieldSetMapperTest extends EasyMockSupport {
+public class TripsFieldSetMapperTest extends EasyMockSupport {
 
     @TestSubject
-    private StopFieldSetMapper mapper = new StopFieldSetMapper();
+    private TripsFieldSetMapper mapper = new TripsFieldSetMapper();
     @Rule
     public EasyMockRule easyMockRule = new EasyMockRule(this);
     @Mock(type = MockType.NICE)
@@ -34,13 +31,12 @@ public class StopFieldSetMapperTest extends EasyMockSupport {
 
     @Test
     public void testMapFieldSet() throws Exception {
+        expect(fieldSetMock.readRawString("route_id")).andReturn("routes:IC106");
+        expect(fieldSetMock.readRawString("service_id")).andReturn("1");
         expect(fieldSetMock.readRawString("trip_id")).andReturn("IC466");
-        expect(fieldSetMock.readDate("arrival_time", StopFieldSetMapper.TIME_FORMAT)).andReturn(new Date());
-        expect(fieldSetMock.readDate("departure_time", StopFieldSetMapper.TIME_FORMAT)).andReturn(new Date());
 
         replayAll();
-
-        LineStop actual = mapper.mapFieldSet(fieldSetMock);
+        Trip actual = mapper.mapFieldSet(fieldSetMock);
 
         Assert.assertNotNull(actual);
     }

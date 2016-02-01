@@ -226,4 +226,9 @@ public class TrainLine extends AbstractEntity implements Train, Line<Train, Line
     public String getName() {
         return "" + getRouteId();
     }
+
+    @Override
+    public Long getLineId() {
+        return getRouteId();
+    }
 }

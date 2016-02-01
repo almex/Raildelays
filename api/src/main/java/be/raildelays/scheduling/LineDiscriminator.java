@@ -7,4 +7,5 @@ package be.raildelays.scheduling;
  * @since 2.0
  */
 public interface LineDiscriminator {
+    Long getLineId();
 }

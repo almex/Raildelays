@@ -40,8 +40,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-@ContextConfiguration(locations = {"/jobs/steps/retrieve-data-from-afas-job-context.xml"})
-public class RetrieveDataFromAfasJobIT extends AbstractContextIT {
+@ContextConfiguration(locations = {"/jobs/steps/load-gtfs-into-database-job-context.xml"})
+public class LoadGtfsDataJobIT extends AbstractContextIT {
 
     /**
      * SUT.
@@ -50,7 +50,7 @@ public class RetrieveDataFromAfasJobIT extends AbstractContextIT {
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Test
-    public void testGrabLineStop() {
+    public void testLoadFromGtfs() {
         BatchStatus batchStatus;
 
         try {
@@ -65,12 +65,8 @@ public class RetrieveDataFromAfasJobIT extends AbstractContextIT {
                 date = today.getTime();
             }
 
-            parameters.put("trainId", new JobParameter("416"));
             parameters.put("date", new JobParameter(date));
-            parameters.put("language", new JobParameter(Language.EN.name()));
-            parameters.put("station.a.name", new JobParameter("Liège-Guillemins"));
-            parameters.put("station.b.name", new JobParameter("Brussels (Bruxelles)-Central"));
-            parameters.put("output.file.path", new JobParameter("file:./target/output.dat"));
+            parameters.put("language", new JobParameter(Language.FR.name()));
 
             batchStatus = jobLauncherTestUtils.launchJob(new JobParameters(parameters)).getStatus();
 

@@ -24,7 +24,7 @@
         </step>
         <step id="loadTrainStep" parent="parentStep">
             <tasklet transaction-manager="batchTransactionManager">
-                <chunk reader="csvTrainReader"
+                <chunk reader="csvTripsReader"
                        processor="chainedProcessorsTrain"
                        writer="databaseWriter"
                        commit-interval="10">
@@ -32,36 +32,18 @@
                 <transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
             </tasklet>
         </step>
-        <step id="loadStopStep" parent="parentStep">
-            <tasklet transaction-manager="batchTransactionManager">
-                <chunk reader="csvStopReader"
-                       processor="chainedProcessorsStop"
-                       writer="databaseWriter"
-                       commit-interval="10">
-                </chunk>
-                <transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
-            </tasklet>
-        </step>
-        <!--<validator ref="loadGtfsIntoDatabaseValidator"/>-->
+        <validator ref="loadGtfsIntoDatabaseValidator"/>
     </job>
 
-    <!--<bean id="loadGtfsIntoDatabaseValidator"
+    <bean id="loadGtfsIntoDatabaseValidator"
           class="org.springframework.batch.core.job.DefaultJobParametersValidator">
         <property name="requiredKeys">
             <list>
-                <value>station.departure</value>
-                <value>station.arrival</value>
-                <value>excel.output.path</value>
-                <value>excel.file.name</value>
-                <value>excel.file.extension</value>
-                <value>excel.template.path</value>
-                <value>excel.archive.path</value>
-                <value>text.output.path</value>
-                <value>language</value>
                 <value>date</value>
+                <value>language</value>
             </list>
         </property>
-    </bean>-->
+    </bean>
 
     <!-- ================================================================================================== -->
     <!-- =====================================         DECIDERS       ===================================== -->
@@ -72,39 +54,103 @@
     <!-- =====================================         READERS        ===================================== -->
     <!-- ================================================================================================== -->
 
-    <bean id="csvTrainReader"
+    <!--<bean id="csvRoutesReader"
           class="org.springframework.batch.item.file.FlatFileItemReader"
           scope="step">
-        <property name="resource" value="${gtfs.trainlist.uri}"/>
+        <property name="resource" value="${gtfs.routes.uri}"/>
         <property name="lineMapper">
             <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
                 <property name="lineTokenizer">
                     <bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
-                        <property name="names" value="route_id,agency_id,route_short_name,route_long_name,route_type" />
+                        <property name="names" value="route_id,agency_id,route_short_name,route_long_name,route_type"/>
+                        <property name="strict" value="false"/>
                     </bean>
                 </property>
                 <property name="fieldSetMapper">
-                    <bean class="be.raildelays.batch.reader.TrainFieldSetMapper"/>
+                    <bean class="be.raildelays.batch.gtfs.RoutesFieldSetMapper"/>
                 </property>
             </bean>
         </property>
-        <property name="linesToSkip" value="1" />
-    </bean>
+        <property name="linesToSkip" value="1"/>
+    </bean>-->
 
-    <bean id="csvStopReader"
+    <bean id="csvTripsReader"
           class="org.springframework.batch.item.file.FlatFileItemReader"
           scope="step">
-        <property name="resource" value="${gtfs.stoplist.uri}"/>
+        <property name="resource" value="${gtfs.trips.uri}"/>
+        <property name="lineMapper">
+            <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+                <property name="lineTokenizer">
+                    <bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+                        <property name="names" value="route_id,service_id,trip_id"/>
+                        <property name="strict" value="false"/>
+                    </bean>
+                </property>
+                <property name="fieldSetMapper">
+                    <bean class="be.raildelays.batch.gtfs.TripsFieldSetMapper"/>
+                </property>
+            </bean>
+        </property>
+        <property name="linesToSkip" value="1"/>
+    </bean>
+
+    <bean id="csvStopTimesReader"
+          class="org.springframework.batch.item.file.FlatFileItemReader"
+          scope="step">
+        <property name="resource" value="${gtfs.stop.times.uri}"/>
         <property name="lineMapper">
             <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
                 <property name="lineTokenizer">
                     <bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
                         <property name="names"
                                   value="trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type,shape_dist_traveled,timepoint"/>
+                        <property name="strict" value="false"/>
                     </bean>
                 </property>
                 <property name="fieldSetMapper">
-                    <bean class="be.raildelays.batch.reader.StopFieldSetMapper"/>
+                    <bean class="be.raildelays.batch.gtfs.StopTimesFieldSetMapper"/>
+                </property>
+            </bean>
+        </property>
+        <property name="linesToSkip" value="1"/>
+    </bean>
+
+    <bean id="csvCalendarDatesReader"
+          class="org.springframework.batch.item.file.FlatFileItemReader"
+          scope="step">
+        <property name="resource" value="${gtfs.calendar.dates.uri}"/>
+        <property name="lineMapper">
+            <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+                <property name="lineTokenizer">
+                    <bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+                        <property name="names"
+                                  value="service_id,date,exception_type"/>
+                        <property name="strict" value="false"/>
+                    </bean>
+                </property>
+                <property name="fieldSetMapper">
+                    <bean class="be.raildelays.batch.gtfs.CalendarDatesFieldSetMapper"/>
+                </property>
+            </bean>
+        </property>
+        <property name="linesToSkip" value="1"/>
+    </bean>
+
+    <bean id="csvStopsReader"
+          class="org.springframework.batch.item.file.FlatFileItemReader"
+          scope="step">
+        <property name="resource" value="${gtfs.stops.uri}"/>
+        <property name="lineMapper">
+            <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+                <property name="lineTokenizer">
+                    <bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+                        <property name="names"
+                                  value="stop_id,stop_name,stop_lat,stop_lon,platform_code,parent_station,location_type"/>
+                        <property name="strict" value="false"/>
+                    </bean>
+                </property>
+                <property name="fieldSetMapper">
+                    <bean class="be.raildelays.batch.gtfs.StopsFieldSetMapper"/>
                 </property>
             </bean>
         </property>
@@ -121,18 +167,13 @@
           lazy-init="true">
         <property name="delegates">
             <list>
-                <ref bean="validatorProcessor"/>
-            </list>
-        </property>
-    </bean>
-
-
-    <bean id="chainedProcessorsStop"
-          class="org.springframework.batch.item.support.CompositeItemProcessor"
-          scope="step"
-          lazy-init="true">
-        <property name="delegates">
-            <list>
+                <bean class="be.raildelays.batch.processor.NewLineStopProcessor">
+                    <property name="calendarDatesReader" ref="csvCalendarDatesReader"/>
+                    <property name="stopTimesReader" ref="csvStopTimesReader"/>
+                    <property name="stopsReader" ref="csvStopsReader"/>
+                    <property name="date" value="#{jobParameters['date']}"/>
+                    <property name="lang" value="#{jobParameters['language']?.toUpperCase()}"/>
+                </bean>
                 <ref bean="validatorProcessor"/>
             </list>
         </property>

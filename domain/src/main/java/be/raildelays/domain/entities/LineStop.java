@@ -48,7 +48,7 @@ import java.time.format.DateTimeFormatter;
 @Entity
 @Table(name = "LINE_STOP", uniqueConstraints = @UniqueConstraint(columnNames = {
         "TRAIN_ID", "DATE", "STATION_ID"}, name ="LineStopUniqueBusinessKeyConstraint"))
-public class LineStop extends AbstractEntity implements Stop<Station>, Comparable<LineStop> {
+public class LineStop extends AbstractEntity implements Stop<Station, TrainLine>, Comparable<LineStop> {
 
     private static final long serialVersionUID = 7142886242889314414L;
 
@@ -118,7 +118,7 @@ public class LineStop extends AbstractEntity implements Stop<Station>, Comparabl
                 .append("{ ") //
                 .append("id: ").append(id).append(", ")  //
                 .append("date: ")
-                .append(date.format(DateTimeFormatter.ISO_DATE))
+                .append(date != null ? date.format(DateTimeFormatter.ISO_DATE) : "null")
                 .append(", ") //
                 .append("trainLine: {").append(trainLine) //
                 .append("}, ") //
@@ -190,6 +190,11 @@ public class LineStop extends AbstractEntity implements Stop<Station>, Comparabl
     @Override
     public TimeDelay getArrivalTime() {
         return arrivalTime;
+    }
+
+    @Override
+    public TrainLine getLine() {
+        return getTrainLine();
     }
 
     @Override

@@ -7,9 +7,11 @@ import be.raildelays.location.Location;
  * @author Almex
  * @since 2.0
  */
-public interface Stop<T extends Location> {
+public interface Stop<L extends Location, I extends Line> {
 
-    T getLocation();
+    I getLine();
+
+    L getLocation();
 
     TimeDelay getDepartureTime();
 
