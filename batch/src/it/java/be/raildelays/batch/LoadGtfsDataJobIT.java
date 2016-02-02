@@ -27,6 +27,7 @@ package be.raildelays.batch;
 import be.raildelays.domain.Language;
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobParameter;
@@ -50,6 +51,7 @@ public class LoadGtfsDataJobIT extends AbstractContextIT {
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Test
+    @Ignore
     public void testLoadFromGtfs() {
         BatchStatus batchStatus;
 
