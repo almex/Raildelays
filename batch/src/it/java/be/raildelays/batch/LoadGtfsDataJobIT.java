@@ -25,9 +25,7 @@
 package be.raildelays.batch;
 
 import be.raildelays.domain.Language;
-import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobParameter;
@@ -36,8 +34,7 @@ import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,23 +48,13 @@ public class LoadGtfsDataJobIT extends AbstractContextIT {
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Test
-    @Ignore
     public void testLoadFromGtfs() {
         BatchStatus batchStatus;
 
         try {
             Map<String, JobParameter> parameters = new HashMap<>();
-            Calendar today = Calendar.getInstance();
-            Date date;
 
-            if (today.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY ||
-                    today.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
-                date = DateUtils.addDays(today.getTime(), -2);
-            } else {
-                date = today.getTime();
-            }
-
-            parameters.put("date", new JobParameter(date));
+            parameters.put("date", new JobParameter(new SimpleDateFormat("yyyyMMdd").parse("20150101")));
             parameters.put("language", new JobParameter(Language.FR.name()));
 
             batchStatus = jobLauncherTestUtils.launchJob(new JobParameters(parameters)).getStatus();
