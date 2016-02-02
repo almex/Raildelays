@@ -8,6 +8,8 @@ import be.raildelays.domain.entities.Station;
 import be.raildelays.domain.entities.TrainLine;
 import be.raildelays.logging.Logger;
 import be.raildelays.logging.LoggerFactory;
+import be.raildelays.repository.StationDao;
+import be.raildelays.repository.TrainLineDao;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemStreamReader;
@@ -34,16 +36,19 @@ public class NewLineStopProcessor implements ItemProcessor<Trip, LineStop>, Init
     private ItemStreamReader<StopTime> stopTimesReader;
     private ItemStreamReader<CalendarDate> calendarDatesReader;
     private ItemStreamReader<Stop> stopsReader;
+    private TrainLineDao trainLineDao;
+    private StationDao stationDao;
     private LocalDate date;
     private Language lang;
-    private static Map<ItemStreamReader<?>, List<?>> cache = new WeakHashMap<>(3);
 
+    private static Map<ItemStreamReader<?>, List<?>> cache = new WeakHashMap<>(3);
     private static final Logger LOGGER = LoggerFactory.getLogger("Stop", NewLineStopProcessor.class);
 
     @Override
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(lang, "The property 'lang' is mandatory");
         Assert.notNull(date, "The property 'date' is mandatory");
+        Assert.notNull(trainLineDao, "The property 'trainLineDao' is mandatory");
         Assert.notNull(stopsReader, "The property 'stopsReader' is mandatory");
         Assert.notNull(stopTimesReader, "The property 'stopTimesReader' is mandatory");
         Assert.notNull(calendarDatesReader, "The property 'calendarDatesReader' is mandatory");
@@ -75,7 +80,7 @@ public class NewLineStopProcessor implements ItemProcessor<Trip, LineStop>, Init
 
             if (stop != null) {
                 LineStop.Builder current = new LineStop.Builder()
-                        .trainLine(new TrainLine.Builder(GtfsFiledSetMapper.parseRouteId(item.getRouteId())).build())
+                        .trainLine(getTrainLine(item))
                         .arrivalTime(TimeDelay.of(stopTime.getArrivalTime()))
                         .departureTime(TimeDelay.of(stopTime.getDepartureTime()))
                         .station(getStation(stop))
@@ -96,6 +101,17 @@ public class NewLineStopProcessor implements ItemProcessor<Trip, LineStop>, Init
         return result != null ? result.build(false) : null;
     }
 
+    private TrainLine getTrainLine(Trip item) {
+        Long routeId = GtfsFiledSetMapper.parseRouteId(item.getRouteId());
+        TrainLine result = trainLineDao.findByRouteId(routeId);
+
+        if (result == null) {
+            result = new TrainLine.Builder(routeId).build();
+        }
+
+        return result;
+    }
+
     private Station getStation(Stop stop) {
         Station result = null;
 
@@ -107,16 +123,22 @@ public class NewLineStopProcessor implements ItemProcessor<Trip, LineStop>, Init
                 switch (lang) {
                     case FR:
                         stationName = stationName.substring(index + 1);
+                        result = stationDao.findByFrenchName(stationName);
                         break;
                     case NL:
                         stationName = stationName.substring(0, index);
+                        result = stationDao.findByDutchName(stationName);
                         break;
                     case EN:
                     default:
                 }
+            } else {
+                result = stationDao.findByEnglishName(stationName);
             }
 
-            result = new Station(stationName, lang);
+            if (result == null) {
+                result = new Station(stationName, lang);
+            }
         }
 
         return result;
@@ -186,6 +208,14 @@ public class NewLineStopProcessor implements ItemProcessor<Trip, LineStop>, Init
 
     public void setCalendarDatesReader(ItemStreamReader<CalendarDate> calendarDatesReader) {
         this.calendarDatesReader = calendarDatesReader;
+    }
+
+    public void setTrainLineDao(TrainLineDao trainLineDao) {
+        this.trainLineDao = trainLineDao;
+    }
+
+    public void setStationDao(StationDao stationDao) {
+        this.stationDao = stationDao;
     }
 
     public void setStopsReader(ItemStreamReader<Stop> stopsReader) {

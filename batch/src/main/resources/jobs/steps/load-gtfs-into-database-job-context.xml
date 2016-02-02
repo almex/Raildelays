@@ -173,6 +173,8 @@
                     <property name="stopsReader" ref="csvStopsReader"/>
                     <property name="date" value="#{jobParameters['date']}"/>
                     <property name="lang" value="#{jobParameters['language']?.toUpperCase()}"/>
+                    <property name="trainLineDao" ref="trainLineDao"/>
+                    <property name="stationDao" ref="stationDao"/>
                 </bean>
                 <ref bean="validatorProcessor"/>
             </list>
