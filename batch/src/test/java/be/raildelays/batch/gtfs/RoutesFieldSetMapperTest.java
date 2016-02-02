@@ -40,5 +40,6 @@ public class RoutesFieldSetMapperTest extends EasyMockSupport {
         Route actual = mapper.mapFieldSet(fieldSetMock);
 
         Assert.assertNotNull(actual);
+        verifyAll();
     }
 }

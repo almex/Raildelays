@@ -41,5 +41,6 @@ public class CalendarDatesFieldSetMapperTest extends EasyMockSupport {
         CalendarDate actual = mapper.mapFieldSet(fieldSetMock);
 
         Assert.assertNotNull(actual);
+        verifyAll();
     }
 }

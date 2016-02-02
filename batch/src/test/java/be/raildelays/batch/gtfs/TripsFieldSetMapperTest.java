@@ -39,5 +39,6 @@ public class TripsFieldSetMapperTest extends EasyMockSupport {
         Trip actual = mapper.mapFieldSet(fieldSetMock);
 
         Assert.assertNotNull(actual);
+        verifyAll();
     }
 }
