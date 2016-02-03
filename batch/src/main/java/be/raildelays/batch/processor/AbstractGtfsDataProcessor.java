@@ -30,7 +30,7 @@ public abstract class AbstractGtfsDataProcessor<I, O> implements ItemProcessor<I
     }
 
     protected static <O> List<O> doReadAll(ItemStreamReader<O> reader) {
-        List<O> result = Collections.synchronizedList(new ArrayList<>());
+        List<O> result = new ArrayList<>();
 
         reader.open(new ExecutionContext());
 
@@ -44,6 +44,6 @@ public abstract class AbstractGtfsDataProcessor<I, O> implements ItemProcessor<I
             reader.close();
         }
 
-        return result;
+        return Collections.unmodifiableList(result);
     }
 }

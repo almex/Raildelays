@@ -25,7 +25,7 @@ public class AggregateLineStopProcessor extends AbstractGtfsDataProcessor<LineSt
     private LineStopDao lineStopDao;
     private StationDao stationDao;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("LiS", FindStopTimesProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("Agg", AggregateLineStopProcessor.class);
 
     @Override
     public void afterPropertiesSet() throws Exception {

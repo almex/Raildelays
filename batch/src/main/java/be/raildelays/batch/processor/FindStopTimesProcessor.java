@@ -8,6 +8,7 @@ import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,7 +31,7 @@ public class FindStopTimesProcessor extends AbstractGtfsDataProcessor<Trip, Trip
 
     @Override
     public Trip process(Trip item) throws Exception {
-        item.getStopTimes().addAll(findStopTimes(item.getTripId()));
+        item.setStopTimes(findStopTimes(item.getTripId()));
 
         LOGGER.debug("result", item);
 
@@ -41,7 +42,7 @@ public class FindStopTimesProcessor extends AbstractGtfsDataProcessor<Trip, Trip
         return readAll(stopTimesReader)
                 .parallelStream()
                 .filter(stopTime -> stopTime.getTripId().equals(tripId))
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public void setStopTimesReader(ItemStreamReader<StopTime> stopTimesReader) {

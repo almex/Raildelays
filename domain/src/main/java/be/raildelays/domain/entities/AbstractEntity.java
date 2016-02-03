@@ -47,8 +47,15 @@ public abstract class AbstractEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected Long id;
 
+    @Version
+    public Long version;
+
     public Long getId() {
         return id;
+    }
+
+    public Long getVersion() {
+        return version;
     }
 
     @Override

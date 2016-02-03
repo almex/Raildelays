@@ -27,7 +27,11 @@
                 <chunk reader="csvTripsReader"
                        processor="chainedProcessorsTrain"
                        writer="databaseWriter"
-                       commit-interval="10">
+                       commit-interval="10"
+                       retry-limit="3">
+                    <retryable-exception-classes>
+                        <include class="org.springframework.dao.OptimisticLockingFailureException"/>
+                    </retryable-exception-classes>
                     <skip-policy>
                         <bean xmlns="http://www.springframework.org/schema/beans"
                               class="org.springframework.batch.core.step.skip.CompositeSkipPolicy">

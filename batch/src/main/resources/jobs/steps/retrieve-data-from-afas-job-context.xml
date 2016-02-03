@@ -21,7 +21,8 @@
                 <chunk reader="afasItemReader"
                        processor="chainedProcessorsForAfas"
                        writer="jpaItemWriter"
-                       commit-interval="10" retry-limit="3">
+                       commit-interval="10"
+                       retry-limit="3">
                     <retryable-exception-classes>
                         <include class="org.springframework.dao.OptimisticLockingFailureException"/>
                     </retryable-exception-classes>

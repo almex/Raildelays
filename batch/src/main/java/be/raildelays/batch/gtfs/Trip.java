@@ -1,6 +1,6 @@
 package be.raildelays.batch.gtfs;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -27,7 +27,7 @@ public class Trip {
      * Default constructor.
      */
     public Trip() {
-        stopTimes = new ArrayList<>();
+        stopTimes = Collections.emptyList();
     }
 
     public enum Accessibility {
