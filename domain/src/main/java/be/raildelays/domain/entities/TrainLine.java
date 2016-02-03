@@ -98,7 +98,7 @@ public class TrainLine extends AbstractEntity implements Train, Comparable<Train
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(shortName);
+        return Objects.hashCode(routeId);
     }
 
     @Override

@@ -27,7 +27,7 @@
                 <chunk reader="csvTripsReader"
                        processor="chainedProcessorsTrain"
                        writer="databaseWriter"
-                       commit-interval="100">
+                       commit-interval="10">
                     <skip-policy>
                         <bean xmlns="http://www.springframework.org/schema/beans"
                               class="org.springframework.batch.core.step.skip.CompositeSkipPolicy">
