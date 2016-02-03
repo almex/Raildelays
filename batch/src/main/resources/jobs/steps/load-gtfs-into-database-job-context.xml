@@ -27,7 +27,26 @@
                 <chunk reader="csvTripsReader"
                        processor="chainedProcessorsTrain"
                        writer="databaseWriter"
-                       commit-interval="10">
+                       commit-interval="100">
+                    <skip-policy>
+                        <bean xmlns="http://www.springframework.org/schema/beans"
+                              class="org.springframework.batch.core.step.skip.CompositeSkipPolicy">
+                            <property name="skipPolicies">
+                                <array xmlns="http://www.springframework.org/schema/beans">
+                                    <bean class="org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy">
+                                        <property name="skipLimit" value="10"/>
+                                        <property name="skippableExceptionMap">
+                                            <map>
+                                                <entry key="org.springframework.batch.item.validator.ValidationException"
+                                                       value="true"/>
+                                            </map>
+                                        </property>
+                                    </bean>
+                                    <bean class="be.raildelays.batch.skip.SkipUniqueKeyViolationPolicy"/>
+                                </array>
+                            </property>
+                        </bean>
+                    </skip-policy>
                 </chunk>
                 <transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
             </tasklet>

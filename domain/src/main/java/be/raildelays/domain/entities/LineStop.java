@@ -25,7 +25,6 @@
 package be.raildelays.domain.entities;
 
 import be.raildelays.delays.TimeDelay;
-import be.raildelays.scheduling.Stop;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -48,7 +47,7 @@ import java.time.format.DateTimeFormatter;
 @Entity
 @Table(name = "LINE_STOP", uniqueConstraints = @UniqueConstraint(columnNames = {
         "TRAIN_ID", "DATE", "STATION_ID"}, name ="LineStopUniqueBusinessKeyConstraint"))
-public class LineStop extends AbstractEntity implements Stop<Station, TrainLine>, Comparable<LineStop> {
+public class LineStop extends AbstractEntity implements Comparable<LineStop> {
 
     private static final long serialVersionUID = 7142886242889314414L;
 
@@ -187,22 +186,10 @@ public class LineStop extends AbstractEntity implements Stop<Station, TrainLine>
         return id;
     }
 
-    @Override
     public TimeDelay getArrivalTime() {
         return arrivalTime;
     }
 
-    @Override
-    public TrainLine getLine() {
-        return getTrainLine();
-    }
-
-    @Override
-    public Station getLocation() {
-        return getStation();
-    }
-
-    @Override
     public TimeDelay getDepartureTime() {
         return departureTime;
     }

@@ -31,6 +31,7 @@ import org.springframework.batch.core.step.skip.SkipPolicy;
 import javax.persistence.PersistenceException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Locale;
+import java.util.function.Function;
 
 /**
  * This {@link org.springframework.batch.core.step.skip.SkipPolicy} is dedicated to determine if we have an exceptional
@@ -44,7 +45,10 @@ import java.util.Locale;
  */
 public class SkipUniqueKeyViolationPolicy implements SkipPolicy {
 
-    public static final String CONSTRAINT_NAME = "LineStopUniqueBusinessKeyConstraint".toUpperCase();
+    public static final String[] CONSTRAINT_NAMES = {
+            "LineStopUniqueBusinessKeyConstraint".toUpperCase(),
+            "TrainLineUniqueBusinessKeyConstraint".toUpperCase()
+    };
 
 
     @Override
@@ -61,26 +65,39 @@ public class SkipUniqueKeyViolationPolicy implements SkipPolicy {
     }
 
     private static boolean isExpectedViolation(Throwable e) {
-        boolean result = false;
+        boolean violated = false;
 
         if (e instanceof ConstraintViolationException) {
             // We must ignore accent (we use Local.ENGLISH for that) and case
-            result = ((ConstraintViolationException) e).getConstraintName().toUpperCase(Locale.ENGLISH).equals(CONSTRAINT_NAME);
+            violated = matchAnyViolationNames(
+                    ((ConstraintViolationException) e).getConstraintName().toUpperCase(Locale.ENGLISH)::equals
+            );
         } else if (e instanceof SQLIntegrityConstraintViolationException) {
             // We must ignore accent (we use Local.ENGLISH for that) and case
-            result = e.getMessage().toUpperCase(Locale.ENGLISH).contains(CONSTRAINT_NAME);
-        } else if (e instanceof PersistenceException) {
+            violated = matchAnyViolationNames(e.getMessage().toUpperCase(Locale.ENGLISH)::contains);
+        } else if (e instanceof PersistenceException && e.getCause() != null) {
             /**
              * We are in the case where Hibernate encapsulate the Exception into a PersistenceException.
              * Then we must check recursively into causes.
              */
-            if (e.getCause() != null) {
-                result = isExpectedViolation(e.getCause());
+            violated = isExpectedViolation(e.getCause());
+        }
+
+        return violated;
+    }
+
+    private static boolean matchAnyViolationNames(Function<String, Boolean> check) {
+        boolean match = false;
+
+        for (String constraintName : CONSTRAINT_NAMES) {
+            match = check.apply(constraintName);
+
+            if (match) {
+                break;
             }
         }
 
-        return result;
+        return match;
     }
-
 
 }

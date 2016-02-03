@@ -71,4 +71,25 @@ public class LineStopJpaDaoIT extends AbstractIT {
 
         assertEquals("You should have the same result as expectedTime.", expectedLineStop, lineStop);
     }
+
+    @Test
+    public void testFindByRouteIdAndDateAndStationName() {
+        LocalDate date = LocalDate.now();
+        TrainLine trainLine = trainLineDao.saveAndFlush(new TrainLine.Builder(466L).build());
+        LineStop expectedLineStop = lineStopDao.save(new LineStop.Builder().date(date)
+                .trainLine(trainLine)
+                .station(new Station("Liège-Guillemins"))
+                .arrivalTime(TimeDelay.now())
+                .departureTime(TimeDelay.now())
+                .canceledArrival(false)
+                .canceledDeparture(false)
+                .build());
+        LineStop lineStop = lineStopDao.findByRouteIdAndDateAndStationName(
+                expectedLineStop.getTrainLine().getRouteId(),
+                date,
+                "Liège-Guillemins"
+        );
+
+        assertEquals("You should have the same result as expectedTime.", expectedLineStop, lineStop);
+    }
 }

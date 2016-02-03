@@ -25,13 +25,10 @@
 package be.raildelays.domain.entities;
 
 import be.raildelays.location.Route;
-import be.raildelays.scheduling.Line;
 import be.raildelays.vehicule.Train;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import static java.util.Comparator.*;
@@ -47,9 +44,12 @@ import static java.util.Comparator.*;
  * @see AbstractEntity
  */
 @Entity
-@Table(name = "TRAIN_LINE")
+@Table(
+        name = "TRAIN_LINE",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"ROUTE_ID"}, name = "TrainLineUniqueBusinessKeyConstraint")
+)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public class TrainLine extends AbstractEntity implements Train, Line<Train, LineStop>, Route<Station>, Comparable<TrainLine> {
+public class TrainLine extends AbstractEntity implements Train, Route<Station>, Comparable<TrainLine> {
 
     private static final long serialVersionUID = -1527666012499664304L;
 
@@ -71,9 +71,6 @@ public class TrainLine extends AbstractEntity implements Train, Line<Train, Line
     @JoinColumn(name = "DESTINATION_ID")
     private Station destination;
 
-    @OneToMany(mappedBy = "trainLine", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LineStop> stops;
-
     /**
      * Default constructor used by Hibernate.
      */
@@ -81,7 +78,6 @@ public class TrainLine extends AbstractEntity implements Train, Line<Train, Line
     }
 
     protected TrainLine(Builder builder) {
-        this.stops = new ArrayList<>();
         this.shortName = builder.shortName;
         this.longName = builder.longName;
         this.routeId = builder.routeId;
@@ -210,16 +206,6 @@ public class TrainLine extends AbstractEntity implements Train, Line<Train, Line
     @Override
     public Station getDestination() {
         return destination;
-    }
-
-    @Override
-    public Train getDiscriminator() {
-        return this;
-    }
-
-    @Override
-    public List<LineStop> getStops() {
-        return stops;
     }
 
     @Override

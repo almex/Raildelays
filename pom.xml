@@ -95,7 +95,7 @@
         <version.querydsl>3.4.2</version.querydsl>
         <version.validation.api>1.1.0.Final</version.validation.api>
         <version.javax.el-api>2.2.4</version.javax.el-api>
-        <version.hsqldb>2.3.3</version.hsqldb>
+        <version.hsqldb>2.3.2</version.hsqldb>
         <version.derby>10.10.1.1</version.derby>
         <version.servlet>3.1.0</version.servlet>
         <version.undertow>1.2.10.Final</version.undertow>

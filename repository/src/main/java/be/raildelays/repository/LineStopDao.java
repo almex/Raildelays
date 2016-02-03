@@ -45,8 +45,9 @@ public interface LineStopDao extends JpaRepository<LineStop, Long>, LineStopDaoC
     /**
      * Search a list of line stops that belong to a trainLine for a certain day.
      *
-     * @param trainLine trainLine id in Railtime format.
-     * @param date  day of the year for which you do the search
+     * @param trainLine trainLine id in Afas format.
+     * @param date      day of the year for which you do the search
+     * @param station   station id in Afas format
      * @return a list of line stop
      */
     LineStop findByTrainLineAndDateAndStation(TrainLine trainLine, LocalDate date, Station station);
@@ -68,8 +69,27 @@ public interface LineStopDao extends JpaRepository<LineStop, Long>, LineStopDaoC
     /**
      * Search a list of line stops that belong to a trainLine for a certain day.
      *
+     * @param trainId trainLine id coming from our internal respository.
+     * @param date    day of the year for which you do the search
+     * @return a list of line stop
+     */
+    @Query("SELECT o "
+            + "FROM LineStop o "
+            + "WHERE o.date = :date "
+            + "AND o.trainLine.routeId = :routeId "
+            + "AND (o.station.frenchName = :stationName "
+            + "  OR o.station.englishName = :stationName "
+            + "  OR o.station.dutchName = :stationName)")
+    LineStop findByRouteIdAndDateAndStationName(@Param("routeId") Long routeId,
+                                                @Param("date") LocalDate date,
+                                                @Param("stationName") String stationName);
+
+
+    /**
+     * Search a list of line stops that belong to a trainLine for a certain day.
+     *
      * @param trainLine for which we match its names.
-     * @param date  day of the year for which you do the search
+     * @param date      day of the year for which you do the search
      * @return a list of line stop
      */
     List<LineStop> findByTrainLineAndDate(TrainLine trainLine, LocalDate date);

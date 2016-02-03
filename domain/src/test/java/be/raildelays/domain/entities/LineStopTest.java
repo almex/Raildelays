@@ -87,7 +87,6 @@ public class LineStopTest extends AbstractObjectTest {
         assertNotNull(DATA_POINT1.getArrivalTime());
         assertNotNull(DATA_POINT1.getDate());
         assertNotNull(DATA_POINT1.getTrainLine());
-        assertNotNull(DATA_POINT1.getLocation());
         assertNotNull(DATA_POINT1.getNext());
         assertNotNull(DATA_POINT1.getPrevious());
         assertFalse(DATA_POINT1.isCanceledDeparture());

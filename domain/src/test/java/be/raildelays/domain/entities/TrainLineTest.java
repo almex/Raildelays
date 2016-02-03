@@ -56,7 +56,5 @@ public class TrainLineTest extends AbstractObjectTest {
         assertNotNull(DATA_POINT1.getLongName());
         assertNotNull(DATA_POINT1.getRouteId());
         assertNotNull(DATA_POINT1.getName());
-        assertNotNull(DATA_POINT1.getStops());
-        assertNotNull(DATA_POINT1.getDiscriminator());
     }
 }
