@@ -17,10 +17,10 @@ public class StopTimesFieldSetMapper implements GtfsFiledSetMapper<StopTime> {
     public StopTime mapFieldSet(FieldSet fieldSet) throws BindException {
         StopTime result = new StopTime();
 
-        result.setTripId(fieldSet.readRawString("trip_id"));
+        result.setTripId(fieldSet.readString("trip_id"));
         result.setArrivalTime(GtfsFiledSetMapper.readTime(fieldSet, "arrival_time"));
         result.setDepartureTime(GtfsFiledSetMapper.readTime(fieldSet, "departure_time"));
-        result.setStopId(fieldSet.readRawString("stop_id"));
+        result.setStopId(fieldSet.readString("stop_id"));
         result.setStopSequence(fieldSet.readInt("stop_sequence"));
 
         return result;

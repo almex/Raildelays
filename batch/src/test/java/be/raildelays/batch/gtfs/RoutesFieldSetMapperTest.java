@@ -31,9 +31,9 @@ public class RoutesFieldSetMapperTest extends EasyMockSupport {
 
     @Test
     public void testMapFieldSet() throws Exception {
-        expect(fieldSetMock.readRawString("route_id")).andReturn("route:IC466");
-        expect(fieldSetMock.readRawString("route_short_name")).andReturn("IC466");
-        expect(fieldSetMock.readRawString("route_long_name")).andReturn("Liège-Guillemins - Bruxelles Central");
+        expect(fieldSetMock.readString("route_id")).andReturn("route:IC466");
+        expect(fieldSetMock.readString("route_short_name")).andReturn("IC466");
+        expect(fieldSetMock.readString("route_long_name")).andReturn("Liège-Guillemins - Bruxelles Central");
 
         replayAll();
 

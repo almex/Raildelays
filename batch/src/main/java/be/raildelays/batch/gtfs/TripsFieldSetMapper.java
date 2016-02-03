@@ -16,9 +16,9 @@ public class TripsFieldSetMapper implements GtfsFiledSetMapper<Trip> {
     public Trip mapFieldSet(FieldSet fieldSet) throws BindException {
         Trip result = new Trip();
 
-        result.setServiceId(fieldSet.readRawString("service_id"));
-        result.setRouteId(fieldSet.readRawString("route_id"));
-        result.setTripId(fieldSet.readRawString("trip_id"));
+        result.setServiceId(fieldSet.readString("service_id"));
+        result.setRouteId(fieldSet.readString("route_id"));
+        result.setTripId(fieldSet.readString("trip_id"));
 
         return result;
     }

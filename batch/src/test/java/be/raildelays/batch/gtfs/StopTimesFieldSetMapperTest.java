@@ -31,10 +31,10 @@ public class StopTimesFieldSetMapperTest extends EasyMockSupport {
 
     @Test
     public void testMapFieldSet() throws Exception {
-        expect(fieldSetMock.readRawString("trip_id")).andReturn("IC466");
-        expect(fieldSetMock.readRawString("arrival_time")).andReturn("05:36:00");
-        expect(fieldSetMock.readRawString("departure_time")).andReturn("25:36:00");
-        expect(fieldSetMock.readRawString("stop_id")).andReturn("stops:008841673:0");
+        expect(fieldSetMock.readString("trip_id")).andReturn("IC466");
+        expect(fieldSetMock.readString("arrival_time")).andReturn("05:36:00");
+        expect(fieldSetMock.readString("departure_time")).andReturn("25:36:00");
+        expect(fieldSetMock.readString("stop_id")).andReturn("stops:008841673:0");
         expect(fieldSetMock.readInt("stop_sequence")).andReturn(1);
 
         replayAll();

@@ -16,9 +16,9 @@ public class RoutesFieldSetMapper implements GtfsFiledSetMapper<Route> {
     public Route mapFieldSet(FieldSet fieldSet) throws BindException {
         Route result = new Route();
 
-        result.setRouteId(fieldSet.readRawString("route_id"));
-        result.setRouteShortName(fieldSet.readRawString("route_short_name"));
-        result.setRouteLongName(fieldSet.readRawString("route_long_name"));
+        result.setRouteId(fieldSet.readString("route_id"));
+        result.setRouteShortName(fieldSet.readString("route_short_name"));
+        result.setRouteLongName(fieldSet.readString("route_long_name"));
 
         return result;
     }

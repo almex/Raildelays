@@ -34,7 +34,7 @@ public class CalendarDatesFieldSetMapperTest extends EasyMockSupport {
     @Test
     public void testMapFieldSet() throws Exception {
         expect(fieldSetMock.readDate("date", GtfsFiledSetMapper.DATE_FORMAT)).andReturn(new Date());
-        expect(fieldSetMock.readRawString("service_id")).andReturn("1");
+        expect(fieldSetMock.readString("service_id")).andReturn("1");
         expect(fieldSetMock.readInt("exception_type")).andReturn(0);
 
         replayAll();

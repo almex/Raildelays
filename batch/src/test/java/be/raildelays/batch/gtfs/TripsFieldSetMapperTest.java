@@ -31,9 +31,9 @@ public class TripsFieldSetMapperTest extends EasyMockSupport {
 
     @Test
     public void testMapFieldSet() throws Exception {
-        expect(fieldSetMock.readRawString("route_id")).andReturn("routes:IC106");
-        expect(fieldSetMock.readRawString("service_id")).andReturn("1");
-        expect(fieldSetMock.readRawString("trip_id")).andReturn("IC466");
+        expect(fieldSetMock.readString("route_id")).andReturn("routes:IC106");
+        expect(fieldSetMock.readString("service_id")).andReturn("1");
+        expect(fieldSetMock.readString("trip_id")).andReturn("IC466");
 
         replayAll();
         Trip actual = mapper.mapFieldSet(fieldSetMock);

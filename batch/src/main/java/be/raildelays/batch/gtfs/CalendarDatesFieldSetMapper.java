@@ -17,7 +17,7 @@ public class CalendarDatesFieldSetMapper implements GtfsFiledSetMapper<CalendarD
         CalendarDate result = new CalendarDate();
 
         result.setDate(GtfsFiledSetMapper.readDate(fieldSet, "date"));
-        result.setServiceId(fieldSet.readRawString("service_id"));
+        result.setServiceId(fieldSet.readString("service_id"));
         result.setExceptionType(CalendarDate.ExceptionType.valueOfIndex(fieldSet.readInt("exception_type")));
 
         return result;

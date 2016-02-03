@@ -44,7 +44,7 @@ public interface GtfsFiledSetMapper<T> extends FieldSetMapper<T> {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(TIME_FORMAT, Locale.ENGLISH)
                 .withChronology(IsoChronology.INSTANCE)
                 .withResolverStyle(ResolverStyle.LENIENT); // We should be able to parse 25:00:01
-        String value = fieldSet.readRawString(name);
+        String value = fieldSet.readString(name);
 
         return LocalTime.parse(value, formatter);
     }

@@ -17,10 +17,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -146,7 +143,7 @@ public class NewLineStopProcessor implements ItemProcessor<Trip, LineStop>, Init
 
     private Stop findStop(String stopId) {
         return readAll(stopsReader)
-                .stream()
+                .parallelStream()
                 .filter(stop -> stop.getStopId().equals(stopId))
                 .findFirst()
                 .orElse(null);
@@ -154,14 +151,14 @@ public class NewLineStopProcessor implements ItemProcessor<Trip, LineStop>, Init
 
     private List<StopTime> findStopTimes(String tripId) {
         return readAll(stopTimesReader)
-                .stream()
+                .parallelStream()
                 .filter(stopTime -> stopTime.getTripId().equals(tripId))
                 .collect(Collectors.toList());
     }
 
     private boolean isScheduled(String serviceId) {
         return readAll(calendarDatesReader)
-                .stream()
+                .parallelStream()
                 .filter(calendarDate -> calendarDate.getServiceId().equals(serviceId))
                 .anyMatch(calendarDate -> calendarDate.isIncluded(this.date));
     }
@@ -184,7 +181,7 @@ public class NewLineStopProcessor implements ItemProcessor<Trip, LineStop>, Init
     }
 
     private static <O> List<O> doReadAll(ItemStreamReader<O> reader) {
-        List<O> result = new ArrayList<>();
+        List<O> result = Collections.synchronizedList(new ArrayList<>());
 
         reader.open(new ExecutionContext());
 

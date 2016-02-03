@@ -17,13 +17,13 @@ public class StopsFieldSetMapper implements GtfsFiledSetMapper<Stop> {
     public Stop mapFieldSet(FieldSet fieldSet) throws BindException {
         Stop result = new Stop();
 
-        result.setStopId(fieldSet.readRawString("stop_id"));
-        result.setStopName(fieldSet.readRawString("stop_name"));
-        result.setStopLat(fieldSet.readRawString("stop_lat"));
-        result.setStopLon(fieldSet.readRawString("stop_lon"));
-        result.setStopCode(fieldSet.readRawString("platform_code"));
+        result.setStopId(fieldSet.readString("stop_id"));
+        result.setStopName(fieldSet.readString("stop_name"));
+        result.setStopLat(fieldSet.readString("stop_lat"));
+        result.setStopLon(fieldSet.readString("stop_lon"));
+        result.setStopCode(fieldSet.readString("platform_code"));
         result.setLocationType(Stop.LocationType.valueOfIndex(fieldSet.readInt("location_type")));
-        result.setParentStation(fieldSet.readRawString("parent_station"));
+        result.setParentStation(fieldSet.readString("parent_station"));
 
         return result;
     }

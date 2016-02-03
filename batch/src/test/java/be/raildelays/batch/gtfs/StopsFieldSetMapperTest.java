@@ -31,13 +31,13 @@ public class StopsFieldSetMapperTest extends EasyMockSupport {
 
     @Test
     public void testMapFieldSet() throws Exception {
-        expect(fieldSetMock.readRawString("stop_id")).andReturn("stops:007015400");
-        expect(fieldSetMock.readRawString("stop_name")).andReturn("London Saint Pancras International");
-        expect(fieldSetMock.readRawString("stop_lat")).andReturn("51.5310399");
-        expect(fieldSetMock.readRawString("stop_lon")).andReturn("-0.1260606");
-        expect(fieldSetMock.readRawString("platform_code")).andReturn("");
+        expect(fieldSetMock.readString("stop_id")).andReturn("stops:007015400");
+        expect(fieldSetMock.readString("stop_name")).andReturn("London Saint Pancras International");
+        expect(fieldSetMock.readString("stop_lat")).andReturn("51.5310399");
+        expect(fieldSetMock.readString("stop_lon")).andReturn("-0.1260606");
+        expect(fieldSetMock.readString("platform_code")).andReturn("");
         expect(fieldSetMock.readInt("location_type")).andReturn(1);
-        expect(fieldSetMock.readRawString("parent_station")).andReturn("");
+        expect(fieldSetMock.readString("parent_station")).andReturn("");
 
         replayAll();
         Stop actual = mapper.mapFieldSet(fieldSetMock);
