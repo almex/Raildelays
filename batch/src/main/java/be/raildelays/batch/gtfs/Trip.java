@@ -1,5 +1,8 @@
 package be.raildelays.batch.gtfs;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Bean representation of GTFS trips.txt file.
  *
@@ -18,6 +21,14 @@ public class Trip {
     private String shapeId;
     private Accessibility wheelchairAccessible;
     private Accessibility bikesAllowed;
+    private List<StopTime> stopTimes;
+
+    /**
+     * Default constructor.
+     */
+    public Trip() {
+        stopTimes = new ArrayList<>();
+    }
 
     public enum Accessibility {
         ALLOWED, NOT_ALLOWED;
@@ -113,6 +124,14 @@ public class Trip {
 
     public void setBikesAllowed(Accessibility bikesAllowed) {
         this.bikesAllowed = bikesAllowed;
+    }
+
+    public List<StopTime> getStopTimes() {
+        return stopTimes;
+    }
+
+    public void setStopTimes(List<StopTime> stopTimes) {
+        this.stopTimes = stopTimes;
     }
 }
 

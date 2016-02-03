@@ -171,18 +171,42 @@
           lazy-init="true">
         <property name="delegates">
             <list>
-                <bean class="be.raildelays.batch.processor.NewLineStopProcessor">
-                    <property name="calendarDatesReader" ref="csvCalendarDatesReader"/>
-                    <property name="stopTimesReader" ref="csvStopTimesReader"/>
-                    <property name="stopsReader" ref="csvStopsReader"/>
-                    <property name="date" value="#{jobParameters['date']}"/>
-                    <property name="lang" value="#{jobParameters['language']?.toUpperCase()}"/>
-                    <property name="trainLineDao" ref="trainLineDao"/>
-                    <property name="stationDao" ref="stationDao"/>
-                </bean>
+                <ref bean="filterUnscheduledTripProcessor"/>
+                <ref bean="findStopTimesProcessor"/>
+                <ref bean="buildLineStopProcessor"/>
+                <ref bean="aggregateLineStopProcessor"/>
                 <ref bean="validatorProcessor"/>
             </list>
         </property>
+    </bean>
+
+    <bean id="filterUnscheduledTripProcessor"
+          class="be.raildelays.batch.processor.FilterUnscheduledTripProcessor"
+          scope="step">
+        <property name="calendarDatesReader" ref="csvCalendarDatesReader"/>
+        <property name="date" value="#{jobParameters['date']}"/>
+    </bean>
+
+    <bean id="findStopTimesProcessor"
+          class="be.raildelays.batch.processor.FindStopTimesProcessor"
+          scope="step">
+        <property name="stopTimesReader" ref="csvStopTimesReader"/>
+    </bean>
+
+    <bean id="buildLineStopProcessor"
+          class="be.raildelays.batch.processor.BuildLineStopProcessor"
+          scope="step">
+        <property name="stopsReader" ref="csvStopsReader"/>
+        <property name="date" value="#{jobParameters['date']}"/>
+        <property name="lang" value="#{jobParameters['language']?.toUpperCase()}"/>
+    </bean>
+
+    <bean id="aggregateLineStopProcessor"
+          class="be.raildelays.batch.processor.AggregateLineStopProcessor"
+          scope="step">
+        <property name="trainLineDao" ref="trainLineDao"/>
+        <property name="stationDao" ref="stationDao"/>
+        <property name="lineStopDao" ref="lineStopDao"/>
     </bean>
 
     <!-- ================================================================================================== -->
