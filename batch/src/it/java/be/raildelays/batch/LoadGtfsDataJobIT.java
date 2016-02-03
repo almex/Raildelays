@@ -54,7 +54,7 @@ public class LoadGtfsDataJobIT extends AbstractContextIT {
         try {
             Map<String, JobParameter> parameters = new HashMap<>();
 
-            parameters.put("date", new JobParameter(new SimpleDateFormat("yyyyMMdd").parse("20160101")));
+            parameters.put("date", new JobParameter(new SimpleDateFormat("yyyyMMdd").parse("20150101")));
             parameters.put("language", new JobParameter(Language.FR.name()));
 
             batchStatus = jobLauncherTestUtils.launchJob(new JobParameters(parameters)).getStatus();

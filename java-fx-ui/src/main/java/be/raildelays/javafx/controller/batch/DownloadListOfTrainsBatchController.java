@@ -24,10 +24,16 @@
 
 package be.raildelays.javafx.controller.batch;
 
+import javafx.fxml.FXML;
+import javafx.scene.control.DateCell;
+import javafx.scene.control.DatePicker;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.ResourceBundle;
 
 /**
@@ -35,6 +41,8 @@ import java.util.ResourceBundle;
  * @since 2.0
  */
 public class DownloadListOfTrainsBatchController extends AbstractBatchController {
+    @FXML
+    private DatePicker date;
 
     @Override
     public void doStart() {
@@ -53,6 +61,8 @@ public class DownloadListOfTrainsBatchController extends AbstractBatchController
             service.cancel();
         }
 
+        builder.addDate("date", Date.from(date.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+
         service.reset();
         service.start(jobName, builder.toJobParameters());
 
@@ -62,6 +72,19 @@ public class DownloadListOfTrainsBatchController extends AbstractBatchController
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setJobName("loadGtfsIntoDatabaseJob");
+        date.setValue(LocalDate.now());
+        date.setDayCellFactory(param -> new DateCell() {
+
+            @Override
+            public void updateItem(LocalDate item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (item.isBefore(LocalDate.now().minusDays(6)) ||
+                        item.isAfter(LocalDate.now())) {
+                    setDisable(true);
+                }
+            }
+        });
         super.initialize(location, resources);
     }
 }

@@ -22,6 +22,7 @@
         <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
               minWidth="-Infinity" prefHeight="39.0" prefWidth="600.0">
             <children>
+                <DatePicker fx:id="date" showWeekNumbers="false"/>
                 <Button fx:id="startButton" mnemonicParsing="false" onAction="#doStart" text="Start"/>
                 <Button fx:id="stopButton" mnemonicParsing="false" onAction="#doStop" text="Stop"/>
                 <Button fx:id="restartButton" mnemonicParsing="false" onAction="#doRestart"

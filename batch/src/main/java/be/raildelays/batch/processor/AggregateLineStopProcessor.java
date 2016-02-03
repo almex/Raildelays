@@ -36,10 +36,10 @@ public class AggregateLineStopProcessor extends AbstractGtfsDataProcessor<LineSt
 
     @Override
     public LineStop process(LineStop item) throws Exception {
-        LineStop result = passThrough(this::merge, item);
+        LineStop result = passThrough(item, this::merge);
 
         if (result == null) {
-            result = passThrough(this::aggregate, item);
+            result = passThrough(item, this::aggregate);
         }
 
         LOGGER.debug("result", result);
@@ -47,7 +47,7 @@ public class AggregateLineStopProcessor extends AbstractGtfsDataProcessor<LineSt
         return result;
     }
 
-    private LineStop passThrough(Function<LineStop, LineStop.Builder> function, LineStop item) {
+    private LineStop passThrough(LineStop item, Function<LineStop, LineStop.Builder> function) {
         LineStop.Builder builder = function.apply(item);
         LineStop next = item.getNext();
 
@@ -92,13 +92,13 @@ public class AggregateLineStopProcessor extends AbstractGtfsDataProcessor<LineSt
     }
 
     private LineStop.Builder merge(LineStop item) {
-        LineStop.Builder result = null;
+        LineStop.Builder result = null; // If we don't find any existing data we return null
         LineStop actual = lineStopDao.findByRouteIdAndDateAndStationName(
                 item.getTrainLine().getRouteId(), item.getDate(), item.getStation().getName()
         );
 
         if (actual != null) {
-            result = new LineStop.Builder(item);
+            result = new LineStop.Builder(item, false, false);
             result.id(actual.getId());
         }
 
