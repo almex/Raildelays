@@ -51,12 +51,14 @@ public class AggregateLineStopProcessor extends AbstractGtfsDataProcessor<LineSt
         LineStop.Builder builder = function.apply(item);
         LineStop next = item.getNext();
 
-        while (next != null) {
-            builder.addNext(function.apply(next));
-            next = next.getNext();
+        if (builder != null) {
+            while (next != null) {
+                builder.addNext(function.apply(next));
+                next = next.getNext();
+            }
         }
 
-        return builder.build();
+        return builder != null ? builder.build() : null;
     }
 
     private Station findStation(Station actual) {
@@ -90,12 +92,13 @@ public class AggregateLineStopProcessor extends AbstractGtfsDataProcessor<LineSt
     }
 
     private LineStop.Builder merge(LineStop item) {
-        LineStop.Builder result = new LineStop.Builder(item);
+        LineStop.Builder result = null;
         LineStop actual = lineStopDao.findByRouteIdAndDateAndStationName(
                 item.getTrainLine().getRouteId(), item.getDate(), item.getStation().getName()
         );
 
         if (actual != null) {
+            result = new LineStop.Builder(item);
             result.id(actual.getId());
         }
 

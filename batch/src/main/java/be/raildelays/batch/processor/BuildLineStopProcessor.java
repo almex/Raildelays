@@ -57,7 +57,7 @@ public class BuildLineStopProcessor extends AbstractGtfsDataProcessor<Trip, Line
         for (StopTime stopTime : item.getStopTimes()) {
             Stop stop = findStop(stopTime.getStopId());
 
-            if (stop != null) {
+            if (stop != null && stop.getLocationType().equals(Stop.LocationType.NOT_PHYSICAL)) {
                 LineStop.Builder current = new LineStop.Builder()
                         .trainLine(new TrainLine.Builder(GtfsFiledSetMapper.parseRouteId(item.getRouteId())).build())
                         .arrivalTime(TimeDelay.of(stopTime.getArrivalTime()))

@@ -81,6 +81,7 @@ public class ScraperItemReader<T, R extends Request> implements ItemReader<T>, I
         retryTemplate.setBackOffPolicy(backOffPolicy);
     }
 
+    @Override
     public T read() throws Exception {
 
         return retryTemplate.execute(context -> {

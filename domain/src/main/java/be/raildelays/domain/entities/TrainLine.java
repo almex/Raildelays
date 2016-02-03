@@ -24,7 +24,6 @@
 
 package be.raildelays.domain.entities;
 
-import be.raildelays.location.Route;
 import be.raildelays.vehicule.Train;
 
 import javax.persistence.*;
@@ -49,7 +48,7 @@ import static java.util.Comparator.*;
         uniqueConstraints = @UniqueConstraint(columnNames = {"ROUTE_ID"}, name = "TrainLineUniqueBusinessKeyConstraint")
 )
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public class TrainLine extends AbstractEntity implements Train, Route<Station>, Comparable<TrainLine> {
+public class TrainLine extends AbstractEntity implements Train, Comparable<TrainLine> {
 
     private static final long serialVersionUID = -1527666012499664304L;
 
@@ -63,14 +62,6 @@ public class TrainLine extends AbstractEntity implements Train, Route<Station>, 
     @NotNull
     private Long routeId;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "DEPARTURE_ID")
-    private Station departure;
-
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "DESTINATION_ID")
-    private Station destination;
-
     /**
      * Default constructor used by Hibernate.
      */
@@ -81,8 +72,6 @@ public class TrainLine extends AbstractEntity implements Train, Route<Station>, 
         this.shortName = builder.shortName;
         this.longName = builder.longName;
         this.routeId = builder.routeId;
-        this.destination = builder.destination;
-        this.departure = builder.departure;
     }
 
     @Override
@@ -124,8 +113,6 @@ public class TrainLine extends AbstractEntity implements Train, Route<Station>, 
         private String shortName;
         private String longName;
         private Long routeId;
-        private Station departure;
-        private Station destination;
 
         /**
          * Minimal initialization constructor.
@@ -146,8 +133,6 @@ public class TrainLine extends AbstractEntity implements Train, Route<Station>, 
                 this.routeId = toCopy.routeId;
                 this.shortName = toCopy.shortName;
                 this.longName = toCopy.longName;
-                this.departure = toCopy.departure;
-                this.destination = toCopy.destination;
             }
         }
 
@@ -158,16 +143,6 @@ public class TrainLine extends AbstractEntity implements Train, Route<Station>, 
 
         public Builder longName(final String longName) {
             this.longName = longName;
-            return this;
-        }
-
-        public Builder departure(final Station departure) {
-            this.departure = departure;
-            return this;
-        }
-
-        public Builder destination(final Station destination) {
-            this.destination = destination;
             return this;
         }
 
@@ -196,16 +171,6 @@ public class TrainLine extends AbstractEntity implements Train, Route<Station>, 
 
     public Long getRouteId() {
         return routeId;
-    }
-
-    @Override
-    public Station getDeparture() {
-        return departure;
-    }
-
-    @Override
-    public Station getDestination() {
-        return destination;
     }
 
     @Override

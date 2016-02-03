@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.junit.experimental.theories.DataPoint;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 public class TrainLineTest extends AbstractObjectTest {
 
@@ -35,8 +34,6 @@ public class TrainLineTest extends AbstractObjectTest {
         DATA_POINT1 = new TrainLine.Builder(466L)
                 .shortName("Liège - Verviers")
                 .longName("IC466 : Liège - Verviers")
-                .departure(null)
-                .destination(null)
                 .build(false);
 
         DATA_POINT2 = DATA_POINT1;
@@ -50,8 +47,6 @@ public class TrainLineTest extends AbstractObjectTest {
 
     @Test
     public void testAccessors() {
-        assertNull(DATA_POINT1.getDeparture());
-        assertNull(DATA_POINT1.getDestination());
         assertNotNull(DATA_POINT1.getShortName());
         assertNotNull(DATA_POINT1.getLongName());
         assertNotNull(DATA_POINT1.getRouteId());
