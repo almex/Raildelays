@@ -113,4 +113,16 @@
         </property>
     </bean>
 
+    <!-- ================================================================================================== -->
+    <!-- =====================================       PROCESSORS       ===================================== -->
+    <!-- ================================================================================================== -->
+
+    <bean id="aggregateLineStopProcessor"
+          class="be.raildelays.batch.processor.AggregateLineStopProcessor"
+          scope="step">
+        <property name="trainLineDao" ref="trainLineDao"/>
+        <property name="stationDao" ref="stationDao"/>
+        <property name="lineStopDao" ref="lineStopDao"/>
+    </bean>
+
 </beans>

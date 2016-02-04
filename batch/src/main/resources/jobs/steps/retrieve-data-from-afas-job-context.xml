@@ -130,6 +130,7 @@
           class="org.springframework.batch.item.support.CompositeItemProcessor">
         <property name="delegates">
             <list>
+                <ref bean="aggregateLineStopProcessor"/>
                 <ref bean="validatorProcessor"/>
             </list>
         </property>

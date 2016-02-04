@@ -27,9 +27,7 @@ package be.raildelays.batch;
 import be.raildelays.domain.Language;
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.JobParameter;
-import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.*;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -49,17 +47,22 @@ public class LoadGtfsDataJobIT extends AbstractContextIT {
 
     @Test
     public void testLoadFromGtfs() {
-        BatchStatus batchStatus;
-
         try {
             Map<String, JobParameter> parameters = new HashMap<>();
 
             parameters.put("date", new JobParameter(new SimpleDateFormat("yyyyMMdd").parse("20150101")));
             parameters.put("language", new JobParameter(Language.FR.name()));
 
-            batchStatus = jobLauncherTestUtils.launchJob(new JobParameters(parameters)).getStatus();
+            JobExecution jobExecution = jobLauncherTestUtils.launchJob(new JobParameters(parameters));
+            BatchStatus batchStatus = jobExecution.getStatus();
 
             Assert.assertFalse(batchStatus.isUnsuccessful());
+            StepExecution stepExecution = jobExecution.getStepExecutions()
+                    .stream()
+                    .filter(step -> step.getStepName().equals("loadTrainStep"))
+                    .findFirst()
+                    .get();
+            Assert.assertEquals(0, stepExecution.getSkipCount());
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail("Your batch job has failed due to an exception.");
