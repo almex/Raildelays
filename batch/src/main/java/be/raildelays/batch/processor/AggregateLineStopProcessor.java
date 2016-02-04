@@ -11,6 +11,7 @@ import be.raildelays.repository.TrainLineDao;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
+import java.util.Collections;
 import java.util.function.Function;
 
 /**
@@ -82,10 +83,14 @@ public class AggregateLineStopProcessor extends AbstractGtfsDataProcessor<LineSt
 
         if (station != null) {
             result.station(station);
+        } else {
+            result.station(stationDao.save(item.getStation()));
         }
 
         if (trainLine != null) {
             result.trainLine(trainLine);
+        } else {
+            result.trainLine(trainLineDao.save(item.getTrainLine()));
         }
 
         return result;
