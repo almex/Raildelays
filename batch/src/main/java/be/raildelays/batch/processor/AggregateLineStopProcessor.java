@@ -59,17 +59,17 @@ public class AggregateLineStopProcessor extends AbstractGtfsDataProcessor<LineSt
             }
         }
 
-        return builder != null ? builder.build() : null;
+        return builder != null ? builder.build(false) : null;
     }
 
     private Station findStation(Station actual) {
         Station result = actual;
 
-        if (actual.getFrenchName() != null) {
+        if (!"".equals(actual.getFrenchName())) {
             result = stationDao.findByFrenchName(actual.getFrenchName());
-        } else if (actual.getDutchName() != null) {
+        } else if (!"".equals(actual.getDutchName())) {
             result = stationDao.findByDutchName(actual.getDutchName());
-        } else if (actual.getEnglishName() != null) {
+        } else if (!"".equals(actual.getEnglishName())) {
             result = stationDao.findByEnglishName(actual.getEnglishName());
         }
 
