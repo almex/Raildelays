@@ -9,6 +9,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.test.MetaDataInstanceFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.UrlResource;
 
@@ -32,7 +33,7 @@ public class HttpDownloadFileTaskletTest {
     @Before
     public void setUp() throws Exception {
         tasklet = new HttpDownloadFileTasklet();
-        tasklet.setInputFile(new UrlResource("http://gtfs.irail.be/nmbs/nmbs-latest.zip"));
+        tasklet.setInputFile(new ClassPathResource("/nmbs-latest.zip"));
         tasklet.setDestinationFolder(new FileSystemResource(DIRECTORY));
         cleanUp();
     }
