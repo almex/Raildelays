@@ -11,7 +11,6 @@ import be.raildelays.repository.TrainLineDao;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
-import java.util.Collections;
 import java.util.function.Function;
 
 /**

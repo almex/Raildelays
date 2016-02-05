@@ -27,17 +27,22 @@ public interface GtfsFiledSetMapper<T> extends FieldSetMapper<T> {
     static Long parseRouteId(String shortName) {
         StringBuilder builder = new StringBuilder();
         Pattern pattern = Pattern.compile("[0-9]+");
+        Long result = null;
 
-        // Retrieved all numeric values
-        for (int i = 0; i < shortName.length(); i++) {
-            char character = shortName.charAt(i);
+        if (shortName != null) {
+            // Retrieved all numeric values
+            for (int i = 0; i < shortName.length(); i++) {
+                char character = shortName.charAt(i);
 
-            if (pattern.matcher(new String(new char[]{character})).find()) {
-                builder.append(character);
+                if (pattern.matcher(new String(new char[]{character})).find()) {
+                    builder.append(character);
+                }
             }
+
+            result = Long.parseLong(builder.toString());
         }
 
-        return Long.parseLong(builder.toString());
+        return result;
     }
 
     static LocalTime readTime(FieldSet fieldSet, String name) {

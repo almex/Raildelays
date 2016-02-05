@@ -44,7 +44,7 @@ public class AggregateLineStopProcessorTest extends EasyMockSupport {
     }
 
     @Test
-    public void testProcess() throws Exception {
+    public void testProcessAggrgate() throws Exception {
         Station station = new Station("Liège-Guillemins");
         TrainLine trainLine = new TrainLine.Builder(1L).build(false);
         LineStop expected = new LineStop.Builder()
@@ -61,6 +61,28 @@ public class AggregateLineStopProcessorTest extends EasyMockSupport {
         expect(lineStopDao.findByRouteIdAndDateAndStationName(anyLong(), anyObject(), anyString())).andReturn(null);
         expect(stationDao.findByEnglishName(anyString())).andReturn(station);
         expect(trainLineDao.findByRouteId(anyLong())).andReturn(trainLine);
+
+        replayAll();
+
+        assertNotNull(processor.process(expected));
+    }
+
+    @Test
+    public void testProcessMerge() throws Exception {
+        Station station = new Station("Liège-Guillemins");
+        TrainLine trainLine = new TrainLine.Builder(1L).build(false);
+        LineStop expected = new LineStop.Builder()
+                .trainLine(trainLine)
+                .station(station)
+                .date(LocalDate.now())
+                .addNext(new LineStop.Builder()
+                        .trainLine(trainLine)
+                        .station(new Station("Bruxelles-central"))
+                        .date(LocalDate.now())
+                )
+                .build(false);
+
+        expect(lineStopDao.findByRouteIdAndDateAndStationName(anyLong(), anyObject(), anyString())).andReturn(expected);
 
         replayAll();
 

@@ -59,7 +59,8 @@ public class BuildLineStopProcessor extends AbstractGtfsDataProcessor<Trip, Line
 
             if (stop != null && stop.getLocationType().equals(Stop.LocationType.NOT_PHYSICAL)) {
                 LineStop.Builder current = new LineStop.Builder()
-                        .trainLine(new TrainLine.Builder(GtfsFiledSetMapper.parseRouteId(item.getRouteId())).build())
+                        .trainLine(new TrainLine.Builder(GtfsFiledSetMapper.parseRouteId(item.getRouteId()))
+                                .build(false))
                         .arrivalTime(TimeDelay.of(stopTime.getArrivalTime()))
                         .departureTime(TimeDelay.of(stopTime.getDepartureTime()))
                         .station(getStation(stop))
@@ -83,7 +84,7 @@ public class BuildLineStopProcessor extends AbstractGtfsDataProcessor<Trip, Line
     private Station getStation(Stop stop) {
         Station result = null;
 
-        if (stop != null) {
+        if (stop != null && stop.getStopName() != null) {
             String stationName = stop.getStopName();
             int index = stationName.indexOf("/");
 
@@ -107,11 +108,17 @@ public class BuildLineStopProcessor extends AbstractGtfsDataProcessor<Trip, Line
     }
 
     private Stop findStop(String stopId) {
-        return readAll(stopsReader)
-                .parallelStream()
-                .filter(stop -> stop.getStopId().equals(stopId))
-                .findFirst()
-                .orElse(null);
+        Stop result = null;
+
+        if (stopId != null) {
+            result = readAll(stopsReader)
+                    .parallelStream()
+                    .filter(stop -> stopId.equals(stop.getStopId()))
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        return result;
     }
 
     public void setStopsReader(ItemStreamReader<Stop> stopsReader) {
