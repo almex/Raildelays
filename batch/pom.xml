@@ -107,6 +107,11 @@
             <version>${version.log4j}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.almex</groupId>
+            <artifactId>pojo-unit</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>com.sun.mail</groupId>
