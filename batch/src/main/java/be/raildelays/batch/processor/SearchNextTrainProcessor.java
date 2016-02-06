@@ -85,10 +85,6 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
             BatchExcelRowMapperProcessor processor = new BatchExcelRowMapperProcessor();
 
             switch (lang) {
-                case EN:
-                    processor.setStationA(item.getDepartureStation().getEnglishName());
-                    processor.setStationB(item.getArrivalStation().getEnglishName());
-                    break;
                 case FR:
                     processor.setStationA(item.getDepartureStation().getFrenchName());
                     processor.setStationB(item.getArrivalStation().getFrenchName());
@@ -96,6 +92,11 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
                 case NL:
                     processor.setStationA(item.getDepartureStation().getDutchName());
                     processor.setStationB(item.getArrivalStation().getDutchName());
+                    break;
+                case EN:
+                default:
+                    processor.setStationA(item.getDepartureStation().getEnglishName());
+                    processor.setStationB(item.getArrivalStation().getEnglishName());
                     break;
             }
             processor.setLanguage(lang.name());

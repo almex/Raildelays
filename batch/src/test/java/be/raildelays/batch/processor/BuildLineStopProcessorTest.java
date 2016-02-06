@@ -4,9 +4,6 @@ import be.raildelays.batch.gtfs.Stop;
 import be.raildelays.batch.gtfs.StopTime;
 import be.raildelays.batch.gtfs.Trip;
 import be.raildelays.domain.Language;
-import be.raildelays.repository.LineStopDao;
-import be.raildelays.repository.StationDao;
-import be.raildelays.repository.TrainLineDao;
 import org.easymock.*;
 import org.junit.Before;
 import org.junit.Rule;
@@ -17,7 +14,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 
 import static org.easymock.EasyMock.expect;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Almex
@@ -49,6 +46,7 @@ public class BuildLineStopProcessorTest extends EasyMockSupport {
         Stop stop = new Stop();
 
         stop.setStopId("1");
+        stop.setStopName("foo / bar");
         stop.setLocationType(Stop.LocationType.NOT_PHYSICAL);
         processor.setLang(Language.EN);
 
@@ -64,6 +62,7 @@ public class BuildLineStopProcessorTest extends EasyMockSupport {
         Stop stop = new Stop();
 
         stop.setStopId("1");
+        stop.setStopName("foo / bar");
         stop.setLocationType(Stop.LocationType.NOT_PHYSICAL);
         processor.setLang(Language.FR);
 
@@ -79,6 +78,7 @@ public class BuildLineStopProcessorTest extends EasyMockSupport {
         Stop stop = new Stop();
 
         stop.setStopId("1");
+        stop.setStopName("foo / bar");
         stop.setLocationType(Stop.LocationType.NOT_PHYSICAL);
         processor.setLang(Language.NL);
 
