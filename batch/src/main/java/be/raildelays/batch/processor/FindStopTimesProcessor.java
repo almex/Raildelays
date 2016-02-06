@@ -9,6 +9,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,10 +40,16 @@ public class FindStopTimesProcessor extends AbstractGtfsDataProcessor<Trip, Trip
     }
 
     private List<StopTime> findStopTimes(String tripId) {
-        return readAll(stopTimesReader)
-                .parallelStream()
-                .filter(stopTime -> stopTime.getTripId().equals(tripId))
-                .collect(Collectors.toCollection(ArrayList::new));
+        List<StopTime> result = Collections.emptyList();
+
+        if (tripId != null) {
+            result = readAll(stopTimesReader)
+                    .parallelStream()
+                    .filter(stopTime -> tripId.equals(stopTime.getTripId()))
+                    .collect(Collectors.toCollection(ArrayList::new));
+        }
+
+        return result;
     }
 
     public void setStopTimesReader(ItemStreamReader<StopTime> stopTimesReader) {

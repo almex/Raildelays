@@ -43,10 +43,16 @@ public class FilterUnscheduledTripProcessor extends AbstractGtfsDataProcessor<Tr
     }
 
     private boolean isScheduled(String serviceId) {
-        return readAll(calendarDatesReader)
-                .parallelStream()
-                .filter(calendarDate -> calendarDate.getServiceId().equals(serviceId))
-                .anyMatch(calendarDate -> calendarDate.isIncluded(this.date));
+        boolean result = false;
+
+        if (serviceId != null) {
+            result = readAll(calendarDatesReader)
+                    .parallelStream()
+                    .filter(calendarDate -> serviceId.equals(calendarDate.getServiceId()))
+                    .anyMatch(calendarDate -> calendarDate.isIncluded(this.date));
+        }
+
+        return result;
     }
 
     public void setCalendarDatesReader(ItemStreamReader<CalendarDate> calendarDatesReader) {
