@@ -54,17 +54,17 @@ public class StopTest extends AbstractObjectTest {
         DATA_POINT3.setZoneId(DATA_POINT1.getZoneId());
 
         DATA_POINT4 = new Stop();
-        DATA_POINT1.setStopName("Bruxelles-Central");
-        DATA_POINT1.setStopId("1432");
-        DATA_POINT1.setLocationType(Stop.LocationType.PHYSICAL);
-        DATA_POINT1.setStopCode("foo");
-        DATA_POINT1.setParentStation(DATA_POINT1.getStopId());
-        DATA_POINT1.setStopDesc("bar");
-        DATA_POINT1.setStopLat("0.001");
-        DATA_POINT1.setStopLon("0.001");
-        DATA_POINT1.setStopTimezone(SimpleTimeZone.getDefault());
-        DATA_POINT1.setStopUrl(new URL("http://www.github.com"));
-        DATA_POINT1.setWheelchairBoarding(Stop.Accessibility.NOT_ALLOWED);
-        DATA_POINT1.setZoneId("25");
+        DATA_POINT4.setStopName("Bruxelles-Central");
+        DATA_POINT4.setStopId("1432");
+        DATA_POINT4.setLocationType(Stop.LocationType.PHYSICAL);
+        DATA_POINT4.setStopCode("foo");
+        DATA_POINT4.setParentStation(DATA_POINT1.getStopId());
+        DATA_POINT4.setStopDesc("bar");
+        DATA_POINT4.setStopLat("0.001");
+        DATA_POINT4.setStopLon("0.001");
+        DATA_POINT4.setStopTimezone(SimpleTimeZone.getDefault());
+        DATA_POINT4.setStopUrl(new URL("http://www.github.com"));
+        DATA_POINT4.setWheelchairBoarding(Stop.Accessibility.NOT_ALLOWED);
+        DATA_POINT4.setZoneId("25");
     }
 }

@@ -50,15 +50,15 @@ public class RouteTest extends AbstractObjectTest {
         DATA_POINT2.setRouteUrl(DATA_POINT1.getRouteUrl());
 
         DATA_POINT4 = new Route();
-        DATA_POINT1.setRouteLongName("515 : Liège-Guillemins - Bruxelles-Central");
-        DATA_POINT1.setRouteShortName("Liège-Guillemins - Bruxelles-Central");
-        DATA_POINT1.setAgencyId("118");
-        DATA_POINT1.setRouteColor("red");
-        DATA_POINT1.setRouteDesc("bar");
-        DATA_POINT1.setRouteId("515");
-        DATA_POINT1.setRouteTextColor("red");
-        DATA_POINT1.setRouteType(Route.RouteType.RAIL);
-        DATA_POINT1.setRouteUrl(new URL("http://www.github.com"));
+        DATA_POINT4.setRouteLongName("515 : Liège-Guillemins - Bruxelles-Central");
+        DATA_POINT4.setRouteShortName("Liège-Guillemins - Bruxelles-Central");
+        DATA_POINT4.setAgencyId("118");
+        DATA_POINT4.setRouteColor("red");
+        DATA_POINT4.setRouteDesc("bar");
+        DATA_POINT4.setRouteId("515");
+        DATA_POINT4.setRouteTextColor("red");
+        DATA_POINT4.setRouteType(Route.RouteType.RAIL);
+        DATA_POINT4.setRouteUrl(new URL("http://www.github.com"));
 
     }
 }
