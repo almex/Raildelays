@@ -55,7 +55,6 @@ public class MultiExcelFileToWriteLocatorTest extends AbstractFileTest {
 
         resourceLocator.setResourceItemSearch((item, resource) -> 0);
         resourceLocator.onOpen(context);
-        //resourceLocator.onWrite(new ExcelRow.Builder(LocalDate.now(), Sens.ARRIVAL).build(false), context);
 
         Assert.assertNotNull(context.getResource());
         Assert.assertEquals(EXCEL_FILE_NAME, context.getResource().getFilename());
@@ -87,7 +86,35 @@ public class MultiExcelFileToWriteLocatorTest extends AbstractFileTest {
 
         Assert.assertFalse(context.containsResource());
 
-        resourceLocator.onWrite(new BatchExcelRow.Builder(LocalDate.parse("2014-05-22"), Sens.ARRIVAL).build(false), context);
+        resourceLocator.onWrite(
+                new BatchExcelRow.Builder(LocalDate.parse("2014-05-22"), Sens.ARRIVAL).build(false), context
+        );
+
+        Assert.assertEquals(EXCEL_FILE_NAME, context.getResource().getFilename());
+    }
+
+    /**
+     * We expect to have a resource in the context if the ResourceItemSearch has reached the maxItemCount after writing
+     * 3 items.
+     */
+    @Test
+    public void testMaxItemCount() throws Exception {
+        ResourceContext context = new ResourceContext(new ExecutionContext(), "foo");
+
+        resourceLocator.setResourceItemSearch((item, resource) -> ResourceItemSearch.EOF);
+        resourceLocator.onOpen(context);
+
+        Assert.assertFalse(context.containsResource());
+
+        resourceLocator.onWrite(
+                new BatchExcelRow.Builder(LocalDate.parse("2014-05-20"), Sens.ARRIVAL).build(false), context
+        );
+        resourceLocator.onWrite(
+                new BatchExcelRow.Builder(LocalDate.parse("2014-05-21"), Sens.ARRIVAL).build(false), context
+        );
+        resourceLocator.onWrite(
+                new BatchExcelRow.Builder(LocalDate.parse("2014-05-22"), Sens.ARRIVAL).build(false), context
+        );
 
         Assert.assertEquals(EXCEL_FILE_NAME, context.getResource().getFilename());
     }

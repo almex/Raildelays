@@ -76,7 +76,7 @@ public class MultiExcelFileToWriteLocator extends CountingItemResourceLocator<Ba
          * Either we have reached the end of the current file, or we don't have any any resource yet, then we must
          * create a new file.
          */
-        if (context.getCurrentIndex() > maxItemCount + rowsToSkip || !context.containsResource()) {
+        if (context.getCurrentIndex() >= maxItemCount + rowsToSkip || !context.containsResource()) {
             String suffix = item.getDate().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
             File file = ExcelFileUtils.getFile(directory.getFile(), filePrefix, suffix, fileExtension);
 
@@ -91,21 +91,25 @@ public class MultiExcelFileToWriteLocator extends CountingItemResourceLocator<Ba
                             pathname.getName().endsWith(ExcelSheetItemWriter.Format.OOXML.getFileExtension()));
 
             if (files != null) {
-                for (File file : files) {
-                    //-- We search the first empty Row
-                    int index = resourceItemSearch.indexOf(BatchExcelRow.EMPTY, new FileSystemResource(file));
-
-                    if (index != ResourceItemSearch.EOF) {
-                        context.changeResource(new FileSystemResource(file));
-                        context.setCurrentIndex(index);
-                        break;
-                    }
-                }
+                findIndexInFiles(context, files);
             }
         } catch (IOException e) {
             throw new ItemStreamException("The directory cannot be resolved", e);
         } catch (Exception e) {
             throw new ItemStreamException("Cannot find content in your Excel file", e);
+        }
+    }
+
+    private void findIndexInFiles(ResourceContext context, File[] files) throws Exception {
+        for (File file : files) {
+            //-- We search the first empty Row
+            int index = resourceItemSearch.indexOf(BatchExcelRow.EMPTY, new FileSystemResource(file));
+
+            if (index != ResourceItemSearch.EOF) {
+                context.changeResource(new FileSystemResource(file));
+                context.setCurrentIndex(index);
+                break;
+            }
         }
     }
 
