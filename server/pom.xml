@@ -23,7 +23,7 @@
 
     <dependencies>
 
-        <dependency>
+        <!--<dependency>
             <groupId>com.github.almex</groupId>
             <artifactId>raildelays-batch</artifactId>
         </dependency>
@@ -32,6 +32,12 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <scope>compile</scope>
+        </dependency>-->
+
+        <dependency>
+            <groupId>org.mortbay.jetty.alpn</groupId>
+            <artifactId>alpn-boot</artifactId>
+            <version>8.1.7.v20160121</version>
         </dependency>
 
         <!-- Undertow - Embedded Servlet Container -->
@@ -48,6 +54,11 @@
             <artifactId>undertow-websockets-jsr</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.jboss.xnio</groupId>
+            <artifactId>xnio-nio</artifactId>
+            <version>3.3.4.Final</version>
+        </dependency>
+        <!--<dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-servlet-core</artifactId>
         </dependency>
@@ -55,13 +66,13 @@
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-json-jackson</artifactId>
             <version>2.20</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>org.springframework.hateoas</groupId>
             <artifactId>spring-hateoas</artifactId>
         </dependency>
@@ -72,8 +83,8 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-undertow</artifactId>
-        </dependency>
-        <dependency>
+        </dependency>-->
+        <!--<dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jersey</artifactId>
             <version>${version.spring.boot}</version>
@@ -83,7 +94,7 @@
                     <artifactId>spring-boot-starter-tomcat</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
+        </dependency>-->
 
 
     </dependencies>
