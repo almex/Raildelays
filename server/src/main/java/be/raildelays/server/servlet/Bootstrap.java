@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-package io.undertow.examples.http2;
+package be.raildelays.server.servlet;
 
 import io.undertow.Handlers;
 import io.undertow.Undertow;
