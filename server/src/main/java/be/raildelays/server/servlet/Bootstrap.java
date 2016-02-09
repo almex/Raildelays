@@ -33,6 +33,8 @@ import io.undertow.server.session.SessionAttachmentHandler;
 import io.undertow.server.session.SessionCookieConfig;
 import io.undertow.util.Headers;
 import io.undertow.util.StatusCodes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xnio.OptionMap;
 import org.xnio.Xnio;
 
@@ -48,11 +50,13 @@ import static io.undertow.Handlers.resource;
 import static io.undertow.predicate.Predicates.secure;
 
 /**
- * @author Stuart Douglas
+ * @author Almex
  */
 public class Bootstrap {
 
     private static final char[] STORE_PASSWORD = "password".toCharArray();
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Bootstrap.class);
 
     private Bootstrap() {
         // Not used
@@ -60,25 +64,46 @@ public class Bootstrap {
 
     public static void main(final String[] args) throws Exception {
         String version = System.getProperty("java.version");
-        System.out.println("Java version " + version);
-        if (version.charAt(0) == '1' && Integer.parseInt(version.charAt(2) + "") < 8) {
-            System.out.println("This example requires Java 1.8 or later");
-            System.out.println("The HTTP2 spec requires certain cyphers that are not present in older JVM's");
-            System.out.println("See section 9.2.2 of the HTTP2 specification for details");
+        String bindAddress = System.getProperty("bind.address", "localhost");
+
+        LOGGER.info("Java version " + version);
+
+        if (version.charAt(0) == '1' && Integer.parseInt(Character.toString(version.charAt(2))) < 8) {
+            LOGGER.error("This example requires Java 1.8 or later");
+            LOGGER.error("The HTTP2 spec requires certain cyphers that are not present in older JVM's");
+            LOGGER.error("See section 9.2.2 of the HTTP2 specification for details");
+
             System.exit(1);
         }
-        String bindAddress = System.getProperty("bind.address", "localhost");
+
         SSLContext sslContext = createSSLContext(loadKeyStore("server.keystore"), loadKeyStore("server.truststore"));
         Undertow server = Undertow.builder()
                 .setServerOption(UndertowOptions.ENABLE_HTTP2, true)
                 .setServerOption(UndertowOptions.ENABLE_SPDY, true)
                 .addHttpListener(8080, bindAddress)
                 .addHttpsListener(8443, bindAddress, sslContext)
-                .setHandler(new SessionAttachmentHandler(new LearningPushHandler(100, -1, Handlers.header(predicate(secure(), resource(new PathResourceManager(Paths.get(System.getProperty("example.directory", System.getProperty("user.home"))), 100))
+                .setHandler(new SessionAttachmentHandler(new LearningPushHandler(
+                        100,
+                        -1,
+                        Handlers.header(
+                                predicate(secure(),
+                                        resource(new PathResourceManager(Paths.get(
+                                                System.getProperty("example.directory", System.getProperty("user.home"))),
+                                                100
+                                        ))
                         .setDirectoryListingEnabled(true), exchange -> {
-                    exchange.getResponseHeaders().add(Headers.LOCATION, "https://" + exchange.getHostName() + ":" + (exchange.getHostPort() + 363) + exchange.getRelativePath());
+                                            exchange.getResponseHeaders()
+                                                    .add(
+                                                            Headers.LOCATION,
+                                                            "https://" + exchange.getHostName() + ":" + (exchange.getHostPort() + 363) + exchange.getRelativePath());
                     exchange.setStatusCode(StatusCodes.TEMPORARY_REDIRECT);
-                }), "x-undertow-transport", ExchangeAttributes.transportProtocol())), new InMemorySessionManager("test"), new SessionCookieConfig())).build();
+                                        }),
+                                "x-undertow-transport",
+                                ExchangeAttributes.transportProtocol()
+                        )),
+                        new InMemorySessionManager("test"),
+                        new SessionCookieConfig()))
+                .build();
 
         server.start();
 
