@@ -29,10 +29,11 @@
             <map>
                 <!-- Add reference to a Spring bean in the JobDataMap of any JobDetail -->
                 <entry key="service" value-ref="batchStartAndRecoveryService"/>
+                <entry key="jobParametersExtractor" value-ref="jobParametersFromPropertiesExtractor"/>
             </map>
         </property>
         <property name="dataSource" ref="quartzDataSource"/>
-        <property name="startupDelay" value="10"/>
+        <property name="startupDelay" value="5"/>
         <property name="transactionManager" ref="raildelaysTransactionManager"/>
         <property name="waitForJobsToCompleteOnShutdown" value="true"/>
     </bean>

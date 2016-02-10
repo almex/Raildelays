@@ -3,31 +3,10 @@
        xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <!--<bean id="quartzMainJob" class="be.raildelays.server.scheduler.MainJob">
-        <property name="propertiesExtractor" ref="jobParametersFromPropertiesExtractor"/>
-        <property name="service" ref="BatchStartAndRecoveryService"/>
-    </bean>-->
-
     <bean name="mainJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
         <property name="jobClass" value="be.raildelays.server.scheduler.MainJob"/>
-        <property name="jobDataAsMap">
-            <map>
-                <entry key="jobParameters" value-ref="jobParameters"/>
-            </map>
-        </property>
         <property name="durability" value="true"/>
         <property name="requestsRecovery" value="true"/>
-    </bean>
-
-    <bean id="jobParameters" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-        <property name="targetObject" ref="jobParametersFromPropertiesExtractor"/>
-        <property name="targetMethod" value="getJobParameters"/>
-        <property name="arguments">
-            <list>
-                <null>job</null>
-                <null>stepExecution</null>
-            </list>
-        </property>
     </bean>
 
 </beans>

@@ -27,7 +27,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
-                    <finalName>raildelays-batch-${project.version}</finalName>
+                    <finalName>raildelays-micro-services-${project.version}</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                     <descriptors>
                         <descriptor>src/main/resources/assemblies/assembly.xml</descriptor>
@@ -50,7 +50,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>raildelays-batch</artifactId>
+            <artifactId>raildelays-server</artifactId>
         </dependency>
         <!--dependency>
             <groupId>${project.groupId}</groupId>

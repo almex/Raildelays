@@ -16,8 +16,9 @@
  *  limitations under the License.
  */
 
-package be.raildelays.server.servlet;
+package be.raildelays.server;
 
+import be.raildelays.server.servlet.RaildelaysWebApplicationInitializer;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.UndertowOptions;

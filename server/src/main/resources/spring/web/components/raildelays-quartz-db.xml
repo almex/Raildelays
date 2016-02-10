@@ -3,7 +3,6 @@
        xmlns:jdbc="http://www.springframework.org/schema/jdbc"
        xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-
 		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
     <bean id="quartzDataSource" class="org.apache.commons.dbcp.BasicDataSource"
@@ -14,7 +13,7 @@
         <property name="url" value="jdbc:hsqldb:file:data/quartz"/>
     </bean>
 
-    <jdbc:initialize-database data-source="batchDataSource" ignore-failures="ALL">
+    <jdbc:initialize-database data-source="quartzDataSource" ignore-failures="ALL">
         <jdbc:script execution="INIT" location="classpath:/ddl/create_quartz_schema.sql"/>
     </jdbc:initialize-database>
 
