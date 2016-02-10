@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
+
+    <bean id="quartzDataSource" class="org.apache.commons.dbcp.BasicDataSource"
+          destroy-method="close">
+        <property name="driverClassName" value="org.hsqldb.jdbc.JDBCDriver"/>
+        <property name="username" value="sa"/>
+        <property name="password" value=""/>
+        <property name="url" value="jdbc:hsqldb:file:data/quartz"/>
+    </bean>
+
+    <jdbc:initialize-database data-source="batchDataSource" ignore-failures="ALL">
+        <jdbc:script execution="INIT" location="classpath:/ddl/create_quartz_schema.sql"/>
+    </jdbc:initialize-database>
+
+</beans>

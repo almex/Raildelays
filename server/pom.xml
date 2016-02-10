@@ -23,7 +23,7 @@
 
     <dependencies>
 
-        <!--<dependency>
+        <dependency>
             <groupId>com.github.almex</groupId>
             <artifactId>raildelays-batch</artifactId>
         </dependency>
@@ -31,8 +31,11 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <scope>compile</scope>
-        </dependency>-->
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.mortbay.jetty.alpn</groupId>

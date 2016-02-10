@@ -21,20 +21,18 @@ package be.raildelays.server.servlet;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.UndertowOptions;
-import io.undertow.attribute.ExchangeAttributes;
 import io.undertow.protocols.ssl.UndertowXnioSsl;
-import io.undertow.server.handlers.LearningPushHandler;
+import io.undertow.server.handlers.PathHandler;
 import io.undertow.server.handlers.ResponseCodeHandler;
 import io.undertow.server.handlers.proxy.LoadBalancingProxyClient;
 import io.undertow.server.handlers.proxy.ProxyHandler;
-import io.undertow.server.handlers.resource.PathResourceManager;
-import io.undertow.server.session.InMemorySessionManager;
-import io.undertow.server.session.SessionAttachmentHandler;
-import io.undertow.server.session.SessionCookieConfig;
-import io.undertow.util.Headers;
-import io.undertow.util.StatusCodes;
+import io.undertow.servlet.Servlets;
+import io.undertow.servlet.api.DeploymentInfo;
+import io.undertow.servlet.api.DeploymentManager;
+import io.undertow.servlet.api.ServletContainerInitializerInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.SpringServletContainerInitializer;
 import org.xnio.OptionMap;
 import org.xnio.Xnio;
 
@@ -44,18 +42,15 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyStore;
-
-import static io.undertow.Handlers.predicate;
-import static io.undertow.Handlers.resource;
-import static io.undertow.predicate.Predicates.secure;
+import java.util.Collections;
 
 /**
  * @author Almex
+ * @since 2.0
  */
 public class Bootstrap {
 
     private static final char[] STORE_PASSWORD = "password".toCharArray();
-
     private static final Logger LOGGER = LoggerFactory.getLogger(Bootstrap.class);
 
     private Bootstrap() {
@@ -76,33 +71,26 @@ public class Bootstrap {
             System.exit(1);
         }
 
+        DeploymentInfo deploymentInfo = Servlets.deployment()
+                .addServletContainerInitalizer(new ServletContainerInitializerInfo(
+                        SpringServletContainerInitializer.class,
+                        Collections.singleton(RaildelaysWebApplicationInitializer.class)))
+                .setClassLoader(Bootstrap.class.getClassLoader())
+                .setContextPath("/")
+                .setDeploymentName("raildelays.war");
+
+        DeploymentManager manager = Servlets.defaultContainer().addDeployment(deploymentInfo);
+        manager.deploy();
+        PathHandler path = Handlers.path(Handlers.redirect("/"))
+                .addPrefixPath("/", manager.start());
+
         SSLContext sslContext = createSSLContext(loadKeyStore("server.keystore"), loadKeyStore("server.truststore"));
         Undertow server = Undertow.builder()
                 .setServerOption(UndertowOptions.ENABLE_HTTP2, true)
                 .setServerOption(UndertowOptions.ENABLE_SPDY, true)
                 .addHttpListener(8080, bindAddress)
                 .addHttpsListener(8443, bindAddress, sslContext)
-                .setHandler(new SessionAttachmentHandler(new LearningPushHandler(
-                        100,
-                        -1,
-                        Handlers.header(
-                                predicate(secure(),
-                                        resource(new PathResourceManager(Paths.get(
-                                                System.getProperty("example.directory", System.getProperty("user.home"))),
-                                                100
-                                        ))
-                        .setDirectoryListingEnabled(true), exchange -> {
-                                            exchange.getResponseHeaders()
-                                                    .add(
-                                                            Headers.LOCATION,
-                                                            "https://" + exchange.getHostName() + ":" + (exchange.getHostPort() + 363) + exchange.getRelativePath());
-                    exchange.setStatusCode(StatusCodes.TEMPORARY_REDIRECT);
-                                        }),
-                                "x-undertow-transport",
-                                ExchangeAttributes.transportProtocol()
-                        )),
-                        new InMemorySessionManager("test"),
-                        new SessionCookieConfig()))
+                .setHandler(path)
                 .build();
 
         server.start();
@@ -120,7 +108,6 @@ public class Bootstrap {
                 .setHandler(new ProxyHandler(proxy, 30000, ResponseCodeHandler.HANDLE_404))
                 .build();
         reverseProxy.start();
-
     }
 
     private static KeyStore loadKeyStore(String name) throws Exception {

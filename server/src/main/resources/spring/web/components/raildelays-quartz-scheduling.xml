@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="mainJobCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="mainJobDetail"/>
+        <!-- run every morning at 00:00 -->
+        <property name="cronExpression" value="0 0 0 * * ?"/>
+    </bean>
+
+    <bean id="mainJobAtStartupTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+        <property name="jobDetail" ref="mainJobDetail"/>
+        <property name="repeatCount" value="0"/>
+        <property name="repeatInterval" value="10"/>
+    </bean>
+
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="mainJobCronTrigger"/>
+                <ref bean="mainJobAtStartupTrigger"/>
+            </list>
+        </property>
+        <property name="jobFactory">
+            <bean class="org.springframework.scheduling.quartz.SpringBeanJobFactory"/>
+        </property>
+        <property name="schedulerContextAsMap">
+            <map>
+                <!-- Add reference to a Spring bean in the JobDataMap of any JobDetail -->
+                <entry key="service" value-ref="batchStartAndRecoveryService"/>
+            </map>
+        </property>
+        <property name="dataSource" ref="quartzDataSource"/>
+        <property name="startupDelay" value="10"/>
+        <property name="transactionManager" ref="raildelaysTransactionManager"/>
+        <property name="waitForJobsToCompleteOnShutdown" value="true"/>
+    </bean>
+
+</beans>

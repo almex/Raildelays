@@ -25,12 +25,11 @@
 package be.raildelays.batch;
 
 import be.raildelays.batch.service.BatchStartAndRecoveryService;
-import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobParameters;
@@ -44,9 +43,18 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.step.job.JobParametersExtractor;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
+/**
+ * @author Almex
+ * @since 1.0
+ */
 public class Bootstrap {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Bootstrap.class);
@@ -56,14 +64,15 @@ public class Bootstrap {
     }
 
     /**
-     * @param args
+     * @param args offline: activate offline mode, norecovery: do not execute recovery, date: search delays for only
+     *             on date passed as parameter
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
         final String[] contextPaths = new String[]{"/spring/bootstrap-context.xml", "/jobs/main-job-context.xml"};
-        final CommandLineParser parser = new BasicParser();
+        final CommandLineParser parser = new DefaultParser();
         final Options options = new Options();
-        final List<Date> dates;
+        final List<LocalDate> dates;
 
         options.addOption("offline", false, "activate offline mode");
         options.addOption("norecovery", false, "do not execute recovery");
@@ -74,9 +83,15 @@ public class Bootstrap {
         final String searchDate = cmd.getOptionValue("date", "");
 
         if (StringUtils.isNotEmpty(searchDate)) {
-            dates = Arrays.asList(DateUtils.parseDate(searchDate, new String[]{"dd/MM/yyyy", "dd-MM-yyyy", "yyyyMMdd"}));
+            DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+                    .append(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                    .append(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+                    .append(DateTimeFormatter.ofPattern("yyyyMMdd"))
+                    .toFormatter();
+
+            dates = Collections.singletonList(LocalDate.parse(searchDate, formatter));
         } else {
-            dates = generateListOfDates();
+            dates = ExcelFileUtils.generateListOfDates();
         }
 
         ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext(contextPaths);
@@ -85,7 +100,9 @@ public class Bootstrap {
         applicationContext.registerShutdownHook(); // Register close of this Spring context to shutdown of the JVM
         applicationContext.start();
 
-        final BatchStartAndRecoveryService service = applicationContext.getBean("BatchStartAndRecoveryService", BatchStartAndRecoveryService.class);
+        BatchStartAndRecoveryService service = applicationContext.getBean(
+                "batchStartAndRecoveryService", BatchStartAndRecoveryService.class
+        );
 
         try {
             JobParametersExtractor propertiesExtractor = applicationContext.getBean("jobParametersFromPropertiesExtractor",
@@ -100,7 +117,7 @@ public class Bootstrap {
             }
 
             //-- Launch one Job per date
-            for (Date date : dates) {
+            for (LocalDate date : dates) {
                 startMainJob(service, propertiesExtractor, date);
             }
         } catch (Exception e) {
@@ -117,69 +134,28 @@ public class Bootstrap {
         System.exit(0);
     }
 
-    private static void startMainJob(BatchStartAndRecoveryService service, JobParametersExtractor propertiesExtractor, Date date) throws JobInstanceAlreadyExistsException, NoSuchJobException, JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException {
+    private static void startMainJob(BatchStartAndRecoveryService service,
+                                     JobParametersExtractor propertiesExtractor,
+                                     LocalDate date)
+            throws JobInstanceAlreadyExistsException, NoSuchJobException, JobParametersInvalidException,
+            JobExecutionAlreadyRunningException, JobRestartException {
         JobParameters jobParameters = propertiesExtractor.getJobParameters(null, null);
         JobParametersBuilder builder = new JobParametersBuilder(jobParameters);
 
-
-        builder.addDate("date", date);
+        builder.addDate("date", Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
         try {
             service.start("mainJob", builder.toJobParameters());
         } catch (JobInstanceAlreadyCompleteException e) {
-            LOGGER.warn("Job already completed for this date " + new SimpleDateFormat("dd/MM/yyyy").format(date), e);
+            LOGGER.warn(
+                    String.format(
+                            "Job already completed for this date %s",
+                            date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                    ), e
+            );
         }
     }
 
-    /**
-     * Generate a list of day of week from today to 7 in the past.
-     *
-     * @return a list of {@link Date} from Monday to Friday.
-     */
-    private static List<Date> generateListOfDates() {
-        List<Date> result = new ArrayList<>();
-        Calendar date = DateUtils.truncate(Calendar.getInstance(),
-                Calendar.DAY_OF_MONTH);
-        date.setLenient(false);
-        Date monday = null;
-        Date tuesday = null;
-        Date wednesday = null;
-        Date thursday = null;
-        Date friday = null;
 
-        for (int i = 0; i < 7; i++) {
-            date.add(Calendar.DAY_OF_MONTH, -1);
-
-            switch (date.get(Calendar.DAY_OF_WEEK)) {
-                case Calendar.MONDAY:
-                    monday = date.getTime();
-                    break;
-                case Calendar.TUESDAY:
-                    tuesday = date.getTime();
-                    break;
-                case Calendar.WEDNESDAY:
-                    wednesday = date.getTime();
-                    break;
-                case Calendar.THURSDAY:
-                    thursday = date.getTime();
-                    break;
-                case Calendar.FRIDAY:
-                    friday = date.getTime();
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        result.add(monday);
-        result.add(tuesday);
-        result.add(wednesday);
-        result.add(thursday);
-        result.add(friday);
-
-        Collections.sort(result); //-- To order outcomes
-
-        return result;
-    }
 
 }

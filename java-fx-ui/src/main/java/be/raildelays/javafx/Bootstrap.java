@@ -74,6 +74,7 @@ public class Bootstrap extends Application {
 
     @Override
     public void init() throws Exception {
+        FXMLLoader rootLoader = new FXMLLoader(getClass().getResource("/fxml/batch/index.fxml"));
         final String[] contextPaths = new String[]{
                 "/spring/bootstrap-fx-context.xml",
                 "/jobs/main-job-context.xml",
@@ -81,8 +82,6 @@ public class Bootstrap extends Application {
                 "/jobs/steps/handle-more-than-one-hour-delays-job-context.xml",
                 "/jobs/steps/load-gtfs-into-database-job-context.xml"
         };
-
-        FXMLLoader rootLoader = new FXMLLoader(getClass().getResource("/fxml/batch/index.fxml"));
 
         applicationContext = new ClassPathXmlApplicationContext(contextPaths);
         applicationContext.registerShutdownHook(); // Register close of this Spring context to shutdown of the JVM
@@ -95,7 +94,7 @@ public class Bootstrap extends Application {
             );
 
             scheduledService.setService(
-                    applicationContext.getBean("BatchStartAndRecoveryService", BatchStartAndRecoveryService.class)
+                    applicationContext.getBean("batchStartAndRecoveryService", BatchStartAndRecoveryService.class)
             );
 
             if (clazz.isAssignableFrom(BatchIndexController.class)) {

@@ -28,8 +28,14 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 /**
  * Utility class helpful to build all what is related to Excel file location/path/name.
@@ -71,5 +77,57 @@ public class ExcelFileUtils extends FileUtils {
         int extensionIndex = originalFileName.lastIndexOf(".");
 
         return originalFileName.substring(extensionIndex);
+    }
+
+    /**
+     * Generate a list of day of week from today to 7 in the past.
+     *
+     * @return a list of {@link Date} from Monday to Friday.
+     */
+    public static List<LocalDate> generateListOfDates() {
+        List<LocalDate> result = new ArrayList<>();
+        LocalDate date = LocalDateTime
+                .ofInstant(Calendar.getInstance().toInstant(), ZoneId.systemDefault())
+                .toLocalDate();
+
+        LocalDate monday = null;
+        LocalDate tuesday = null;
+        LocalDate wednesday = null;
+        LocalDate thursday = null;
+        LocalDate friday = null;
+
+        for (int i = 0; i < 7; i++) {
+            date = date.plus(-1, ChronoUnit.DAYS);
+
+            switch (DayOfWeek.of(date.get(ChronoField.DAY_OF_WEEK))) {
+                case MONDAY:
+                    monday = date;
+                    break;
+                case TUESDAY:
+                    tuesday = date;
+                    break;
+                case WEDNESDAY:
+                    wednesday = date;
+                    break;
+                case THURSDAY:
+                    thursday = date;
+                    break;
+                case FRIDAY:
+                    friday = date;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        result.add(monday);
+        result.add(tuesday);
+        result.add(wednesday);
+        result.add(thursday);
+        result.add(friday);
+
+        Collections.sort(result); //-- To order outcomes
+
+        return result;
     }
 }
