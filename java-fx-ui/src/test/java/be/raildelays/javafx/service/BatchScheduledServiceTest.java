@@ -25,6 +25,7 @@
 package be.raildelays.javafx.service;
 
 import be.raildelays.batch.service.BatchStartAndRecoveryService;
+import be.raildelays.javafx.test.GraphicalTest;
 import be.raildelays.javafx.test.JavaFXThreadingRule;
 import javafx.util.Duration;
 import org.easymock.EasyMock;
@@ -32,6 +33,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.batch.core.JobExecution;
@@ -42,6 +44,7 @@ import org.springframework.batch.test.MetaDataInstanceFactory;
  * @author Almex
  * @since 1.2
  */
+@Category(GraphicalTest.class)
 @RunWith(BlockJUnit4ClassRunner.class)
 public class BatchScheduledServiceTest {
 
