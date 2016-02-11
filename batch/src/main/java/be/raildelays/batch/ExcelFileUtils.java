@@ -24,8 +24,6 @@
 
 package be.raildelays.batch;
 
-import org.apache.commons.io.FileUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.time.DayOfWeek;
@@ -43,7 +41,11 @@ import java.util.*;
  * @author Almex
  * @since 1.2
  */
-public class ExcelFileUtils extends FileUtils {
+public final class ExcelFileUtils {
+
+    private ExcelFileUtils() {
+        // It's an utility class
+    }
 
     public static File getFile(File directory, String prefix, LocalDate date, String extension) throws IOException {
         assert date != null : "You must provide a date!";
