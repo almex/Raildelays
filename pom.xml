@@ -1038,6 +1038,10 @@
                             <sources>
                                 <source>${it.source.path}</source>
                             </sources>
+                            <!-- No runnable on Travis.ci (otherwise get "Gtk-WARNING **: cannot open display") -->
+                            <excludedGroups>
+                                be.raildelays.javafx.test.GraphicalTest
+                            </excludedGroups>
                         </configuration>
                         <executions>
                             <execution>
