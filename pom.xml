@@ -1040,7 +1040,7 @@
                             </sources>
                             <!-- No runnable on Travis.ci (otherwise get "Gtk-WARNING **: cannot open display") -->
                             <excludedGroups>
-                                be.raildelays.javafx.test.GraphicalTest
+                                be.raildelays.test.GraphicalTest
                             </excludedGroups>
                         </configuration>
                         <executions>
@@ -1295,7 +1295,7 @@
                             </includes>
                             <!-- No runnable on Travis.ci (otherwise get "Gtk-WARNING **: cannot open display") -->
                             <excludedGroups>
-                                be.raildelays.javafx.test.GraphicalTest
+                                be.raildelays.test.GraphicalTest
                             </excludedGroups>
                         </configuration>
                     </plugin>

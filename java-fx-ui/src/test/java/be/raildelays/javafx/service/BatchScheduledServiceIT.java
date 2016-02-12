@@ -25,8 +25,8 @@
 package be.raildelays.javafx.service;
 
 import be.raildelays.batch.service.BatchStartAndRecoveryService;
-import be.raildelays.javafx.test.GraphicalTest;
 import be.raildelays.javafx.test.JavaFXThreadingRule;
+import be.raildelays.test.GraphicalTest;
 import javafx.util.Duration;
 import org.easymock.EasyMock;
 import org.junit.Assert;
