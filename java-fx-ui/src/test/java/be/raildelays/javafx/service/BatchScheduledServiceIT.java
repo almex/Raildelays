@@ -46,7 +46,7 @@ import org.springframework.batch.test.MetaDataInstanceFactory;
  */
 @Category(GraphicalTest.class)
 @RunWith(BlockJUnit4ClassRunner.class)
-public class BatchScheduledServiceTest {
+public class BatchScheduledServiceIT {
 
     private BatchScheduledService service;
     private BatchStartAndRecoveryService startAndRecoveryService;
