@@ -128,8 +128,7 @@
           class="org.springframework.batch.item.file.MultiResourceItemReader"
           scope="step">
         <property name="delegate">
-            <bean class="org.springframework.batch.item.file.ExcelSheetItemReader"
-                  scope="step">
+            <bean class="org.springframework.batch.item.file.ExcelSheetItemReader">
                 <property name="name" value="allExcelFilesToSplitItemReader"/>
                 <property name="rowsToSkip" value="${excel.sheet0.rows.to.skip}"/>
                 <property name="maxItemCount" value="${excel.sheet0.max.item.count}"/>
@@ -175,11 +174,9 @@
           class="org.springframework.batch.item.resource.ResourceLocatorItemStreamWriter"
           scope="step">
         <property name="delegate">
-            <bean class="org.springframework.batch.item.file.ExcelSheetItemWriter"
-                  scope="step">
+            <bean class="org.springframework.batch.item.file.ExcelSheetItemWriter">
                 <property name="rowAggregator">
-                    <bean class="be.raildelays.batch.writer.ExcelRowAggregator"
-                          scope="step">
+                    <bean class="be.raildelays.batch.writer.ExcelRowAggregator">
                         <property name="language" value="#{jobParameters['language']}"/>
                     </bean>
                 </property>
@@ -193,8 +190,7 @@
         </property>
         <property name="name" value="excelSheetBeforeItemWriter"/>
         <property name="resourceLocator">
-            <bean class="be.raildelays.batch.writer.MultiExcelFileToWriteLocator"
-                  scope="step">
+            <bean class="be.raildelays.batch.writer.MultiExcelFileToWriteLocator">
                 <property name="filePrefix" value="#{jobParameters['excel.file.name']}"/>
                 <property name="fileExtension" value=".#{jobParameters['excel.file.extension']}"/>
                 <property name="directory"
@@ -210,11 +206,9 @@
           class="org.springframework.batch.item.resource.ResourceLocatorItemStreamWriter"
           scope="step">
         <property name="delegate">
-            <bean class="org.springframework.batch.item.file.ExcelSheetItemWriter"
-                  scope="step">
+            <bean class="org.springframework.batch.item.file.ExcelSheetItemWriter">
                 <property name="rowAggregator">
-                    <bean class="be.raildelays.batch.writer.ExcelRowAggregator"
-                          scope="step">
+                    <bean class="be.raildelays.batch.writer.ExcelRowAggregator">
                         <property name="language" value="#{jobParameters['language']}"/>
                     </bean>
                 </property>

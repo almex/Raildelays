@@ -124,10 +124,16 @@
     <profiles>
         <profile>
             <id>coveralls</id>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-                <skip>true</skip>
-            </configuration>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>
