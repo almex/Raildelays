@@ -222,8 +222,7 @@
         </property>
         <property name="name" value="excelSheetAfterItemWriter"/>
         <property name="resourceLocator">
-            <bean class="be.raildelays.batch.writer.MultiExcelFileToWriteLocator"
-                  scope="step">
+            <bean class="be.raildelays.batch.writer.MultiExcelFileToWriteLocator">
                 <property name="filePrefix" value="#{jobParameters['excel.file.name']}"/>
                 <property name="fileExtension" value=".#{jobParameters['excel.file.extension']}"/>
                 <property name="directory" value="file:#{jobParameters['excel.output.path']}"/>

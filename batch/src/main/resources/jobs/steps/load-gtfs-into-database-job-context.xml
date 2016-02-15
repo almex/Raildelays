@@ -229,9 +229,10 @@
     <!-- ================================================================================================== -->
 
     <bean id="databaseWriter"
-          class="org.springframework.batch.item.database.JpaItemWriter"
+          class="org.springframework.batch.item.data.RepositoryItemWriter"
           scope="step">
-        <property name="entityManagerFactory" ref="raildelaysEntityManagerFactory"/>
+        <property name="repository" ref="lineStopDao"/>
+        <property name="methodName" value="saveAndFlush"/>
     </bean>
 
     <!-- ================================================================================================== -->

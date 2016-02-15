@@ -24,11 +24,12 @@
 
 package be.raildelays.domain.entities;
 
+import org.springframework.data.domain.Persistable;
+
 import javax.persistence.*;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
-import java.io.Serializable;
 import java.util.Set;
 
 /**
@@ -38,7 +39,7 @@ import java.util.Set;
  * @since 1.0
  */
 @MappedSuperclass
-public abstract class AbstractEntity implements Serializable {
+public abstract class AbstractEntity implements Persistable<Long> {
 
     private static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
@@ -52,6 +53,11 @@ public abstract class AbstractEntity implements Serializable {
 
     public Long getId() {
         return id;
+    }
+
+    @Override
+    public boolean isNew() {
+        return id != null;
     }
 
     public Long getVersion() {

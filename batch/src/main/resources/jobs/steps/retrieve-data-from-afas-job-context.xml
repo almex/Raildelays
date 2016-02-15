@@ -20,7 +20,7 @@
             <tasklet transaction-manager="batchTransactionManager">
                 <chunk reader="afasItemReader"
                        processor="chainedProcessorsForAfas"
-                       writer="jpaItemWriter"
+                       writer="databaseItemWriter"
                        commit-interval="10"
                        retry-limit="3">
                     <retryable-exception-classes>
@@ -140,10 +140,11 @@
     <!-- =====================================         WRITERS        ===================================== -->
     <!-- ================================================================================================== -->
 
-    <bean id="jpaItemWriter"
-          class="org.springframework.batch.item.database.JpaItemWriter"
+    <bean id="databaseItemWriter"
+          class="org.springframework.batch.item.data.RepositoryItemWriter"
           scope="step">
-        <property name="entityManagerFactory" ref="raildelaysEntityManagerFactory"/>
+        <property name="repository" ref="lineStopDao"/>
+        <property name="methodName" value="saveAndFlush"/>
     </bean>
 
     <!-- ================================================================================================== -->
