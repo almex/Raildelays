@@ -102,8 +102,10 @@ public class AggregateLineStopProcessor extends AbstractGtfsDataProcessor<LineSt
         );
 
         if (actual != null) {
-            result = new LineStop.Builder(item, false, false);
-            result.id(actual.getId());
+            result = new LineStop.Builder(item, false, false)
+                    .id(actual.getId())
+                    .station(item.getStation())
+                    .trainLine(item.getTrainLine());
         }
 
         return result;

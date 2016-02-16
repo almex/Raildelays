@@ -72,6 +72,7 @@ public class TrainLine extends AbstractEntity implements Train, Comparable<Train
         this.shortName = builder.shortName;
         this.longName = builder.longName;
         this.routeId = builder.routeId;
+        this.id = builder.id;
     }
 
     @Override
@@ -110,6 +111,7 @@ public class TrainLine extends AbstractEntity implements Train, Comparable<Train
     }
 
     public static class Builder {
+        private Long id;
         private String shortName;
         private String longName;
         private Long routeId;
@@ -143,6 +145,11 @@ public class TrainLine extends AbstractEntity implements Train, Comparable<Train
 
         public Builder longName(final String longName) {
             this.longName = longName;
+            return this;
+        }
+
+        public Builder id(final Long id) {
+            this.id = id;
             return this;
         }
 
