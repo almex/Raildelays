@@ -97,8 +97,8 @@ public class AggregateLineStopProcessor extends AbstractGtfsDataProcessor<LineSt
 
     private LineStop.Builder merge(LineStop item) {
         LineStop.Builder result = null; // If we don't find any existing data we return null
-        LineStop actual = lineStopDao.findByRouteIdAndDateAndStationName(
-                item.getTrainLine().getRouteId(), item.getDate(), item.getStation().getName()
+        LineStop actual = lineStopDao.findByTrainLineAndDateAndStation(
+                item.getTrainLine(), item.getDate(), item.getStation()
         );
 
         if (actual != null) {

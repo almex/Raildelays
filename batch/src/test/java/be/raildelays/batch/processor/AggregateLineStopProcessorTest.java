@@ -19,6 +19,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * @author Almex
  */
+@SuppressWarnings("unused") // Mocks are injected via EasyMockRule
 public class AggregateLineStopProcessorTest extends EasyMockSupport {
 
     @TestSubject
@@ -57,7 +58,7 @@ public class AggregateLineStopProcessorTest extends EasyMockSupport {
                 )
                 .build(false);
 
-        expect(lineStopDao.findByRouteIdAndDateAndStationName(anyLong(), anyObject(), anyString())).andReturn(null);
+        expect(lineStopDao.findByTrainLineAndDateAndStation(anyObject(), anyObject(), anyObject())).andReturn(null);
         expect(stationDao.findByEnglishName(anyString())).andReturn(station);
         expect(trainLineDao.findByRouteId(anyLong())).andReturn(trainLine);
 
@@ -81,7 +82,7 @@ public class AggregateLineStopProcessorTest extends EasyMockSupport {
                 )
                 .build(false);
 
-        expect(lineStopDao.findByRouteIdAndDateAndStationName(anyLong(), anyObject(), anyString()))
+        expect(lineStopDao.findByTrainLineAndDateAndStation(anyObject(), anyObject(), anyObject()))
                 .andReturn(expected);
 
         replayAll();

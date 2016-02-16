@@ -44,7 +44,7 @@ public interface LineStopDaoCustom {
      * @param station        departure station
      * @param delayThreshold minimum delay (in milliseconds)
      * @param request        define the paging
-     * @return  a sub-list (called a {@link Page}) of {@link LineStop} belonging to departure
+     * @return a sub-list (called a {@link Page}) of {@link LineStop} belonging to departure
      */
     Page<LineStop> findDepartureDelays(LocalDate date, Station station, long delayThreshold, Pageable request);
 
@@ -99,10 +99,21 @@ public interface LineStopDaoCustom {
      * Return the first {@link be.raildelays.domain.entities.LineStop } for a certain
      * {@link TrainLine} at a certain {@link be.raildelays.domain.entities.Station}.
      *
-     * @param trainLine   which stop the the <code>station</code>
-     * @param station representing the stop of the line
+     * @param trainLine which stop the the <code>station</code>
+     * @param station   representing the stop of the line
      * @return the first line stop from a list ascending ordered by expectedTime arrival time
      */
     LineStop findFistScheduledLine(TrainLine trainLine, Station station);
+
+    /**
+     * Search a certain line stop that belong to a train line for a certain day and a certain station.
+     *
+     * @param trainLine train line coming from our internal repository (we match only the routId).
+     * @param station   station we are searching for based on the name given in any language
+     * @param date      day of the year for which you do the search
+     * @return a list of line stop
+     */
+    LineStop findByTrainLineAndDateAndStation(TrainLine trainLine, LocalDate date, Station station);
+
 
 }

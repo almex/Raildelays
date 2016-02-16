@@ -84,10 +84,10 @@ public class LineStopJpaDaoIT extends AbstractIT {
                 .canceledArrival(false)
                 .canceledDeparture(false)
                 .build());
-        LineStop lineStop = lineStopDao.findByRouteIdAndDateAndStationName(
-                expectedLineStop.getTrainLine().getRouteId(),
+        LineStop lineStop = lineStopDao.findByTrainLineAndDateAndStation(
+                expectedLineStop.getTrainLine(),
                 date,
-                "Liège-Guillemins"
+                new Station("Liège-Guillemins")
         );
 
         assertEquals("You should have the same result as expectedTime.", expectedLineStop, lineStop);

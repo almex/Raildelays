@@ -88,11 +88,11 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
     protected TimeDelay departureTime;
 
     @OneToOne(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER, optional = true, orphanRemoval = true)
-    @PrimaryKeyJoinColumn(name = "PREVIOUS_ID")
+    @JoinColumn(name = "PREVIOUS_ID")
     protected LineStop previous;
 
     @OneToOne(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER, optional = true, orphanRemoval = true)
-    @PrimaryKeyJoinColumn(name = "NEXT_ID")
+    @JoinColumn(name = "NEXT_ID")
     protected LineStop next;
 
     /**

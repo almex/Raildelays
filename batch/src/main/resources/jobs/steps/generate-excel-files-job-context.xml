@@ -207,8 +207,8 @@
     <bean id="excelRowMapperProcessor"
           class="be.raildelays.batch.processor.BatchExcelRowMapperProcessor"
           scope="step">
-        <property name="stationA" value="#{jobParameters['station.departure']}"/>
-        <property name="stationB" value="#{jobParameters['station.arrival']}"/>
+        <property name="stationAName" value="#{jobParameters['station.departure']}"/>
+        <property name="stationBName" value="#{jobParameters['station.arrival']}"/>
         <property name="language" value="#{jobParameters['language']}"/>
     </bean>
 

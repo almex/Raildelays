@@ -44,16 +44,16 @@ public class BatchExcelRowMapperProcessor implements ItemProcessor<LineStop, Bat
 
     private static final Logger LOGGER = LoggerFactory.getLogger("Xls", BatchExcelRowMapperProcessor.class);
 
-    private String stationA;
+    private String stationAName;
 
-    private String stationB;
+    private String stationBName;
 
     private String language = Language.EN.name();
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Validate.notNull(stationA, "Station A name is mandatory");
-        Validate.notNull(stationB, "Station B name is mandatory");
+        Validate.notNull(stationAName, "Station A name is mandatory");
+        Validate.notNull(stationBName, "Station B name is mandatory");
         Validate.notNull(language, "language is mandatory");
     }
 
@@ -63,7 +63,7 @@ public class BatchExcelRowMapperProcessor implements ItemProcessor<LineStop, Bat
 
         LOGGER.trace("item", item);
 
-        result = extractSens(item, stationA, stationB);
+        result = extractSens(item, stationAName, stationBName);
 
         LOGGER.trace("result", result);
 
@@ -167,12 +167,12 @@ public class BatchExcelRowMapperProcessor implements ItemProcessor<LineStop, Bat
                 .build(false);
     }
 
-    public void setStationA(String stationA) {
-        this.stationA = stationA;
+    public void setStationAName(String stationAName) {
+        this.stationAName = stationAName;
     }
 
-    public void setStationB(String stationB) {
-        this.stationB = stationB;
+    public void setStationBName(String stationBName) {
+        this.stationBName = stationBName;
     }
 
     public void setLanguage(String language) {

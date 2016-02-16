@@ -102,8 +102,8 @@ public class BatchExcelRowMapperProcessorTest {
         fromB = lineStop.getNext().getNext().getNext(); // stationB
 
         processor = new BatchExcelRowMapperProcessor();
-        processor.setStationA("stationA");
-        processor.setStationB("stationB");
+        processor.setStationAName("stationA");
+        processor.setStationBName("stationB");
         processor.setLanguage(Language.EN.name());
         processor.afterPropertiesSet();
     }
@@ -141,8 +141,8 @@ public class BatchExcelRowMapperProcessorTest {
 
     @Test
     public void testProcessSensArrival() throws Exception {
-        processor.setStationA("stationB");
-        processor.setStationB("stationA");
+        processor.setStationAName("stationB");
+        processor.setStationBName("stationA");
 
         BatchExcelRow excelRow = processor.process(fromB);
 

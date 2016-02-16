@@ -86,17 +86,17 @@ public class SearchNextTrainProcessor implements ItemProcessor<BatchExcelRow, Ba
 
             switch (lang) {
                 case FR:
-                    processor.setStationA(item.getDepartureStation().getFrenchName());
-                    processor.setStationB(item.getArrivalStation().getFrenchName());
+                    processor.setStationAName(item.getDepartureStation().getFrenchName());
+                    processor.setStationBName(item.getArrivalStation().getFrenchName());
                     break;
                 case NL:
-                    processor.setStationA(item.getDepartureStation().getDutchName());
-                    processor.setStationB(item.getArrivalStation().getDutchName());
+                    processor.setStationAName(item.getDepartureStation().getDutchName());
+                    processor.setStationBName(item.getArrivalStation().getDutchName());
                     break;
                 case EN:
                 default:
-                    processor.setStationA(item.getDepartureStation().getEnglishName());
-                    processor.setStationB(item.getArrivalStation().getEnglishName());
+                    processor.setStationAName(item.getDepartureStation().getEnglishName());
+                    processor.setStationBName(item.getArrivalStation().getEnglishName());
                     break;
             }
             processor.setLanguage(lang.name());

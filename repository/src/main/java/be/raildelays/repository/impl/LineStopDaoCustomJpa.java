@@ -65,7 +65,6 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
     public Page<LineStop> findDepartureDelays(LocalDate date, Station station, long delayThreshold, Pageable pageable) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
-        Root<LineStop> root = query.from(LineStop.class);
         Subquery<Long> canceled = query.subquery(Long.class);
         Subquery<Long> notCanceled = query.subquery(Long.class);
         Root<LineStop> canceledRoot = canceled.from(LineStop.class);
@@ -106,7 +105,6 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
     public Page<LineStop> findArrivalDelays(LocalDate date, Station station, long delayThreshold, Pageable pageable) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
-        Root<LineStop> root = query.from(LineStop.class);
         Subquery<Long> canceled = query.subquery(Long.class);
         Subquery<Long> notCanceled = query.subquery(Long.class);
         Root<LineStop> canceledRoot = canceled.from(LineStop.class);
@@ -162,6 +160,13 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
                 .and(trainEquals(trainLine)));
     }
 
+    @Override
+    public LineStop findByTrainLineAndDateAndStation(TrainLine trainLine, LocalDate date, Station station) {
+        return findFirstOne(where(dateEquals(date))
+                .and(stationEquals(station))
+                .and(trainEquals(trainLine)));
+    }
+
     private Page<LineStop> findAll(Specifications<LineStop> specifications, Pageable pageable) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
@@ -209,8 +214,8 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
 
         return entityManager
                 .createQuery(query
-                                .where(specifications.toPredicate(root, query, builder))
-                                .orderBy(QueryUtils.toOrders(sort, root, builder))
+                        .where(specifications.toPredicate(root, query, builder))
+                        .orderBy(QueryUtils.toOrders(sort, root, builder))
                 ).getResultList();
     }
 
@@ -248,19 +253,23 @@ public class LineStopDaoCustomJpa implements LineStopDaoCustom {
     }
 
     private LineStop findFirstOne(Specifications<LineStop> specification) {
+        LineStop result = null;
+
         try {
             CriteriaBuilder builder = entityManager.getCriteriaBuilder();
             CriteriaQuery<LineStop> query = builder.createQuery(LineStop.class);
             Root<LineStop> root = query.from(LineStop.class);
 
-            return entityManager
+            result = entityManager
                     .createQuery(query.where(specification.toPredicate(root, query, builder)))
                     .setMaxResults(1)
                     .setFirstResult(0)
                     .getSingleResult();
         } catch (NoResultException e) {
-            return null;
+            LOGGER.trace("We have no result to return.", e);
         }
+
+        return result;
     }
 
 }
