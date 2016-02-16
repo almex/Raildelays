@@ -55,7 +55,7 @@ public interface LineStopDao extends JpaRepository<LineStop, Long>, LineStopDaoC
     /**
      * Search a list of line stops that belong to a trainLine for a certain day.
      *
-     * @param trainId trainLine id coming from our internal respository.
+     * @param trainId trainLine id coming from our internal repository.
      * @param date    day of the year for which you do the search
      * @return a list of line stop
      */
@@ -67,14 +67,15 @@ public interface LineStopDao extends JpaRepository<LineStop, Long>, LineStopDaoC
 
 
     /**
-     * Search a list of line stops that belong to a trainLine for a certain day.
+     * Search a certain line stop that belong to a train line for a certain day and a certain station.
      *
-     * @param trainId trainLine id coming from our internal respository.
-     * @param date    day of the year for which you do the search
+     * @param routeId     train line id coming from our internal repository.
+     * @param date        day of the year for which you do the search
+     * @param stationName name of the station in any language
      * @return a list of line stop
      */
     @Query("SELECT o "
-            + "FROM LineStop o "
+            + "FROM LineStop o LEFT JOIN FETCH o.next LEFT JOIN FETCH o.previous "
             + "WHERE o.date = :date "
             + "AND o.trainLine.routeId = :routeId "
             + "AND (o.station.frenchName = :stationName "

@@ -7,7 +7,6 @@ import be.raildelays.repository.LineStopDao;
 import be.raildelays.repository.StationDao;
 import be.raildelays.repository.TrainLineDao;
 import org.easymock.*;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -15,7 +14,7 @@ import org.junit.Test;
 import java.time.LocalDate;
 
 import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Almex
@@ -44,7 +43,7 @@ public class AggregateLineStopProcessorTest extends EasyMockSupport {
     }
 
     @Test
-    public void testProcessAggrgate() throws Exception {
+    public void testProcessAggregate() throws Exception {
         Station station = new Station("Liège-Guillemins");
         TrainLine trainLine = new TrainLine.Builder(1L).build(false);
         LineStop expected = new LineStop.Builder()
@@ -82,7 +81,8 @@ public class AggregateLineStopProcessorTest extends EasyMockSupport {
                 )
                 .build(false);
 
-        expect(lineStopDao.findByRouteIdAndDateAndStationName(anyLong(), anyObject(), anyString())).andReturn(expected);
+        expect(lineStopDao.findByRouteIdAndDateAndStationName(anyLong(), anyObject(), anyString()))
+                .andReturn(expected);
 
         replayAll();
 

@@ -87,12 +87,12 @@ public class LineStop extends AbstractEntity implements Comparable<LineStop> {
             @AttributeOverride(column = @Column(name = "DEPARTURE_TIME_DELAY"), name = "delay")})
     protected TimeDelay departureTime;
 
-    @OneToOne(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER, optional = true)
-    @JoinColumn(name = "PREVIOUS_ID")
+    @OneToOne(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER, optional = true, orphanRemoval = true)
+    @PrimaryKeyJoinColumn(name = "PREVIOUS_ID")
     protected LineStop previous;
 
-    @OneToOne(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER, optional = true)
-    @JoinColumn(name = "NEXT_ID")
+    @OneToOne(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER, optional = true, orphanRemoval = true)
+    @PrimaryKeyJoinColumn(name = "NEXT_ID")
     protected LineStop next;
 
     /**

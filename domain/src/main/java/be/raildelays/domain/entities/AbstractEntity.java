@@ -24,12 +24,11 @@
 
 package be.raildelays.domain.entities;
 
-import org.springframework.data.domain.Persistable;
-
 import javax.persistence.*;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
+import java.io.Serializable;
 import java.util.Set;
 
 /**
@@ -39,7 +38,7 @@ import java.util.Set;
  * @since 1.0
  */
 @MappedSuperclass
-public abstract class AbstractEntity implements Persistable<Long> {
+public abstract class AbstractEntity implements Serializable {
 
     private static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
@@ -55,11 +54,6 @@ public abstract class AbstractEntity implements Persistable<Long> {
         return id;
     }
 
-    @Override
-    public boolean isNew() {
-        return id != null;
-    }
-
     public Long getVersion() {
         return version;
     }
@@ -71,9 +65,11 @@ public abstract class AbstractEntity implements Persistable<Long> {
     public abstract int hashCode();
 
     /**
-     * @param object
-     * @param <T>
-     * @return
+     * Use Bean Validation to validate an entity.
+     *
+     * @param object to validate
+     * @param <T> type of the Object
+     * @return the Object itself
      * @throws IllegalArgumentException
      */
     protected static <T> T validate(T object) {
