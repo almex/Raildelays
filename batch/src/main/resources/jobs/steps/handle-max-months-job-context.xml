@@ -183,21 +183,21 @@
                 <property name="useItemIndex" value="false"/>
                 <property name="name" value="excelSheetBeforeItemWriter"/>
                 <property name="shouldDeleteIfExists" value="false"/>
-                <property name="rowsToSkip" value="${excel.sheet0.rows.to.skip}"/>
                 <property name="maxItemCount" value="${excel.sheet0.max.item.count}"/>
+                <property name="rowsToSkip" value="${excel.sheet0.rows.to.skip}"/>
                 <property name="template" value="file:#{jobParameters['excel.template.path']}"/>
             </bean>
         </property>
         <property name="name" value="excelSheetBeforeItemWriter"/>
         <property name="resourceLocator">
             <bean class="be.raildelays.batch.writer.MultiExcelFileToWriteLocator">
+                <property name="useItemIndex" value="false"/>
                 <property name="filePrefix" value="#{jobParameters['excel.file.name']}"/>
                 <property name="fileExtension" value=".#{jobParameters['excel.file.extension']}"/>
                 <property name="directory"
                           value="file:#{jobParameters['excel.archive.path']}/#{T(java.time.LocalDate).now().toString()}/"/>
                 <property name="maxItemCount" value="${excel.sheet0.max.item.count}"/>
                 <property name="rowsToSkip" value="${excel.sheet0.rows.to.skip}"/>
-                <property name="useItemIndex" value="false"/>
                 <property name="resourceItemSearch" ref="resourceItemSearch"/>
             </bean>
         </property>
@@ -216,14 +216,15 @@
                 <property name="useItemIndex" value="false"/>
                 <property name="name" value="excelSheetAfterItemWriter"/>
                 <property name="shouldDeleteIfExists" value="true"/>
-                <property name="rowsToSkip" value="${excel.sheet0.rows.to.skip}"/>
                 <property name="maxItemCount" value="${excel.sheet0.max.item.count}"/>
+                <property name="rowsToSkip" value="${excel.sheet0.rows.to.skip}"/>
                 <property name="template" value="file:#{jobParameters['excel.template.path']}"/>
             </bean>
         </property>
         <property name="name" value="excelSheetAfterItemWriter"/>
         <property name="resourceLocator">
             <bean class="be.raildelays.batch.writer.MultiExcelFileToWriteLocator">
+                <property name="useItemIndex" value="false"/>
                 <property name="filePrefix" value="#{jobParameters['excel.file.name']}"/>
                 <property name="fileExtension" value=".#{jobParameters['excel.file.extension']}"/>
                 <property name="directory" value="file:#{jobParameters['excel.output.path']}"/>

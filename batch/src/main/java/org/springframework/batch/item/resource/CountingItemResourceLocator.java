@@ -39,7 +39,7 @@ public class CountingItemResourceLocator<T> implements ResourceLocator<T> {
 
     @Override
     public void onOpen(ResourceContext context) throws ItemStreamException {
-        context.setCurrentIndex(rowsToSkip);
+        resetIndex(context);
     }
 
     @Override
@@ -50,6 +50,10 @@ public class CountingItemResourceLocator<T> implements ResourceLocator<T> {
     @Override
     public void onRead(T item, ResourceContext context) throws Exception {
         context.incrementIndex();
+    }
+
+    protected void resetIndex(ResourceContext context) {
+        context.setCurrentIndex(rowsToSkip);
     }
 
     public void setMaxItemCount(int maxItemCount) {

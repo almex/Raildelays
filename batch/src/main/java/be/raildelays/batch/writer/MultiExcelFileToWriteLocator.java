@@ -82,6 +82,8 @@ public class MultiExcelFileToWriteLocator extends CountingItemResourceLocator<Ba
             File file = ExcelFileUtils.getFile(directory.getFile(), filePrefix, suffix, fileExtension);
 
             context.changeResource(new FileSystemResource(file));
+            // We must reset the current item index as we changed the resource
+            resetIndex(context);
         }
     }
 
@@ -92,7 +94,7 @@ public class MultiExcelFileToWriteLocator extends CountingItemResourceLocator<Ba
                             pathname.getName().endsWith(ExcelSheetItemWriter.Format.OOXML.getFileExtension()));
 
             if (files != null) {
-                findIndexInFiles(context, files);
+                findIndexOfFirstEmptyRow(context, files);
             }
         } catch (IOException e) {
             throw new ItemStreamException("The directory cannot be resolved", e);
@@ -101,7 +103,7 @@ public class MultiExcelFileToWriteLocator extends CountingItemResourceLocator<Ba
         }
     }
 
-    private void findIndexInFiles(ResourceContext context, File[] files) throws Exception {
+    private void findIndexOfFirstEmptyRow(ResourceContext context, File[] files) throws Exception {
         for (File file : files) {
             //-- We search the first empty Row
             int index = resourceItemSearch.indexOf(BatchExcelRow.EMPTY, new FileSystemResource(file));
