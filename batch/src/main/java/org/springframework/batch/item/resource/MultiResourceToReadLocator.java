@@ -44,7 +44,7 @@ public class MultiResourceToReadLocator<T> extends CountingItemResourceLocator<T
     private String filter = "*";
     private Resource[] resources;
     private Resource directory;
-    private int index = 0;
+    private int resourceIndex = 0;
 
     @Override
     public void onOpen(ResourceContext context) throws ItemStreamException {
@@ -58,10 +58,10 @@ public class MultiResourceToReadLocator<T> extends CountingItemResourceLocator<T
             }
 
             resources = result.toArray(new Resource[result.size()]);
-            index = 0;
+            resourceIndex = 0;
 
             if (resources.length > 0) {
-                context.setResource(resources[index++]);
+                context.setResource(resources[resourceIndex++]);
             }
         } catch (IOException e) {
             throw new ItemStreamException("I/O error when reading directory", e);
@@ -72,8 +72,8 @@ public class MultiResourceToReadLocator<T> extends CountingItemResourceLocator<T
     public void onRead(T item, ResourceContext context) throws Exception {
         super.onRead(item, context);
 
-        if (item == null && index < resources.length) {
-            context.changeResource(resources[index++]);
+        if (item == null && resourceIndex < resources.length) {
+            context.changeResource(resources[resourceIndex++]);
         }
     }
 

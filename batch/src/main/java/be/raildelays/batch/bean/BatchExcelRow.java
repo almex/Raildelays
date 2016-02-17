@@ -54,6 +54,7 @@ public class BatchExcelRow extends ExcelRow<BatchExcelRow> implements IndexedIte
         this.canceled = canceled;
     }
 
+    @Override
     public Long getIndex() {
         return index;
     }
@@ -64,7 +65,7 @@ public class BatchExcelRow extends ExcelRow<BatchExcelRow> implements IndexedIte
 
     @Override
     public void setItemCount(int count) {
-        setIndex(new Long(count));
+        setIndex((long) count);
     }
 
     public static class Builder extends ExcelRow.Builder {
@@ -161,6 +162,7 @@ public class BatchExcelRow extends ExcelRow<BatchExcelRow> implements IndexedIte
             return this;
         }
 
+        @Override
         public Builder effectiveTrain2(final TrainLine effectiveTrainLine2) {
             super.effectiveTrain2(effectiveTrainLine2);
             return this;

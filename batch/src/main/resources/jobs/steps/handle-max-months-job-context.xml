@@ -197,6 +197,7 @@
                           value="file:#{jobParameters['excel.archive.path']}/#{T(java.time.LocalDate).now().toString()}/"/>
                 <property name="maxItemCount" value="${excel.sheet0.max.item.count}"/>
                 <property name="rowsToSkip" value="${excel.sheet0.rows.to.skip}"/>
+                <property name="useItemIndex" value="false"/>
                 <property name="resourceItemSearch" ref="resourceItemSearch"/>
             </bean>
         </property>

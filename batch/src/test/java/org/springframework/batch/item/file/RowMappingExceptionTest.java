@@ -22,17 +22,17 @@ public class RowMappingExceptionTest {
 
     @Test(expected = RowMappingException.class)
     public void test2ParametersConstructor() {
-        throw new RowMappingException("", row);
+        throw new RowMappingException(new Exception(), row);
     }
 
     @Test(expected = RowMappingException.class)
     public void test3ParametersConstructor() {
-        throw new RowMappingException("", row, 0);
+        throw new RowMappingException(new Exception(), row, 0);
     }
 
     @Test(expected = RowMappingException.class)
     public void test4ParametersConstructor() {
-        RowMappingException exception = new RowMappingException("", row, 0, new Exception());
+        RowMappingException exception = new RowMappingException(new Exception(), row, 0, new Exception());
 
         Assert.assertEquals(0, exception.getLineNumber());
         Assert.assertEquals(0, exception.getRow().getRowNum());

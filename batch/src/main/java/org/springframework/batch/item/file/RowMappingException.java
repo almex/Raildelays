@@ -12,23 +12,24 @@ import org.springframework.batch.item.ParseException;
  */
 public class RowMappingException extends ParseException {
 
-    private Row row;
+    private final Row row;
 
-    private int lineNumber;
+    private final int lineNumber;
 
-    public RowMappingException(String message, Row row) {
-        super("Mapping error: '" + message + " at rowNum=" + (row != null ? row.getRowNum() : "null"));
+    public RowMappingException(Exception e, Row row) {
+        super("Mapping error: '" + e.getMessage() + " at rowNum=" + (row != null ? row.getRowNum() : "null"));
         this.row = row;
+        this.lineNumber = 0;
     }
 
-    public RowMappingException(String message, Row row, int lineNumber) {
-        super("Mapping error: '" + message + "' at lineNumber=" + lineNumber + ", rowNum=" + (row != null ? row.getRowNum() : "null"));
+    public RowMappingException(Exception e, Row row, int lineNumber) {
+        super("Mapping error: '" + e.getMessage() + "' at lineNumber=" + lineNumber + ", rowNum=" + (row != null ? row.getRowNum() : "null"));
         this.row = row;
         this.lineNumber = lineNumber;
     }
 
-    public RowMappingException(String message, Row row, int lineNumber, Throwable cause) {
-        super("Mapping error: '" + message + "' at lineNumber=" + lineNumber + ", rowNum=" + (row != null ? row.getRowNum() : "null"), cause);
+    public RowMappingException(Exception e, Row row, int lineNumber, Throwable cause) {
+        super("Mapping error: '" + e.getMessage() + "' at lineNumber=" + lineNumber + ", rowNum=" + (row != null ? row.getRowNum() : "null"), cause);
         this.row = row;
         this.lineNumber = lineNumber;
     }

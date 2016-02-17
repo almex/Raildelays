@@ -38,10 +38,7 @@ import org.springframework.batch.item.file.RowMappingException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
-import javax.validation.Validation;
 import javax.validation.ValidationException;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -81,8 +78,6 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchExcelRowMapper.class);
     private boolean validateOutcomes = false;
 
-    private Validator validator;
-
     private String language = Language.EN.name();
 
     private static <T> T getValue(Row row, int cellIndex, CellParser<T> parser) {
@@ -103,9 +98,6 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
 
     @Override
     public void afterPropertiesSet() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
-
         Assert.notNull(language, "You must set language before using this bean");
     }
 
@@ -128,7 +120,7 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
                     .index((long) row.getRowNum())
                     .build(validateOutcomes);
         } catch (ValidationException e) {
-            throw new RowMappingException(e.getMessage(), row, rowIndex);
+            throw new RowMappingException(e, row, rowIndex);
         }
     }
 
@@ -171,7 +163,7 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
                         LOGGER.error("Cannot convert rowIndex={} cellIndex={} of type={} into Date", cell.getRowIndex(), cell.getColumnIndex(), cell.getCellType());
                 }
             } catch (DateTimeParseException e) {
-                LOGGER.error("Parsing exception: cannot convert into date rowIndex={} cellIndex={}, exception={}", cell.getRowIndex(), cellIndex, e.getMessage());
+                LOGGER.error(String.format("Parsing exception: cannot convert into date rowIndex=%s cellIndex=%s, exception :", cell.getRowIndex(), cellIndex), e);
             }
 
             return result;
@@ -268,6 +260,7 @@ public class BatchExcelRowMapper implements RowMapper<BatchExcelRow>, Initializi
         this.validateOutcomes = validateOutcomes;
     }
 
+    @FunctionalInterface
     private interface CellParser<T> {
         T getValue(Cell cell);
     }

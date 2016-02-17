@@ -124,6 +124,8 @@
             <bean class="org.springframework.batch.item.resource.MultiResourceToReadLocator">
                 <property name="directory" value="file:#{jobParameters['excel.output.path']}"/>
                 <property name="filter" value="*.#{jobParameters['excel.file.extension']}"/>
+                <property name="maxItemCount" value="${excel.sheet0.max.item.count}"/>
+                <property name="rowsToSkip" value="${excel.sheet0.rows.to.skip}"/>
             </bean>
         </property>
     </bean>
@@ -191,6 +193,8 @@
                 <property name="fileName" value="#{jobParameters['excel.file.name']}"/>
                 <property name="fileExtension" value=".#{jobParameters['excel.file.extension']}"/>
                 <property name="directoryPath" value="#{jobParameters['excel.output.path']}"/>
+                <property name="rowsToSkip" value="${excel.sheet0.rows.to.skip}"/>
+                <property name="maxItemCount" value="${excel.sheet0.max.item.count}"/>
             </bean>
         </property>
         <property name="name" value="oneHourDelayItemWriter"/>
@@ -201,8 +205,7 @@
           class="org.springframework.batch.item.file.ExcelSheetItemWriter"
           scope="step">
         <property name="rowAggregator">
-            <bean class="be.raildelays.batch.writer.ExcelRowAggregator"
-                  scope="step">
+            <bean class="be.raildelays.batch.writer.ExcelRowAggregator">
                 <property name="language" value="#{jobParameters['language']}"/>
             </bean>
         </property>

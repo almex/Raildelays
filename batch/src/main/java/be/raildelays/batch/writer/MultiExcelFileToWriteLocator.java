@@ -51,11 +51,12 @@ public class MultiExcelFileToWriteLocator extends CountingItemResourceLocator<Ba
     protected String fileExtension;
     protected ResourceItemSearch<BatchExcelRow> resourceItemSearch;
     protected boolean forceNewFile = false;
-    protected int rowsToSkip = 0;
+    protected boolean useItemIndex = true;
 
     @Override
     public void onOpen(ResourceContext context) throws ItemStreamException {
         super.onOpen(context);
+
         if (!forceNewFile) {
             findFirstEmptyRow(context);
         }
@@ -68,12 +69,12 @@ public class MultiExcelFileToWriteLocator extends CountingItemResourceLocator<Ba
         /**
          * In case we have an indexed item, we must set the current index with the one of the current item.
          */
-        if (item.getIndex() != null) {
+        if (useItemIndex && item.getIndex() != null) {
             context.setCurrentIndex(item.getIndex().intValue());
         }
 
         /**
-         * Either we have reached the end of the current file, or we don't have any any resource yet, then we must
+         * Either we have reached the end of the current file, or we don't have any resource yet, then we must
          * create a new file.
          */
         if (context.getCurrentIndex() >= maxItemCount + rowsToSkip || !context.containsResource()) {
@@ -129,11 +130,20 @@ public class MultiExcelFileToWriteLocator extends CountingItemResourceLocator<Ba
         this.resourceItemSearch = resourceItemSearch;
     }
 
+    /**
+     * @param forceNewFile {@code true} if you want to force creation of a new file, {@code false} otherwise (by default
+     *                     it's set to {@code false}).
+     */
     public void setForceNewFile(boolean forceNewFile) {
         this.forceNewFile = forceNewFile;
     }
 
-    public void setRowsToSkip(int rowsToSkip) {
-        this.rowsToSkip = rowsToSkip;
+    /**
+     * @param useItemIndex {@code true} if you want to use the index of an
+     *                     {@link org.springframework.batch.item.IndexedItem} or {@code false} if you don't
+     *                     (by default it's set to {@code true}).
+     */
+    public void setUseItemIndex(boolean useItemIndex) {
+        this.useItemIndex = useItemIndex;
     }
 }

@@ -124,7 +124,7 @@ public class ExcelSheetItemReaderTest {
     @Test(expected = ParseException.class)
     public void testParseException() throws Exception {
         reader.setRowMapper((row, rowIndex) -> {
-            throw new RowMappingException("", row);
+            throw new RowMappingException(new Exception(), row);
         });
         reader.open(new ExecutionContext());
         reader.read();

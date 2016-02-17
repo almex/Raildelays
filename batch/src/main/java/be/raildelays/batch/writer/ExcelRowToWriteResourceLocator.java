@@ -56,6 +56,8 @@ public class ExcelRowToWriteResourceLocator extends CountingItemResourceLocator<
      */
     @Override
     public void onWrite(ExcelRow item, ResourceContext context) throws Exception {
+        super.onWrite(item, context);
+
         if (!context.containsResource() && isValid(item)) {
             String suffix = item.getDate().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
             File file = ExcelFileUtils.getFile(new File(directoryPath), fileName, suffix, fileExtension);
