@@ -32,7 +32,21 @@ import java.io.Serializable;
 import java.util.Set;
 
 /**
+ * <p>
  * Abstract entity parent of all entities of this project.
+ * In our JPA data model we don't use the Pessimistic Locking (see {@code @Version} JPA annotation). Otherwise
+ * Spring Data JPA will assume that an entity is new by testing if the version is {@code null} or not
+ * (see {@code org.springframework.data.jpa.repository.support.JpaMetamodelEntityInformation#isNew(java.lang.Object)}).
+ * </p>
+ * <p>
+ * Knowing that we only have one connection targeting the same database, we do not need such transactional mechanism.
+ * </p>
+ * <p>
+ * Note that all our entities use the Value Object Design Pattern and therefor we do not want to copy {@code version}
+ * and {@code id} from one instance to another instance of the same Entity. Only if the {@code id} is not {@code null}
+ * should mark the Entity as new or not (see Spring Data JPA default behaviour in
+ * {@code org.springframework.data.repository.core.support.AbstractEntityInformation#isNew(java.lang.Object)}).
+ * </p>
  *
  * @author Almex
  * @since 1.0
@@ -47,15 +61,8 @@ public abstract class AbstractEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected Long id;
 
-    @Version
-    public Long version;
-
     public Long getId() {
         return id;
-    }
-
-    public Long getVersion() {
-        return version;
     }
 
     @Override
