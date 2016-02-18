@@ -26,7 +26,7 @@
                 <chunk reader="oneHourDelayItemReader"
                        processor="chainedProcessorsForMoreThanOneHourDelay"
                        writer="emailWriter"
-                       commit-interval="1">
+                       commit-interval="10">
                 </chunk>
             </tasklet>
         </step>

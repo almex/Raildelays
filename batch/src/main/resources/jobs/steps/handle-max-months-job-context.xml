@@ -65,7 +65,7 @@
                 <chunk reader="allExcelFilesToSplitItemReader"
                        processor="splitBeforeExcelSheetProcessor"
                        writer="excelSheetBeforeItemWriter"
-                       commit-interval="1">
+                       commit-interval="10">
                 </chunk>
             </tasklet>
         </step>
