@@ -77,13 +77,11 @@ public class MultiExcelFileToWriteLocator extends CountingItemResourceLocator<Ba
          * Either we have reached the end of the current file, or we don't have any resource yet, then we must
          * create a new file.
          */
-        if (context.getCurrentIndex() >= maxItemCount + rowsToSkip || !context.containsResource()) {
+        if (context.getCurrentIndex() >= super.getMaxItemIndex() || !context.containsResource()) {
             String suffix = item.getDate().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
             File file = ExcelFileUtils.getFile(directory.getFile(), filePrefix, suffix, fileExtension);
 
             context.changeResource(new FileSystemResource(file));
-            // We must reset the current item index as we changed the resource
-            resetIndex(context);
         }
     }
 

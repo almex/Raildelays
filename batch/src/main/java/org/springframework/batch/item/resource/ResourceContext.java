@@ -43,12 +43,17 @@ public class ResourceContext {
     public static final String CURRENT_INDEX_KEY = "current.index";
     private ExecutionContext executionContext;
     private String keyPrefix;
+    private int rowsToSkip = 0;
 
     public ResourceContext(ExecutionContext executionContext, String keyPrefix) {
         this.executionContext = executionContext;
         this.keyPrefix = keyPrefix;
         setHasChanged(false);
-        setCurrentIndex(0);
+        resetIndex();
+    }
+
+    private void resetIndex() {
+        setCurrentIndex(rowsToSkip);
     }
 
     /**
@@ -60,7 +65,7 @@ public class ResourceContext {
         Resource previousResource = getResource();
 
         if (previousResource == null || !previousResource.equals(resource)) {
-            setCurrentIndex(0);
+            resetIndex();
             setHasChanged(true);
             setResource(resource);
         }
@@ -143,6 +148,10 @@ public class ResourceContext {
 
     private String getKey(String key) {
         return keyPrefix + "." + key;
+    }
+
+    public void setRowsToSkip(int rowsToSkip) {
+        this.rowsToSkip = rowsToSkip;
     }
 
     /**

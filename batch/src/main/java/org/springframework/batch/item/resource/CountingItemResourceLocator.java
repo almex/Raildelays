@@ -34,12 +34,12 @@ import org.springframework.batch.item.ItemStreamException;
  */
 public class CountingItemResourceLocator<T> implements ResourceLocator<T> {
 
-    protected int maxItemCount;
-    protected int rowsToSkip = 0;
+    private int maxItemCount = Integer.MAX_VALUE;
+    private int rowsToSkip = 0;
 
     @Override
     public void onOpen(ResourceContext context) throws ItemStreamException {
-        resetIndex(context);
+        context.setRowsToSkip(rowsToSkip);
     }
 
     @Override
@@ -52,8 +52,8 @@ public class CountingItemResourceLocator<T> implements ResourceLocator<T> {
         context.incrementIndex();
     }
 
-    protected void resetIndex(ResourceContext context) {
-        context.setCurrentIndex(rowsToSkip);
+    protected int getMaxItemIndex() {
+        return maxItemCount + rowsToSkip;
     }
 
     public void setMaxItemCount(int maxItemCount) {
