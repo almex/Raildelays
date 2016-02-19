@@ -6,13 +6,13 @@
     <bean id="mainJobCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="mainJobDetail"/>
         <!-- run every morning at 00:00 of the week -->
-        <property name="cronExpression" value="0 0 0 * * MON-FRI"/>
+        <property name="cronExpression" value="0 0 0 ? * MON-FRI"/>
     </bean>
 
     <bean id="loadGtfsDataJobCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="loadGtfsDataJobDetail"/>
         <!-- run every morning at 00:00 of the week-end -->
-        <property name="cronExpression" value="0 0 0 * * SAT-SUN"/>
+        <property name="cronExpression" value="0 0 0 ? * SAT-SUN"/>
     </bean>
 
     <bean id="mainJobAtStartupTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
