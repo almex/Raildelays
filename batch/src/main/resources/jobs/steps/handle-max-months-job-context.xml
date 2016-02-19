@@ -125,7 +125,7 @@
     <!-- ================================================================================================== -->
 
     <bean id="allExcelFilesToSplitItemReader"
-          class="org.springframework.batch.item.file.MultiResourceItemReader"
+          class="org.springframework.batch.item.resource.ResourceLocatorItemStreamReader"
           scope="step">
         <property name="delegate">
             <bean class="org.springframework.batch.item.file.ExcelSheetItemReader">
@@ -139,8 +139,15 @@
                 </property>
             </bean>
         </property>
-        <property name="resources"
-                  value="file:#{jobParameters['excel.output.path']}/*.#{jobParameters['excel.file.extension']}"/>
+        <property name="name" value="allExcelFilesToSplitItemReader"/>
+        <property name="resourceLocator">
+            <bean class="org.springframework.batch.item.resource.MultiResourceToReadLocator">
+                <property name="directory" value="file:#{jobParameters['excel.output.path']}"/>
+                <property name="filter" value="*.#{jobParameters['excel.file.extension']}"/>
+                <property name="maxItemCount" value="${excel.sheet0.max.item.count}"/>
+                <property name="rowsToSkip" value="${excel.sheet0.rows.to.skip}"/>
+            </bean>
+        </property>
     </bean>
 
     <!-- ================================================================================================== -->

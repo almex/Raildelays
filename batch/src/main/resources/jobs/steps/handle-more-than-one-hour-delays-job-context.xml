@@ -107,9 +107,8 @@
           class="org.springframework.batch.item.resource.ResourceLocatorItemStreamReader"
           scope="step">
         <property name="delegate">
-            <bean class="org.springframework.batch.item.file.ExcelSheetItemReader"
-                  scope="step">
-                <property name="name" value="allExcelFilesToSplitItemReader"/>
+            <bean class="org.springframework.batch.item.file.ExcelSheetItemReader">
+                <property name="name" value="allExcelFilesItemReader"/>
                 <property name="rowsToSkip" value="${excel.sheet0.rows.to.skip}"/>
                 <property name="maxItemCount" value="${excel.sheet0.max.item.count}"/>
                 <property name="rowMapper">

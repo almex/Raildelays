@@ -145,6 +145,10 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
          */
         try (InputStream inputStream = new FileInputStream(resource.getFile())) {
             this.workbook = WorkbookFactory.create(inputStream);
+        } finally {
+            if (workbook != null) {
+                workbook.close();
+            }
         }
 
         noInput = false;
@@ -154,7 +158,6 @@ public class ExcelSheetItemReader<T> extends AbstractItemCountingItemStreamItemR
     @Override
     protected void doClose() throws Exception {
         this.noInput = true;
-        this.workbook = null;
     }
 
     @Override

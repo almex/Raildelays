@@ -75,7 +75,10 @@ public class ResourceLocatorItemStreamWriter<S extends ResourceAwareItemStreamWr
         }
 
         // Now we can get through all our resources and write all our sub-list of items
-        for (Resource resource : splitMap.keySet()) {
+        for (Map.Entry<Resource, List<T>> entry : splitMap.entrySet()) {
+            Resource resource = entry.getKey();
+            List<T> subItems = entry.getValue();
+
             delegate.setResource(resource);
 
             if (!opened) {
@@ -84,7 +87,7 @@ public class ResourceLocatorItemStreamWriter<S extends ResourceAwareItemStreamWr
                 opened = true;
             }
 
-            delegate.write(splitMap.get(resource));
+            delegate.write(subItems);
 
             if (splitMap.size() > 1) {
                 // If we have more than one resource, we must close the current one
