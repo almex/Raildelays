@@ -9,4 +9,10 @@
         <property name="requestsRecovery" value="true"/>
     </bean>
 
+    <bean name="loadGtfsDataJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="be.raildelays.server.scheduler.LoadGtfsDataJob"/>
+        <property name="durability" value="true"/>
+        <property name="requestsRecovery" value="true"/>
+    </bean>
+
 </beans>

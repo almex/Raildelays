@@ -20,9 +20,9 @@ import java.util.List;
  * @since 2.0
  */
 @DisallowConcurrentExecution
-public class MainJob extends AbstractJob {
+public class LoadGtfsDataJob extends AbstractJob {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MainJob.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoadGtfsDataJob.class);
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -35,7 +35,7 @@ public class MainJob extends AbstractJob {
 
                 builder.addDate("date", Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
-                JobExecution jobExecution = service.startNewInstance("mainJob", builder.toJobParameters());
+                JobExecution jobExecution = service.startNewInstance("loadGtfsIntoDatabaseJob", builder.toJobParameters());
 
                 if (jobExecution.getStatus().isUnsuccessful()) {
                     throw new JobExecutionException("Job 'mainJob' has FAILED!");
@@ -45,4 +45,5 @@ public class MainJob extends AbstractJob {
             LOGGER.error("Error when starting the job: ", e);
         }
     }
+
 }

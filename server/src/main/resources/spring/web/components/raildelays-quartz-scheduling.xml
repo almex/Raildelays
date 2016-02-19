@@ -5,12 +5,24 @@
 
     <bean id="mainJobCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="mainJobDetail"/>
-        <!-- run every morning at 00:00 -->
-        <property name="cronExpression" value="0 0 0 * * ?"/>
+        <!-- run every morning at 00:00 of the week -->
+        <property name="cronExpression" value="0 0 0 * * MON-FRI"/>
+    </bean>
+
+    <bean id="loadGtfsDataJobCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="loadGtfsDataJobDetail"/>
+        <!-- run every morning at 00:00 of the week-end -->
+        <property name="cronExpression" value="0 0 0 * * SAT-SUN"/>
     </bean>
 
     <bean id="mainJobAtStartupTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
         <property name="jobDetail" ref="mainJobDetail"/>
+        <property name="repeatCount" value="0"/>
+        <property name="repeatInterval" value="10"/>
+    </bean>
+
+    <bean id="loadGtfsDataJobAtStartupTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+        <property name="jobDetail" ref="loadGtfsDataJobDetail"/>
         <property name="repeatCount" value="0"/>
         <property name="repeatInterval" value="10"/>
     </bean>
@@ -20,6 +32,8 @@
             <list>
                 <ref bean="mainJobCronTrigger"/>
                 <ref bean="mainJobAtStartupTrigger"/>
+                <ref bean="loadGtfsDataJobCronTrigger"/>
+                <ref bean="loadGtfsDataJobAtStartupTrigger"/>
             </list>
         </property>
         <property name="jobFactory">
@@ -36,6 +50,12 @@
         <property name="startupDelay" value="5"/>
         <property name="transactionManager" ref="raildelaysTransactionManager"/>
         <property name="waitForJobsToCompleteOnShutdown" value="true"/>
+        <property name="taskExecutor">
+            <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor">
+                <property name="concurrencyLimit" value="1"/>
+                <property name="threadPriority" value="#{T(Thread).MIN_PRIORITY}"/>
+            </bean>
+        </property>
     </bean>
 
 </beans>
