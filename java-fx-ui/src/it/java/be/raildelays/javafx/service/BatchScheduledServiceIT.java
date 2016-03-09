@@ -27,6 +27,7 @@ package be.raildelays.javafx.service;
 import be.raildelays.batch.service.BatchStartAndRecoveryService;
 import be.raildelays.javafx.test.JavaFXThreadingRule;
 import be.raildelays.test.GraphicalTest;
+import javafx.concurrent.Task;
 import javafx.util.Duration;
 import org.easymock.EasyMock;
 import org.junit.Assert;
@@ -39,6 +40,8 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.test.MetaDataInstanceFactory;
+
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author Almex
@@ -55,12 +58,15 @@ public class BatchScheduledServiceIT {
 
     @Before
     public void setUp() throws Exception {
+        JobExecution expected = MetaDataInstanceFactory.createJobExecution();
         startAndRecoveryService = EasyMock.createMock(BatchStartAndRecoveryService.class);
 
         service = new BatchScheduledService();
         service.setService(startAndRecoveryService);
         service.setDelay(Duration.seconds(1));
         service.setPeriod(Duration.seconds(1));
+
+        EasyMock.expect(startAndRecoveryService.refresh(expected)).andReturn(expected);
     }
 
     @Test
@@ -77,16 +83,7 @@ public class BatchScheduledServiceIT {
         service.start("foo", new JobParameters());
 
         Assert.assertEquals(expected, service.getJobExecution());
-    }
-
-    @Test
-    public void testCreateTask() throws Exception {
-
-    }
-
-    @Test
-    public void testReset() throws Exception {
-
+        assertOnTask();
     }
 
     @Test
@@ -106,6 +103,7 @@ public class BatchScheduledServiceIT {
         service.restart();
 
         Assert.assertEquals(expected2, service.getJobExecution());
+        assertOnTask();
     }
 
     @Test
@@ -124,10 +122,26 @@ public class BatchScheduledServiceIT {
         service.stop();
 
         Assert.assertEquals(expected, service.getJobExecution());
+        assertOnTask();
     }
 
     @Test
     public void testAbandon() throws Exception {
+        JobExecution expected = MetaDataInstanceFactory.createJobExecution();
+
+        EasyMock.expect(startAndRecoveryService.startNewInstance(
+                EasyMock.anyString(),
+                EasyMock.anyObject(JobParameters.class)
+        )).andReturn(expected);
+        EasyMock.expect(startAndRecoveryService.abandon(EasyMock.anyLong())).andReturn(expected);
+
+        EasyMock.replay(startAndRecoveryService);
+
+        service.start("foo", new JobParameters());
+        service.abandon();
+
+        Assert.assertEquals(expected, service.getJobExecution());
+        assertOnTask();
 
     }
 
@@ -145,5 +159,14 @@ public class BatchScheduledServiceIT {
         service.start("foo", new JobParameters());
 
         Assert.assertTrue(service.isStarted());
+        assertOnTask();
+    }
+
+    private void assertOnTask() throws InterruptedException, ExecutionException {
+        Task<Integer> task = service.createTask();
+
+        task.run();
+
+        Assert.assertEquals(service.countProperty().get(), (int) task.get());
     }
 }

@@ -54,7 +54,15 @@
                 </chunk>
                 <transaction-attributes isolation="DEFAULT" propagation="REQUIRED"/>
             </tasklet>
+            <listeners merge="true">
+                <!-- Register some ID's in the MDC -->
+                <listener ref="loggerContextStepListener"/>
+            </listeners>
         </step>
+        <listeners merge="true">
+            <!-- Register some ID's in the MDC -->
+            <listener ref="loggerContextJobListener"/>
+        </listeners>
         <validator ref="loadGtfsIntoDatabaseValidator"/>
     </job>
 

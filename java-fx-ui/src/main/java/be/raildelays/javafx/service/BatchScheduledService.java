@@ -68,7 +68,7 @@ public class BatchScheduledService extends ScheduledService<Integer> {
     protected Task<Integer> createTask() {
         return new Task<Integer>() {
             protected Integer call() {
-                final int counter = getCount();
+                final int counter = getCount() + 1;
 
                 try {
                     jobExecution = service.refresh(jobExecution);
@@ -76,7 +76,7 @@ public class BatchScheduledService extends ScheduledService<Integer> {
                     LOGGER.error("Error when retrieving last status of the job execution: ", e);
                 }
 
-                count.set(counter + 1);
+                count.set(counter);
 
                 return counter;
             }
