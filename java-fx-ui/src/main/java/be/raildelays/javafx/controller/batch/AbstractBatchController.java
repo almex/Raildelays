@@ -71,8 +71,8 @@ public abstract class AbstractBatchController implements Initializable, BatchCon
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        service.setOnSucceeded((event) -> doRefreshProgress());
-        service.setOnFailed((event) -> {
+        service.setOnSucceeded(event -> doRefreshProgress());
+        service.setOnFailed(event -> {
             final Throwable error = service.getException();
             progressLabel.setText("ERROR");
             LOGGER.error("An error occurred!", error);
@@ -129,6 +129,7 @@ public abstract class AbstractBatchController implements Initializable, BatchCon
                     case ABANDONED:
                         resetButtons();
                         break;
+                    default:
                 }
             } else {
                 resetButtons();
@@ -202,6 +203,7 @@ public abstract class AbstractBatchController implements Initializable, BatchCon
         }
     }
 
+    @Override
     public void setService(BatchScheduledService service) {
         this.service = service;
     }
@@ -210,6 +212,7 @@ public abstract class AbstractBatchController implements Initializable, BatchCon
         this.jobName = jobName;
     }
 
+    @Override
     public void setPropertiesExtractor(JobParametersExtractor propertiesExtractor) {
         this.propertiesExtractor = propertiesExtractor;
     }
