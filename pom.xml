@@ -776,6 +776,11 @@
                 <configuration>
                     <!-- Otherwise the file based database is created in ${basedir} -->
                     <workingDirectory>${project.build.directory}</workingDirectory>
+                    <argLine>
+                        -Dglass.platform=Monocle
+                        -Dmonocle.platform=Headless
+                        -Dprism.order=sw
+                    </argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -783,6 +788,12 @@
                 <configuration>
                     <!-- Otherwise the file based database is created in ${basedir} -->
                     <workingDirectory>${project.build.directory}</workingDirectory>
+                    <!-- No runnable on Travis.ci (otherwise get "Gtk-WARNING **: cannot open display") -->
+                    <argLine>
+                        -Dglass.platform=Monocle
+                        -Dmonocle.platform=Headless
+                        -Dprism.order=sw
+                    </argLine>
                 </configuration>
             </plugin>
         </plugins>
@@ -1035,10 +1046,6 @@
                             <sources>
                                 <source>${it.source.path}</source>
                             </sources>
-                            <!-- No runnable on Travis.ci (otherwise get "Gtk-WARNING **: cannot open display") -->
-                            <!--<excludedGroups>-->
-                                <!--be.raildelays.test.GraphicalTest-->
-                            <!--</excludedGroups>-->
                         </configuration>
                         <executions>
                             <execution>
@@ -1048,7 +1055,12 @@
                                     <goal>integration-test</goal>
                                 </goals>
                                 <configuration>
-                                    <argLine>-Xmx512m -Xms256m -XX:MaxMetaspaceSize=256m -XX:MetaspaceSize=128m
+                                    <!-- No runnable on Travis.ci (otherwise get "Gtk-WARNING **: cannot open display") -->
+                                    <argLine>
+                                        -Xmx512m -Xms256m -XX:MaxMetaspaceSize=256m -XX:MetaspaceSize=128m
+                                        -Dglass.platform=Monocle
+                                        -Dmonocle.platform=Headless
+                                        -Dprism.order=sw
                                     </argLine>
                                 </configuration>
                             </execution>
@@ -1164,8 +1176,12 @@
                                     <!-- fork mode must be enable with JaCoCo (1 thread per CPU Core) -->
                                     <reuseForks>true</reuseForks>
                                     <!-- coverage.test.argLine is the link with JaCoCo plug-in -->
-                                    <argLine>${coverage.test.argLine} -Xmx256m -Xms128m -XX:MaxMetaspaceSize=128m
+                                    <argLine>
+                                        ${coverage.test.argLine} -Xmx256m -Xms128m -XX:MaxMetaspaceSize=128m
                                         -XX:MetaspaceSize=64m
+                                        -Dglass.platform=Monocle
+                                        -Dmonocle.platform=Headless
+                                        -Dprism.order=sw
                                     </argLine>
                                 </configuration>
                             </execution>
@@ -1198,8 +1214,12 @@
                                     <!-- fork mode must be enable with JaCoCo (1 thread per CPU Core) -->
                                     <reuseForks>true</reuseForks>
                                     <!-- coverage.it.argLine is the link with JaCoCo plug-in -->
-                                    <argLine>${coverage.it.argLine} -Xmx512m -Xms256m -XX:MaxMetaspaceSize=256m
+                                    <argLine>
+                                        ${coverage.it.argLine} -Xmx512m -Xms256m -XX:MaxMetaspaceSize=256m
                                         -XX:MetaspaceSize=128m
+                                        -Dglass.platform=Monocle
+                                        -Dmonocle.platform=Headless
+                                        -Dprism.order=sw
                                     </argLine>
                                 </configuration>
                             </execution>
@@ -1291,9 +1311,6 @@
                                 <include>**/*IT.java</include>
                             </includes>
                             <!-- No runnable on Travis.ci (otherwise get "Gtk-WARNING **: cannot open display") -->
-                            <!--<excludedGroups>-->
-                                <!--be.raildelays.test.GraphicalTest-->
-                            <!--</excludedGroups>-->
                             <argLine>
                                 -Dglass.platform=Monocle
                                 -Dmonocle.platform=Headless
