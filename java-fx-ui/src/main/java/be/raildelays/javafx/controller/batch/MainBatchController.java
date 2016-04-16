@@ -24,9 +24,6 @@
 
 package be.raildelays.javafx.controller.batch;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
@@ -75,7 +72,7 @@ public class MainBatchController extends AbstractBatchController {
     }
 
     @Override
-    public void initialize(URL location, ResourceBundle resources){
+    public void initialize(URL location, ResourceBundle resources) {
         setJobName("mainJob");
         date.setValue(LocalDate.now());
         date.setDayCellFactory(param -> new DateCell() {
@@ -94,15 +91,9 @@ public class MainBatchController extends AbstractBatchController {
     }
 
     @Override
-    protected ChangeListener<Worker.State> getStateChangeListener() {
-
-        return (ObservableValue<? extends Worker.State> observable,
-                Worker.State oldValue,
-                Worker.State newValue) -> {
-            super.getStateChangeListener().changed(observable, oldValue, newValue);
-            date.setDisable(startButton.isDisable());
-        };
-
+    protected void executeStateChange() {
+        super.executeStateChange();
+        date.setDisable(startButton.isDisable());
     }
 
     @Override

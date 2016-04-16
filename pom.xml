@@ -126,6 +126,7 @@
         <version.dbunit>2.4.9</version.dbunit>
         <version.easymock>3.4</version.easymock>
         <version.jacoco>0.7.5.201505241946</version.jacoco>
+        <verion.testfx>4.0.4-alpha</verion.testfx>
 
         <!-- Surefire/Failsafe settings -->
         <forkCount>1</forkCount>
@@ -279,6 +280,16 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-mock</artifactId>
                 <version>${version.spring.mock}}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.testfx</groupId>
+                <artifactId>testfx-core</artifactId>
+                <version>${verion.testfx}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.testfx</groupId>
+                <artifactId>testfx-junit</artifactId>
+                <version>${verion.testfx}</version>
             </dependency>
 
             <!-- Persistence -->

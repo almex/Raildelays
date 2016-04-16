@@ -44,6 +44,10 @@ import java.util.Locale;
  */
 public class LineStopSpecifications {
 
+    private LineStopSpecifications() {
+        // Not used
+    }
+
     /**
      * Creates a specification used to find LineStop whose Station equals the expectedTime one.
      *

@@ -87,40 +87,42 @@ public class Bootstrap extends Application {
         applicationContext.registerShutdownHook(); // Register close of this Spring context to shutdown of the JVM
         applicationContext.start();
 
-        rootLoader.setControllerFactory(clazz -> {
-            BatchScheduledService scheduledService = new BatchScheduledService();
-            JobParametersExtractor propertiesExtractor = applicationContext.getBean(
-                    "jobParametersFromPropertiesExtractor", JobParametersExtractor.class
-            );
-
-            scheduledService.setService(
-                    applicationContext.getBean("batchStartAndRecoveryService", BatchStartAndRecoveryService.class)
-            );
-
-            if (clazz.isAssignableFrom(BatchIndexController.class)) {
-                controller = new BatchIndexController();
-            } else if (clazz.isAssignableFrom(MainBatchController.class)) {
-                controller = new MainBatchController();
-            } else if (clazz.isAssignableFrom(HandleOneHourDelayBatchController.class)) {
-                controller = new HandleOneHourDelayBatchController();
-            } else if (clazz.isAssignableFrom(HandleMaxMonthsBatchController.class)) {
-                controller = new HandleMaxMonthsBatchController();
-            } else if (clazz.isAssignableFrom(DownloadListOfTrainsBatchController.class)) {
-                controller = new DownloadListOfTrainsBatchController();
-            }
-
-            if (controller != null) {
-                controller.setService(scheduledService);
-                controller.setPropertiesExtractor(propertiesExtractor);
-            }
-
-            LOGGER.info("The factory built a controller.");
-
-            return controller;
-        });
+        rootLoader.setControllerFactory(this::getController);
         root = rootLoader.load();
 
         Platform.runLater(() -> scene = new Scene(root, 640, 480));
+    }
+
+    private BatchController getController(Class<?> clazz) {
+        BatchScheduledService scheduledService = new BatchScheduledService();
+        JobParametersExtractor propertiesExtractor = applicationContext.getBean(
+                "jobParametersFromPropertiesExtractor", JobParametersExtractor.class
+        );
+
+        scheduledService.setService(
+                applicationContext.getBean("batchStartAndRecoveryService", BatchStartAndRecoveryService.class)
+        );
+
+        if (clazz.isAssignableFrom(BatchIndexController.class)) {
+            controller = new BatchIndexController();
+        } else if (clazz.isAssignableFrom(MainBatchController.class)) {
+            controller = new MainBatchController();
+        } else if (clazz.isAssignableFrom(HandleOneHourDelayBatchController.class)) {
+            controller = new HandleOneHourDelayBatchController();
+        } else if (clazz.isAssignableFrom(HandleMaxMonthsBatchController.class)) {
+            controller = new HandleMaxMonthsBatchController();
+        } else if (clazz.isAssignableFrom(DownloadListOfTrainsBatchController.class)) {
+            controller = new DownloadListOfTrainsBatchController();
+        }
+
+        if (controller != null) {
+            controller.setService(scheduledService);
+            controller.setPropertiesExtractor(propertiesExtractor);
+        }
+
+        LOGGER.info("The factory built a controller.");
+
+        return controller;
     }
 
     private void doStart(Stage primaryStage) throws IOException {

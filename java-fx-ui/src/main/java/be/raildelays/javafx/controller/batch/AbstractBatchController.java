@@ -25,7 +25,6 @@
 package be.raildelays.javafx.controller.batch;
 
 import be.raildelays.javafx.service.BatchScheduledService;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
@@ -74,67 +73,66 @@ public abstract class AbstractBatchController implements Initializable, BatchCon
         service.setOnSucceeded(event -> doRefreshProgress());
         service.setOnFailed(event -> {
             final Throwable error = service.getException();
+
             progressLabel.setText("ERROR");
             LOGGER.error("An error occurred!", error);
         });
+        service.stateProperty().addListener((ObservableValue<? extends Worker.State> observable,
+                                             Worker.State oldValue,
+                                             Worker.State newValue) -> executeStateChange());
         service.setDelay(Duration.seconds(1));
         service.setPeriod(Duration.seconds(1));
-        service.stateProperty().addListener(getStateChangeListener());
         progressLabel.setText("");
 
         resetButtons();
     }
 
-    protected ChangeListener<Worker.State> getStateChangeListener() {
-        return (ObservableValue<? extends Worker.State> observable,
-                                             Worker.State oldValue,
-                                             Worker.State newValue) -> {
-            JobExecution jobExecution = service.getJobExecution();
+    protected void executeStateChange() {
+        JobExecution jobExecution = service.getJobExecution();
 
-            if (service.isStarted()) {
-                switch (jobExecution.getStatus()) {
-                    case STARTING:
-                        startButton.setDisable(true);
-                        stopButton.setDisable(false);
-                        abandonButton.setDisable(true);
-                        restartButton.setDisable(true);
-                        break;
-                    case STARTED:
-                        startButton.setDisable(true);
-                        stopButton.setDisable(false);
-                        abandonButton.setDisable(true);
-                        restartButton.setDisable(true);
-                        break;
-                    case COMPLETED:
-                        resetButtons();
-                        break;
-                    case FAILED:
-                        startButton.setDisable(true);
-                        stopButton.setDisable(true);
-                        abandonButton.setDisable(false);
-                        restartButton.setDisable(false);
-                        break;
-                    case STOPPING:
-                        startButton.setDisable(true);
-                        stopButton.setDisable(true);
-                        abandonButton.setDisable(true);
-                        restartButton.setDisable(true);
-                        break;
-                    case STOPPED:
-                        startButton.setDisable(true);
-                        stopButton.setDisable(true);
-                        abandonButton.setDisable(false);
-                        restartButton.setDisable(false);
-                        break;
-                    case ABANDONED:
-                        resetButtons();
-                        break;
-                    default:
-                }
-            } else {
-                resetButtons();
+        if (service.isStarted()) {
+            switch (jobExecution.getStatus()) {
+                case STARTING:
+                    startButton.setDisable(true);
+                    stopButton.setDisable(false);
+                    abandonButton.setDisable(true);
+                    restartButton.setDisable(true);
+                    break;
+                case STARTED:
+                    startButton.setDisable(true);
+                    stopButton.setDisable(false);
+                    abandonButton.setDisable(true);
+                    restartButton.setDisable(true);
+                    break;
+                case COMPLETED:
+                    resetButtons();
+                    break;
+                case FAILED:
+                    startButton.setDisable(true);
+                    stopButton.setDisable(true);
+                    abandonButton.setDisable(false);
+                    restartButton.setDisable(false);
+                    break;
+                case STOPPING:
+                    startButton.setDisable(true);
+                    stopButton.setDisable(true);
+                    abandonButton.setDisable(true);
+                    restartButton.setDisable(true);
+                    break;
+                case STOPPED:
+                    startButton.setDisable(true);
+                    stopButton.setDisable(true);
+                    abandonButton.setDisable(false);
+                    restartButton.setDisable(false);
+                    break;
+                case ABANDONED:
+                    resetButtons();
+                    break;
+                default:
             }
-        };
+        } else {
+            resetButtons();
+        }
     }
 
     protected void resetButtons() {
@@ -182,7 +180,7 @@ public abstract class AbstractBatchController implements Initializable, BatchCon
         service.reset();
     }
 
-    public void doRefreshProgress() {
+    protected void doRefreshProgress() {
         if (service.isStarted()) {
             final JobExecution jobExecution = service.getJobExecution();
             final long stepDoneCount = jobExecution.getStepExecutions().stream()
@@ -215,5 +213,33 @@ public abstract class AbstractBatchController implements Initializable, BatchCon
     @Override
     public void setPropertiesExtractor(JobParametersExtractor propertiesExtractor) {
         this.propertiesExtractor = propertiesExtractor;
+    }
+
+    public void setStartButton(Button startButton) {
+        this.startButton = startButton;
+    }
+
+    public void setStopButton(Button stopButton) {
+        this.stopButton = stopButton;
+    }
+
+    public void setRestartButton(Button restartButton) {
+        this.restartButton = restartButton;
+    }
+
+    public void setAbandonButton(Button abandonButton) {
+        this.abandonButton = abandonButton;
+    }
+
+    public void setProgressBar(ProgressBar progressBar) {
+        this.progressBar = progressBar;
+    }
+
+    public void setProgressIndicator(ProgressIndicator progressIndicator) {
+        this.progressIndicator = progressIndicator;
+    }
+
+    public void setProgressLabel(Label progressLabel) {
+        this.progressLabel = progressLabel;
     }
 }
