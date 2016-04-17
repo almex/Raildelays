@@ -1289,6 +1289,10 @@
                                 <include>**/*Test.java</include>
                                 <include>**/*IT.java</include>
                             </includes>
+                            <!-- To solve NoClassDefFoundError javafx.fxml.Initializable -->
+                            <additionalClasspathElements>
+                                <additionalClasspathElement>${java.home}/lib/ext/jfxrt.jar</additionalClasspathElement>
+                            </additionalClasspathElements>
                         </configuration>
                     </plugin>
                     <!-- To publish code-coverage on Coveralls via Travis-ci -->
