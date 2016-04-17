@@ -47,29 +47,15 @@ public class MainBatchController extends AbstractBatchController {
     @Override
     public void doStart() {
         if (date.getValue() != null) {
-            JobParameters jobParameters = propertiesExtractor.getJobParameters(null, null);
-            JobParametersBuilder builder = new JobParametersBuilder(jobParameters);
-
-            startButton.setDisable(true);
-            stopButton.setDisable(false);
-            abandonButton.setDisable(true);
-            restartButton.setDisable(true);
-            progressBar.setProgress(0.0);
-            progressIndicator.setProgress(0.0);
-            progressLabel.setText("");
-
-            if (service.isRunning()) {
-                service.cancel();
-            }
-
-            builder.addDate("date", Date.from(date.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
-
-            service.reset();
-            service.start(jobName, builder.toJobParameters());
-
-            doRefreshProgress();
+            super.doStart();
         }
     }
+
+    @Override
+    protected void addExtraJobParameters(JobParametersBuilder builder) {
+        builder.addDate("date", Date.from(date.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+    }
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

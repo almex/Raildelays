@@ -47,30 +47,13 @@ public class HandleOneHourDelayBatchController extends AbstractBatchController {
     @Override
     public void doStart() {
         if (file != null) {
-            JobParameters jobParameters = propertiesExtractor.getJobParameters(null, null);
-            JobParametersBuilder builder = new JobParametersBuilder(jobParameters);
-
-            startButton.setDisable(true);
-            stopButton.setDisable(false);
-            abandonButton.setDisable(true);
-            restartButton.setDisable(true);
-            progressBar.setProgress(0.0);
-            progressIndicator.setProgress(0.0);
-            progressLabel.setText("");
-
-            if (service.isRunning()) {
-                service.cancel();
-            }
-
-            builder.addString("more.than.one.hour.excel.path", file.getAbsolutePath());
-
-            service.reset();
-            service.start(jobName, builder.toJobParameters());
-
-            file = null;
-
-            doRefreshProgress();
+            super.doStart();
         }
+    }
+
+    @Override
+    protected void addExtraJobParameters(JobParametersBuilder builder) {
+        builder.addString("more.than.one.hour.excel.path", file.getAbsolutePath());
     }
 
     public void onBrowse() {

@@ -24,20 +24,19 @@ import static org.easymock.EasyMock.*;
  */
 @Category(GraphicalTest.class)
 @RunWith(BlockJUnit4ClassRunner.class)
-public class AbstractBatchControllerIT {
+public abstract class AbstractBatchControllerIT<T extends AbstractBatchController> {
 
-    private BatchControllerTest controller = new BatchControllerTest();
+    protected T controller;
 
     @Rule
     public JavaFXThreadingRule javafxRule = new JavaFXThreadingRule();
-    private BatchScheduledService service;
-    private JobParametersExtractor extractor;
-    private BatchStartAndRecoveryService recoveryService;
+    protected BatchScheduledService service;
+    protected JobParametersExtractor extractor;
+    protected BatchStartAndRecoveryService recoveryService;
+    protected FXMLLoader rootLoader;
 
     @Before
     public void setUp() throws Exception {
-        FXMLLoader rootLoader = new FXMLLoader(getClass().getResource("/test.fxml"));
-
         recoveryService = createMock(BatchStartAndRecoveryService.class);
         service = new BatchScheduledService();
         service.setService(recoveryService);
@@ -62,6 +61,19 @@ public class AbstractBatchControllerIT {
 
         service.start("foo", new JobParameters());
         controller.doAbandon();
+    }
+
+    @Test
+    public void testDoStart() throws Exception {
+        JobExecution jobExecution = MetaDataInstanceFactory.createJobExecution();
+
+        jobExecution.setStatus(BatchStatus.STARTING);
+
+        expect(extractor.getJobParameters(null, null)).andReturn(new JobParameters());
+        expect(recoveryService.startNewInstance(anyString(), anyObject())).andReturn(jobExecution);
+        replay(recoveryService, extractor);
+
+        controller.doStart();
     }
 
     @Test

@@ -54,6 +54,12 @@ public class BatchIndexController implements BatchController, Initializable {
     @FXML
     private HandleOneHourDelayBatchController handleOneHourDelayJobController;
 
+    @FXML
+    private VBox loadGtfsIntoDatabaseJob;
+
+    @FXML
+    private DownloadListOfTrainsBatchController downloadListOfTrainsBatchController;
+
     private BatchScheduledService service;
 
     @Override

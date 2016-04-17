@@ -37,9 +37,13 @@ import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.step.job.JobParametersExtractor;
 
 import java.net.URL;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.ResourceBundle;
 
 /**
@@ -171,7 +175,31 @@ public abstract class AbstractBatchController implements Initializable, BatchCon
         }
     }
 
-    public abstract void doStart();
+    public void doStart() {
+        JobParameters jobParameters = propertiesExtractor.getJobParameters(null, null);
+        JobParametersBuilder builder = new JobParametersBuilder(jobParameters);
+
+        startButton.setDisable(true);
+        stopButton.setDisable(false);
+        abandonButton.setDisable(true);
+        restartButton.setDisable(true);
+        progressBar.setProgress(0.0);
+        progressIndicator.setProgress(0.0);
+        progressLabel.setText("");
+
+        if (service.isRunning()) {
+            service.cancel();
+        }
+
+        addExtraJobParameters(builder);
+
+        service.reset();
+        service.start(jobName, builder.toJobParameters());
+
+        doRefreshProgress();
+    }
+
+    protected abstract void addExtraJobParameters(JobParametersBuilder builder);
 
     @Override
     public void destroy() {
@@ -213,33 +241,5 @@ public abstract class AbstractBatchController implements Initializable, BatchCon
     @Override
     public void setPropertiesExtractor(JobParametersExtractor propertiesExtractor) {
         this.propertiesExtractor = propertiesExtractor;
-    }
-
-    public void setStartButton(Button startButton) {
-        this.startButton = startButton;
-    }
-
-    public void setStopButton(Button stopButton) {
-        this.stopButton = stopButton;
-    }
-
-    public void setRestartButton(Button restartButton) {
-        this.restartButton = restartButton;
-    }
-
-    public void setAbandonButton(Button abandonButton) {
-        this.abandonButton = abandonButton;
-    }
-
-    public void setProgressBar(ProgressBar progressBar) {
-        this.progressBar = progressBar;
-    }
-
-    public void setProgressIndicator(ProgressIndicator progressIndicator) {
-        this.progressIndicator = progressIndicator;
-    }
-
-    public void setProgressLabel(Label progressLabel) {
-        this.progressLabel = progressLabel;
     }
 }

@@ -46,28 +46,16 @@ public class DownloadListOfTrainsBatchController extends AbstractBatchController
 
     @Override
     public void doStart() {
-        JobParameters jobParameters = propertiesExtractor.getJobParameters(null, null);
-        JobParametersBuilder builder = new JobParametersBuilder(jobParameters);
-
-        startButton.setDisable(true);
-        stopButton.setDisable(false);
-        abandonButton.setDisable(true);
-        restartButton.setDisable(true);
-        progressBar.setProgress(0.0);
-        progressIndicator.setProgress(0.0);
-        progressLabel.setText("");
-
-        if (service.isRunning()) {
-            service.cancel();
+        if (date != null) {
+            super.doStart();
         }
-
-        builder.addDate("date", Date.from(date.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
-
-        service.reset();
-        service.start(jobName, builder.toJobParameters());
-
-        doRefreshProgress();
     }
+
+    @Override
+    protected void addExtraJobParameters(JobParametersBuilder builder) {
+        builder.addDate("date", Date.from(date.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+    }
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
