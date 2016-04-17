@@ -776,11 +776,6 @@
                 <configuration>
                     <!-- Otherwise the file based database is created in ${basedir} -->
                     <workingDirectory>${project.build.directory}</workingDirectory>
-                    <argLine>
-                        -Dglass.platform=Monocle
-                        -Dmonocle.platform=Headless
-                        -Dprism.order=sw
-                    </argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -788,12 +783,6 @@
                 <configuration>
                     <!-- Otherwise the file based database is created in ${basedir} -->
                     <workingDirectory>${project.build.directory}</workingDirectory>
-                    <!-- No runnable on Travis.ci (otherwise get "Gtk-WARNING **: cannot open display") -->
-                    <argLine>
-                        -Dglass.platform=Monocle
-                        -Dmonocle.platform=Headless
-                        -Dprism.order=sw
-                    </argLine>
                 </configuration>
             </plugin>
         </plugins>
@@ -1055,12 +1044,8 @@
                                     <goal>integration-test</goal>
                                 </goals>
                                 <configuration>
-                                    <!-- No runnable on Travis.ci (otherwise get "Gtk-WARNING **: cannot open display") -->
                                     <argLine>
                                         -Xmx512m -Xms256m -XX:MaxMetaspaceSize=256m -XX:MetaspaceSize=128m
-                                        -Dglass.platform=Monocle
-                                        -Dmonocle.platform=Headless
-                                        -Dprism.order=sw
                                     </argLine>
                                 </configuration>
                             </execution>
@@ -1179,9 +1164,6 @@
                                     <argLine>
                                         ${coverage.test.argLine} -Xmx256m -Xms128m -XX:MaxMetaspaceSize=128m
                                         -XX:MetaspaceSize=64m
-                                        -Dglass.platform=Monocle
-                                        -Dmonocle.platform=Headless
-                                        -Dprism.order=sw
                                     </argLine>
                                 </configuration>
                             </execution>
@@ -1217,9 +1199,6 @@
                                     <argLine>
                                         ${coverage.it.argLine} -Xmx512m -Xms256m -XX:MaxMetaspaceSize=256m
                                         -XX:MetaspaceSize=128m
-                                        -Dglass.platform=Monocle
-                                        -Dmonocle.platform=Headless
-                                        -Dprism.order=sw
                                     </argLine>
                                 </configuration>
                             </execution>
@@ -1310,12 +1289,6 @@
                                 <include>**/*Test.java</include>
                                 <include>**/*IT.java</include>
                             </includes>
-                            <!-- No runnable on Travis.ci (otherwise get "Gtk-WARNING **: cannot open display") -->
-                            <argLine>
-                                -Dglass.platform=Monocle
-                                -Dmonocle.platform=Headless
-                                -Dprism.order=sw
-                            </argLine>
                         </configuration>
                     </plugin>
                     <!-- To publish code-coverage on Coveralls via Travis-ci -->

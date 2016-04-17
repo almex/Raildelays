@@ -8,6 +8,8 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 import javax.swing.*;
+import java.lang.reflect.Method;
+import java.net.URLClassLoader;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -76,8 +78,18 @@ public class JavaFXThreadingRule implements TestRule {
             CountDownLatch latch = new CountDownLatch(1);
 
             SwingUtilities.invokeLater(() -> {
+
+                try {
+                    URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+                    Class clazz = Class.forName ("javafx.embed.swing.JFXPanel");
+                    clazz.getClassLoader().loadClass()
+                    clazz.newInstance ();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 // initializes JavaFX environment
-                new JFXPanel();
+                //new JFXPanel();
 
                 latch.countDown();
             });
