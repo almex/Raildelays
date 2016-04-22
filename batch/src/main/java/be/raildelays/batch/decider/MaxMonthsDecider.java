@@ -96,7 +96,7 @@ public class MaxMonthsDecider extends AbstractReadAndDecideTasklet<ExcelRow> imp
             /**
              * If the period between the first date and today is greater or equal to maxNumberOfMonth
              */
-            if (period.get(ChronoUnit.MONTHS) >= maxNumberOfMonth) {
+            if (period.toTotalMonths() >= maxNumberOfMonth) {
                 result = endDate;
             }
         }
