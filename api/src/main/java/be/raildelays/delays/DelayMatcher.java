@@ -13,14 +13,14 @@ public class DelayMatcher<T> implements Matcher<T> {
     }
 
     public static OperatorMatcher<Long> is(Long value) {
-        return is(equalTo(value));
+        return is(equalsTo(value));
     }
 
-    public static OperatorMatcher<Long> equalTo(Long value) {
+    public static OperatorMatcher<Long> equalsTo(Long value) {
         return OperatorMatcher.operator(Operator.EQUAL, ValueMatcher.value(value));
     }
 
-    public static OperatorMatcher<Long> equal() {
+    public static OperatorMatcher<Long> equals() {
         return OperatorMatcher.operator(Operator.EQUAL, ValueMatcher.value(0L));
     }
 
