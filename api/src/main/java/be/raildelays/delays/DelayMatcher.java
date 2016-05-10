@@ -20,12 +20,16 @@ public class DelayMatcher<T> implements Matcher<T> {
         return OperatorMatcher.operator(Operator.EQUAL, ValueMatcher.value(value));
     }
 
-    public static OperatorMatcher<Long> equals() {
+    public static OperatorMatcher<Long> zero() {
         return OperatorMatcher.operator(Operator.EQUAL, ValueMatcher.value(0L));
     }
 
     public static OperatorMatcher<Long> greaterThan(Long value) {
         return OperatorMatcher.operator(Operator.GREATER, ValueMatcher.value(value));
+    }
+
+    public static OperatorMatcher<Long> greaterThanOrEqual(Long value) {
+        return OperatorMatcher.operator(Operator.GREATER_OR_EQUAL, ValueMatcher.value(value));
     }
 
     public static OperatorMatcher<Long> after() {
@@ -34,6 +38,9 @@ public class DelayMatcher<T> implements Matcher<T> {
 
     public static OperatorMatcher<Long> lessThan(Long value) {
         return OperatorMatcher.operator(Operator.LESS, ValueMatcher.value(value));
+    }
+    public static OperatorMatcher<Long> lessThanOrEqual(Long value) {
+        return OperatorMatcher.operator(Operator.LESS_OR_EQUAL, ValueMatcher.value(value));
     }
 
     public static OperatorMatcher<Long> before() {
@@ -141,18 +148,6 @@ public class DelayMatcher<T> implements Matcher<T> {
             }
 
             return result;
-        }
-
-        protected TimeDelay getFrom() {
-            return from;
-        }
-
-        protected void setFrom(TimeDelay from) {
-            this.from = from;
-        }
-
-        protected TimeDelay getTo() {
-            return to;
         }
 
         protected void setTo(TimeDelay to) {
