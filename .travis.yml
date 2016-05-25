@@ -6,6 +6,8 @@ before_install:
   - "sh -e /etc/init.d/xvfb start"
 jdk:
 - oraclejdk8
+install:
+- mvn install -B
 script:
 - mvn verify -Pit -B
 after_success:
