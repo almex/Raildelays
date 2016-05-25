@@ -1,0 +1,28 @@
+plugins {
+    id "at.comm_unity.gradle.plugins.jpamodelgen" version "1.1.1"
+}
+
+apply plugin: 'at.comm_unity.gradle.plugins.jpamodelgen'
+
+jpaModelgen {
+    library = "org.hibernate:hibernate-jpamodelgen:$hibernateVersion"
+    jpaModelgenSourcesDir = "${buildDir}/generated-sources"
+
+}
+
+compileJava.options.compilerArgs += ["-proc:none"]
+
+description = 'Domain layer'
+
+dependencies {
+    compile project(':raildelays-api')
+    compile group: 'org.hibernate.javax.persistence', name: 'hibernate-jpa-2.1-api', version: '1.0.0.Final'
+    compile group: 'org.hibernate', name: 'hibernate-jpamodelgen', version: '5.1.0.Final'
+    compile group: 'javax.validation', name: 'validation-api', version: '1.1.0.Final'
+    compile group: 'javax.el', name: 'javax.el-api', version: '2.2.4'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
+    compile group: 'org.hibernate', name: 'hibernate-validator', version: '5.2.1.Final'
+    compile group: 'org.glassfish.web', name: 'javax.el', version: '2.2.4'
+    compile group: 'org.hibernate', name: 'hibernate-validator-cdi', version: '5.2.1.Final'
+    testCompile group: 'com.github.almex', name: 'pojo-unit', version: '1.1.0'
+}

@@ -1,0 +1,12 @@
+description = 'Java FX UI'
+dependencies {
+    compile project(':raildelays-batch')
+    compile group: 'org.springframework.batch', name: 'spring-batch-core', version: '3.0.6.RELEASE'
+    compile group: 'org.springframework.batch', name: 'spring-batch-infrastructure', version: '3.0.6.RELEASE'
+    compile group: 'com.sun.mail', name: 'javax.mail', version: '1.5.2'
+    compile group: 'org.apache.poi', name: 'poi', version: '3.13'
+    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.13'
+    compile group: 'org.hsqldb', name: 'hsqldb', version: '2.3.3'
+    runtime group: 'com.lmax', name: 'disruptor', version: '3.3.2'
+    testCompile group: 'org.springframework.batch', name: 'spring-batch-test', version: '3.0.6.RELEASE'
+}

@@ -64,3 +64,9 @@ target
 .idea
 
 *.iml
+data/
+gradle/
+domain/build/
+api/build/
+.gradle/
+logs/

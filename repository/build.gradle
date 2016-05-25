@@ -1,0 +1,30 @@
+description = 'Repository layer'
+dependencies {
+    compile project(':raildelays-domain')
+    compile group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.1.0.Final'
+    compile group: 'com.atomikos', name: 'transactions-jdbc', version: '3.9.2'
+    compile(group: 'com.atomikos', name: 'transactions-hibernate3', version: '3.9.2') {
+        exclude(module: 'hibernate')
+    }
+    compile(group: 'org.apache.xbean', name: 'xbean-spring', version: '3.16') {
+        exclude(module: 'spring')
+    }
+    compile group: 'org.springframework', name: 'spring-core', version: '4.2.1.RELEASE'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
+    compile group: 'org.springframework', name: 'spring-tx', version: '4.2.1.RELEASE'
+    compile group: 'org.hsqldb', name: 'hsqldb', version: '2.3.3'
+    compile group: 'org.springframework', name: 'spring-jdbc', version: '4.2.1.RELEASE'
+    compile group: 'org.springframework', name: 'spring-orm', version: '4.2.1.RELEASE'
+    compile(group: 'org.springframework.data', name: 'spring-data-jpa', version: '1.9.2.RELEASE') {
+        exclude(module: 'slf4j-api')
+        exclude(module: 'slf4j-log4j12')
+        exclude(module: 'jcl-over-slf4j')
+    }
+    compile group: 'org.hibernate', name: 'hibernate-validator', version: '5.2.1.Final'
+    compile group: 'org.glassfish.web', name: 'javax.el', version: '2.2.4'
+    compile group: 'org.hibernate', name: 'hibernate-validator-cdi', version: '5.2.1.Final'
+    compile group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'
+    compile group: 'org.bgee.log4jdbc-log4j2', name: 'log4jdbc-log4j2-jdbc4.1', version: '1.16'
+    testCompile group: 'org.dbunit', name: 'dbunit', version: '2.4.9'
+    testCompile group: 'com.excilys.ebi.spring-dbunit', name: 'spring-dbunit-test', version: '1.4.0'
+}

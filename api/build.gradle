@@ -1,0 +1,4 @@
+description = 'API'
+dependencies {
+    testCompile group: 'com.github.almex', name: 'pojo-unit', version: '1.1.0'
+}

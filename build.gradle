@@ -1,0 +1,46 @@
+allprojects {
+    apply plugin: 'maven'
+
+    group = 'com.github.almex'
+    version = '2.0.0-SNAPSHOT'
+}
+
+ext {
+    hibernateVersion = '5.1.0.Final'
+}
+
+subprojects {
+    apply plugin: 'java'
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+
+    repositories {
+        mavenLocal()
+
+        maven { url "http://repo.maven.apache.org/maven2" }
+    }
+
+    sourceSets {
+        main {
+            java.srcDirs = ["${buildDir}/generated-sources", "src/main/java"]
+        }
+    }
+
+    configurations.all {
+    }
+
+    dependencies {
+        compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.12'
+        compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.5'
+        compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.5'
+        compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.5'
+        compile group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.5'
+        compile group: 'org.jboss.logging', name: 'jboss-logging', version: '3.3.0.Final'
+        testCompile group: 'junit', name: 'junit', version: '4.12'
+        testCompile group: 'org.hamcrest', name: 'hamcrest-junit', version: '2.0.0.0'
+        testCompile group: 'org.easymock', name: 'easymock', version: '3.4'
+        testCompile group: 'org.springframework', name: 'spring-test', version: '4.2.1.RELEASE'
+        testCompile group: 'org.springframework', name: 'spring-context', version: '4.2.1.RELEASE'
+    }
+}

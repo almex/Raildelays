@@ -1,0 +1,20 @@
+rootProject.name = 'raildelays-parent'
+include ':raildelays-api'
+include ':raildelays-domain'
+include ':raildelays-repository'
+include ':raildelays-scraper'
+include ':raildelays-service'
+include ':raildelays-batch'
+include ':raildelays-java-fx-ui'
+include ':raildelays-server'
+//include ':raildelays-assembly-descriptor'
+
+project(':raildelays-api').projectDir = "$rootDir/api" as File
+project(':raildelays-domain').projectDir = "$rootDir/domain" as File
+project(':raildelays-repository').projectDir = "$rootDir/repository" as File
+project(':raildelays-scraper').projectDir = "$rootDir/scraper" as File
+project(':raildelays-service').projectDir = "$rootDir/service" as File
+project(':raildelays-batch').projectDir = "$rootDir/batch" as File
+project(':raildelays-java-fx-ui').projectDir = "$rootDir/java-fx-ui" as File
+project(':raildelays-server').projectDir = "$rootDir/server" as File
+//project(':raildelays-assembly-descriptor').projectDir = "$rootDir/" as File

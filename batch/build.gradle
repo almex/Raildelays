@@ -1,0 +1,21 @@
+description = 'Batch layer'
+dependencies {
+    compile project(':raildelays-domain')
+    compile project(':raildelays-service')
+    compile project(':raildelays-scraper')
+    compile group: 'org.springframework', name: 'spring-core', version: '4.2.1.RELEASE'
+    compile group: 'org.springframework', name: 'spring-context-support', version: '4.2.1.RELEASE'
+    compile group: 'org.springframework.batch', name: 'spring-batch-core', version: '3.0.6.RELEASE'
+    compile group: 'org.springframework.batch', name: 'spring-batch-infrastructure', version: '3.0.6.RELEASE'
+    compile group: 'com.sun.mail', name: 'javax.mail', version: '1.5.2'
+    compile group: 'org.apache.poi', name: 'poi', version: '3.13'
+    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.13'
+    compile group: 'commons-cli', name: 'commons-cli', version: '1.3.1'
+    compile group: 'commons-io', name: 'commons-io', version: '2.4'
+    compile group: 'org.hsqldb', name: 'hsqldb', version: '2.3.3'
+    runtime group: 'com.lmax', name: 'disruptor', version: '3.3.2'
+    testCompile group: 'org.springframework.batch', name: 'spring-batch-test', version: '3.0.6.RELEASE'
+    testCompile group: 'com.github.almex', name: 'pojo-unit', version: '1.1.0'
+    testCompile group: 'org.dbunit', name: 'dbunit', version: '2.4.9'
+    testCompile group: 'com.excilys.ebi.spring-dbunit', name: 'spring-dbunit-test', version: '1.4.0'
+}
