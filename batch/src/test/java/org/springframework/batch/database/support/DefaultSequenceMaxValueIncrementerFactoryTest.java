@@ -28,7 +28,9 @@ public class DefaultSequenceMaxValueIncrementerFactoryTest {
     @Test
     public void testGetIncrementer() throws Exception {
         for (DatabaseType type : DatabaseType.values()) {
-            Assert.assertNotNull(sequenceMaxValueIncrementerFactory.getIncrementer(type.name(), "bar"));
+            if (type !=  DatabaseType.DB2VSE && type != DatabaseType.DB2AS400) {
+                Assert.assertNotNull(sequenceMaxValueIncrementerFactory.getIncrementer(type.name(), "bar"));
+            }
         }
     }
 
