@@ -6,55 +6,55 @@ import java.time.LocalTime;
  * @author Almex
  * @since 2.0
  */
-public class DelayMatcher<T> implements Matcher<T> {
+public interface DelayMatcher<T> extends Matcher<T> {
 
-    public static OperatorMatcher<Long> is(OperatorMatcher<Long> matcher) {
+    static OperatorMatcher<Long> is(OperatorMatcher<Long> matcher) {
         return matcher;
     }
 
-    public static OperatorMatcher<Long> is(Long value) {
+    static OperatorMatcher<Long> is(Long value) {
         return is(equalsTo(value));
     }
 
-    public static OperatorMatcher<Long> equalsTo(Long value) {
+    static OperatorMatcher<Long> equalsTo(Long value) {
         return OperatorMatcher.operator(Operator.EQUAL, ValueMatcher.value(value));
     }
 
-    public static OperatorMatcher<Long> zero() {
+    static OperatorMatcher<Long> zero() {
         return OperatorMatcher.operator(Operator.EQUAL, ValueMatcher.value(0L));
     }
 
-    public static OperatorMatcher<Long> greaterThan(Long value) {
+    static OperatorMatcher<Long> greaterThan(Long value) {
         return OperatorMatcher.operator(Operator.GREATER, ValueMatcher.value(value));
     }
 
-    public static OperatorMatcher<Long> greaterThanOrEqual(Long value) {
+    static OperatorMatcher<Long> greaterThanOrEqual(Long value) {
         return OperatorMatcher.operator(Operator.GREATER_OR_EQUAL, ValueMatcher.value(value));
     }
 
-    public static OperatorMatcher<Long> after() {
+    static OperatorMatcher<Long> after() {
         return greaterThan(0L);
     }
 
-    public static OperatorMatcher<Long> lessThan(Long value) {
+    static OperatorMatcher<Long> lessThan(Long value) {
         return OperatorMatcher.operator(Operator.LESS, ValueMatcher.value(value));
     }
-    public static OperatorMatcher<Long> lessThanOrEqual(Long value) {
+    static OperatorMatcher<Long> lessThanOrEqual(Long value) {
         return OperatorMatcher.operator(Operator.LESS_OR_EQUAL, ValueMatcher.value(value));
     }
 
-    public static OperatorMatcher<Long> before() {
+    static OperatorMatcher<Long> before() {
         return lessThan(0L);
     }
 
-    public static boolean difference(OrderingComparison comparison,
+    static boolean difference(OrderingComparison comparison,
                                      OperatorMatcher<Long> matcher) {
         comparison.setOperator(matcher.getOperator());
 
         return comparison.match(matcher.getValueMatcher().getValue());
     }
 
-    public static boolean duration(OrderingComparison comparison,
+    static boolean duration(OrderingComparison comparison,
                                    OperatorMatcher<Long> matcher) {
         // A duration is the opposite of a difference
         return difference(comparison, opposite(matcher));
@@ -70,7 +70,7 @@ public class DelayMatcher<T> implements Matcher<T> {
      * @throws UnsupportedOperationException if the {@link OperatorMatcher#operator} is not supported by this
      * implementation.
      */
-    private static OperatorMatcher<Long> opposite(OperatorMatcher<Long> matcher) {
+    static OperatorMatcher<Long> opposite(OperatorMatcher<Long> matcher) {
         Operator operator = matcher.getOperator();
         ValueMatcher<Long> valueMatcher = ValueMatcher.value(-matcher.getValueMatcher().getValue());
 
@@ -97,25 +97,24 @@ public class DelayMatcher<T> implements Matcher<T> {
         return OperatorMatcher.operator(operator, valueMatcher);
     }
 
-    public static OrderingComparison between(TimeDelay from) {
+    static OrderingComparison between(TimeDelay from) {
         return new OrderingComparison(from);
     }
 
-    public static OrderingComparison between(LocalTime from) {
+    static OrderingComparison between(LocalTime from) {
         return new OrderingComparison(TimeDelay.of(from));
     }
 
     @Override
-    public boolean match(T object) {
+    default boolean match(T object) {
         return false;
     }
-
 
     enum Operator {
         GREATER, LESS, EQUAL, GREATER_OR_EQUAL, LESS_OR_EQUAL
     }
 
-    public static class OrderingComparison implements Matcher<Long> {
+    class OrderingComparison implements Matcher<Long> {
 
         private TimeDelay from;
         private TimeDelay to;
@@ -171,7 +170,7 @@ public class DelayMatcher<T> implements Matcher<T> {
         }
     }
 
-    private static class ValueMatcher<V> implements Matcher<V> {
+    class ValueMatcher<V> implements Matcher<V> {
 
         private V value;
 
@@ -205,7 +204,7 @@ public class DelayMatcher<T> implements Matcher<T> {
         }
     }
 
-    private static class OperatorMatcher<V> implements Matcher<Operator> {
+    class OperatorMatcher<V> implements Matcher<Operator> {
 
         private Operator operator;
         private ValueMatcher<V> valueMatcher;

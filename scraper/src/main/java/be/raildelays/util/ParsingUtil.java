@@ -37,8 +37,6 @@ import java.time.format.DateTimeFormatter;
 public final class ParsingUtil {
 
     public static final String DATE_FORMAT = "dd/MM/yyyy";
-    public static final String TIME_FORMAT = "HH:mm";
-    public static final String TIMESTAMP_FORMAT = DATE_FORMAT + TIME_FORMAT;
     /**
      * Default constructor.
      */
@@ -46,27 +44,7 @@ public final class ParsingUtil {
         // No instantiation is possible.
     }
 
-    public static LocalDateTime parseTimestamp(String value) {
-        return LocalDateTime.parse(value, DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT));
-    }
-
-    public static LocalTime parseTime(String value) {
-        return LocalTime.parse(value, DateTimeFormatter.ofPattern(TIME_FORMAT));
-    }
-
     public static LocalDate parseDate(String value) {
         return LocalDate.parse(value, DateTimeFormatter.ofPattern(DATE_FORMAT));
-    }
-
-    public static String formatTimestamp(LocalDateTime value) {
-        return value.format(DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT));
-    }
-
-    public static String formatTime(LocalTime value) {
-        return value.format(DateTimeFormatter.ofPattern(TIME_FORMAT));
-    }
-
-    public static String formatDate(LocalDate value) {
-        return value.format(DateTimeFormatter.ofPattern(DATE_FORMAT));
     }
 }
