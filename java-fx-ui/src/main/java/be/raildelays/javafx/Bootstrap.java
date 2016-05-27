@@ -36,6 +36,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.step.job.JobParametersExtractor;
@@ -75,6 +76,15 @@ public class Bootstrap extends Application {
     @Override
     public void init() throws Exception {
         FXMLLoader rootLoader = new FXMLLoader(getClass().getResource("/fxml/batch/index.fxml"));
+        applicationContext = initApplicationContext();
+
+        rootLoader.setControllerFactory(new BatchControllerFactory(applicationContext));
+        root = rootLoader.load();
+
+        Platform.runLater(() -> scene = new Scene(root, 640, 480));
+    }
+
+    public static ClassPathXmlApplicationContext initApplicationContext() {
         final String[] contextPaths = new String[]{
                 "/spring/bootstrap-fx-context.xml",
                 "/jobs/main-job-context.xml",
@@ -82,47 +92,56 @@ public class Bootstrap extends Application {
                 "/jobs/steps/handle-more-than-one-hour-delays-job-context.xml",
                 "/jobs/steps/load-gtfs-into-database-job-context.xml"
         };
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext(contextPaths);
 
-        applicationContext = new ClassPathXmlApplicationContext(contextPaths);
+
         applicationContext.registerShutdownHook(); // Register close of this Spring context to shutdown of the JVM
         applicationContext.start();
 
-        rootLoader.setControllerFactory(this::getController);
-        root = rootLoader.load();
-
-        Platform.runLater(() -> scene = new Scene(root, 640, 480));
+        return applicationContext;
     }
 
-    private BatchController getController(Class<?> clazz) {
-        BatchScheduledService scheduledService = new BatchScheduledService();
-        JobParametersExtractor propertiesExtractor = applicationContext.getBean(
-                "jobParametersFromPropertiesExtractor", JobParametersExtractor.class
-        );
+    public static class BatchControllerFactory implements Callback<Class<?>, Object> {
 
-        scheduledService.setService(
-                applicationContext.getBean("batchStartAndRecoveryService", BatchStartAndRecoveryService.class)
-        );
+        private ClassPathXmlApplicationContext applicationContext;
 
-        if (clazz.isAssignableFrom(BatchIndexController.class)) {
-            controller = new BatchIndexController();
-        } else if (clazz.isAssignableFrom(MainBatchController.class)) {
-            controller = new MainBatchController();
-        } else if (clazz.isAssignableFrom(HandleOneHourDelayBatchController.class)) {
-            controller = new HandleOneHourDelayBatchController();
-        } else if (clazz.isAssignableFrom(HandleMaxMonthsBatchController.class)) {
-            controller = new HandleMaxMonthsBatchController();
-        } else if (clazz.isAssignableFrom(DownloadListOfTrainsBatchController.class)) {
-            controller = new DownloadListOfTrainsBatchController();
+        public BatchControllerFactory(ClassPathXmlApplicationContext applicationContext) {
+            this.applicationContext = applicationContext;
         }
 
-        if (controller != null) {
-            controller.setService(scheduledService);
-            controller.setPropertiesExtractor(propertiesExtractor);
+        @Override
+        public Object call(Class<?> clazz) {
+            BatchController controller = null;
+            BatchScheduledService scheduledService = new BatchScheduledService();
+            JobParametersExtractor propertiesExtractor = applicationContext.getBean(
+                    "jobParametersFromPropertiesExtractor", JobParametersExtractor.class
+            );
+
+            scheduledService.setService(
+                    applicationContext.getBean("batchStartAndRecoveryService", BatchStartAndRecoveryService.class)
+            );
+
+            if (clazz.isAssignableFrom(BatchIndexController.class)) {
+                controller = new BatchIndexController();
+            } else if (clazz.isAssignableFrom(MainBatchController.class)) {
+                controller = new MainBatchController();
+            } else if (clazz.isAssignableFrom(HandleOneHourDelayBatchController.class)) {
+                controller = new HandleOneHourDelayBatchController();
+            } else if (clazz.isAssignableFrom(HandleMaxMonthsBatchController.class)) {
+                controller = new HandleMaxMonthsBatchController();
+            } else if (clazz.isAssignableFrom(DownloadListOfTrainsBatchController.class)) {
+                controller = new DownloadListOfTrainsBatchController();
+            }
+
+            if (controller != null) {
+                controller.setService(scheduledService);
+                controller.setPropertiesExtractor(propertiesExtractor);
+            }
+
+            LOGGER.info("The factory built a controller.");
+
+            return controller;
         }
-
-        LOGGER.info("The factory built a controller.");
-
-        return controller;
     }
 
     private void doStart(Stage primaryStage) throws IOException {
@@ -140,6 +159,10 @@ public class Bootstrap extends Application {
     public void stop() throws Exception {
         if (controller != null) {
             controller.destroy();
+        }
+        if (applicationContext != null) {
+            applicationContext.stop();
+            applicationContext.close();
         }
         super.stop();
     }
