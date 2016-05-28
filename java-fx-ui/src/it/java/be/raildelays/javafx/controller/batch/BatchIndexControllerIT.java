@@ -44,10 +44,18 @@ public class BatchIndexControllerIT {
         controller.setPropertiesExtractor(extractor);
     }
 
+    /**
+     * We expect that when loading all the Spring Context that the main Controller can be loaded without any error.
+     * We wait 500ms then we destroy it.
+     */
     @Test
     public void testInitialize() throws Exception {
         rootLoader = new FXMLLoader(getClass().getResource("/fxml/batch/index.fxml"));
         rootLoader.setControllerFactory(new Bootstrap.BatchControllerFactory(Bootstrap.initApplicationContext()));
         rootLoader.load();
+
+        Thread.sleep(500);
+
+        controller.destroy();
     }
 }

@@ -74,9 +74,18 @@ public class BatchIndexController implements BatchController, Initializable {
 
     @Override
     public void destroy() {
-        mainJobController.destroy();
-        handleOneHourDelayJobController.destroy();
-        handleMaxMonthsJobController.destroy();
+        if (mainJobController != null) {
+            mainJobController.destroy();
+        }
+        if (handleMaxMonthsJobController != null) {
+            handleMaxMonthsJobController.destroy();
+        }
+        if (handleOneHourDelayJobController != null) {
+            handleOneHourDelayJobController.destroy();
+        }
+        if (downloadListOfTrainsBatchController != null) {
+            downloadListOfTrainsBatchController.destroy();
+        }
     }
 
     @Override
