@@ -39,17 +39,17 @@ import org.springframework.beans.factory.InitializingBean;
  */
 public class FilterCanceledItemsProcessor implements ItemProcessor<BatchExcelRow, BatchExcelRow> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("Thr", FilterCanceledItemsProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("Can", FilterCanceledItemsProcessor.class);
 
     @Override
     public BatchExcelRow process(final BatchExcelRow item) throws Exception {
-        BatchExcelRow result = null;
+        BatchExcelRow result = item;
 
         LOGGER.trace("item", item);
 
-        if (!item.isCanceled()) {
-            LOGGER.debug("not_cancelled", item);
-            result = item;
+        if (item.isCanceled()) {
+            LOGGER.debug("cancelled", item);
+            result = null;
         }
 
         LOGGER.trace("result", result);

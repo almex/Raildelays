@@ -230,6 +230,9 @@
         <logger name="be.raildelays.batch.processor.AggregateExpectedTimeProcessor" level="trace" additivity="false">
             <appender-ref ref="step2Processor"/>
         </logger>
+        <logger name="be.raildelays.batch.processor.FilterCanceledItemsProcessor" level="trace" additivity="false">
+            <appender-ref ref="step2Processor"/>
+        </logger>
         <logger name="be.raildelays.batch.processor.StoreDelayGreaterThanThresholdInContextProcessor" level="trace"
                 additivity="false">
             <appender-ref ref="step2Processor"/>
@@ -269,8 +272,8 @@
             <appender-ref ref="jdbc"/>
         </logger-->
 
-        <root level="debug">
-            <appender-ref ref="console"/>
+        <root level="error">
+            <appender-ref ref="error"/>
         </root>
     </loggers>
 </configuration>
