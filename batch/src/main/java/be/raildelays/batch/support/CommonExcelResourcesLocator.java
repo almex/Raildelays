@@ -34,6 +34,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Compare source and destination folder content and return a list of common resources.
@@ -41,33 +42,30 @@ import java.util.List;
  * @author Almex
  * @since 1.2
  */
-public class ToDeleteExcelResourcesLocator {
+public class CommonExcelResourcesLocator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ToDeleteExcelResourcesLocator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommonExcelResourcesLocator.class);
 
     public static Resource[] getResources(Resource source, Resource destination) throws IOException {
         List<Resource> resourceList = new ArrayList<>();
         Path sourcePath = source.getFile().toPath();
         Path destinationPath = destination.getFile().toPath();
 
-        if (Files.notExists(destinationPath)) {
-            Files.createDirectories(destinationPath);
+        try (Stream<Path> stream1 = Files.list(sourcePath)) {
+            stream1.filter(path1 -> {
+                boolean result = false;
+
+                try (Stream<Path> stream2 = Files.list(destinationPath)) {
+                    result = stream2
+                            .filter(path2 -> path2.getFileName() != null)
+                            .anyMatch(path2 -> path2.getFileName().equals(path1.getFileName()));
+                } catch (IOException e) {
+                    LOGGER.error("Cannot list this directory", e);
+                }
+
+                return result;
+            }).forEach(path -> resourceList.add(new FileSystemResource(path.toFile())));
         }
-
-        Files.list(sourcePath)
-                .filter(path1 -> {
-                    boolean result = false;
-
-                    try {
-                        result = Files.list(destinationPath)
-                                .filter(path2 -> path2.getFileName() != null)
-                                .anyMatch(path2 -> path2.getFileName().equals(path1.getFileName()));
-                    } catch (IOException e) {
-                        LOGGER.error("Cannot list this directory", e);
-                    }
-
-                    return result;
-                }).forEach(path -> resourceList.add(new FileSystemResource(path.toFile())));
 
         return resourceList.toArray(new Resource[resourceList.size()]);
     }

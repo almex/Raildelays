@@ -194,6 +194,7 @@
                 <ref bean="validatorProcessor"/>
                 <ref bean="searchNextTrainProcessor"/>
                 <ref bean="validatorProcessor"/>
+                <ref bean="filterCanceledItemsProcessor"/>
                 <ref bean="filterTwoSensPerDayXlsProcessor"/>
                 <ref bean="filterSmallDelaysProcessor"/>
                 <!--ref bean="storeInContextMoreThanOneHourDelayProcessor"/-->
@@ -228,6 +229,10 @@
         <property name="language" value="#{jobParameters['language']}"/>
         <property name="outputReader" ref="readAllExcelFiles"/>
     </bean>
+
+    <bean id="filterCanceledItemsProcessor"
+          class="be.raildelays.batch.processor.FilterCanceledItemsProcessor"
+          scope="step"/>
 
     <bean id="filterSmallDelaysProcessor"
           class="be.raildelays.batch.processor.FilterSmallDelaysProcessor">

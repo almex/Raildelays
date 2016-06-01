@@ -288,7 +288,7 @@
           class="be.raildelays.batch.tasklet.DeleteFileTasklet"
           scope="step">
         <property name="resources">
-            <bean class="be.raildelays.batch.support.ToDeleteExcelResourcesLocator" factory-method="getResources">
+            <bean class="be.raildelays.batch.support.CommonExcelResourcesLocator" factory-method="getResources">
                 <constructor-arg value="file:#{jobParameters['excel.output.path']}"/>
                 <constructor-arg
                         value="file:#{jobParameters['excel.archive.path']}/#{T(java.time.LocalDate).now().toString()}/"/>

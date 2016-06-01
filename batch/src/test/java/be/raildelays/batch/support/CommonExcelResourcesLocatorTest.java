@@ -17,9 +17,9 @@ import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 /**
- * Created by xbmc on 16-04-15.
+ * @author Almex
  */
-public class ToDeleteExcelResourcesLocatorTest {
+public class CommonExcelResourcesLocatorTest {
 
     private static Path TARGET_PATH; // Should be ./target/
 
@@ -29,7 +29,7 @@ public class ToDeleteExcelResourcesLocatorTest {
 
     private static Path[] PATHS;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ToDeleteExcelResourcesLocator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommonExcelResourcesLocator.class);
 
     @Before
     public void setUp() throws Exception {
@@ -57,7 +57,7 @@ public class ToDeleteExcelResourcesLocatorTest {
         Assert.assertEquals(3, Files.list(SOURCE_PATH).count());
         Assert.assertEquals(4, Files.list(DESTINATION_PATH).count());
 
-        Resource[] result = ToDeleteExcelResourcesLocator.getResources(new FileSystemResource(SOURCE_PATH.toFile()),
+        Resource[] result = CommonExcelResourcesLocator.getResources(new FileSystemResource(SOURCE_PATH.toFile()),
                 new FileSystemResource(DESTINATION_PATH.toFile()));
 
         Assert.assertEquals(2, result.length);
@@ -66,7 +66,7 @@ public class ToDeleteExcelResourcesLocatorTest {
     @Test(expected = AssertionError.class)
     @Ignore
     public void testAssertion() throws IOException {
-        ToDeleteExcelResourcesLocator.getResources(new FileSystemResource(PATHS[0].toFile()),
+        CommonExcelResourcesLocator.getResources(new FileSystemResource(PATHS[0].toFile()),
                 new FileSystemResource(DESTINATION_PATH.toFile()));
     }
 
