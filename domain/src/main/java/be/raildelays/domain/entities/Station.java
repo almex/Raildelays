@@ -25,7 +25,6 @@
 package be.raildelays.domain.entities;
 
 import be.raildelays.domain.Language;
-import be.raildelays.location.Location;
 
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
@@ -43,7 +42,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "STATION")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public class Station extends I18nEntity implements Location {
+public class Station extends I18nEntity {
 
     private static final long serialVersionUID = -3436298381031779337L;
 
@@ -74,7 +73,6 @@ public class Station extends I18nEntity implements Location {
                 .append(" }").toString();
     }
 
-    @Override
     public String getName() {
         return getEnglishName();
     }

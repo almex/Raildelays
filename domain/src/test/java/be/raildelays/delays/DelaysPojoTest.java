@@ -24,6 +24,7 @@
 
 package be.raildelays.delays;
 
+import be.raildelays.delays.TimeDelay;
 import com.github.almex.pojounit.AbstractObjectTest;
 import org.junit.experimental.theories.DataPoint;
 

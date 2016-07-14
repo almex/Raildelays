@@ -24,8 +24,6 @@
 
 package be.raildelays.domain.entities;
 
-import be.raildelays.vehicule.Train;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
@@ -48,7 +46,7 @@ import static java.util.Comparator.*;
         uniqueConstraints = @UniqueConstraint(columnNames = {"ROUTE_ID"}, name = "TrainLineUniqueBusinessKeyConstraint")
 )
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public class TrainLine extends AbstractEntity implements Train, Comparable<TrainLine> {
+public class TrainLine extends AbstractEntity implements Comparable<TrainLine> {
 
     private static final long serialVersionUID = -1527666012499664304L;
 
@@ -180,13 +178,7 @@ public class TrainLine extends AbstractEntity implements Train, Comparable<Train
         return routeId;
     }
 
-    @Override
     public String getName() {
         return "" + getRouteId();
-    }
-
-    @Override
-    public Long getLineId() {
-        return getRouteId();
     }
 }

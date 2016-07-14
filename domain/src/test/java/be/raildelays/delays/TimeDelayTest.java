@@ -1,5 +1,7 @@
 package be.raildelays.delays;
 
+import be.raildelays.delays.Delays;
+import be.raildelays.delays.TimeDelay;
 import org.junit.Assert;
 import org.junit.Test;
 

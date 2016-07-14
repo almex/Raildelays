@@ -27,6 +27,7 @@ package be.raildelays.batch.skip;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import javax.persistence.PersistenceException;
 import java.sql.SQLIntegrityConstraintViolationException;
@@ -55,10 +56,8 @@ public class SkipUniqueKeyViolationPolicy implements SkipPolicy {
     public boolean shouldSkip(Throwable t, int skipCount) throws SkipLimitExceededException {
         boolean result = false;
 
-        if (skipCount < 0) {
+        if (skipCount < 0 || isExpectedViolation(t)) {
             result = true; // We gracefully skip in case where the caller of this method gives us skipCount<0
-        } else if (isExpectedViolation(t)) {
-            result = true;
         }
 
         return result;
@@ -75,7 +74,8 @@ public class SkipUniqueKeyViolationPolicy implements SkipPolicy {
         } else if (e instanceof SQLIntegrityConstraintViolationException) {
             // We must ignore accent (we use Local.ENGLISH for that) and case
             violated = matchAnyViolationNames(e.getMessage().toUpperCase(Locale.ENGLISH)::contains);
-        } else if (e instanceof PersistenceException && e.getCause() != null) {
+        } else if (e instanceof PersistenceException && e.getCause() != null ||
+                e instanceof DataIntegrityViolationException) {
             /**
              * We are in the case where Hibernate encapsulate the Exception into a PersistenceException.
              * Then we must check recursively into causes.

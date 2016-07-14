@@ -1,5 +1,6 @@
 package be.raildelays.delays;
 
+import javax.persistence.Embeddable;
 import java.io.Serializable;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
@@ -23,6 +24,7 @@ import java.util.Objects;
  * {@link #compareTo(TimeDelay)} return {@code true}.
  * </p>
  */
+@Embeddable
 public final class TimeDelay implements Serializable, Comparable<TimeDelay> {
 
     private static final long DEFAULT_DELAY = 0L;

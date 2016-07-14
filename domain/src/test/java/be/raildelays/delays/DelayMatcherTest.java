@@ -1,6 +1,6 @@
 package be.raildelays.delays;
 
-import javafx.beans.binding.Bindings;
+import be.raildelays.delays.TimeDelay;
 import org.junit.Assert;
 import org.junit.Test;
 

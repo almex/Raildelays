@@ -1,5 +1,4 @@
 rootProject.name = 'raildelays-parent'
-include ':raildelays-api'
 include ':raildelays-domain'
 include ':raildelays-repository'
 include ':raildelays-scraper'
@@ -9,7 +8,6 @@ include ':raildelays-java-fx-ui'
 include ':raildelays-server'
 //include ':raildelays-assembly-descriptor'
 
-project(':raildelays-api').projectDir = "$rootDir/api" as File
 project(':raildelays-domain').projectDir = "$rootDir/domain" as File
 project(':raildelays-repository').projectDir = "$rootDir/repository" as File
 project(':raildelays-scraper').projectDir = "$rootDir/scraper" as File
