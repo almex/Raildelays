@@ -13,10 +13,10 @@
     <dependencies>
 
         <!-- Raildelays modules -->
-        <dependency>
+        <!--dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>raildelays-api</artifactId>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>pojo-unit</artifactId>
