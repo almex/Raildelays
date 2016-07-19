@@ -4,7 +4,7 @@ import be.raildelays.batch.service.BatchStartAndRecoveryService;
 import be.raildelays.javafx.Bootstrap;
 import be.raildelays.javafx.service.BatchScheduledService;
 import be.raildelays.javafx.test.JavaFXThreadingRule;
-import be.raildelays.test.GraphicalTest;
+import be.raildelays.javafx.test.GraphicalTest;
 import javafx.fxml.FXMLLoader;
 import org.junit.Before;
 import org.junit.Rule;

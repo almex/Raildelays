@@ -1,4 +1,4 @@
-package be.raildelays.test;
+package be.raildelays.javafx.test;
 
 /**
  * @author Almex
