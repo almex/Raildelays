@@ -16,7 +16,6 @@
 
         <!-- Add mapping to our Value Objects from our Raildelays API
          to use them in our JPA entities-->
-        <mapping-file>META-INF/orm.xml</mapping-file>
         <class>be.raildelays.domain.entities.LineStop</class>
         <class>be.raildelays.domain.entities.Station</class>
         <class>be.raildelays.domain.entities.TrainLine</class>
